@@ -15,9 +15,47 @@ services:
     command: npm run dev
     networks:
       - 2025_trip_explorer
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    container_name: 2025_trip_explorer-backend
+    volumes:
+      - ./backend:/app
+      - node-modules-backend:/app/node_modules
+    ports:
+      - "3001:3001"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=trip_explorer
+      - POSTGRES_HOST=postgres
+    command: npm run dev
+    networks:
+      - 2025_trip_explorer
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: 2025_trip_explorer-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=trip_explorer
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./backend/src/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - 2025_trip_explorer
 
 networks:
   2025_trip_explorer:
 
 volumes:
   node-modules-trip-explorer:
+  node-modules-backend:
+  postgres-data:

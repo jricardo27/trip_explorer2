@@ -7,7 +7,7 @@ interface TabListProps {
   tabs: string[]
   selectedTab: string
   handleTabChange: (event: React.SyntheticEvent, newValue: string) => void
-  handleTabContextMenu: (event: React.MouseEvent, tab: string) => void
+  handleTabContextMenu: (event: React.MouseEvent | React.TouchEvent, tab: string) => void
 }
 
 export const NULL_TAB = "--NULL-TAB--"

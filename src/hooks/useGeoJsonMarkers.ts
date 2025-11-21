@@ -21,7 +21,14 @@ const useGeoJsonMarkers = (filenames: string[]): GeoJsonDataMap => {
         }
 
         const promises = filenames.map(async (filename): Promise<[string, GeoJsonCollection]> => {
-          const response = await axios.get<GeoJsonCollection>(filename, params)
+          // Remove leading slash if present for the query param
+          const pathParam = filename.startsWith("/") ? filename : "/" + filename
+          const response = await axios.get<GeoJsonCollection>("/api/markers", {
+            params: {
+              ...params.params,
+              path: pathParam,
+            },
+          })
 
           if (typeof response.data == "string") {
             throw new Error(`Error requesting ${filename}, ensure that the path is valid.`)
