@@ -122,6 +122,10 @@ app.put("/api/features", async (req, res) => {
   }
 })
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`)
-})
+export { app }
+
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`)
+  })
+}
