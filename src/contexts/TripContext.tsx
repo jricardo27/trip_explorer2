@@ -18,14 +18,32 @@ export interface Trip {
   days?: TripDay[]
 }
 
+export interface DayLocation {
+  id: string
+  trip_day_id: string
+  country: string
+  country_code?: string
+  city?: string
+  town?: string
+  latitude?: number
+  longitude?: number
+  visit_order: number
+  notes?: string
+  created_at: string
+}
+
 interface TripContextType {
   trips: Trip[]
   currentTrip: Trip | null
   dayFeatures: Record<string, unknown[]>
+  dayLocations: Record<string, DayLocation[]>
   loading: boolean
   fetchTrips: () => Promise<void>
   fetchTripDetails: (id: string) => Promise<void>
   fetchDayFeatures: (dayId: string) => Promise<void>
+  fetchDayLocations: (dayId: string) => Promise<void>
+  addLocationToDay: (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => Promise<void>
+  deleteLocation: (locationId: string, dayId: string) => Promise<void>
   addFeatureToDay: (dayId: string, feature: unknown) => Promise<void>
   createTrip: (name: string, startDate: string, endDate: string) => Promise<void>
   deleteTrip: (id: string) => Promise<void>
@@ -38,6 +56,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [trips, setTrips] = useState<Trip[]>([])
   const [currentTrip, setCurrentTrip] = useState<Trip | null>(null)
   const [dayFeatures, setDayFeatures] = useState<Record<string, unknown[]>>({})
+  const [dayLocations, setDayLocations] = useState<Record<string, DayLocation[]>>({})
   const [loading, setLoading] = useState(false)
 
   const { userId } = useContext(SavedFeaturesContext)!
@@ -150,6 +169,48 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
+  const fetchDayLocations = useCallback(async (dayId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/locations`)
+      if (response.ok) {
+        const data = await response.json()
+        setDayLocations((prev) => ({ ...prev, [dayId]: data }))
+      }
+    } catch (error) {
+      console.error("Failed to fetch day locations:", error)
+    }
+  }, [API_URL])
+
+  const addLocationToDay = async (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => {
+    try {
+      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/locations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(location),
+      })
+      if (response.ok) {
+        await fetchDayLocations(dayId)
+      }
+    } catch (error) {
+      console.error("Failed to add location to day:", error)
+      throw error
+    }
+  }
+
+  const deleteLocation = async (locationId: string, dayId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/api/day-locations/${locationId}`, {
+        method: "DELETE",
+      })
+      if (response.ok) {
+        await fetchDayLocations(dayId)
+      }
+    } catch (error) {
+      console.error("Failed to delete location:", error)
+      throw error
+    }
+  }
+
   useEffect(() => {
     fetchTrips()
   }, [fetchTrips])
@@ -160,10 +221,14 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         trips,
         currentTrip,
         dayFeatures,
+        dayLocations,
         loading,
         fetchTrips,
         fetchTripDetails,
         fetchDayFeatures,
+        fetchDayLocations,
+        addLocationToDay,
+        deleteLocation,
         addFeatureToDay,
         createTrip,
         deleteTrip,

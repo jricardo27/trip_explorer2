@@ -15,12 +15,13 @@ import {
   IconButton,
 } from "@mui/material"
 import React, { useState, useContext, useCallback, useEffect, useMemo } from "react"
-import { MdContentCopy, MdDelete, MdArrowBack, MdAdd } from "react-icons/md"
+import { MdContentCopy, MdDelete, MdArrowBack, MdAdd, MdLocationOn } from "react-icons/md"
 
 import SavedFeaturesContext, { DEFAULT_CATEGORY } from "../../contexts/SavedFeaturesContext"
-import { useTripContext } from "../../contexts/TripContext"
+import { useTripContext, DayLocation } from "../../contexts/TripContext"
 import { AuthModal } from "../Auth/AuthModal"
 import { AddFeatureModal } from "../Trips/AddFeatureModal"
+import { AddLocationModal } from "../Trips/AddLocationModal"
 import { CreateTripModal } from "../Trips/CreateTripModal"
 
 import { CategoryContextMenu } from "./ContextMenu/CategoryContextMenu"
@@ -50,8 +51,22 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, o
   const [viewMode, setViewMode] = useState<"lists" | "trips">("lists")
   const [isCreateTripModalOpen, setIsCreateTripModalOpen] = useState(false)
   const [selectedDayForFeature, setSelectedDayForFeature] = useState<{ id: string; date: string } | null>(null)
+  const [selectedDayForLocation, setSelectedDayForLocation] = useState<{ id: string; date: string } | null>(null)
 
-  const { trips, currentTrip, dayFeatures, fetchTripDetails, deleteTrip, setCurrentTrip, fetchDayFeatures, addFeatureToDay } = useTripContext()
+  const {
+    trips,
+    currentTrip,
+    dayFeatures,
+    dayLocations,
+    fetchTripDetails,
+    deleteTrip,
+    setCurrentTrip,
+    fetchDayFeatures,
+    fetchDayLocations,
+    addFeatureToDay,
+    addLocationToDay,
+    deleteLocation,
+  } = useTripContext()
 
   const { savedFeatures, setSavedFeatures, removeFeature, userId, setUserId, email, logout } = useContext(SavedFeaturesContext)!
   const { selectedFeature, setSelectedFeature } = useFeatureSelection()
@@ -98,9 +113,10 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, o
     if (currentTrip?.days) {
       currentTrip.days.forEach((day) => {
         fetchDayFeatures(day.id)
+        fetchDayLocations(day.id)
       })
     }
-  }, [currentTrip, fetchDayFeatures])
+  }, [currentTrip, fetchDayFeatures, fetchDayLocations])
 
   const handleAddFeature = async (feature: unknown) => {
     if (selectedDayForFeature) {
@@ -108,6 +124,16 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, o
         await addFeatureToDay(selectedDayForFeature.id, feature)
       } catch (error) {
         console.error("Failed to add feature:", error)
+      }
+    }
+  }
+
+  const handleAddLocation = async (location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => {
+    if (selectedDayForLocation) {
+      try {
+        await addLocationToDay(selectedDayForLocation.id, location)
+      } catch (error) {
+        console.error("Failed to add location:", error)
       }
     }
   }
@@ -200,17 +226,59 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, o
                                 <Typography variant="subtitle2">
                                   Day {day.day_index + 1} - {new Date(day.date).toLocaleDateString()}
                                 </Typography>
-                                <Button
-                                  size="small"
-                                  startIcon={<MdAdd />}
-                                  onClick={() => {
-                                    setSelectedDayForFeature({ id: day.id, date: new Date(day.date).toLocaleDateString() })
-                                  }}
-                                >
-                                  Add Feature
-                                </Button>
+                                <Box>
+                                  <Button
+                                    size="small"
+                                    startIcon={<MdLocationOn />}
+                                    onClick={() => {
+                                      setSelectedDayForLocation({ id: day.id, date: new Date(day.date).toLocaleDateString() })
+                                    }}
+                                    sx={{ mr: 1 }}
+                                  >
+                                    Add Loc
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    startIcon={<MdAdd />}
+                                    onClick={() => {
+                                      setSelectedDayForFeature({ id: day.id, date: new Date(day.date).toLocaleDateString() })
+                                    }}
+                                  >
+                                    Add Feat
+                                  </Button>
+                                </Box>
                               </Box>
                               <Box sx={{ p: 1 }}>
+                                {/* Locations Section */}
+                                {dayLocations[day.id] && dayLocations[day.id].length > 0 && (
+                                  <Box sx={{ mb: 2 }}>
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
+                                      Locations
+                                    </Typography>
+                                    <List dense>
+                                      {dayLocations[day.id].map((location) => (
+                                        <ListItem
+                                          key={location.id}
+                                          sx={{ pl: 0 }}
+                                          secondaryAction={(
+                                            <IconButton edge="end" size="small" onClick={() => deleteLocation(location.id, day.id)}>
+                                              <MdDelete fontSize="small" />
+                                            </IconButton>
+                                          )}
+                                        >
+                                          <ListItemText
+                                            primary={`${location.city || location.town || "Unknown"}, ${location.country}`}
+                                            secondary={location.notes}
+                                          />
+                                        </ListItem>
+                                      ))}
+                                    </List>
+                                  </Box>
+                                )}
+
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: "bold", textTransform: "uppercase" }}>
+                                  Features
+                                </Typography>
                                 {features.length === 0 ? (
                                   <Typography variant="body2" color="text.secondary">
                                     No features added yet.
@@ -394,6 +462,12 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, o
           onClose={() => setSelectedDayForFeature(null)}
           onAddFeature={handleAddFeature}
           dayDate={selectedDayForFeature?.date || ""}
+        />
+        <AddLocationModal
+          open={!!selectedDayForLocation}
+          onClose={() => setSelectedDayForLocation(null)}
+          onAddLocation={handleAddLocation}
+          dayDate={selectedDayForLocation?.date || ""}
         />
       </FeatureDragContext>
     </>
