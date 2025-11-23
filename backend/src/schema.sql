@@ -54,3 +54,49 @@ CREATE TABLE IF NOT EXISTS trip_days (
 
 ALTER TABLE saved_features
 ADD COLUMN IF NOT EXISTS trip_day_id UUID REFERENCES trip_days (id) ON DELETE SET NULL;
+
+-- Cities table for geographic data and autocomplete
+CREATE TABLE IF NOT EXISTS cities (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    ascii_name VARCHAR(200),
+    country_code CHAR(2) NOT NULL,
+    country_name VARCHAR(100),
+    admin1_code VARCHAR(20),
+    admin1_name VARCHAR(100),
+    population INTEGER,
+    latitude DECIMAL(10, 7) NOT NULL,
+    longitude DECIMAL(10, 7) NOT NULL,
+    location_coords GEOMETRY (Point, 4326),
+    feature_class CHAR(1),
+    feature_code VARCHAR(10),
+    created_at TIMESTAMP DEFAULT NOW ()
+);
+
+CREATE INDEX IF NOT EXISTS idx_cities_name ON cities (name);
+
+CREATE INDEX IF NOT EXISTS idx_cities_country ON cities (country_code);
+
+CREATE INDEX IF NOT EXISTS idx_cities_coords ON cities USING GIST (location_coords);
+
+CREATE INDEX IF NOT EXISTS idx_cities_search ON cities (name, country_name);
+
+-- Day locations table for multi-location trip days
+CREATE TABLE IF NOT EXISTS day_locations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    trip_day_id UUID NOT NULL REFERENCES trip_days (id) ON DELETE CASCADE,
+    country VARCHAR(100) NOT NULL,
+    country_code CHAR(2),
+    city VARCHAR(100),
+    town VARCHAR(100),
+    latitude DECIMAL(10, 7),
+    longitude DECIMAL(10, 7),
+    location_coords GEOMETRY (Point, 4326),
+    visit_order INTEGER NOT NULL DEFAULT 1,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT NOW ()
+);
+
+CREATE INDEX IF NOT EXISTS idx_day_locations_trip_day ON day_locations (trip_day_id);
+
+CREATE INDEX IF NOT EXISTS idx_day_locations_country ON day_locations (country_code);

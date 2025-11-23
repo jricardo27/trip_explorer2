@@ -325,6 +325,142 @@ app.get("/api/trip-days/:id/features", async (req, res) => {
   }
 })
 
+// Location search endpoint
+app.get("/api/locations/search", async (req, res) => {
+  const { q, limit = "10" } = req.query
+
+  if (!q || typeof q !== "string") {
+    return res.status(400).json({ error: "Query parameter 'q' is required" })
+  }
+
+  try {
+    const result = await query(
+      `SELECT id, name, country_name, country_code, latitude, longitude
+       FROM cities
+       WHERE name ILIKE $1 OR ascii_name ILIKE $1
+       ORDER BY population DESC NULLS LAST
+       LIMIT $2`,
+      [`%${q}%`, parseInt(limit as string)],
+    )
+    res.json(result.rows)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Get locations for a trip day
+app.get("/api/trip-days/:dayId/locations", async (req, res) => {
+  const { dayId } = req.params
+
+  try {
+    const result = await query(
+      "SELECT * FROM day_locations WHERE trip_day_id = $1 ORDER BY visit_order",
+      [dayId],
+    )
+    res.json(result.rows)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Add location to a trip day
+app.post("/api/trip-days/:dayId/locations", async (req, res) => {
+  const { dayId } = req.params
+  const { country, country_code, city, town, latitude, longitude, visit_order, notes } = req.body
+
+  if (!country) {
+    return res.status(400).json({ error: "Country is required" })
+  }
+
+  try {
+    const locationCoords = latitude && longitude
+      ? `ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)`
+      : "NULL"
+
+    const result = await query(
+      `INSERT INTO day_locations 
+       (trip_day_id, country, country_code, city, town, latitude, longitude, location_coords, visit_order, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, ${locationCoords}, $8, $9)
+       RETURNING *`,
+      [dayId, country, country_code, city, town, latitude, longitude, visit_order || 1, notes],
+    )
+    res.status(201).json(result.rows[0])
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Update a day location
+app.put("/api/day-locations/:id", async (req, res) => {
+  const { id } = req.params
+  const { country, country_code, city, town, latitude, longitude, visit_order, notes } = req.body
+
+  try {
+    const locationCoords = latitude && longitude
+      ? `ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)`
+      : "NULL"
+
+    const result = await query(
+      `UPDATE day_locations
+       SET country = $1, country_code = $2, city = $3, town = $4,
+           latitude = $5, longitude = $6, location_coords = ${locationCoords},
+           visit_order = $7, notes = $8
+       WHERE id = $9
+       RETURNING *`,
+      [country, country_code, city, town, latitude, longitude, visit_order, notes, id],
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Location not found" })
+    }
+
+    res.json(result.rows[0])
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Delete a day location
+app.delete("/api/day-locations/:id", async (req, res) => {
+  const { id } = req.params
+
+  try {
+    await query("DELETE FROM day_locations WHERE id = $1", [id])
+    res.json({ message: "Location deleted" })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Reorder day locations
+app.put("/api/trip-days/:dayId/locations/reorder", async (req, res) => {
+  const { dayId } = req.params
+  const { locationIds } = req.body
+
+  if (!Array.isArray(locationIds)) {
+    return res.status(400).json({ error: "locationIds must be an array" })
+  }
+
+  try {
+    // Update visit_order for each location
+    for (let i = 0; i < locationIds.length; i++) {
+      await query(
+        "UPDATE day_locations SET visit_order = $1 WHERE id = $2 AND trip_day_id = $3",
+        [i + 1, locationIds[i], dayId],
+      )
+    }
+    res.json({ message: "Locations reordered" })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
 export { app }
 
 if (process.env.NODE_ENV !== "test") {
