@@ -41,7 +41,12 @@ function App(): React.ReactNode {
   const [welcomeDialogOpen, setWelcomeDialogOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  ReactGA.initialize(config.ga.measurementId)
+  useEffect(() => {
+    // Initialize Google Analytics if measurement ID is provided
+    if (config.ga.measurementId) {
+      ReactGA.initialize(config.ga.measurementId)
+    }
+  }, [])
 
   useEffect(() => {
     const hasShownModal = localStorage.getItem("hasShownModal")

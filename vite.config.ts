@@ -43,6 +43,9 @@ export default defineConfig({
     host: true, // needed for the Docker Container port mapping to work
     strictPort: true,
     port: 5173, // you can replace this port with any port
+    watch: {
+      usePolling: true, // needed for Docker on macOS/Windows
+    },
     proxy: {
       "/api": {
         target: "http://backend:3001",

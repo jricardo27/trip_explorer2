@@ -23,21 +23,23 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     setUserId(id)
   }, [])
 
+  const API_URL = import.meta.env.VITE_API_URL || ""
+
   // Load features from API
   const loadFromApi = useCallback(async () => {
     if (!userId) return
     try {
-      const response = await fetch(`/api/features?user_id=${userId}`)
+      const response = await fetch(`${API_URL}/api/features?user_id=${userId}`)
       if (response.ok) {
         const data = await response.json()
-        setSavedFeaturesState(data)
+        setSavedFeaturesState({ all: [], ...data })
       }
     } catch (error) {
       console.error("Failed to load features:", error)
     }
-  }, [userId])
+  }, [userId, API_URL])
 
-  // Load initial data
+  // Initial load
   useEffect(() => {
     loadFromApi()
   }, [loadFromApi])
@@ -54,7 +56,7 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     if (!feature || !userId) return
 
     try {
-      await fetch("/api/features", {
+      await fetch(`${API_URL}/api/features`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId, list_name: listName, feature }),
@@ -65,7 +67,7 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     } catch (error) {
       console.error("Failed to save feature:", error)
     }
-  }, [userId, loadFromApi])
+  }, [userId, loadFromApi, API_URL])
 
   const removeFeature = useCallback(async (listName: string, selection: selectionInfo | null) => {
     if (!selection || !userId) {
@@ -84,7 +86,7 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     }
 
     try {
-      await fetch("/api/features", {
+      await fetch(`${API_URL}/api/features`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId, list_name: listName, feature_id: featureToRemove.properties.id }),
@@ -93,13 +95,13 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     } catch (error) {
       console.error("Failed to remove feature:", error)
     }
-  }, [userId, savedFeatures, loadFromApi])
+  }, [userId, savedFeatures, loadFromApi, API_URL])
 
   const updateFeature = useCallback(async (_oldFeature: GeoJsonFeature, newFeature: GeoJsonFeature) => {
     if (!userId) return
 
     try {
-      await fetch("/api/features", {
+      await fetch(`${API_URL}/api/features`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId, feature: newFeature }),
@@ -108,7 +110,7 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     } catch (error) {
       console.error("Failed to update feature:", error)
     }
-  }, [userId, loadFromApi])
+  }, [userId, loadFromApi, API_URL])
 
   const contextValue: SavedFeaturesContextType = {
     savedFeatures,

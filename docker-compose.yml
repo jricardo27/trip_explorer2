@@ -19,10 +19,13 @@ services:
       - backend
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: 2025_trip_explorer-backend
     volumes:
       - ./backend:/app
+      - ./public/markers:/app/public/markers
       - node-modules-backend:/app/node_modules
     ports:
       - "3001:3001"
@@ -31,14 +34,13 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=trip_explorer
       - POSTGRES_HOST=postgres
-    command: npm run dev
     networks:
       - 2025_trip_explorer
     depends_on:
       - postgres
 
   postgres:
-    image: postgres:15-alpine
+    image: postgis/postgis:15-3.3-alpine
     container_name: 2025_trip_explorer-postgres
     environment:
       - POSTGRES_USER=postgres
@@ -54,6 +56,7 @@ services:
 
 networks:
   2025_trip_explorer:
+
 
 volumes:
   node-modules-trip-explorer:

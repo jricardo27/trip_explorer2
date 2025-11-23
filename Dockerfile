@@ -3,13 +3,14 @@ FROM node:23-alpine
 
 WORKDIR /app/
 
-# Install dependencies
-COPY package.json /app/
+# Copy package files
+COPY package*.json ./
 
+# Install dependencies
 RUN npm install --loglevel verbose
 
-# Add rest of the client code
-COPY . /app/
+# Copy source code (node_modules will be excluded via .dockerignore)
+COPY . .
 
 EXPOSE 5173
 

@@ -7,11 +7,11 @@ a remote area with no phone coverage.
 In addition to selecting POIs, the application allows users to sort and categorize them, making it easy to plan trips in advance using each category as a
 daily itinerary.
 
-Selected POIs are saved locally, and the application does not require a frontend or backend server, running entirely in the user's browser.
+Selected POIs are saved to a PostgreSQL database, and the application consists of a React frontend and a Node.js backend.
 
 ### Technology
 
-Trip explorer is built using Typescript, React and Vite.
+Trip explorer is built using Typescript, React, Vite, Node.js, Express, PostgreSQL, and PostGIS.
 
 The map is powered by Leaflet, and GeoJSON data is sourced from multiple providers, including:
 
@@ -24,7 +24,7 @@ The map is powered by Leaflet, and GeoJSON data is sourced from multiple provide
 * [Western Australia website](https://www.westernaustralia.com/)
 * [Wiki Camps](https://wikicamps.com.au/)
 
-### Online demo
+
 A live demo of the application is available at [https://jricardo27.github.io/online_trip_explorer/](https://jricardo27.github.io/online_trip_explorer/).
 
 ![SVG Image](public/docs/img/online_trip_explorer_qr.svg)
@@ -83,3 +83,61 @@ Google Earth does not have this limitation, and in the future, it may be possibl
 
 
 ![image](public/docs/img/export_menu.webp)
+
+
+### Running Locally
+
+To run the application locally, you need to have [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed.
+
+1.  Clone the repository:
+    ```bash
+    git clone <repository-url>
+    cd trip_explorer
+    ```
+
+2.  Start the application using Docker Compose:
+    ```bash
+    docker-compose up --build
+    ```
+
+3.  Access the application:
+    *   **Frontend:** [http://localhost:3000](http://localhost:3000)
+    *   **Backend API:** [http://localhost:3001](http://localhost:3001)
+
+### Deployment
+
+The application is containerized and can be easily deployed to any server that supports Docker (e.g., AWS EC2, DigitalOcean Droplet, Google Compute Engine).
+
+1.  **Provision a Server:** Set up a Linux server (e.g., Ubuntu) with Docker and Docker Compose installed.
+
+2.  **Transfer Files:** Copy the project files to your server (or clone the repository).
+
+3.  **Environment Variables:**
+    Ensure the environment variables in `docker-compose.yml` are suitable for your production environment. You might want to use a `.env` file for sensitive data like database passwords.
+
+4.  **Start the Services:**
+    Run the application in detached mode:
+    ```bash
+    docker-compose up -d --build
+    ```
+
+5.  **Reverse Proxy (Optional but Recommended):**
+    For a production deployment, it is recommended to set up a reverse proxy (like Nginx or Traefik) to handle SSL termination and route traffic to the frontend container.
+
+### Free Hosting Strategy
+
+It is possible to host the application for free by separating the frontend and backend:
+
+1.  **Frontend (GitHub Pages):**
+    *   The frontend is a static site and can be hosted on [GitHub Pages](https://pages.github.com/).
+    *   You need to configure the `VITE_API_URL` environment variable in your build process to point to your backend URL (e.g., `https://your-backend-app.onrender.com`).
+    *   If using GitHub Actions for deployment, add the variable to your workflow:
+        ```yaml
+        env:
+          VITE_API_URL: ${{ secrets.BACKEND_URL }}
+        ```
+
+2.  **Backend (Render/Railway/Fly.io):**
+    *   The backend (Node.js + PostgreSQL) can be hosted on free tier services like [Render](https://render.com/), [Railway](https://railway.app/), or [Fly.io](https://fly.io/).
+    *   Deploy the `backend` folder as a Node.js service.
+    *   Provision a PostgreSQL database on the same platform and connect it using environment variables.
