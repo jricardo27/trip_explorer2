@@ -1,10 +1,62 @@
+import bcrypt from "bcryptjs"
 import cors from "cors"
 import express, { Request, Response } from "express"
 
 import { query } from "./db"
 
 const app = express()
-const port = process.env.PORT || 3001
+app.use(cors())
+app.use(express.json())
+
+// Auth endpoints
+app.post("/api/auth/signup", async (req: Request, res: Response) => {
+  const { email, password } = req.body
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required" })
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const result = await query(
+      "INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email",
+      [email, hashedPassword],
+    )
+    res.json(result.rows[0])
+  } catch (err: unknown) {
+    const error = err as { code?: string }
+    if (error.code === "23505") { // Unique violation
+      res.status(490).json({ error: "Email already exists" })
+    } else {
+      console.error(err)
+      res.status(500).json({ error: "Internal server error" })
+    }
+  }
+})
+
+app.post("/api/auth/login", async (req: Request, res: Response) => {
+  const { email, password } = req.body
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required" })
+  }
+
+  try {
+    const result = await query("SELECT * FROM users WHERE email = $1", [email])
+    const user = result.rows[0]
+
+    if (user && (await bcrypt.compare(password, user.password_hash))) {
+      res.json({ id: user.id, email: user.email })
+    } else {
+      res.status(401).json({ error: "Invalid credentials" })
+    }
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+const PORT = process.env.PORT || 3001
 
 app.use(cors())
 app.use(express.json())
@@ -162,7 +214,7 @@ app.put("/api/features", async (req, res) => {
 export { app }
 
 if (process.env.NODE_ENV !== "test") {
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`)
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
   })
 }

@@ -11,6 +11,7 @@ import React, { useState, useContext, useCallback, useEffect, useMemo } from "re
 import { MdContentCopy } from "react-icons/md"
 
 import SavedFeaturesContext, { DEFAULT_CATEGORY } from "../../contexts/SavedFeaturesContext"
+import { AuthModal } from "../Auth/AuthModal"
 
 import { CategoryContextMenu } from "./ContextMenu/CategoryContextMenu"
 import { FeatureContextMenu } from "./ContextMenu/FeatureContextMenu"
@@ -35,8 +36,9 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, o
   const [selectedTab, setSelectedTab] = useState<string>(DEFAULT_CATEGORY)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [inputUserId, setInputUserId] = useState<string>("")
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
-  const { savedFeatures, setSavedFeatures, removeFeature, userId, setUserId } = useContext(SavedFeaturesContext)!
+  const { savedFeatures, setSavedFeatures, removeFeature, userId, setUserId, email, logout } = useContext(SavedFeaturesContext)!
   const { selectedFeature, setSelectedFeature } = useFeatureSelection()
   const { contextMenu, contextMenuTab, contextMenuFeature, handleContextMenu, handleTabContextMenu, handleClose } = useContextMenu()
   const { moveCategory, handleRenameCategory, handleAddCategory, handleRemoveCategory } = useCategoryManagement(
@@ -90,6 +92,7 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, o
             "& .MuiDrawer-paper": {
               width: drawerWidth,
               marginTop: "64px",
+              height: "calc(100% - 64px)",
               boxSizing: "border-box",
             },
           }}
@@ -124,47 +127,78 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, o
                 />
               </Box>
               <Box sx={{ p: 2, borderTop: 1, borderColor: "divider", bgcolor: "background.default" }}>
-                <Typography variant="subtitle2" gutterBottom>User Sync</Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-                  <Typography variant="caption" sx={{ fontFamily: "monospace", bgcolor: "action.hover", p: 0.5, borderRadius: 1 }}>
-                    {userId}
-                  </Typography>
-                  <Button
-                    size="small"
-                    startIcon={<MdContentCopy />}
-                    onClick={() => {
-                      navigator.clipboard.writeText(userId)
-                      // toast.success("ID Copied")
-                    }}
-                  >
-                    Copy
-                  </Button>
-                </Box>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <TextField
-                    size="small"
-                    label="Enter ID to Sync"
-                    value={inputUserId}
-                    onChange={(e) => setInputUserId(e.target.value)}
-                    fullWidth
-                  />
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => {
-                      if (inputUserId) {
-                        setUserId(inputUserId)
-                        setInputUserId("")
-                      }
-                    }}
-                  >
-                    Sync
-                  </Button>
-                </Box>
+                {email ? (
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    <Typography variant="subtitle2">Logged in as:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>{email}</Typography>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="error"
+                      onClick={() => {
+                        // Confirm logout?
+                        if (window.confirm("Are you sure you want to logout?")) {
+                          logout()
+                        }
+                      }}
+                    >
+                      Logout
+                    </Button>
+                  </Box>
+                ) : (
+                  <>
+                    <Box sx={{ mb: 2 }}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={() => setIsAuthModalOpen(true)}
+                      >
+                        Login / Sign Up
+                      </Button>
+                    </Box>
+                    <Typography variant="subtitle2" gutterBottom>Guest Sync</Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+                      <Typography variant="caption" sx={{ fontFamily: "monospace", bgcolor: "action.hover", p: 0.5, borderRadius: 1 }}>
+                        {userId}
+                      </Typography>
+                      <Button
+                        size="small"
+                        startIcon={<MdContentCopy />}
+                        onClick={() => {
+                          navigator.clipboard.writeText(userId)
+                        }}
+                      >
+                        Copy
+                      </Button>
+                    </Box>
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <TextField
+                        size="small"
+                        label="Enter ID to Sync"
+                        value={inputUserId}
+                        onChange={(e) => setInputUserId(e.target.value)}
+                        fullWidth
+                      />
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => {
+                          if (inputUserId) {
+                            setUserId(inputUserId)
+                            setInputUserId("")
+                          }
+                        }}
+                      >
+                        Sync
+                      </Button>
+                    </Box>
+                  </>
+                )}
               </Box>
             </Box>
           </Box>
         </Drawer>
+        <AuthModal open={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
         <CategoryContextMenu
           contextMenu={contextMenu}
           contextMenuTab={contextMenuTab}

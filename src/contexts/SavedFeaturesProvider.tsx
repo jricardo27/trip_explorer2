@@ -12,6 +12,7 @@ interface SavedFeaturesProviderProps {
 const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children }) => {
   const [savedFeatures, setSavedFeaturesState] = useState<SavedFeaturesStateType>({ all: [] })
   const [userId, setUserId] = useState<string>("")
+  const [email, setEmail] = useState<string | null>(localStorage.getItem("userEmail"))
 
   // Initialize User ID
   useEffect(() => {
@@ -124,9 +125,21 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     setUserId: (id: string) => {
       localStorage.setItem("userId", id)
       setUserId(id)
-      // We need to reload from API when ID changes
-      // loadFromApi depends on userId, so it will be called if we add it to dependency array of useEffect
-      // But loadFromApi is memoized on userId.
+    },
+    email: email,
+    login: (newEmail: string, newId: string) => {
+      setEmail(newEmail)
+      setUserId(newId)
+      localStorage.setItem("userEmail", newEmail)
+      localStorage.setItem("userId", newId)
+    },
+    logout: () => {
+      setEmail(null)
+      localStorage.removeItem("userEmail")
+      // Generate new guest ID
+      const newId = crypto.randomUUID()
+      setUserId(newId)
+      localStorage.setItem("userId", newId)
     },
   }
 

@@ -41,6 +41,10 @@ vi.mock("./FeatureList/FeatureDragContext", () => ({
   FeatureDragContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
+vi.mock("../Auth/AuthModal", () => ({
+  AuthModal: () => <div data-testid="auth-modal" />,
+}))
+
 const mockContextValue = {
   savedFeatures: {
     all: [
@@ -59,6 +63,9 @@ const mockContextValue = {
   loadFromLocalStorage: vi.fn(),
   userId: "test-user-id",
   setUserId: vi.fn(),
+  email: null,
+  login: vi.fn(),
+  logout: vi.fn(),
 }
 
 describe("SavedFeaturesDrawer", () => {

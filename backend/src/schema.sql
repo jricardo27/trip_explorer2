@@ -8,12 +8,19 @@ CREATE TABLE IF NOT EXISTS markers (
 
 CREATE TABLE IF NOT EXISTS geo_features (
     id SERIAL PRIMARY KEY,
-    source_path VARCHAR(255) NOT NULL,
+    source_path TEXT NOT NULL,
     properties JSONB NOT NULL,
-    geom GEOMETRY (Geometry, 4326) NOT NULL
+    geom GEOMETRY (Geometry, 4326)
 );
 
-CREATE INDEX IF NOT EXISTS idx_geo_features_geom ON geo_features USING GIST (geom);
+CREATE INDEX IF NOT EXISTS geo_features_geom_idx ON geo_features USING GIST (geom);
+
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW ()
+);
 
 CREATE INDEX IF NOT EXISTS idx_geo_features_source_path ON geo_features (source_path);
 
