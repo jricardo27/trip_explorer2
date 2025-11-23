@@ -2,6 +2,7 @@ import * as fs from "fs"
 import * as path from "path"
 import * as readline from "readline"
 
+import AdmZip from "adm-zip"
 import axios from "axios"
 
 import { pool } from "../db"
@@ -57,22 +58,24 @@ async function downloadCitiesData(): Promise<void> {
 
   console.log("Downloading cities data (this may take a while)...")
 
-  // Download the cities file directly
+  const ZIP_FILE = path.join(DATA_DIR, "cities15000.zip")
+
+  // Download the zip file
   const response = await axios.get(
-    "https://download.geonames.org/export/dump/cities15000.txt",
-    { responseType: "stream", timeout: 60000 },
+    "https://download.geonames.org/export/dump/cities15000.zip",
+    { responseType: "arraybuffer", timeout: 120000 },
   )
 
-  const writer = fs.createWriteStream(CITIES_FILE)
-  response.data.pipe(writer)
+  fs.writeFileSync(ZIP_FILE, response.data)
+  console.log("Download complete, extracting...")
 
-  return new Promise((resolve, reject) => {
-    writer.on("finish", () => {
-      console.log("Download complete")
-      resolve()
-    })
-    writer.on("error", reject)
-  })
+  // Extract the zip file
+  const zip = new AdmZip(ZIP_FILE)
+  zip.extractAllTo(DATA_DIR, true)
+
+  // Clean up zip file
+  fs.unlinkSync(ZIP_FILE)
+  console.log("Extraction complete")
 }
 
 // Parse a city record from GeoNames format

@@ -11,6 +11,8 @@
         "test": "vitest"
     },
     "dependencies": {
+        "@types/adm-zip": "^0.5.7",
+        "adm-zip": "^0.5.16",
         "axios": "^1.13.2",
         "bcryptjs": "^3.0.3",
         "cors": "^2.8.5",
