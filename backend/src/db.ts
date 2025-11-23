@@ -3,7 +3,7 @@ import { Pool } from "pg"
 
 dotenv.config()
 
-const pool = new Pool({
+export const pool = new Pool({
   user: process.env.POSTGRES_USER || "postgres",
   host: process.env.POSTGRES_HOST || "postgres",
   database: process.env.POSTGRES_DB || "trip_explorer",

@@ -35,3 +35,22 @@ CREATE TABLE IF NOT EXISTS saved_features (
 );
 
 CREATE INDEX IF NOT EXISTS idx_saved_features_user_id ON saved_features (user_id);
+
+CREATE TABLE IF NOT EXISTS trips (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    user_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    start_date DATE,
+    end_date DATE,
+    created_at TIMESTAMP DEFAULT NOW ()
+);
+
+CREATE TABLE IF NOT EXISTS trip_days (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    trip_id UUID REFERENCES trips (id) ON DELETE CASCADE,
+    day_index INT NOT NULL,
+    date DATE
+);
+
+ALTER TABLE saved_features
+ADD COLUMN IF NOT EXISTS trip_day_id UUID REFERENCES trip_days (id) ON DELETE SET NULL;

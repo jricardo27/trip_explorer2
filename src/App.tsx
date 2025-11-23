@@ -8,6 +8,7 @@ import TopMenu from "./components/TopMenu/TopMenu"
 import WelcomeModal from "./components/WelcomeModal/WelcomeModal"
 import config from "./config"
 import SavedFeaturesProvider from "./contexts/SavedFeaturesProvider"
+import { TripProvider } from "./contexts/TripContext"
 import { AustralianCapitalTerritory } from "./pages/Australia/AustralianCapitalTerritory"
 import { NewSouthWales } from "./pages/Australia/NewSouthWales"
 import { NorthernTerritory } from "./pages/Australia/NorthernTerritory"
@@ -73,22 +74,24 @@ function App(): React.ReactNode {
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
         <RedirectHandler />
         <SavedFeaturesProvider>
-          <TopMenu onMenuClick={openDrawer} />
-          <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
-            <Routes>
-              <Route path="/" element={<Destinations />} />
-              <Route path="/australianCapitalTerritory" element={<AustralianCapitalTerritory drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-              <Route path="/newSouthWales" element={<NewSouthWales drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-              <Route path="/northernTerritory" element={<NorthernTerritory drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-              <Route path="/queensland" element={<Queensland drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-              <Route path="/southAustralia" element={<SouthAustralia drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-              <Route path="/tasmania" element={<Tasmania drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-              <Route path="/victoria" element={<Victoria drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-              <Route path="/westernAustralia" element={<WesternAustralia drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-              <Route path="/newZealand" element={<NewZealand drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Box>
+          <TripProvider>
+            <TopMenu onMenuClick={openDrawer} />
+            <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+              <Routes>
+                <Route path="/" element={<Destinations />} />
+                <Route path="/australianCapitalTerritory" element={<AustralianCapitalTerritory drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route path="/newSouthWales" element={<NewSouthWales drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route path="/northernTerritory" element={<NorthernTerritory drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route path="/queensland" element={<Queensland drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route path="/southAustralia" element={<SouthAustralia drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route path="/tasmania" element={<Tasmania drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route path="/victoria" element={<Victoria drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route path="/westernAustralia" element={<WesternAustralia drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route path="/newZealand" element={<NewZealand drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Box>
+          </TripProvider>
         </SavedFeaturesProvider>
       </Box>
       <WelcomeModal open={welcomeDialogOpen} onClose={handleClose} />

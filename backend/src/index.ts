@@ -146,7 +146,7 @@ app.get("/api/features", async (req, res) => {
 
 // Add a saved feature
 app.post("/api/features", async (req, res) => {
-  const { user_id, list_name, feature } = req.body
+  const { user_id, list_name, feature, trip_day_id } = req.body
 
   if (!user_id || !list_name || !feature) {
     return res.status(400).json({ error: "Missing required fields" })
@@ -154,8 +154,8 @@ app.post("/api/features", async (req, res) => {
 
   try {
     await query(
-      "INSERT INTO saved_features (user_id, list_name, feature) VALUES ($1, $2, $3)",
-      [user_id, list_name, feature],
+      "INSERT INTO saved_features (user_id, list_name, feature, trip_day_id) VALUES ($1, $2, $3, $4)",
+      [user_id, list_name, feature, trip_day_id || null],
     )
     res.status(201).json({ message: "Feature saved" })
   } catch (err) {
@@ -205,6 +205,120 @@ app.put("/api/features", async (req, res) => {
       [feature, user_id, feature.properties.id],
     )
     res.json({ message: "Feature updated" })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// --- Trips API ---
+
+// Create a trip
+app.post("/api/trips", async (req, res) => {
+  const { user_id, name, start_date, end_date } = req.body
+
+  if (!user_id || !name || !start_date || !end_date) {
+    return res.status(400).json({ error: "Missing required fields" })
+  }
+
+  const client = await (await import("./db")).pool.connect()
+
+  try {
+    await client.query("BEGIN")
+
+    // Create Trip
+    const tripResult = await client.query(
+      "INSERT INTO trips (user_id, name, start_date, end_date) VALUES ($1, $2, $3, $4) RETURNING *",
+      [user_id, name, start_date, end_date],
+    )
+    const trip = tripResult.rows[0]
+
+    // Generate Days
+    const start = new Date(start_date)
+    const end = new Date(end_date)
+    const diffTime = Math.abs(end.getTime() - start.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+
+    for (let i = 0; i < diffDays; i++) {
+      const currentDay = new Date(start)
+      currentDay.setDate(start.getDate() + i)
+      await client.query(
+        "INSERT INTO trip_days (trip_id, day_index, date) VALUES ($1, $2, $3)",
+        [trip.id, i, currentDay.toISOString().split("T")[0]],
+      )
+    }
+
+    await client.query("COMMIT")
+    res.status(201).json(trip)
+  } catch (err) {
+    await client.query("ROLLBACK")
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  } finally {
+    client.release()
+  }
+})
+
+// Get user trips
+app.get("/api/trips", async (req, res) => {
+  const { user_id } = req.query
+  if (!user_id || typeof user_id !== "string") {
+    return res.status(400).json({ error: "User ID is required" })
+  }
+
+  try {
+    const result = await query("SELECT * FROM trips WHERE user_id = $1 ORDER BY start_date", [user_id])
+    res.json(result.rows)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Get trip details
+app.get("/api/trips/:id", async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const tripResult = await query("SELECT * FROM trips WHERE id = $1", [id])
+    if (tripResult.rows.length === 0) {
+      return res.status(404).json({ error: "Trip not found" })
+    }
+    const trip = tripResult.rows[0]
+
+    const daysResult = await query("SELECT * FROM trip_days WHERE trip_id = $1 ORDER BY day_index", [id])
+    trip.days = daysResult.rows
+
+    res.json(trip)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Delete trip
+app.delete("/api/trips/:id", async (req, res) => {
+  const { id } = req.params
+
+  try {
+    await query("DELETE FROM trips WHERE id = $1", [id])
+    res.json({ message: "Trip deleted" })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Get features for a specific trip day
+app.get("/api/trip-days/:id/features", async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const result = await query(
+      "SELECT * FROM saved_features WHERE trip_day_id = $1 ORDER BY created_at",
+      [id],
+    )
+    res.json(result.rows.map((row) => row.feature))
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: "Internal server error" })
