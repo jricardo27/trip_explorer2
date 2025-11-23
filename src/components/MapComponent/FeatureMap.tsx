@@ -26,12 +26,13 @@ interface FeatureMapProps extends MapComponentProps {
 export const FeatureMap = ({ geoJsonOverlaySources, drawerOpen, closeDrawer, ...mapProps }: FeatureMapProps): React.ReactNode => {
   const { addFeature, savedFeatures } = useContext(SavedFeaturesContext)!
 
+  const [bounds, setBounds] = useState<L.LatLngBounds | null>(null)
   const [contextMenuPosition, setContextMenuPosition] = useState<L.LatLng | null>(null)
   const [selectedFeature, setSelectedFeature] = useState<GeoJsonFeature | null>(null)
   const [fixedOverlays, setFixedOverlays] = useState<TLayerOverlay[]>([])
   const [dynamicOverlays, setDynamicOverlays] = useState<TLayerOverlay[]>([])
   const overlayFilePaths = useMemo(() => (Object.keys(geoJsonOverlaySources)), [geoJsonOverlaySources])
-  const overlayMarkers = useGeoJsonMarkers(overlayFilePaths)
+  const overlayMarkers = useGeoJsonMarkers(overlayFilePaths, bounds)
 
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down("sm"))
@@ -92,7 +93,8 @@ export const FeatureMap = ({ geoJsonOverlaySources, drawerOpen, closeDrawer, ...
               popupActionButtons={[{
                 label: "Save",
                 startIcon: <MdAssignmentAdd />,
-                onClick: onSaveFeatureToList }]}
+                onClick: onSaveFeatureToList,
+              }]}
             />
           ),
         }
@@ -126,7 +128,7 @@ export const FeatureMap = ({ geoJsonOverlaySources, drawerOpen, closeDrawer, ...
 
   return (
     <>
-      <MapComponent overlays={[...fixedOverlays, ...dynamicOverlays]} contextMenuHandler={onMapContextMenuHandler} {...mapProps}>
+      <MapComponent overlays={[...fixedOverlays, ...dynamicOverlays]} contextMenuHandler={onMapContextMenuHandler} onBoundsChange={setBounds} {...mapProps}>
         <FeatureMapContextMenu selectedFeature={selectedFeature} menuLatLng={contextMenuPosition} />
       </MapComponent>
       <SavedFeaturesDrawer

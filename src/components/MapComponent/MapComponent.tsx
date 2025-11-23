@@ -17,6 +17,7 @@ export interface MapComponentProps {
   center: TCoordinate | [number, number]
   overlays?: TLayerOverlay[]
   contextMenuHandler?: (event: L.LeafletMouseEvent) => void
+  onBoundsChange?: (bounds: L.LatLngBounds) => void
 }
 
 const MapComponent = ({
@@ -24,6 +25,7 @@ const MapComponent = ({
   center,
   overlays,
   contextMenuHandler,
+  onBoundsChange,
 }: MapComponentProps): React.ReactElement => {
   const [mapState, setMapState] = useState(() => {
     const saved = localStorage.getItem("mapState")
@@ -73,9 +75,10 @@ const MapComponent = ({
     localStorage.setItem("activeBaseLayer", activeBaseLayer)
   }, [activeBaseLayer])
 
-  const handleMapMove = useCallback((center: [number, number], zoom: number) => {
+  const handleMapMove = useCallback((center: [number, number], zoom: number, bounds: L.LatLngBounds) => {
     setMapState({ center, zoom })
-  }, [])
+    onBoundsChange?.(bounds)
+  }, [onBoundsChange])
 
   return (
     <>

@@ -10,18 +10,55 @@ app.use(cors())
 app.use(express.json())
 
 // Get all markers for a specific path
+// Get all markers for a specific path, optionally filtered by bounds
 app.get("/api/markers", async (req: Request, res: Response) => {
-  const { path } = req.query
+  const { path, min_lon, min_lat, max_lon, max_lat } = req.query
+
   if (!path || typeof path !== "string") {
     return res.status(400).json({ error: "Path query parameter is required" })
   }
 
   try {
-    const result = await query("SELECT data FROM markers WHERE path = $1", [path])
-    if (result.rows.length > 0) {
-      res.json(result.rows[0].data)
+    // If bounds are provided, use spatial query on geo_features
+    if (min_lon && min_lat && max_lon && max_lat) {
+      // Get top-level properties from markers table
+      const propsResult = await query("SELECT data->'properties' as properties FROM markers WHERE path = $1", [path])
+      const collectionProperties = propsResult.rows[0]?.properties || {}
+
+      console.log(`[API] Path: ${path}, Bounds: ${min_lon},${min_lat},${max_lon},${max_lat}`)
+      console.log("[API] Found properties:", collectionProperties ? "Yes" : "No")
+
+      const queryText = `
+        SELECT properties, ST_AsGeoJSON(geom) as geometry 
+        FROM geo_features 
+        WHERE source_path = $1 
+        AND geom && ST_MakeEnvelope($2, $3, $4, $5, 4326)
+      `
+      const values = [path, Number(min_lon), Number(min_lat), Number(max_lon), Number(max_lat)]
+
+      const result = await query(queryText, values)
+      console.log(`[API] Found ${result.rows.length} features`)
+
+      // Reconstruct FeatureCollection
+      const features = result.rows.map((row) => ({
+        type: "Feature",
+        properties: row.properties,
+        geometry: JSON.parse(row.geometry),
+      }))
+
+      res.json({
+        type: "FeatureCollection",
+        properties: collectionProperties,
+        features,
+      })
     } else {
-      res.status(404).json({ error: "Markers not found" })
+      // Fallback to full file fetch (legacy)
+      const result = await query("SELECT data FROM markers WHERE path = $1", [path])
+      if (result.rows.length > 0) {
+        res.json(result.rows[0].data)
+      } else {
+        res.status(404).json({ error: "Markers not found" })
+      }
     }
   } catch (err) {
     console.error(err)

@@ -1,31 +1,46 @@
 import axios from "axios"
+import { LatLngBounds } from "leaflet"
 import { useEffect, useState } from "react"
 
 import { GeoJsonCollection, GeoJsonDataMap, GeoJsonFeature, GeoJsonProperties, TAny } from "../data/types"
 import deepMerge from "../utils/deepmerge.ts"
 
-const useGeoJsonMarkers = (filenames: string[]): GeoJsonDataMap => {
+const useGeoJsonMarkers = (filenames: string[], bounds?: LatLngBounds | null): GeoJsonDataMap => {
   const [geoJsonData, setGeoJsonData] = useState<GeoJsonDataMap>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
+      // If bounds is explicitly null, it means we are waiting for the map to initialize
+      if (bounds === null) {
+        return
+      }
+
       setLoading(true)
       try {
-        const params: Record<string, Record<string, number>> = {}
+        const params: Record<string, string | number> = {}
 
         const isProduction = import.meta.env.MODE === "production"
         if (!isProduction) { // Always reload the files when running in development
-          params["params"] = { t: Date.now() }
+          params["t"] = Date.now()
+        }
+
+        // Add bounds to query params if available
+        if (bounds) {
+          params["min_lon"] = bounds.getWest()
+          params["min_lat"] = bounds.getSouth()
+          params["max_lon"] = bounds.getEast()
+          params["max_lat"] = bounds.getNorth()
         }
 
         const promises = filenames.map(async (filename): Promise<[string, GeoJsonCollection]> => {
           // Remove leading slash if present for the query param
           const pathParam = filename.startsWith("/") ? filename : "/" + filename
+
           const response = await axios.get<GeoJsonCollection>("/api/markers", {
             params: {
-              ...params.params,
+              ...params,
               path: pathParam,
             },
           })
@@ -82,8 +97,13 @@ const useGeoJsonMarkers = (filenames: string[]): GeoJsonDataMap => {
       }
     }
 
-    fetchData()
-  }, [filenames])
+    // Debounce the fetch if bounds are changing rapidly
+    const timeoutId = setTimeout(() => {
+      fetchData()
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [filenames, bounds]) // Re-fetch when filenames or bounds change
 
   if (loading) {
     return { ...geoJsonData, loading: true } as GeoJsonDataMap & { loading: true } // Return the current data and loading state

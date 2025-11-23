@@ -86,6 +86,7 @@ const StyledGeoJson = ({
 
   return (
     <GeoJSON
+      key={JSON.stringify(data)}
       data={data as GeoJsonCollection}
       pointToLayer={pointToLayer}
       onEachFeature={(feature, layer) => {
