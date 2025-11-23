@@ -4,8 +4,11 @@ import {
   TextField,
   useTheme,
   useMediaQuery,
+  Typography,
+  Button,
 } from "@mui/material"
 import React, { useState, useContext, useCallback, useEffect, useMemo } from "react"
+import { MdContentCopy } from "react-icons/md"
 
 import SavedFeaturesContext, { DEFAULT_CATEGORY } from "../../contexts/SavedFeaturesContext"
 
@@ -31,8 +34,9 @@ const excludedProperties = ["id", "images", "style"] as const
 const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, onClose, setCurrentCategory }) => {
   const [selectedTab, setSelectedTab] = useState<string>(DEFAULT_CATEGORY)
   const [searchQuery, setSearchQuery] = useState<string>("")
+  const [inputUserId, setInputUserId] = useState<string>("")
 
-  const { savedFeatures, setSavedFeatures, removeFeature } = useContext(SavedFeaturesContext)!
+  const { savedFeatures, setSavedFeatures, removeFeature, userId, setUserId } = useContext(SavedFeaturesContext)!
   const { selectedFeature, setSelectedFeature } = useFeatureSelection()
   const { contextMenu, contextMenuTab, contextMenuFeature, handleContextMenu, handleTabContextMenu, handleClose } = useContextMenu()
   const { moveCategory, handleRenameCategory, handleAddCategory, handleRemoveCategory } = useCategoryManagement(
@@ -99,24 +103,65 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, o
                 handleTabContextMenu={handleTabContextMenu}
               />
             </Box>
-            <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
-              <TextField
-                fullWidth
-                label="Search Features"
-                variant="outlined"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                sx={{ mb: 2 }}
-              />
-              <FeatureList
-                items={filteredItems}
-                setSavedFeatures={setSavedFeatures}
-                selectedTab={selectedTab}
-                selectedFeature={selectedFeature}
-                setSelectedFeature={setSelectedFeature}
-                handleContextMenu={handleContextMenu}
-                excludedProperties={Array.from(excludedProperties)}
-              />
+            <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", height: "100%" }}>
+              <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Search Features"
+                  variant="outlined"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  sx={{ mb: 2 }}
+                />
+                <FeatureList
+                  items={filteredItems}
+                  setSavedFeatures={setSavedFeatures}
+                  selectedTab={selectedTab}
+                  selectedFeature={selectedFeature}
+                  setSelectedFeature={setSelectedFeature}
+                  handleContextMenu={handleContextMenu}
+                  excludedProperties={Array.from(excludedProperties)}
+                />
+              </Box>
+              <Box sx={{ p: 2, borderTop: 1, borderColor: "divider", bgcolor: "background.default" }}>
+                <Typography variant="subtitle2" gutterBottom>User Sync</Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+                  <Typography variant="caption" sx={{ fontFamily: "monospace", bgcolor: "action.hover", p: 0.5, borderRadius: 1 }}>
+                    {userId}
+                  </Typography>
+                  <Button
+                    size="small"
+                    startIcon={<MdContentCopy />}
+                    onClick={() => {
+                      navigator.clipboard.writeText(userId)
+                      // toast.success("ID Copied")
+                    }}
+                  >
+                    Copy
+                  </Button>
+                </Box>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <TextField
+                    size="small"
+                    label="Enter ID to Sync"
+                    value={inputUserId}
+                    onChange={(e) => setInputUserId(e.target.value)}
+                    fullWidth
+                  />
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => {
+                      if (inputUserId) {
+                        setUserId(inputUserId)
+                        setInputUserId("")
+                      }
+                    }}
+                  >
+                    Sync
+                  </Button>
+                </Box>
+              </Box>
             </Box>
           </Box>
         </Drawer>

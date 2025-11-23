@@ -22,6 +22,8 @@ export type SavedFeaturesContextType = {
   setSavedFeatures: setSavedFeaturesType
   saveToLocalStorage: () => void
   loadFromLocalStorage: () => void
+  userId: string
+  setUserId: (id: string) => void
 }
 
 export const DEFAULT_CATEGORY = "all"

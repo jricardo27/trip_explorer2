@@ -57,6 +57,8 @@ const mockContextValue = {
   updateFeature: vi.fn(),
   saveToLocalStorage: vi.fn(),
   loadFromLocalStorage: vi.fn(),
+  userId: "test-user-id",
+  setUserId: vi.fn(),
 }
 
 describe("SavedFeaturesDrawer", () => {
@@ -69,6 +71,7 @@ describe("SavedFeaturesDrawer", () => {
     expect(screen.getByText("all")).toBeInTheDocument()
     expect(screen.getByText("list1")).toBeInTheDocument()
     expect(screen.getByText("Feature 1")).toBeInTheDocument()
+    expect(screen.getByText("test-user-id")).toBeInTheDocument()
   })
 
   it("should filter features based on search", () => {
@@ -96,5 +99,21 @@ describe("SavedFeaturesDrawer", () => {
     // list1 only has Feature 1
     expect(screen.getByText("Feature 1")).toBeInTheDocument()
     expect(screen.queryByText("Feature 2")).not.toBeInTheDocument()
+  })
+
+  it("should allow updating user ID", () => {
+    render(
+      <SavedFeaturesContext.Provider value={mockContextValue}>
+        <SavedFeaturesDrawer drawerOpen={true} onClose={vi.fn()} />
+      </SavedFeaturesContext.Provider>,
+    )
+
+    const input = screen.getByLabelText("Enter ID to Sync")
+    fireEvent.change(input, { target: { value: "new-id" } })
+
+    const syncButton = screen.getByText("Sync")
+    fireEvent.click(syncButton)
+
+    expect(mockContextValue.setUserId).toHaveBeenCalledWith("new-id")
   })
 })

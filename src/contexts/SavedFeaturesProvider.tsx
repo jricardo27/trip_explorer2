@@ -120,6 +120,14 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     setSavedFeatures,
     saveToLocalStorage: () => { }, // No-op for compatibility
     loadFromLocalStorage: loadFromApi, // Mapped to API load
+    userId,
+    setUserId: (id: string) => {
+      localStorage.setItem("userId", id)
+      setUserId(id)
+      // We need to reload from API when ID changes
+      // loadFromApi depends on userId, so it will be called if we add it to dependency array of useEffect
+      // But loadFromApi is memoized on userId.
+    },
   }
 
   return (
