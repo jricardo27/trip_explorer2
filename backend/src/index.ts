@@ -372,8 +372,14 @@ app.get("/api/trip-days/:id/features", async (req, res) => {
   const { id } = req.params
 
   try {
-    const result = await query("SELECT * FROM saved_features WHERE trip_day_id = $1 ORDER BY created_at", [id])
-    res.json(result.rows.map((row) => row.feature))
+    const result = await query("SELECT * FROM saved_features WHERE trip_day_id = $1 ORDER BY visit_order", [id])
+    res.json(
+      result.rows.map((row) => ({
+        ...row.feature,
+        saved_id: row.id,
+        visit_order: row.visit_order,
+      })),
+    )
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: "Internal server error" })
