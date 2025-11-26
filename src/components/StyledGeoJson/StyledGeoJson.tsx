@@ -59,27 +59,36 @@ const StyledGeoJson = ({
     return L.marker(latlng, { icon: customIcon })
   }, [])
 
-  const defaultTabMapping: TTabMapping = useMemo(() => (
-    {
+  const defaultTabMapping: TTabMapping = useMemo(
+    () => ({
       General: ["name", "url", { key: "description", className: styles.scrollableContent }],
-    }
-  ), [])
+    }),
+    [],
+  )
 
-  const defaultOnPopupOpen = useCallback(({ feature, layer, popupTabMapping, popupContainerProps, bottomMenu }: onPopupOpenProps) => {
-    // Get the popup element
-    const popup = layer.getPopup()
-    if (popup) {
-      // Create a container for the popup content
-      const container = L.DomUtil.create("div")
-      const root = createRoot(container)
-      root.render(
-        <PopupContent feature={feature as GeoJsonFeature} tabMapping={popupTabMapping} containerProps={popupContainerProps} bottomMenu={bottomMenu} />,
-      )
+  const defaultOnPopupOpen = useCallback(
+    ({ feature, layer, popupTabMapping, popupContainerProps, bottomMenu }: onPopupOpenProps) => {
+      // Get the popup element
+      const popup = layer.getPopup()
+      if (popup) {
+        // Create a container for the popup content
+        const container = L.DomUtil.create("div")
+        const root = createRoot(container)
+        root.render(
+          <PopupContent
+            feature={feature as GeoJsonFeature}
+            tabMapping={popupTabMapping}
+            containerProps={popupContainerProps}
+            bottomMenu={bottomMenu}
+          />,
+        )
 
-      // Set the popup content
-      popup.setContent(container)
-    }
-  }, [])
+        // Set the popup content
+        popup.setContent(container)
+      }
+    },
+    [],
+  )
 
   const onPopupOpenHandler = popupOpenHandler || defaultOnPopupOpen
   const tabMapping = Object.assign({}, popupTabMapping || defaultTabMapping, popupTabMappingExtra || {})
@@ -95,19 +104,34 @@ const StyledGeoJson = ({
             layer.bindTooltip(`${feature.properties.name}`, { permanent: false, direction: "auto" })
           }
 
-          layer.bindPopup("", { ...popupProps || {} }) // Initialize with empty content
+          layer.bindPopup("", { ...(popupProps || {}) }) // Initialize with empty content
 
           // Add an event listener for when the popup opens
           layer.on("popupopen", () => {
             const bottomMenu = (
               <>
                 {popupActionButtons?.map((props: menuActionButton, index) => (
-                  <Button key={index} startIcon={props?.startIcon} endIcon={props?.endIcon} onClick={() => { props.onClick(feature) }}>{props.label}</Button>
+                  <Button
+                    key={index}
+                    startIcon={props?.startIcon}
+                    endIcon={props?.endIcon}
+                    onClick={() => {
+                      props.onClick(feature)
+                    }}
+                  >
+                    {props.label}
+                  </Button>
                 ))}
               </>
             )
 
-            onPopupOpenHandler({ feature, layer, popupTabMapping: tabMapping, popupContainerProps: popupContainerProps, bottomMenu: bottomMenu })
+            onPopupOpenHandler({
+              feature,
+              layer,
+              popupTabMapping: tabMapping,
+              popupContainerProps: popupContainerProps,
+              bottomMenu: bottomMenu,
+            })
           })
 
           if (contextMenuHandler) {

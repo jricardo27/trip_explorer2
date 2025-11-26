@@ -1,5 +1,20 @@
 import { Menu as MenuIcon } from "@mui/icons-material"
-import { AppBar, Box, Button, Grid2, List, ListItem, ListItemButton, ListItemText, Menu, MenuItem, Toolbar, Tooltip, Typography, alpha } from "@mui/material"
+import {
+  AppBar,
+  Box,
+  Button,
+  Grid2,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Tooltip,
+  Typography,
+  alpha,
+} from "@mui/material"
 import React, { useContext, useState } from "react"
 import { FaDownload, FaUpload } from "react-icons/fa"
 import { MdHelpOutline, MdLocationOn } from "react-icons/md"
@@ -122,12 +137,7 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
                   startIcon={<FaDownload />}
                 />
               </Tooltip>
-              <Menu
-                id="fade-menu"
-                anchorEl={anchorEl}
-                open={exportMenuIsOpen}
-                onClose={closeExportMenu}
-              >
+              <Menu id="fade-menu" anchorEl={anchorEl} open={exportMenuIsOpen} onClose={closeExportMenu}>
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsGeoJson(savedFeatures))}>To GeoJson</MenuItem>
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsKml(savedFeatures))}>To KML</MenuItem>
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsBackup(savedFeatures))}>Export backup</MenuItem>
@@ -145,15 +155,28 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
                   startIcon={<FaUpload />}
                 />
               </Tooltip>
-              <Menu
-                id="import-menu"
-                anchorEl={importAnchorEl}
-                open={importMenuIsOpen}
-                onClose={closeImportMenu}
-              >
-                <MenuItem onClick={closeMenuAfterAction(() => { importBackup("override", setSavedFeatures) })}>Override existing POIs</MenuItem>
-                <MenuItem onClick={closeMenuAfterAction(() => { importBackup("append", setSavedFeatures) })}>Append categories</MenuItem>
-                <MenuItem onClick={closeMenuAfterAction(() => { importBackup("merge", setSavedFeatures) })}>Merge Categories</MenuItem>
+              <Menu id="import-menu" anchorEl={importAnchorEl} open={importMenuIsOpen} onClose={closeImportMenu}>
+                <MenuItem
+                  onClick={closeMenuAfterAction(() => {
+                    importBackup("override", setSavedFeatures)
+                  })}
+                >
+                  Override existing POIs
+                </MenuItem>
+                <MenuItem
+                  onClick={closeMenuAfterAction(() => {
+                    importBackup("append", setSavedFeatures)
+                  })}
+                >
+                  Append categories
+                </MenuItem>
+                <MenuItem
+                  onClick={closeMenuAfterAction(() => {
+                    importBackup("merge", setSavedFeatures)
+                  })}
+                >
+                  Merge Categories
+                </MenuItem>
               </Menu>
             </Grid2>
             <Grid2 size={2}>
@@ -184,7 +207,10 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
                             onClick={(event) => handleDestinationChange(event, dest.path)}
                             sx={{
                               pl: 4,
-                              bgcolor: location === dest.path ? (theme) => alpha(theme.palette.primary.main, 0.2) : "transparent",
+                              bgcolor:
+                                location === dest.path
+                                  ? (theme) => alpha(theme.palette.primary.main, 0.2)
+                                  : "transparent",
                             }}
                           >
                             <ListItemText primary={dest.label} />

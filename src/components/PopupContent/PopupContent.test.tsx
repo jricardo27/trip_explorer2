@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react"
-import React from "react"
 import { describe, it, expect, vi } from "vitest"
 
 import PopupContent from "./PopupContent"
@@ -11,13 +10,13 @@ vi.mock("react-image-gallery", () => ({
 
 describe("PopupContent", () => {
   const defaultFeature = {
-    type: "Feature",
+    type: "Feature" as const,
     properties: {
       name: "Test Feature",
       description: "Test Description",
       images: ["img1.jpg"],
     },
-    geometry: { type: "Point", coordinates: [0, 0] },
+    geometry: { type: "Point" as const, coordinates: [0, 0] },
   }
 
   const defaultTabMapping = {
@@ -25,7 +24,6 @@ describe("PopupContent", () => {
   }
 
   it("should render feature properties", () => {
-    // @ts-expect-error - Test mock types
     render(<PopupContent feature={defaultFeature} tabMapping={defaultTabMapping} />)
     expect(screen.getByText("name:")).toBeInTheDocument()
     expect(screen.getByText("Test Feature")).toBeInTheDocument()
@@ -34,7 +32,6 @@ describe("PopupContent", () => {
   })
 
   it("should render gallery tab if images exist", () => {
-    // @ts-expect-error - Test mock types
     render(<PopupContent feature={defaultFeature} tabMapping={defaultTabMapping} />)
     // On large screens (default in test env usually), gallery is side-by-side, not a tab.
     // But ImageGallery should be rendered.
@@ -42,8 +39,9 @@ describe("PopupContent", () => {
   })
 
   it("should render bottom menu if provided", () => {
-    // @ts-expect-error - Test mock types
-    render(<PopupContent feature={defaultFeature} tabMapping={defaultTabMapping} bottomMenu={<button>Action</button>} />)
+    render(
+      <PopupContent feature={defaultFeature} tabMapping={defaultTabMapping} bottomMenu={<button>Action</button>} />,
+    )
     expect(screen.getByText("Action")).toBeInTheDocument()
   })
 })

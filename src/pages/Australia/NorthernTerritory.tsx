@@ -8,9 +8,16 @@ import { TTabMapping } from "../../data/types/TTabMapping"
 interface NorthernTerritoryProps {
   drawerOpen: boolean
   closeDrawer: () => void
+  isPinned?: boolean
+  onTogglePin?: () => void
 }
 
-export const NorthernTerritory = ({ drawerOpen, closeDrawer }: NorthernTerritoryProps): React.ReactNode => {
+export const NorthernTerritory = ({
+  drawerOpen,
+  closeDrawer,
+  isPinned,
+  onTogglePin,
+}: NorthernTerritoryProps): React.ReactNode => {
   const geoJsonOverlaySources = useMemo(
     (): Record<string, TTabMapping> => ({
       "/markers/northernTerritory/accommodation_NT.json": {
@@ -30,7 +37,18 @@ export const NorthernTerritory = ({ drawerOpen, closeDrawer }: NorthernTerritory
       "/markers/northernTerritory/discovery_parks_NT.json": {
         General: ["name", "area", "website", "reviews"],
       },
-    }), [])
+    }),
+    [],
+  )
 
-  return <FeatureMap center={DARWIN_LOCATION} geoJsonOverlaySources={geoJsonOverlaySources} drawerOpen={drawerOpen} closeDrawer={closeDrawer} />
+  return (
+    <FeatureMap
+      center={DARWIN_LOCATION}
+      geoJsonOverlaySources={geoJsonOverlaySources}
+      drawerOpen={drawerOpen}
+      closeDrawer={closeDrawer}
+      isPinned={isPinned}
+      onTogglePin={onTogglePin}
+    />
+  )
 }

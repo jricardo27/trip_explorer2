@@ -69,7 +69,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
       <DialogTitle>{isLogin ? "Login" : "Sign Up"}</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
           <TextField
             autoFocus
             margin="dense"
@@ -109,7 +113,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
           <Button type="submit" variant="contained" disabled={loading}>
-            {loading ? "Please wait..." : (isLogin ? "Login" : "Sign Up")}
+            {loading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
           </Button>
         </DialogActions>
       </form>

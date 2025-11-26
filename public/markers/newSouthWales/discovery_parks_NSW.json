@@ -12,10 +12,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          147.03646850585938,
-          -36.10369491577149
-        ]
+        "coordinates": [147.03646850585938, -36.10369491577149]
       },
       "properties": {
         "id": "NHUM",
@@ -59,10 +56,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          144.7950897216797,
-          -36.111236572265625
-        ]
+        "coordinates": [144.7950897216797, -36.111236572265625]
       },
       "properties": {
         "id": "NMWA",
@@ -102,10 +96,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          144.7950897216797,
-          -36.110939025878906
-        ]
+        "coordinates": [144.7950897216797, -36.110939025878906]
       },
       "properties": {
         "id": "NHOR",
@@ -145,10 +136,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          144.77626037597656,
-          -36.11752700805664
-        ]
+        "coordinates": [144.77626037597656, -36.11752700805664]
       },
       "properties": {
         "id": "NMOE",
@@ -196,10 +184,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          144.73045349121094,
-          -36.106204986572266
-        ]
+        "coordinates": [144.73045349121094, -36.106204986572266]
       },
       "properties": {
         "id": "NMOW",
@@ -235,10 +220,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.59571838378906,
-          -36.41080856323242
-        ]
+        "coordinates": [148.59571838378906, -36.41080856323242]
       },
       "properties": {
         "id": "NJIN",
@@ -278,10 +260,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.87359619140625,
-          -37.09785461425781
-        ]
+        "coordinates": [149.87359619140625, -37.09785461425781]
       },
       "properties": {
         "id": "NEDN",
@@ -321,10 +300,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.90658569335938,
-          -36.940399169921875
-        ]
+        "coordinates": [149.90658569335938, -36.940399169921875]
       },
       "properties": {
         "id": "NPAM",
@@ -364,10 +340,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          150.14056396484375,
-          -36.2469482421875
-        ]
+        "coordinates": [150.14056396484375, -36.2469482421875]
       },
       "properties": {
         "id": "NNRM",
@@ -411,10 +384,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          150.4395294189453,
-          -35.38869094848633
-        ]
+        "coordinates": [150.4395294189453, -35.38869094848633]
       },
       "properties": {
         "id": "NULD",
@@ -458,10 +428,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          150.8092041015625,
-          -34.76925277709961
-        ]
+        "coordinates": [150.8092041015625, -34.76925277709961]
       },
       "properties": {
         "id": "NGER",
@@ -501,10 +468,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          151.14337158203125,
-          -33.78950881958008
-        ]
+        "coordinates": [151.14337158203125, -33.78950881958008]
       },
       "properties": {
         "id": "NLAC",
@@ -544,10 +508,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.58758544921875,
-          -32.25761032104492
-        ]
+        "coordinates": [148.58758544921875, -32.25761032104492]
       },
       "properties": {
         "id": "NDUB",
@@ -587,10 +548,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          152.4702606201172,
-          -32.099674224853516
-        ]
+        "coordinates": [152.4702606201172, -32.099674224853516]
       },
       "properties": {
         "id": "NFOR",
@@ -646,10 +604,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          152.72039794921875,
-          -31.856849670410156
-        ]
+        "coordinates": [152.72039794921875, -31.856849670410156]
       },
       "properties": {
         "id": "NHAR",
@@ -693,10 +648,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          153.18795776367188,
-          -30.167089462280273
-        ]
+        "coordinates": [153.18795776367188, -30.167089462280273]
       },
       "properties": {
         "id": "NEME",
@@ -756,10 +708,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          153.06228637695312,
-          -28.86173439025879
-        ]
+        "coordinates": [153.06228637695312, -28.86173439025879]
       },
       "properties": {
         "id": "NCAS",
@@ -791,10 +740,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          153.58570861816406,
-          -28.868749618530273
-        ]
+        "coordinates": [153.58570861816406, -28.868749618530273]
       },
       "properties": {
         "id": "NBAL",
@@ -838,10 +784,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          153.59439086914062,
-          -28.635610580444336
-        ]
+        "coordinates": [153.59439086914062, -28.635610580444336]
       },
       "properties": {
         "id": "NBYR",

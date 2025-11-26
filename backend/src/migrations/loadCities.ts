@@ -61,10 +61,10 @@ async function downloadCitiesData(): Promise<void> {
   const ZIP_FILE = path.join(DATA_DIR, "cities15000.zip")
 
   // Download the zip file
-  const response = await axios.get(
-    "https://download.geonames.org/export/dump/cities15000.zip",
-    { responseType: "arraybuffer", timeout: 120000 },
-  )
+  const response = await axios.get("https://download.geonames.org/export/dump/cities15000.zip", {
+    responseType: "arraybuffer",
+    timeout: 120000,
+  })
 
   fs.writeFileSync(ZIP_FILE, response.data)
   console.log("Download complete, extracting...")
@@ -141,9 +141,9 @@ async function insertBatch(cities: CityRecord[], countryNames: Map<string, strin
   cities.forEach((city, index) => {
     const offset = index * 11
     const placeholder =
-            `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, ` +
-            `$${offset + 5}, $${offset + 6}, $${offset + 7}, $${offset + 8}, ` +
-            `$${offset + 9}, ST_SetSRID(ST_MakePoint($${offset + 10}, $${offset + 11}), 4326))`
+      `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, ` +
+      `$${offset + 5}, $${offset + 6}, $${offset + 7}, $${offset + 8}, ` +
+      `$${offset + 9}, ST_SetSRID(ST_MakePoint($${offset + 10}, $${offset + 11}), 4326))`
     placeholders.push(placeholder)
 
     values.push(
@@ -177,9 +177,32 @@ async function main() {
   try {
     console.log("Starting cities data import...")
 
+    // Check if already imported
+    try {
+      const res = await pool.query("SELECT value FROM meta WHERE key = 'cities_imported'")
+      if (res.rows.length > 0 && res.rows[0].value === "true") {
+        console.log("Cities already imported (flag found). Skipping.")
+        process.exit(0)
+      }
+    } catch (e: unknown) {
+      const error = e as { message?: string }
+      console.warn("Could not check meta table:", error.message)
+    }
+
     const countryNames = await loadCountryNames()
     await downloadCitiesData()
     await importCities(countryNames)
+
+    // Set flag
+    try {
+      await pool.query(
+        "INSERT INTO meta (key, value) VALUES ('cities_imported', 'true') ON CONFLICT (key) DO UPDATE SET value = 'true'",
+      )
+      console.log("Set cities_imported flag.")
+    } catch (e: unknown) {
+      const error = e as { message?: string }
+      console.error("Failed to set cities_imported flag:", error.message)
+    }
 
     console.log("Import complete!")
     process.exit(0)

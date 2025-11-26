@@ -1,7 +1,11 @@
 import React, { useCallback } from "react"
 import { useMap, useMapEvent } from "react-leaflet"
 
-const MapStateManager = ({ onMapMove }: { onMapMove?: (center: [number, number], zoom: number, bounds: L.LatLngBounds) => void }): React.ReactNode => {
+const MapStateManager = ({
+  onMapMove,
+}: {
+  onMapMove?: (center: [number, number], zoom: number, bounds: L.LatLngBounds) => void
+}): React.ReactNode => {
   const map = useMap()
 
   const saveMapState = useCallback(() => {

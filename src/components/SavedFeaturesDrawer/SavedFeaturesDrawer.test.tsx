@@ -8,7 +8,13 @@ import SavedFeaturesDrawer from "./SavedFeaturesDrawer"
 
 // Mock sub-components
 vi.mock("./TabList/TabList", () => ({
-  TabList: ({ tabs, handleTabChange }: { tabs: string[]; handleTabChange: (e: React.SyntheticEvent, tab: string) => void }) => (
+  TabList: ({
+    tabs,
+    handleTabChange,
+  }: {
+    tabs: string[]
+    handleTabChange: (e: React.SyntheticEvent, tab: string) => void
+  }) => (
     <div>
       {tabs.map((tab: string) => (
         <button key={tab} onClick={(e) => handleTabChange(e, tab)}>
@@ -48,11 +54,23 @@ vi.mock("../Auth/AuthModal", () => ({
 const mockContextValue = {
   savedFeatures: {
     all: [
-      { type: "Feature" as const, properties: { name: "Feature 1" }, geometry: { type: "Point" as const, coordinates: [0, 0] } },
-      { type: "Feature" as const, properties: { name: "Feature 2" }, geometry: { type: "Point" as const, coordinates: [1, 1] } },
+      {
+        type: "Feature" as const,
+        properties: { name: "Feature 1" },
+        geometry: { type: "Point" as const, coordinates: [0, 0] },
+      },
+      {
+        type: "Feature" as const,
+        properties: { name: "Feature 2" },
+        geometry: { type: "Point" as const, coordinates: [1, 1] },
+      },
     ],
     list1: [
-      { type: "Feature" as const, properties: { name: "Feature 1" }, geometry: { type: "Point" as const, coordinates: [0, 0] } },
+      {
+        type: "Feature" as const,
+        properties: { name: "Feature 1" },
+        geometry: { type: "Point" as const, coordinates: [0, 0] },
+      },
     ],
   },
   setSavedFeatures: vi.fn(),
@@ -72,7 +90,13 @@ describe("SavedFeaturesDrawer", () => {
   it("should render drawer content when open", () => {
     render(
       <SavedFeaturesContext.Provider value={mockContextValue}>
-        <SavedFeaturesDrawer drawerOpen={true} onClose={vi.fn()} />
+        <SavedFeaturesDrawer
+          drawerOpen={true}
+          onClose={vi.fn()}
+          isPinned={false}
+          onTogglePin={vi.fn()}
+          onFlyTo={vi.fn()}
+        />
       </SavedFeaturesContext.Provider>,
     )
     expect(screen.getByText("all")).toBeInTheDocument()
@@ -84,7 +108,13 @@ describe("SavedFeaturesDrawer", () => {
   it("should filter features based on search", () => {
     render(
       <SavedFeaturesContext.Provider value={mockContextValue}>
-        <SavedFeaturesDrawer drawerOpen={true} onClose={vi.fn()} />
+        <SavedFeaturesDrawer
+          drawerOpen={true}
+          onClose={vi.fn()}
+          isPinned={false}
+          onTogglePin={vi.fn()}
+          onFlyTo={vi.fn()}
+        />
       </SavedFeaturesContext.Provider>,
     )
 
@@ -98,7 +128,13 @@ describe("SavedFeaturesDrawer", () => {
   it("should switch tabs", () => {
     render(
       <SavedFeaturesContext.Provider value={mockContextValue}>
-        <SavedFeaturesDrawer drawerOpen={true} onClose={vi.fn()} />
+        <SavedFeaturesDrawer
+          drawerOpen={true}
+          onClose={vi.fn()}
+          isPinned={false}
+          onTogglePin={vi.fn()}
+          onFlyTo={vi.fn()}
+        />
       </SavedFeaturesContext.Provider>,
     )
 
@@ -111,7 +147,13 @@ describe("SavedFeaturesDrawer", () => {
   it("should allow updating user ID", () => {
     render(
       <SavedFeaturesContext.Provider value={mockContextValue}>
-        <SavedFeaturesDrawer drawerOpen={true} onClose={vi.fn()} />
+        <SavedFeaturesDrawer
+          drawerOpen={true}
+          onClose={vi.fn()}
+          isPinned={false}
+          onTogglePin={vi.fn()}
+          onFlyTo={vi.fn()}
+        />
       </SavedFeaturesContext.Provider>,
     )
 

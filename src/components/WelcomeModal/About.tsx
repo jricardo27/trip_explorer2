@@ -33,24 +33,26 @@ const About = (): React.ReactNode => {
               objectFit: "contain",
             }}
           />
-          Trip Explorer is a simple application that enables users to select points of interest (POIs) from a curated list on a map and export them as a KML
-          (Keyhole Markup Language) file.
+          Trip Explorer is a simple application that enables users to select points of interest (POIs) from a curated
+          list on a map and export them as a KML (Keyhole Markup Language) file.
         </Typography>
       </Box>
 
       <Typography variant="body1">
-        This file can be imported into an offline map such as Organic Maps in case you are travelling to a remote area with no phone coverage.
+        This file can be imported into an offline map such as Organic Maps in case you are travelling to a remote area
+        with no phone coverage.
       </Typography>
 
       <Typography variant="body1">
         <br />
-        In addition to selecting POIs, the application allows users to sort and categorize them, making it easy to plan trips in advance using each category
-        as a daily itinerary.
+        In addition to selecting POIs, the application allows users to sort and categorize them, making it easy to plan
+        trips in advance using each category as a daily itinerary.
       </Typography>
 
       <Typography variant="body1">
         <br />
-        Selected POIs are saved locally, and the application does not require a frontend or backend server, running entirely in the user&#39;s browser.
+        Selected POIs are saved locally, and the application does not require a frontend or backend server, running
+        entirely in the user&#39;s browser.
         <br />
         <br />
       </Typography>
@@ -72,14 +74,18 @@ const About = (): React.ReactNode => {
       <List>
         {sources.map(({ name, url }) => (
           <ListItem key={name} sx={{ paddingBottom: 0 }}>
-            <ListItemIcon><MdStarBorder /></ListItemIcon>
+            <ListItemIcon>
+              <MdStarBorder />
+            </ListItemIcon>
             <ListItemText
               sx={{ margin: 0 }}
-              primary={(
+              primary={
                 <Typography variant="body1">
-                  <Link href={url} target="_blank" rel="noopener noreferrer">{name}</Link>
+                  <Link href={url} target="_blank" rel="noopener noreferrer">
+                    {name}
+                  </Link>
                 </Typography>
-              )}
+              }
             />
           </ListItem>
         ))}

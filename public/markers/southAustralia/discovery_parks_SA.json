@@ -12,10 +12,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          139.78334045410156,
-          -37.16402053833008
-        ]
+        "coordinates": [139.78334045410156, -37.16402053833008]
       },
       "properties": {
         "id": "SROB",
@@ -55,10 +52,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          140.45361328125,
-          -34.2510986328125
-        ]
+        "coordinates": [140.45361328125, -34.2510986328125]
       },
       "properties": {
         "id": "SBON",
@@ -94,10 +88,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          138.77285766601562,
-          -35.496726989746094
-        ]
+        "coordinates": [138.77285766601562, -35.496726989746094]
       },
       "properties": {
         "id": "SGOO",
@@ -137,10 +128,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          138.79995727539062,
-          -35.0218391418457
-        ]
+        "coordinates": [138.79995727539062, -35.0218391418457]
       },
       "properties": {
         "id": "SHAH",
@@ -184,10 +172,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          138.95004272460938,
-          -34.53023147583008
-        ]
+        "coordinates": [138.95004272460938, -34.53023147583008]
       },
       "properties": {
         "id": "SBAR",
@@ -227,10 +212,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          138.50535583496094,
-          -34.94786071777344
-        ]
+        "coordinates": [138.50535583496094, -34.94786071777344]
       },
       "properties": {
         "id": "SWES",
@@ -270,10 +252,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          138.47874450683594,
-          -34.852691650390625
-        ]
+        "coordinates": [138.47874450683594, -34.852691650390625]
       },
       "properties": {
         "id": "SADE",
@@ -313,10 +292,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          138.62059020996094,
-          -33.8643684387207
-        ]
+        "coordinates": [138.62059020996094, -33.8643684387207]
       },
       "properties": {
         "id": "SCLA",
@@ -352,10 +328,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          136.80804443359375,
-          -35.96062469482422
-        ]
+        "coordinates": [136.80804443359375, -35.96062469482422]
       },
       "properties": {
         "id": "SKAN",
@@ -391,10 +364,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          137.5784912109375,
-          -33.04072189331055
-        ]
+        "coordinates": [137.5784912109375, -33.04072189331055]
       },
       "properties": {
         "id": "SWHY",
@@ -434,10 +404,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          137.754638671875,
-          -32.48078536987305
-        ]
+        "coordinates": [137.754638671875, -32.48078536987305]
       },
       "properties": {
         "id": "SAUG",
@@ -477,10 +444,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          138.6002960205078,
-          -31.529539108276367
-        ]
+        "coordinates": [138.6002960205078, -31.529539108276367]
       },
       "properties": {
         "id": "SWPR",
@@ -516,10 +480,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          135.47206115722656,
-          -34.62375259399414
-        ]
+        "coordinates": [135.47206115722656, -34.62375259399414]
       },
       "properties": {
         "id": "SCOF",
@@ -555,10 +516,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          136.8926239013672,
-          -30.566286087036133
-        ]
+        "coordinates": [136.8926239013672, -30.566286087036133]
       },
       "properties": {
         "id": "SROX",
@@ -598,10 +556,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          134.19802856445312,
-          -32.7957763671875
-        ]
+        "coordinates": [134.19802856445312, -32.7957763671875]
       },
       "properties": {
         "id": "SSTR",

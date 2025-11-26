@@ -19,6 +19,9 @@ vi.mock("../StyledGeoJson/StyledGeoJson", () => ({
 vi.mock("./FeatureMapContextMenu", () => ({
   default: () => <div data-testid="feature-map-context-menu" />,
 }))
+vi.mock("./TripRouteLayer", () => ({
+  default: () => <div data-testid="trip-route-layer" />,
+}))
 
 // Mock hooks
 const mockOverlayMarkers = {
@@ -31,6 +34,13 @@ vi.mock("../../hooks/useGeoJsonMarkers", () => ({
   default: () => mockOverlayMarkers,
 }))
 
+vi.mock("../../contexts/TripContext", () => ({
+  useTripContext: () => ({
+    trips: [],
+    currentTrip: null,
+  }),
+}))
+
 const mockContextValue = {
   savedFeatures: {
     all: [],
@@ -41,6 +51,11 @@ const mockContextValue = {
   updateFeature: vi.fn(),
   saveToLocalStorage: vi.fn(),
   loadFromLocalStorage: vi.fn(),
+  userId: "test-user",
+  setUserId: vi.fn(),
+  email: "test@example.com",
+  login: vi.fn(),
+  logout: vi.fn(),
 }
 
 describe("FeatureMap", () => {

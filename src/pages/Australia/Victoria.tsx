@@ -8,9 +8,11 @@ import { TTabMapping } from "../../data/types/TTabMapping"
 interface VictoriaProps {
   drawerOpen: boolean
   closeDrawer: () => void
+  isPinned?: boolean
+  onTogglePin?: () => void
 }
 
-export const Victoria = ({ drawerOpen, closeDrawer }: VictoriaProps): React.ReactNode => {
+export const Victoria = ({ drawerOpen, closeDrawer, isPinned, onTogglePin }: VictoriaProps): React.ReactNode => {
   const geoJsonOverlaySources = useMemo(
     (): Record<string, TTabMapping> => ({
       "/markers/victoria/accommodation_VIC.json": {
@@ -30,7 +32,18 @@ export const Victoria = ({ drawerOpen, closeDrawer }: VictoriaProps): React.Reac
       "/markers/victoria/discovery_parks_VIC.json": {
         General: ["name", "area", "website", "reviews"],
       },
-    }), [])
+    }),
+    [],
+  )
 
-  return <FeatureMap center={MELBOURNE_LOCATION} geoJsonOverlaySources={geoJsonOverlaySources} drawerOpen={drawerOpen} closeDrawer={closeDrawer} />
+  return (
+    <FeatureMap
+      center={MELBOURNE_LOCATION}
+      geoJsonOverlaySources={geoJsonOverlaySources}
+      drawerOpen={drawerOpen}
+      closeDrawer={closeDrawer}
+      isPinned={isPinned}
+      onTogglePin={onTogglePin}
+    />
+  )
 }

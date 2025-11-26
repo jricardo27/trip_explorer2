@@ -1,12 +1,4 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
-  Button,
-  Alert,
-} from "@mui/material"
+import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, Alert } from "@mui/material"
 import React, { useState } from "react"
 
 import { useTripContext } from "../../contexts/TripContext"
@@ -23,6 +15,20 @@ export const CreateTripModal: React.FC<CreateTripModalProps> = ({ open, onClose 
   const [error, setError] = useState<string | null>(null)
 
   const { createTrip, loading } = useTripContext()
+
+  React.useEffect(() => {
+    if (startDate) {
+      const start = new Date(startDate)
+      const nextDay = new Date(start)
+      nextDay.setDate(start.getDate() + 1)
+      const nextDayStr = nextDay.toISOString().split("T")[0]
+
+      // If end date is empty or before the new start date + 1, update it
+      if (!endDate || endDate < nextDayStr) {
+        setEndDate(nextDayStr)
+      }
+    }
+  }, [startDate, endDate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,7 +54,11 @@ export const CreateTripModal: React.FC<CreateTripModalProps> = ({ open, onClose 
       <DialogTitle>Create New Trip</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
           <TextField
             autoFocus
             margin="dense"

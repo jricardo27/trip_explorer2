@@ -42,7 +42,9 @@ export const useFeatureManagement = (
       removeFeature(selectedTab, contextMenuFeature)
       setSavedFeatures((prev: SavedFeaturesStateType) => ({
         ...prev,
-        [DEFAULT_CATEGORY]: prev[DEFAULT_CATEGORY].filter((f, index) => idxFeat(index, f) !== idxSel(contextMenuFeature)),
+        [DEFAULT_CATEGORY]: prev[DEFAULT_CATEGORY].filter(
+          (f, index) => idxFeat(index, f) !== idxSel(contextMenuFeature),
+        ),
       }))
     }
   }, [contextMenuFeature, selectedTab, removeFeature, setSavedFeatures])

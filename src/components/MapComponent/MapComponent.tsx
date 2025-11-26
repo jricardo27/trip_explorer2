@@ -53,19 +53,13 @@ const MapComponent = ({
     return savedBaseLayer ?? "Esri World Street Map"
   })
 
-  const memoizedSetOverlayVisibility = useCallback(
-    (newVisibility: React.SetStateAction<Record<string, boolean>>) => {
-      setOverlayVisibility(newVisibility)
-    },
-    [],
-  )
+  const memoizedSetOverlayVisibility = useCallback((newVisibility: React.SetStateAction<Record<string, boolean>>) => {
+    setOverlayVisibility(newVisibility)
+  }, [])
 
-  const memoizedSetActiveBaseLayer = useCallback(
-    (newBaseLayer: React.SetStateAction<string>) => {
-      setActiveBaseLayer(newBaseLayer)
-    },
-    [],
-  )
+  const memoizedSetActiveBaseLayer = useCallback((newBaseLayer: React.SetStateAction<string>) => {
+    setActiveBaseLayer(newBaseLayer)
+  }, [])
 
   useEffect(() => {
     localStorage.setItem("overlayVisibility", JSON.stringify(overlayVisibility))
@@ -75,10 +69,13 @@ const MapComponent = ({
     localStorage.setItem("activeBaseLayer", activeBaseLayer)
   }, [activeBaseLayer])
 
-  const handleMapMove = useCallback((center: [number, number], zoom: number, bounds: L.LatLngBounds) => {
-    setMapState({ center, zoom })
-    onBoundsChange?.(bounds)
-  }, [onBoundsChange])
+  const handleMapMove = useCallback(
+    (center: [number, number], zoom: number, bounds: L.LatLngBounds) => {
+      setMapState({ center, zoom })
+      onBoundsChange?.(bounds)
+    },
+    [onBoundsChange],
+  )
 
   return (
     <>
@@ -98,16 +95,8 @@ const MapComponent = ({
         <ZoomLevelDisplay />
         <LayersControl position="topright">
           {Object.entries(BaseLayers).map(([key, layer]) => (
-            <LayersControl.BaseLayer
-              key={key}
-              name={layer.name}
-              checked={activeBaseLayer === layer.name}
-            >
-              <TileLayer
-                attribution={layer.attribution}
-                url={layer.url}
-                maxZoom={layer.maxZoom || 20}
-              />
+            <LayersControl.BaseLayer key={key} name={layer.name} checked={activeBaseLayer === layer.name}>
+              <TileLayer attribution={layer.attribution} url={layer.url} maxZoom={layer.maxZoom || 20} />
             </LayersControl.BaseLayer>
           ))}
 

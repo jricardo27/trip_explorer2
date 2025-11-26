@@ -19,17 +19,16 @@ interface SortableFeatureItemProps {
   handleContextMenu: (event: React.MouseEvent | React.TouchEvent, selection: selectionInfo) => void
 }
 
-export const SortableFeatureItem = (
-  { feature, id, index, selectedTab, selectedFeature, setSelectedFeature, handleContextMenu }: SortableFeatureItemProps,
-) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: id })
+export const SortableFeatureItem = ({
+  feature,
+  id,
+  index,
+  selectedTab,
+  selectedFeature,
+  setSelectedFeature,
+  handleContextMenu,
+}: SortableFeatureItemProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -77,9 +76,7 @@ export const SortableFeatureItem = (
           <MdDragIndicator />
         </IconButton>
       </ListItemIcon>
-      <ListItemText
-        primary={feature.properties?.name || "Unnamed Feature"}
-      />
+      <ListItemText primary={feature.properties?.name || "Unnamed Feature"} />
     </ListItem>
   )
 }

@@ -7,9 +7,14 @@ import {
   TextField,
   Box,
   Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from "@mui/material"
 import React, { useState } from "react"
 
+import { TRANSPORT_MODES } from "../../constants/transportModes"
 import { DayLocation } from "../../contexts/TripContext"
 
 import { LocationAutocomplete, CityOption } from "./LocationAutocomplete"
@@ -21,15 +26,16 @@ interface AddLocationModalProps {
   dayDate: string
 }
 
-export const AddLocationModal: React.FC<AddLocationModalProps> = ({
-  open,
-  onClose,
-  onAddLocation,
-  dayDate,
-}) => {
+export const AddLocationModal: React.FC<AddLocationModalProps> = ({ open, onClose, onAddLocation, dayDate }) => {
   const [selectedCity, setSelectedCity] = useState<CityOption | null>(null)
   const [notes, setNotes] = useState("")
   const [visitOrder, setVisitOrder] = useState(1)
+  const [transportMode, setTransportMode] = useState("")
+  const [transportDetails, setTransportDetails] = useState("")
+  const [transportCost, setTransportCost] = useState("")
+  const [durationMinutes, setDurationMinutes] = useState("")
+  const [startTime, setStartTime] = useState("")
+  const [endTime, setEndTime] = useState("")
 
   const handleSubmit = () => {
     if (!selectedCity) return
@@ -42,6 +48,12 @@ export const AddLocationModal: React.FC<AddLocationModalProps> = ({
       longitude: parseFloat(selectedCity.longitude),
       visit_order: visitOrder,
       notes: notes.trim() || undefined,
+      transport_mode: transportMode.trim() || undefined,
+      transport_details: transportDetails.trim() || undefined,
+      transport_cost: transportCost ? parseFloat(transportCost) : undefined,
+      duration_minutes: durationMinutes ? parseInt(durationMinutes) : undefined,
+      start_time: startTime || undefined,
+      end_time: endTime || undefined,
     }
 
     onAddLocation(location)
@@ -52,19 +64,24 @@ export const AddLocationModal: React.FC<AddLocationModalProps> = ({
     setSelectedCity(null)
     setNotes("")
     setVisitOrder(1)
+    setTransportMode("")
+    setTransportDetails("")
+    setTransportCost("")
+    setDurationMinutes("")
+    setStartTime("")
+    setEndTime("")
     onClose()
   }
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add Location to {dayDate}</DialogTitle>
+      <DialogTitle>
+        Add Location to
+        {dayDate}
+      </DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 1 }}>
-          <LocationAutocomplete
-            value={selectedCity}
-            onChange={setSelectedCity}
-            label="Search for a city or town"
-          />
+          <LocationAutocomplete value={selectedCity} onChange={setSelectedCity} label="Search for a city or town" />
 
           {selectedCity && (
             <Box sx={{ p: 2, bgcolor: "background.default", borderRadius: 1 }}>
@@ -83,6 +100,68 @@ export const AddLocationModal: React.FC<AddLocationModalProps> = ({
             </Box>
           )}
 
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <FormControl fullWidth>
+              <InputLabel>Transport Mode</InputLabel>
+              <Select value={transportMode} label="Transport Mode" onChange={(e) => setTransportMode(e.target.value)}>
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {TRANSPORT_MODES.map((mode) => (
+                  <MenuItem key={mode.id} value={mode.id}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <mode.icon />
+                      {mode.label}
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label="Duration (mins)"
+              type="number"
+              value={durationMinutes}
+              onChange={(e) => setDurationMinutes(e.target.value)}
+              fullWidth
+            />
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <TextField
+              label="Transport Details"
+              value={transportDetails}
+              onChange={(e) => setTransportDetails(e.target.value)}
+              placeholder="e.g., Flight AA123"
+              fullWidth
+            />
+            <TextField
+              label="Cost"
+              type="number"
+              value={transportCost}
+              onChange={(e) => setTransportCost(e.target.value)}
+              fullWidth
+            />
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <TextField
+              label="Start Time"
+              type="time"
+              InputLabelProps={{ shrink: true }}
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="End Time"
+              type="time"
+              InputLabelProps={{ shrink: true }}
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              fullWidth
+            />
+          </Box>
+
           <TextField
             label="Notes (optional)"
             multiline
@@ -96,11 +175,7 @@ export const AddLocationModal: React.FC<AddLocationModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={!selectedCity}
-        >
+        <Button onClick={handleSubmit} variant="contained" disabled={!selectedCity}>
           Add Location
         </Button>
       </DialogActions>

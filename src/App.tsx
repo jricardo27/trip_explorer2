@@ -57,6 +57,8 @@ function App(): React.ReactNode {
     }
   }, [])
 
+  const [isPinned, setIsPinned] = useState(false)
+
   const handleClose = () => {
     setWelcomeDialogOpen(false)
   }
@@ -69,6 +71,10 @@ function App(): React.ReactNode {
     setDrawerOpen(false)
   }
 
+  const togglePin = () => {
+    setIsPinned(!isPinned)
+  }
+
   return (
     <HashRouter basename="">
       <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
@@ -78,16 +84,116 @@ function App(): React.ReactNode {
             <TopMenu onMenuClick={openDrawer} />
             <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
               <Routes>
-                <Route path="/" element={<Destinations />} />
-                <Route path="/australianCapitalTerritory" element={<AustralianCapitalTerritory drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-                <Route path="/newSouthWales" element={<NewSouthWales drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-                <Route path="/northernTerritory" element={<NorthernTerritory drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-                <Route path="/queensland" element={<Queensland drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-                <Route path="/southAustralia" element={<SouthAustralia drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-                <Route path="/tasmania" element={<Tasmania drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-                <Route path="/victoria" element={<Victoria drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-                <Route path="/westernAustralia" element={<WesternAustralia drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
-                <Route path="/newZealand" element={<NewZealand drawerOpen={drawerOpen} closeDrawer={closeDrawer} />} />
+                <Route
+                  path="/"
+                  element={
+                    <Destinations
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
+                <Route
+                  path="/australianCapitalTerritory"
+                  element={
+                    <AustralianCapitalTerritory
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
+                <Route
+                  path="/newSouthWales"
+                  element={
+                    <NewSouthWales
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
+                <Route
+                  path="/northernTerritory"
+                  element={
+                    <NorthernTerritory
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
+                <Route
+                  path="/queensland"
+                  element={
+                    <Queensland
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
+                <Route
+                  path="/southAustralia"
+                  element={
+                    <SouthAustralia
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
+                <Route
+                  path="/tasmania"
+                  element={
+                    <Tasmania
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
+                <Route
+                  path="/victoria"
+                  element={
+                    <Victoria
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
+                <Route
+                  path="/westernAustralia"
+                  element={
+                    <WesternAustralia
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
+                <Route
+                  path="/newZealand"
+                  element={
+                    <NewZealand
+                      drawerOpen={drawerOpen}
+                      closeDrawer={closeDrawer}
+                      isPinned={isPinned}
+                      onTogglePin={togglePin}
+                    />
+                  }
+                />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Box>

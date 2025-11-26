@@ -11,7 +11,7 @@ export const useFeatureSelection = (): UseFeatureSelection => {
   const [selectedFeature, setSelectedFeature] = useState<selectionInfo | null>(null)
 
   const setSelectedFeatureCallback = useCallback((selection: selectionInfo | null) => {
-    setSelectedFeature((prev) => prev === selection ? null : selection)
+    setSelectedFeature((prev) => (prev === selection ? null : selection))
   }, [])
 
   return {

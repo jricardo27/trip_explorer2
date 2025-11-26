@@ -70,41 +70,55 @@ export const FeatureList = ({
 
   return (
     <List>
-      {items.map((item) => ( // Changed to items.map; mapIndex is not strictly needed if key is stable
-        <React.Fragment key={idxFeat(item.originalIndex, item.feature)}>
-          <SortableFeatureItem
-            feature={item.feature}
-            id={idxFeat(item.originalIndex, item.feature)} // Use originalIndex for stable ID
-            index={item.originalIndex} // Pass originalIndex as index
-            selectedTab={selectedTab}
-            selectedFeature={selectedFeature}
-            setSelectedFeature={setSelectedFeature}
-            handleContextMenu={handleContextMenu}
-          />
-          <Collapse in={idxSel(selectedFeature) === idxFeat(item.originalIndex, item.feature)} timeout="auto" unmountOnExit>
-            <ListItem sx={{ pl: 4 }}>
-              <Button onClick={() => openCloseEditor(item.feature)}>Add/edit notes</Button>
-            </ListItem>
-            {editorVisible && (
-              <>
-                <ListItem sx={{ pl: 4 }}>
-                  <NoteEditor key={idxFeat(item.originalIndex, item.feature)} initialText={notes} onChange={handleNotesChange} />
-                </ListItem>
-                <ListItem sx={{ pl: 4 }}><Button onClick={handleSaveNotes}>Save notes</Button></ListItem>
-              </>
-            )}
-            <List component="div" disablePadding>
-              {Object.entries(item.feature.properties || {})
-                .filter(([key]) => !excludedProperties.includes(key))
-                .map(([key, value]) => (
-                  <ListItem key={key} sx={{ pl: 4 }}>
-                    <ListItemText primary={`${key}: ${value}`} />
+      {items.map(
+        (
+          item, // Changed to items.map; mapIndex is not strictly needed if key is stable
+        ) => (
+          <React.Fragment key={idxFeat(item.originalIndex, item.feature)}>
+            <SortableFeatureItem
+              feature={item.feature}
+              id={idxFeat(item.originalIndex, item.feature)} // Use originalIndex for stable ID
+              index={item.originalIndex} // Pass originalIndex as index
+              selectedTab={selectedTab}
+              selectedFeature={selectedFeature}
+              setSelectedFeature={setSelectedFeature}
+              handleContextMenu={handleContextMenu}
+            />
+            <Collapse
+              in={idxSel(selectedFeature) === idxFeat(item.originalIndex, item.feature)}
+              timeout="auto"
+              unmountOnExit
+            >
+              <ListItem sx={{ pl: 4 }}>
+                <Button onClick={() => openCloseEditor(item.feature)}>Add/edit notes</Button>
+              </ListItem>
+              {editorVisible && (
+                <>
+                  <ListItem sx={{ pl: 4 }}>
+                    <NoteEditor
+                      key={idxFeat(item.originalIndex, item.feature)}
+                      initialText={notes}
+                      onChange={handleNotesChange}
+                    />
                   </ListItem>
-                ))}
-            </List>
-          </Collapse>
-        </React.Fragment>
-      ))}
+                  <ListItem sx={{ pl: 4 }}>
+                    <Button onClick={handleSaveNotes}>Save notes</Button>
+                  </ListItem>
+                </>
+              )}
+              <List component="div" disablePadding>
+                {Object.entries(item.feature.properties || {})
+                  .filter(([key]) => !excludedProperties.includes(key))
+                  .map(([key, value]) => (
+                    <ListItem key={key} sx={{ pl: 4 }}>
+                      <ListItemText primary={`${key}: ${value}`} />
+                    </ListItem>
+                  ))}
+              </List>
+            </Collapse>
+          </React.Fragment>
+        ),
+      )}
     </List>
   )
 }

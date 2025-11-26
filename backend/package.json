@@ -1,36 +1,40 @@
 {
-    "name": "trip-explorer-backend",
-    "version": "1.0.0",
-    "description": "Backend for Trip Explorer",
-    "main": "src/index.ts",
-    "scripts": {
-        "start": "ts-node src/index.ts",
-        "dev": "nodemon src/index.ts",
-        "migrate": "ts-node src/migrate.ts",
-        "migrate:markers": "ts-node src/migrations/loadMarkers.ts",
-        "test": "vitest"
-    },
-    "dependencies": {
-        "@types/adm-zip": "^0.5.7",
-        "adm-zip": "^0.5.16",
-        "axios": "^1.13.2",
-        "bcryptjs": "^3.0.3",
-        "cors": "^2.8.5",
-        "dotenv": "^16.3.1",
-        "express": "^4.18.2",
-        "pg": "^8.11.3"
-    },
-    "devDependencies": {
-        "@types/bcryptjs": "^2.4.6",
-        "@types/cors": "^2.8.17",
-        "@types/express": "^4.17.21",
-        "@types/node": "^20.10.0",
-        "@types/pg": "^8.10.9",
-        "@types/supertest": "^6.0.3",
-        "nodemon": "^3.0.1",
-        "supertest": "^7.1.4",
-        "ts-node": "^10.9.1",
-        "typescript": "^5.3.2",
-        "vitest": "^4.0.12"
-    }
+  "name": "trip-explorer-backend",
+  "version": "1.0.0",
+  "description": "Backend for Trip Explorer",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts",
+    "migrate": "ts-node src/migrate.ts",
+    "migrate:markers": "ts-node src/migrations/loadMarkers.ts",
+    "migrate:cities": "ts-node src/migrations/loadCities.ts",
+    "migrate:unique": "ts-node src/migrations/addCityUniqueConstraint.ts",
+    "migrate:transport": "ts-node src/migrations/addTransportColumns.ts",
+    "migrate:unified": "ts-node src/migrations/addUnifiedTripColumns.ts",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "adm-zip": "^0.5.16",
+    "axios": "^1.13.2",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/pg": "^8.10.9",
+    "@types/supertest": "^6.0.3",
+    "nodemon": "^3.0.1",
+    "supertest": "^7.1.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2",
+    "vitest": "^4.0.12"
+  }
 }

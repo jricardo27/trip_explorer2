@@ -17,5 +17,5 @@ export default function deepMerge(target: Record<string, TAny>, source: Record<s
 }
 
 function isObject(item: TAny) {
-  return (item && typeof item === "object" && !Array.isArray(item))
+  return item && typeof item === "object" && !Array.isArray(item)
 }

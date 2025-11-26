@@ -1,5 +1,4 @@
 import { render } from "@testing-library/react"
-import React from "react"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
 import MapEvents from "./MapEvents"
@@ -31,22 +30,19 @@ describe("MapEvents", () => {
       />,
     )
 
-    expect(mockUseMapEvents).toHaveBeenCalledWith(expect.objectContaining({
-      overlayadd: expect.any(Function),
-      overlayremove: expect.any(Function),
-      baselayerchange: expect.any(Function),
-      contextmenu: contextMenuHandler,
-    }))
+    expect(mockUseMapEvents).toHaveBeenCalledWith(
+      expect.objectContaining({
+        overlayadd: expect.any(Function),
+        overlayremove: expect.any(Function),
+        baselayerchange: expect.any(Function),
+        contextmenu: contextMenuHandler,
+      }),
+    )
   })
 
   it("should handle overlay add event", () => {
     const setOverlayVisibility = vi.fn()
-    render(
-      <MapEvents
-        setOverlayVisibility={setOverlayVisibility}
-        setActiveBaseLayer={vi.fn()}
-      />,
-    )
+    render(<MapEvents setOverlayVisibility={setOverlayVisibility} setActiveBaseLayer={vi.fn()} />)
 
     const handlers = mockUseMapEvents.mock.calls[0][0]
     handlers.overlayadd({ name: "Layer 1" })

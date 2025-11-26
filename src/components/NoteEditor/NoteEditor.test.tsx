@@ -1,12 +1,19 @@
 import { render, screen, fireEvent } from "@testing-library/react"
-import React from "react"
 import { describe, it, expect, vi } from "vitest"
 
 import NoteEditor from "./NoteEditor"
 
 // Mock TinyMCE Editor
 vi.mock("@tinymce/tinymce-react", () => ({
-  Editor: ({ value, onEditorChange, onChange }: { value: string; onEditorChange: (value: string) => void; onChange: (value: string) => void }) => (
+  Editor: ({
+    value,
+    onEditorChange,
+    onChange,
+  }: {
+    value: string
+    onEditorChange: (value: string) => void
+    onChange: (value: string) => void
+  }) => (
     <textarea
       data-testid="mock-editor"
       value={value}

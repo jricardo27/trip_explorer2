@@ -1,5 +1,6 @@
 import pluginJs from "@eslint/js"
 import pluginStylisticJs from "@stylistic/eslint-plugin"
+import eslintConfigPrettier from "eslint-config-prettier"
 import pluginImport from "eslint-plugin-import"
 import pluginReact from "eslint-plugin-react"
 import reactHooks from "eslint-plugin-react-hooks"
@@ -16,6 +17,7 @@ export default [
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
   pluginStylisticJs.configs["recommended-flat"],
+  eslintConfigPrettier,
   {
     files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
     languageOptions: { globals: globals.browser },
@@ -31,35 +33,13 @@ export default [
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@stylistic/max-len": ["error", { code: 160 }],
       "@stylistic/quotes": [2, "double", { avoidEscape: true }],
+      "react/react-in-jsx-scope": "off",
     },
   },
-  {
-    name: "eslintConfigPrettier Overrides",
-    rules: {
-      "@stylistic/arrow-parens": ["error", "always"],
-      "@stylistic/brace-style": ["error", "1tbs", { allowSingleLine: true }],
-      "@stylistic/member-delimiter-style": [
-        "error",
-        {
-          singleline: { delimiter: "semi", requireLast: false },
-          multiline: {
-            delimiter: "none",
-            requireLast: true,
-          },
-        },
-      ],
-      "@stylistic/multiline-ternary": ["error", "always-multiline", { ignoreJSX: true }],
-      "@stylistic/jsx-one-expression-per-line": ["error", { allow: "single-line" }],
-      "@stylistic/operator-linebreak": ["error", "after", { overrides: { "?": "before", ":": "before", "=": "after" } }],
-      "@stylistic/quote-props": ["error", "as-needed"],
-    },
-  },
+
   {
     // Import plugin configuration for sorting imports
     plugins: {

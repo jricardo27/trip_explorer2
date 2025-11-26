@@ -89,7 +89,7 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
   return (
     <Autocomplete
       id="location-autocomplete"
-      getOptionLabel={(option) => typeof option === "string" ? option : `${option.name}, ${option.country_name}`}
+      getOptionLabel={(option) => (typeof option === "string" ? option : `${option.name}, ${option.country_name}`)}
       filterOptions={(x) => x}
       options={options}
       autoComplete

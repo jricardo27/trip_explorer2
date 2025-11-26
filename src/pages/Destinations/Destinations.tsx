@@ -22,7 +22,14 @@ const destinations = [
   },
 ]
 
-const Destinations: React.FC = () => {
+interface DestinationsProps {
+  drawerOpen?: boolean
+  closeDrawer?: () => void
+  isPinned?: boolean
+  onTogglePin?: () => void
+}
+
+const Destinations: React.FC<DestinationsProps> = () => {
   const navigate = useNavigate()
 
   const handleDestinationClick = (path: string) => {

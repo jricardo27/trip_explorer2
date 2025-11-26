@@ -23,10 +23,10 @@ async function migrate() {
         const content = fs.readFileSync(file, "utf-8")
         const data = JSON.parse(content)
 
-        await query(
-          "INSERT INTO markers (path, data) VALUES ($1, $2) ON CONFLICT (path) DO UPDATE SET data = $2",
-          [pathKey, data],
-        )
+        await query("INSERT INTO markers (path, data) VALUES ($1, $2) ON CONFLICT (path) DO UPDATE SET data = $2", [
+          pathKey,
+          data,
+        ])
       }
     }
 

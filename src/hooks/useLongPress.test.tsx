@@ -46,7 +46,11 @@ describe("useLongPress", () => {
     it("should call callback after specified duration", () => {
       const duration = 1000
       const { result } = renderHook(() => useLongPress(mockCallback, duration))
-      const mockEvent = { touches: [{ clientX: 0, clientY: 0 }], preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.TouchEvent
+      const mockEvent = {
+        touches: [{ clientX: 0, clientY: 0 }],
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
+      } as unknown as React.TouchEvent
 
       act(() => result.current.onTouchStart(mockEvent))
       act(() => vi.advanceTimersByTime(duration))
@@ -80,7 +84,11 @@ describe("useLongPress", () => {
 
     it("should NOT cancel long press on onTouchMove if within tolerance", () => {
       const { result } = renderHook(() => useLongPress(mockCallback))
-      const startEvent = { touches: [{ clientX: 0, clientY: 0 }], preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.TouchEvent
+      const startEvent = {
+        touches: [{ clientX: 0, clientY: 0 }],
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
+      } as unknown as React.TouchEvent
       const moveEvent = { touches: [{ clientX: TOUCH_MOVE_TOLERANCE - 1, clientY: 0 }] } as unknown as React.TouchEvent
 
       act(() => result.current.onTouchStart(startEvent))
@@ -97,7 +105,13 @@ describe("useLongPress", () => {
   describe("Mouse Events (Long Left-Click)", () => {
     it("should call callback on long mouse down (left-click)", () => {
       const { result } = renderHook(() => useLongPress(mockCallback))
-      const mockEvent = { button: 0, clientX: 0, clientY: 0, preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.MouseEvent
+      const mockEvent = {
+        button: 0,
+        clientX: 0,
+        clientY: 0,
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
+      } as unknown as React.MouseEvent
 
       act(() => result.current.onMouseDown(mockEvent))
       act(() => vi.advanceTimersByTime(DEFAULT_DURATION))
@@ -143,7 +157,14 @@ describe("useLongPress", () => {
 
     it("should NOT cancel long press on onMouseMove if within tolerance (left button pressed)", () => {
       const { result } = renderHook(() => useLongPress(mockCallback))
-      const mockEvent = { button: 0, clientX: 0, clientY: 0, buttons: 1, preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.MouseEvent
+      const mockEvent = {
+        button: 0,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1,
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
+      } as unknown as React.MouseEvent
       const moveEvent = { clientX: TOUCH_MOVE_TOLERANCE - 1, clientY: 0, buttons: 1 } as unknown as React.MouseEvent
 
       act(() => result.current.onMouseDown(mockEvent))
@@ -156,7 +177,14 @@ describe("useLongPress", () => {
 
     it("should NOT cancel long press on onMouseMove if left button is NOT pressed", () => {
       const { result } = renderHook(() => useLongPress(mockCallback))
-      const mockEvent = { button: 0, clientX: 0, clientY: 0, buttons: 1, preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.MouseEvent
+      const mockEvent = {
+        button: 0,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1,
+        preventDefault: vi.fn(),
+        stopPropagation: vi.fn(),
+      } as unknown as React.MouseEvent
       // Note: buttons: 0 means no button is pressed during move
       const moveEvent = { clientX: TOUCH_MOVE_TOLERANCE + 1, clientY: 0, buttons: 0 } as unknown as React.MouseEvent
 

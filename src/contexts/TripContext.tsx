@@ -4,7 +4,6 @@ import SavedFeaturesContext from "./SavedFeaturesContext"
 
 export interface TripDay {
   id: string
-  trip_id: string
   day_index: number
   date: string
 }
@@ -29,13 +28,43 @@ export interface DayLocation {
   longitude?: number
   visit_order: number
   notes?: string
+  transport_mode?: string
+  transport_details?: string
+  transport_cost?: number
+  duration_minutes?: number
+  start_time?: string
+  end_time?: string
   created_at: string
+}
+
+export interface TripFeature {
+  type: "Feature"
+  properties: {
+    id: string
+    name?: string
+    title?: string
+    description?: string
+    [key: string]: unknown
+  }
+  geometry: {
+    type: string
+    coordinates: number[]
+  }
+  saved_id?: string
+  trip_day_id?: string
+  visit_order?: number
+  transport_mode?: string
+  transport_details?: string
+  transport_cost?: number
+  duration_minutes?: number
+  start_time?: string
+  end_time?: string
 }
 
 interface TripContextType {
   trips: Trip[]
   currentTrip: Trip | null
-  dayFeatures: Record<string, unknown[]>
+  dayFeatures: Record<string, TripFeature[]>
   dayLocations: Record<string, DayLocation[]>
   loading: boolean
   fetchTrips: () => Promise<void>
@@ -45,9 +74,11 @@ interface TripContextType {
   addLocationToDay: (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => Promise<void>
   deleteLocation: (locationId: string, dayId: string) => Promise<void>
   addFeatureToDay: (dayId: string, feature: unknown) => Promise<void>
+  deleteFeature: (savedId: string, dayId: string) => Promise<void>
   createTrip: (name: string, startDate: string, endDate: string) => Promise<void>
   deleteTrip: (id: string) => Promise<void>
   setCurrentTrip: (trip: Trip | null) => void
+  reorderItems: (dayId: string, items: { id: string; type: "location" | "feature"; order: number }[]) => Promise<void>
 }
 
 const TripContext = createContext<TripContextType | undefined>(undefined)
@@ -55,7 +86,7 @@ const TripContext = createContext<TripContextType | undefined>(undefined)
 export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [trips, setTrips] = useState<Trip[]>([])
   const [currentTrip, setCurrentTrip] = useState<Trip | null>(null)
-  const [dayFeatures, setDayFeatures] = useState<Record<string, unknown[]>>({})
+  const [dayFeatures, setDayFeatures] = useState<Record<string, TripFeature[]>>({})
   const [dayLocations, setDayLocations] = useState<Record<string, DayLocation[]>>({})
   const [loading, setLoading] = useState(false)
 
@@ -79,20 +110,46 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [userId, API_URL])
 
-  const fetchTripDetails = useCallback(async (id: string) => {
-    setLoading(true)
-    try {
-      const response = await fetch(`${API_URL}/api/trips/${id}`)
-      if (response.ok) {
-        const data = await response.json()
-        setCurrentTrip(data)
+  const fetchTripDetails = useCallback(
+    async (id: string) => {
+      setLoading(true)
+      try {
+        const response = await fetch(`${API_URL}/api/trips/${id}`)
+        if (response.ok) {
+          const data = await response.json()
+          setCurrentTrip(data)
+
+          // Process locations
+          if (data.allLocations) {
+            const locsByDay: Record<string, DayLocation[]> = {}
+            data.allLocations.forEach((loc: DayLocation) => {
+              if (!locsByDay[loc.trip_day_id]) locsByDay[loc.trip_day_id] = []
+              locsByDay[loc.trip_day_id].push(loc)
+            })
+            setDayLocations((prev) => ({ ...prev, ...locsByDay }))
+          }
+
+          // Process features
+          if (data.allFeatures) {
+            const featsByDay: Record<string, TripFeature[]> = {}
+            data.allFeatures.forEach((feat: TripFeature) => {
+              const dayId = feat.trip_day_id
+              if (dayId) {
+                if (!featsByDay[dayId]) featsByDay[dayId] = []
+                featsByDay[dayId].push(feat)
+              }
+            })
+            setDayFeatures((prev) => ({ ...prev, ...featsByDay }))
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch trip details:", error)
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error("Failed to fetch trip details:", error)
-    } finally {
-      setLoading(false)
-    }
-  }, [API_URL])
+    },
+    [API_URL],
+  )
 
   const createTrip = async (name: string, startDate: string, endDate: string) => {
     if (!userId) return
@@ -135,17 +192,20 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const fetchDayFeatures = useCallback(async (dayId: string) => {
-    try {
-      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features`)
-      if (response.ok) {
-        const data = await response.json()
-        setDayFeatures((prev) => ({ ...prev, [dayId]: data }))
+  const fetchDayFeatures = useCallback(
+    async (dayId: string) => {
+      try {
+        const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features`)
+        if (response.ok) {
+          const data = await response.json()
+          setDayFeatures((prev) => ({ ...prev, [dayId]: data }))
+        }
+      } catch (error) {
+        console.error("Failed to fetch day features:", error)
       }
-    } catch (error) {
-      console.error("Failed to fetch day features:", error)
-    }
-  }, [API_URL])
+    },
+    [API_URL],
+  )
 
   const addFeatureToDay = async (dayId: string, feature: unknown) => {
     if (!userId) return
@@ -169,17 +229,20 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const fetchDayLocations = useCallback(async (dayId: string) => {
-    try {
-      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/locations`)
-      if (response.ok) {
-        const data = await response.json()
-        setDayLocations((prev) => ({ ...prev, [dayId]: data }))
+  const fetchDayLocations = useCallback(
+    async (dayId: string) => {
+      try {
+        const response = await fetch(`${API_URL}/api/trip-days/${dayId}/locations`)
+        if (response.ok) {
+          const data = await response.json()
+          setDayLocations((prev) => ({ ...prev, [dayId]: data }))
+        }
+      } catch (error) {
+        console.error("Failed to fetch day locations:", error)
       }
-    } catch (error) {
-      console.error("Failed to fetch day locations:", error)
-    }
-  }, [API_URL])
+    },
+    [API_URL],
+  )
 
   const addLocationToDay = async (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => {
     try {
@@ -211,6 +274,38 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
+  const deleteFeature = async (savedId: string, dayId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features/${savedId}`, {
+        method: "DELETE",
+      })
+      if (response.ok) {
+        await fetchDayFeatures(dayId)
+      }
+    } catch (error) {
+      console.error("Failed to delete feature:", error)
+      throw error
+    }
+  }
+
+  const reorderItems = async (dayId: string, items: { id: string; type: "location" | "feature"; order: number }[]) => {
+    try {
+      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/reorder`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      })
+      if (response.ok) {
+        // Optimistically update or refetch
+        // Refetching is safer for now
+        await fetchTripDetails(currentTrip!.id)
+      }
+    } catch (error) {
+      console.error("Failed to reorder items:", error)
+      throw error
+    }
+  }
+
   useEffect(() => {
     fetchTrips()
   }, [fetchTrips])
@@ -230,9 +325,11 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addLocationToDay,
         deleteLocation,
         addFeatureToDay,
+        deleteFeature,
         createTrip,
         deleteTrip,
         setCurrentTrip,
+        reorderItems,
       }}
     >
       {children}

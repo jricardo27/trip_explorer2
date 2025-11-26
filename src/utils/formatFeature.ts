@@ -14,7 +14,8 @@ const formatFeature = (feature: GeoJsonFeature): GeoJsonFeature => {
     const tripNotes = turndown.turndown(feature.properties.tripNotes)
 
     if (tripNotes) {
-      new_feature.properties.description = tripNotes + "\n\n--------------------\n\n" + new_feature.properties.description
+      new_feature.properties.description =
+        tripNotes + "\n\n--------------------\n\n" + new_feature.properties.description
     }
   }
 

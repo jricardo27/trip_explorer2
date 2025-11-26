@@ -8,9 +8,11 @@ import { TTabMapping } from "../../data/types/TTabMapping"
 interface QueenslandProps {
   drawerOpen: boolean
   closeDrawer: () => void
+  isPinned?: boolean
+  onTogglePin?: () => void
 }
 
-export const Queensland = ({ drawerOpen, closeDrawer }: QueenslandProps): React.ReactNode => {
+export const Queensland = ({ drawerOpen, closeDrawer, isPinned, onTogglePin }: QueenslandProps): React.ReactNode => {
   const geoJsonOverlaySources = useMemo(
     (): Record<string, TTabMapping> => ({
       "/markers/queensland/accommodation_QLD.json": {
@@ -30,7 +32,18 @@ export const Queensland = ({ drawerOpen, closeDrawer }: QueenslandProps): React.
       "/markers/queensland/discovery_parks_QLD.json": {
         General: ["name", "area", "website", "reviews"],
       },
-    }), [])
+    }),
+    [],
+  )
 
-  return <FeatureMap center={BRISBANE_LOCATION} geoJsonOverlaySources={geoJsonOverlaySources} drawerOpen={drawerOpen} closeDrawer={closeDrawer} />
+  return (
+    <FeatureMap
+      center={BRISBANE_LOCATION}
+      geoJsonOverlaySources={geoJsonOverlaySources}
+      drawerOpen={drawerOpen}
+      closeDrawer={closeDrawer}
+      isPinned={isPinned}
+      onTogglePin={onTogglePin}
+    />
+  )
 }

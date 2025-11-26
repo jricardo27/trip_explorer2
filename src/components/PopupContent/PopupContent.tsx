@@ -61,12 +61,7 @@ const PopupContent = ({ feature, tabMapping, containerProps, bottomMenu }: iPopu
 
           {/* Tab content */}
           {Object.entries(tabMapping).map(([tabName, tabKeys], index) => (
-            <div
-              key={tabName}
-              role="tabpanel"
-              hidden={tabValue !== index}
-              id={`tabpanel-${index}`}
-            >
+            <div key={tabName} role="tabpanel" hidden={tabValue !== index} id={`tabpanel-${index}`}>
               {tabValue === index && (
                 <Box sx={{ p: 1 }}>
                   {tabKeys.map((entry: string | TTabMappingDynamicTab) => {
@@ -91,11 +86,14 @@ const PopupContent = ({ feature, tabMapping, containerProps, bottomMenu }: iPopu
                       isFlat = false
                     }
 
-                    if (isFlat && (typeof value === "string" || typeof value === "number" || typeof value === "boolean")) {
+                    if (
+                      isFlat &&
+                      (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+                    ) {
                       return (
                         <Typography key={propTitle} variant="subtitle1">
                           <strong>{propTitle}:</strong>
-                          <span>{" "}{String(value)}</span>
+                          <span> {String(value)}</span>
                         </Typography>
                       )
                     } else if (typeof value === "object" && value !== null) {
@@ -109,8 +107,18 @@ const PopupContent = ({ feature, tabMapping, containerProps, bottomMenu }: iPopu
                         <Typography variant="subtitle1">
                           <strong>{propTitle}:</strong>
                         </Typography>
-                        {value && !isHtml && <Typography component={htmlComponent} variant={htmlVariant} className={className}>{String(value)}</Typography>}
-                        {value && isHtml && <Typography component="div" className={className} dangerouslySetInnerHTML={{ __html: value }} />}
+                        {value && !isHtml && (
+                          <Typography component={htmlComponent} variant={htmlVariant} className={className}>
+                            {String(value)}
+                          </Typography>
+                        )}
+                        {value && isHtml && (
+                          <Typography
+                            component="div"
+                            className={className}
+                            dangerouslySetInnerHTML={{ __html: value }}
+                          />
+                        )}
                       </div>
                     )
                   })}
@@ -144,8 +152,16 @@ const PopupContent = ({ feature, tabMapping, containerProps, bottomMenu }: iPopu
         )}
       </div>
       {bottomMenu && (
-        <div style={{ height: "30px", borderTop: "1px solid #ccc", display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-          { bottomMenu }
+        <div
+          style={{
+            height: "30px",
+            borderTop: "1px solid #ccc",
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}
+        >
+          {bottomMenu}
         </div>
       )}
     </div>

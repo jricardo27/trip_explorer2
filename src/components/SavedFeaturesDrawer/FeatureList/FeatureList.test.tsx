@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from "@testing-library/react"
-import React from "react"
 import { describe, it, expect, vi } from "vitest"
 
 import { FeatureList } from "./FeatureList"
@@ -15,11 +14,7 @@ vi.mock("./SortableFeatureItem", () => ({
 
 vi.mock("../../NoteEditor/NoteEditor", () => ({
   default: ({ initialText, onChange }: { initialText: string; onChange: (value: string) => void }) => (
-    <textarea
-      data-testid="note-editor"
-      value={initialText}
-      onChange={(e) => onChange(e.target.value)}
-    />
+    <textarea data-testid="note-editor" value={initialText} onChange={(e) => onChange(e.target.value)} />
   ),
 }))
 
@@ -27,11 +22,19 @@ describe("FeatureList", () => {
   const defaultProps = {
     items: [
       {
-        feature: { type: "Feature", properties: { name: "Feature 1", tripNotes: "Note 1" }, geometry: { type: "Point", coordinates: [0, 0] } },
+        feature: {
+          type: "Feature",
+          properties: { name: "Feature 1", tripNotes: "Note 1" },
+          geometry: { type: "Point", coordinates: [0, 0] },
+        },
         originalIndex: 0,
       },
       {
-        feature: { type: "Feature", properties: { name: "Feature 2" }, geometry: { type: "Point", coordinates: [1, 1] } },
+        feature: {
+          type: "Feature",
+          properties: { name: "Feature 2" },
+          geometry: { type: "Point", coordinates: [1, 1] },
+        },
         originalIndex: 1,
       },
     ],

@@ -19,41 +19,47 @@ export const useCategoryManagement = (
   savedFeatures: SavedFeaturesStateType,
   contextMenuTab: string | null,
 ): UseCategoryManagement => {
-  const moveCategory = useCallback((direction: "up" | "down") => {
-    if (!contextMenuTab || contextMenuTab === DEFAULT_CATEGORY) return
+  const moveCategory = useCallback(
+    (direction: "up" | "down") => {
+      if (!contextMenuTab || contextMenuTab === DEFAULT_CATEGORY) return
 
-    const keys = Object.keys(savedFeatures)
-    const index = keys.indexOf(contextMenuTab)
+      const keys = Object.keys(savedFeatures)
+      const index = keys.indexOf(contextMenuTab)
 
-    if (index === -1) return
+      if (index === -1) return
 
-    let newIndex
-    if (direction === "up" && index > 1) {
-      newIndex = index - 1
-    } else if (direction === "down" && index < keys.length - 1) {
-      newIndex = index + 1
-    } else {
-      return // Can't move further up/down
-    }
+      let newIndex
+      if (direction === "up" && index > 1) {
+        newIndex = index - 1
+      } else if (direction === "down" && index < keys.length - 1) {
+        newIndex = index + 1
+      } else {
+        return // Can't move further up/down
+      }
 
-    const newOrder = arrayMove(keys, index, newIndex)
-    const newSavedFeatures = Object.fromEntries(newOrder.map((key) => [key, savedFeatures[key]]))
-    setSavedFeatures(newSavedFeatures)
-  }, [contextMenuTab, savedFeatures, setSavedFeatures])
+      const newOrder = arrayMove(keys, index, newIndex)
+      const newSavedFeatures = Object.fromEntries(newOrder.map((key) => [key, savedFeatures[key]]))
+      setSavedFeatures(newSavedFeatures)
+    },
+    [contextMenuTab, savedFeatures, setSavedFeatures],
+  )
 
-  const handleRenameCategory = useCallback((newName: string) => {
-    if (contextMenuTab && contextMenuTab !== DEFAULT_CATEGORY && newName !== DEFAULT_CATEGORY) {
-      setSavedFeatures((prev: SavedFeaturesStateType) => {
-        const newSavedFeatures = { ...prev }
-        newSavedFeatures[newName] = newSavedFeatures[contextMenuTab]
-        delete newSavedFeatures[contextMenuTab]
-        const keys = Object.keys(newSavedFeatures)
-        const index = keys.indexOf(contextMenuTab)
-        if (index !== -1) keys.splice(index, 1, newName)
-        return Object.fromEntries(keys.map((key) => [key, newSavedFeatures[key]]))
-      })
-    }
-  }, [contextMenuTab, setSavedFeatures])
+  const handleRenameCategory = useCallback(
+    (newName: string) => {
+      if (contextMenuTab && contextMenuTab !== DEFAULT_CATEGORY && newName !== DEFAULT_CATEGORY) {
+        setSavedFeatures((prev: SavedFeaturesStateType) => {
+          const newSavedFeatures = { ...prev }
+          newSavedFeatures[newName] = newSavedFeatures[contextMenuTab]
+          delete newSavedFeatures[contextMenuTab]
+          const keys = Object.keys(newSavedFeatures)
+          const index = keys.indexOf(contextMenuTab)
+          if (index !== -1) keys.splice(index, 1, newName)
+          return Object.fromEntries(keys.map((key) => [key, newSavedFeatures[key]]))
+        })
+      }
+    },
+    [contextMenuTab, setSavedFeatures],
+  )
 
   const handleAddCategory = useCallback(() => {
     let categoryName = prompt("Enter name for category")

@@ -30,7 +30,7 @@ const NoteEditor: React.FC<EditorProps> = ({ initialText, onChange }) => {
           plugins: ["lists", "advlist", "fullscreen", "autolink", "charmap", "code", "image", "link", "table"],
           toolbar: [
             "undo redo bold italic backcolor image charmap link" +
-            " | advlist bullist numlist outdent indent table | code  fullscreen",
+              " | advlist bullist numlist outdent indent table | code  fullscreen",
           ],
           skin_url: "./tinymce/skins/ui/oxide",
         }}

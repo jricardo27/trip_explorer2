@@ -1,4 +1,14 @@
-import { Box, ImageList, ImageListItem, ImageListItemBar, List, ListItem, ListItemIcon, ListItemText, Typography } from "@mui/material"
+import {
+  Box,
+  ImageList,
+  ImageListItem,
+  ImageListItemBar,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from "@mui/material"
 import React from "react"
 import { TbPoint } from "react-icons/tb"
 
@@ -65,7 +75,8 @@ const Tutorial = (): React.ReactNode => {
 
       <Typography variant="body1">
         <br />
-        Available POIs sources vary depending on the destination. For example, if you are travelling to Western Australia, you can select from the following:
+        Available POIs sources vary depending on the destination. For example, if you are travelling to Western
+        Australia, you can select from the following:
       </Typography>
 
       <ImageList>
@@ -82,7 +93,8 @@ const Tutorial = (): React.ReactNode => {
       <Typography variant="h6">Saving Points of Interest (POIs)</Typography>
 
       <Typography variant="body1">
-        The main feature of the app is the ability to select points of interest (POIs) on the map and export them as a KML. It can be done by:
+        The main feature of the app is the ability to select points of interest (POIs) on the map and export them as a
+        KML. It can be done by:
       </Typography>
 
       <List>
@@ -119,7 +131,8 @@ const Tutorial = (): React.ReactNode => {
 
       <Typography variant="body1">
         <br />
-        The saved POIs can be accessed by opening the hamburger menu in the top-left corner of the map, next to the zoom controls.
+        The saved POIs can be accessed by opening the hamburger menu in the top-left corner of the map, next to the zoom
+        controls.
       </Typography>
 
       <ImageList>
@@ -133,18 +146,9 @@ const Tutorial = (): React.ReactNode => {
 
       <Typography variant="body1">
         <br />
-        By default, only the
-        {" "}
-        <strong>ALL</strong>
-        {" "}
-        category is present, but users can add custom categories, such as
-        {" "}
-        <strong>FIRST DAY</strong>
-        {" "}
-        and
-        {" "}
-        <strong>SECOND DAY</strong>
-        , by right-clicking on the left side of the drawer.
+        By default, only the <strong>ALL</strong> category is present, but users can add custom categories, such as{" "}
+        <strong>FIRST DAY</strong> and
+        <strong>SECOND DAY</strong>, by right-clicking on the left side of the drawer.
       </Typography>
 
       <ImageList>
@@ -164,14 +168,18 @@ const Tutorial = (): React.ReactNode => {
 
       <ImageList>
         <ImageListItem>
-          <img src="public/help/img/category_list_second_context_menu.webp" alt="Category list context menu for categories different from ALL" />
+          <img
+            src="public/help/img/category_list_second_context_menu.webp"
+            alt="Category list context menu for categories different from ALL"
+          />
         </ImageListItem>
       </ImageList>
 
       <Typography variant="body1">
         <br />
         <br />
-        Clicking on a POI on the saved list will expand the POI&#39;s details. An editor can be toggled into view to append comments to the POI.
+        Clicking on a POI on the saved list will expand the POI&#39;s details. An editor can be toggled into view to
+        append comments to the POI.
       </Typography>
 
       <ImageList>
@@ -186,7 +194,8 @@ const Tutorial = (): React.ReactNode => {
       <Typography variant="body1">
         <br />
         <br />
-        POI details can also be seen when opening the popup by clicking on the POI on the map. Note that on small screens the gallery will be shown as a tab.
+        POI details can also be seen when opening the popup by clicking on the POI on the map. Note that on small
+        screens the gallery will be shown as a tab.
       </Typography>
 
       <ImageList>
@@ -208,15 +217,17 @@ const Tutorial = (): React.ReactNode => {
 
       <Typography variant="body1">
         <br />
-        Saved POIs can be exported as a GeoJSON or KML file, with a zip file automatically downloaded when the desired option is selected.
+        Saved POIs can be exported as a GeoJSON or KML file, with a zip file automatically downloaded when the desired
+        option is selected.
         <br />
         <br />
         <strong>Note:</strong>
-        When exporting to KML, polygons are converted to MultiLineStrings due to a limitation in the Organic Maps app that does not support polygons, the
-        converted MultiLineStrings are shown as tracks.
+        When exporting to KML, polygons are converted to MultiLineStrings due to a limitation in the Organic Maps app
+        that does not support polygons, the converted MultiLineStrings are shown as tracks.
         <br />
         <br />
-        Google Earth does not have this limitation, and in the future, it may be possible to select whether to export a KML including polygons or not.
+        Google Earth does not have this limitation, and in the future, it may be possible to select whether to export a
+        KML including polygons or not.
       </Typography>
 
       <ImageList>

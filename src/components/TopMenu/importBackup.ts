@@ -2,7 +2,11 @@ import JSZip from "jszip"
 
 import { SavedFeaturesStateType, setSavedFeaturesType } from "../../contexts/SavedFeaturesContext.ts"
 
-const handleFileImport = async (file: File, importMode: "override" | "append" | "merge", setSavedFeatures: setSavedFeaturesType) => {
+const handleFileImport = async (
+  file: File,
+  importMode: "override" | "append" | "merge",
+  setSavedFeatures: setSavedFeaturesType,
+) => {
   try {
     const fileExtension = file.name.split(".").pop()?.toLowerCase()
 
@@ -17,9 +21,10 @@ const handleFileImport = async (file: File, importMode: "override" | "append" | 
         if (importMode === "override") {
           setSavedFeatures(importedData)
         } else if (importMode === "append") {
-          setSavedFeatures((prevSavedFeatures: SavedFeaturesStateType) => (
-            Object.assign({}, prevSavedFeatures, importedData) as SavedFeaturesStateType
-          ))
+          setSavedFeatures(
+            (prevSavedFeatures: SavedFeaturesStateType) =>
+              Object.assign({}, prevSavedFeatures, importedData) as SavedFeaturesStateType,
+          )
         } else if (importMode === "merge") {
           setSavedFeatures((prevSavedFeatures: SavedFeaturesStateType) => {
             const mergedFeatures = { ...prevSavedFeatures }

@@ -222,7 +222,12 @@ describe("filterFeatures", () => {
     const result = filterFeatures(mockItems, "Eta")
     // It should only find "Eta Location with null name" via description
     expect(result.filter((item) => item.feature.id === "8")).toHaveLength(1)
-    expect(result.every((item) => item.feature.properties!.name !== null || item.feature.properties!.description?.toLowerCase().includes("eta"))).toBe(true)
+    expect(
+      result.every(
+        (item) =>
+          item.feature.properties!.name !== null || item.feature.properties!.description?.toLowerCase().includes("eta"),
+      ),
+    ).toBe(true)
   })
 
   it("should not find a match if searching for a term that would match a null description", () => {
@@ -230,7 +235,13 @@ describe("filterFeatures", () => {
     const result = filterFeatures(mockItems, "Theta")
     // It should only find "Theta Landmark" via name
     expect(result.filter((item) => item.feature.id === "9")).toHaveLength(1)
-    expect(result.every((item) => item.feature.properties!.description !== null || item.feature.properties!.name?.toLowerCase().includes("theta"))).toBe(true)
+    expect(
+      result.every(
+        (item) =>
+          item.feature.properties!.description !== null ||
+          item.feature.properties!.name?.toLowerCase().includes("theta"),
+      ),
+    ).toBe(true)
   })
 
   it("should not include items where both name and description are null when searching", () => {

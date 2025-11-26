@@ -12,10 +12,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          152.8725128173828,
-          -25.28738594055176
-        ]
+        "coordinates": [152.8725128173828, -25.28738594055176]
       },
       "properties": {
         "id": "QFRA",
@@ -55,10 +52,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          150.51678466796875,
-          -24.40738868713379
-        ]
+        "coordinates": [150.51678466796875, -24.40738868713379]
       },
       "properties": {
         "id": "QBIL",
@@ -98,10 +92,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.155029296875,
-          -23.511131286621097
-        ]
+        "coordinates": [148.155029296875, -23.511131286621097]
       },
       "properties": {
         "id": "QEME",
@@ -137,10 +128,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.8755645751953,
-          -23.57484436035156
-        ]
+        "coordinates": [148.8755645751953, -23.57484436035156]
       },
       "properties": {
         "id": "QBLA",
@@ -180,10 +168,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          151.380859375,
-          -23.95602226257324
-        ]
+        "coordinates": [151.380859375, -23.95602226257324]
       },
       "properties": {
         "id": "QTAN",
@@ -223,10 +208,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          150.52151489257812,
-          -23.344987869262695
-        ]
+        "coordinates": [150.52151489257812, -23.344987869262695]
       },
       "properties": {
         "id": "QROC",
@@ -266,10 +248,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          150.78578186035156,
-          -23.203838348388672
-        ]
+        "coordinates": [150.78578186035156, -23.203838348388672]
       },
       "properties": {
         "id": "QCOO",
@@ -309,10 +288,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.20689392089844,
-          -21.11273956298828
-        ]
+        "coordinates": [149.20689392089844, -21.11273956298828]
       },
       "properties": {
         "id": "QMAC",
@@ -352,10 +328,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.73890686035156,
-          -20.28311538696289
-        ]
+        "coordinates": [148.73890686035156, -20.28311538696289]
       },
       "properties": {
         "id": "QAIR",
@@ -395,10 +368,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          140.5259552001953,
-          -20.70708274841309
-        ]
+        "coordinates": [140.5259552001953, -20.70708274841309]
       },
       "properties": {
         "id": "QCLO",
@@ -438,10 +408,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          139.51681518554688,
-          -20.72394371032715
-        ]
+        "coordinates": [139.51681518554688, -20.72394371032715]
       },
       "properties": {
         "id": "QARG",
@@ -481,10 +448,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          139.49522399902344,
-          -20.708215713500977
-        ]
+        "coordinates": [139.49522399902344, -20.708215713500977]
       },
       "properties": {
         "id": "QISA",
@@ -524,10 +488,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          147.41473388671875,
-          -19.575157165527344
-        ]
+        "coordinates": [147.41473388671875, -19.575157165527344]
       },
       "properties": {
         "id": "QAYR",
@@ -567,10 +528,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          146.8121337890625,
-          -19.31743621826172
-        ]
+        "coordinates": [146.8121337890625, -19.31743621826172]
       },
       "properties": {
         "id": "QTOW",
@@ -610,10 +568,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          144.56971740722656,
-          -18.20219612121582
-        ]
+        "coordinates": [144.56971740722656, -18.20219612121582]
       },
       "properties": {
         "id": "QUND",
@@ -653,10 +608,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          144.3202362060547,
-          -18.14479637145996
-        ]
+        "coordinates": [144.3202362060547, -18.14479637145996]
       },
       "properties": {
         "id": "QSUR",

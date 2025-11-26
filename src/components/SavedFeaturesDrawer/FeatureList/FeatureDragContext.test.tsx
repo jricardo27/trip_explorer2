@@ -17,7 +17,8 @@ vi.mock("@dnd-kit/core", async () => {
             onDragEnd({
               active: { id: "f1" },
               over: { id: "f2" },
-            })}
+            })
+          }
         >
           Drag End Reorder
         </button>
@@ -27,7 +28,8 @@ vi.mock("@dnd-kit/core", async () => {
             onDragEnd({
               active: { id: "f1" },
               over: { id: "list2", data: { current: { type: "tab" } } },
-            })}
+            })
+          }
         >
           Drag End Move
         </button>
@@ -50,8 +52,16 @@ describe("FeatureDragContext", () => {
   const defaultProps = {
     savedFeatures: {
       list1: [
-        { type: "Feature" as const, properties: { id: "f1", name: "Feature 1" }, geometry: { type: "Point" as const, coordinates: [0, 0] } },
-        { type: "Feature" as const, properties: { id: "f2", name: "Feature 2" }, geometry: { type: "Point" as const, coordinates: [1, 1] } },
+        {
+          type: "Feature" as const,
+          properties: { id: "f1", name: "Feature 1" },
+          geometry: { type: "Point" as const, coordinates: [0, 0] },
+        },
+        {
+          type: "Feature" as const,
+          properties: { id: "f2", name: "Feature 2" },
+          geometry: { type: "Point" as const, coordinates: [1, 1] },
+        },
       ],
       list2: [],
     },

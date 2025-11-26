@@ -27,7 +27,12 @@ interface FeatureDragContextProps {
   }
 }
 
-export const FeatureDragContext: React.FC<FeatureDragContextProps> = ({ children, savedFeatures, selectedTab, setSavedFeatures }) => {
+export const FeatureDragContext: React.FC<FeatureDragContextProps> = ({
+  children,
+  savedFeatures,
+  selectedTab,
+  setSavedFeatures,
+}) => {
   const [activeId, setActiveId] = useState<string | null>(null)
 
   const sensors = useSensors(
@@ -41,43 +46,46 @@ export const FeatureDragContext: React.FC<FeatureDragContextProps> = ({ children
     setActiveId(event.active.id.toString())
   }, [])
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
 
-    if (over && active.id !== over.id) {
-      const activeFeature = savedFeatures[selectedTab].find((f, index) => idxFeat(index, f) === active.id)
+      if (over && active.id !== over.id) {
+        const activeFeature = savedFeatures[selectedTab].find((f, index) => idxFeat(index, f) === active.id)
 
-      if (activeFeature) {
-        const sourceList = selectedTab
-        let destinationList = selectedTab
+        if (activeFeature) {
+          const sourceList = selectedTab
+          let destinationList = selectedTab
 
-        if (over.data?.current?.type === "tab") {
-          destinationList = over.id.toString()
-        }
+          if (over.data?.current?.type === "tab") {
+            destinationList = over.id.toString()
+          }
 
-        if (sourceList !== destinationList) {
-          setSavedFeatures((prev: SavedFeaturesStateType) => {
-            const newSavedFeatures = { ...prev }
-            newSavedFeatures[sourceList] = newSavedFeatures[sourceList].filter((f, index) => {
-              return idxFeat(index, f) !== active.id
+          if (sourceList !== destinationList) {
+            setSavedFeatures((prev: SavedFeaturesStateType) => {
+              const newSavedFeatures = { ...prev }
+              newSavedFeatures[sourceList] = newSavedFeatures[sourceList].filter((f, index) => {
+                return idxFeat(index, f) !== active.id
+              })
+              newSavedFeatures[destinationList] = [...newSavedFeatures[destinationList], activeFeature]
+              return newSavedFeatures
             })
-            newSavedFeatures[destinationList] = [...newSavedFeatures[destinationList], activeFeature]
-            return newSavedFeatures
-          })
-        } else {
-          const oldIndex = savedFeatures[sourceList].findIndex((f, index) => idxFeat(index, f) === active.id)
-          const newIndex = savedFeatures[sourceList].findIndex((f, index) => idxFeat(index, f) === over.id)
-          const newOrder = arrayMove(savedFeatures[sourceList], oldIndex, newIndex)
-          setSavedFeatures((prev: SavedFeaturesStateType) => ({
-            ...prev,
-            [sourceList]: newOrder,
-          }))
+          } else {
+            const oldIndex = savedFeatures[sourceList].findIndex((f, index) => idxFeat(index, f) === active.id)
+            const newIndex = savedFeatures[sourceList].findIndex((f, index) => idxFeat(index, f) === over.id)
+            const newOrder = arrayMove(savedFeatures[sourceList], oldIndex, newIndex)
+            setSavedFeatures((prev: SavedFeaturesStateType) => ({
+              ...prev,
+              [sourceList]: newOrder,
+            }))
+          }
         }
       }
-    }
 
-    setActiveId(null)
-  }, [savedFeatures, selectedTab, setSavedFeatures])
+      setActiveId(null)
+    },
+    [savedFeatures, selectedTab, setSavedFeatures],
+  )
 
   const handleDragCancel = useCallback(() => {
     setActiveId(null)
@@ -96,7 +104,10 @@ export const FeatureDragContext: React.FC<FeatureDragContextProps> = ({ children
         {activeId ? (
           <ListItem>
             <ListItemText
-              primary={savedFeatures[selectedTab].find((f, index) => idxFeat(index, f) === activeId)?.properties?.name || "Unnamed Feature"}
+              primary={
+                savedFeatures[selectedTab].find((f, index) => idxFeat(index, f) === activeId)?.properties?.name ||
+                "Unnamed Feature"
+              }
             />
           </ListItem>
         ) : null}

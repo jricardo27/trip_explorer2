@@ -26,7 +26,12 @@ function ZoomLevelDisplay(): React.ReactNode {
     }
   }, [map])
 
-  return <div style={style}>Zoom: {zoomLevel}</div>
+  return (
+    <div style={style}>
+      Zoom:
+      {zoomLevel}
+    </div>
+  )
 }
 
 export default ZoomLevelDisplay

@@ -16,23 +16,33 @@ const Technical = (): React.ReactNode => {
       </Typography>
       <List>
         <ListItem>
-          <ListItemIcon><MdStarBorder /></ListItemIcon>
+          <ListItemIcon>
+            <MdStarBorder />
+          </ListItemIcon>
           <ListItemText primary="Vite 6 as build tool" />
         </ListItem>
         <ListItem>
-          <ListItemIcon><MdStarBorder /></ListItemIcon>
+          <ListItemIcon>
+            <MdStarBorder />
+          </ListItemIcon>
           <ListItemText primary="React 18 as base library" />
         </ListItem>
         <ListItem>
-          <ListItemIcon><MdStarBorder /></ListItemIcon>
+          <ListItemIcon>
+            <MdStarBorder />
+          </ListItemIcon>
           <ListItemText primary="Typescript 5 as base language" />
         </ListItem>
         <ListItem>
-          <ListItemIcon><MdStarBorder /></ListItemIcon>
+          <ListItemIcon>
+            <MdStarBorder />
+          </ListItemIcon>
           <ListItemText primary="Material Design as UI framework" />
         </ListItem>
         <ListItem>
-          <ListItemIcon><MdStarBorder /></ListItemIcon>
+          <ListItemIcon>
+            <MdStarBorder />
+          </ListItemIcon>
           <ListItemText primary="Leaftlet as map library" />
         </ListItem>
       </List>

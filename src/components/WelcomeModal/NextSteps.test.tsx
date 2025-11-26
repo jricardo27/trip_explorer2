@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react"
-import React from "react"
 import { describe, it, expect } from "vitest"
 
 import NextSteps from "./NextSteps"
@@ -18,6 +17,9 @@ describe("NextSteps", () => {
 
   it("should render issue tracker link", () => {
     render(<NextSteps />)
-    expect(screen.getByText("issue tracker")).toHaveAttribute("href", "https://github.com/jricardo27/trip_explorer/issues")
+    expect(screen.getByText("issue tracker")).toHaveAttribute(
+      "href",
+      "https://github.com/jricardo27/trip_explorer/issues",
+    )
   })
 })

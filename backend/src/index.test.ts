@@ -68,9 +68,7 @@ describe("API Endpoints", () => {
     it("should save a feature", async () => {
       vi.mocked(query).mockResolvedValue({ rows: [] } as unknown as QueryResult)
 
-      const res = await request(app)
-        .post("/api/features")
-        .send({ user_id: "u1", list_name: "l1", feature: {} })
+      const res = await request(app).post("/api/features").send({ user_id: "u1", list_name: "l1", feature: {} })
 
       expect(res.status).toBe(201)
       expect(query).toHaveBeenCalled()

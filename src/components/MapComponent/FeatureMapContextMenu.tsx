@@ -16,7 +16,10 @@ interface FeatureMapContextMenuProps {
 const FeatureMapContextMenu = ({ ...props }: FeatureMapContextMenuProps): React.ReactNode => {
   const { addFeature } = useContext(SavedFeaturesContext)!
 
-  const getOrCreateFeature = (payload: MenuOptionPayload, selectedFeature?: GeoJsonFeature | null): GeoJsonFeature | null => {
+  const getOrCreateFeature = (
+    payload: MenuOptionPayload,
+    selectedFeature?: GeoJsonFeature | null,
+  ): GeoJsonFeature | null => {
     let feature = selectedFeature
 
     if (!feature) {
@@ -82,10 +85,17 @@ const FeatureMapContextMenu = ({ ...props }: FeatureMapContextMenuProps): React.
 
   return (
     <MapContextMenu latlng={props.menuLatLng}>
-      <MenuOption title="Copy feature to clipboard" handler={(payload: MenuOptionPayload) => { copyFeatureToClipboard(payload, props.selectedFeature) }} />
+      <MenuOption
+        title="Copy feature to clipboard"
+        handler={(payload: MenuOptionPayload) => {
+          copyFeatureToClipboard(payload, props.selectedFeature)
+        }}
+      />
       <MenuOption
         title="Save feature to list"
-        handler={(payload: MenuOptionPayload) => { addFeatureToList(payload, props.selectedFeature) }}
+        handler={(payload: MenuOptionPayload) => {
+          addFeatureToList(payload, props.selectedFeature)
+        }}
       />
     </MapContextMenu>
   )

@@ -36,7 +36,10 @@ export const AddFeatureModal: React.FC<AddFeatureModalProps> = ({ open, onClose,
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add Feature to {dayDate}</DialogTitle>
+      <DialogTitle>
+        Add Feature to
+        {dayDate}
+      </DialogTitle>
       <DialogContent>
         {lists.length === 0 ? (
           <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 4 }}>
@@ -56,7 +59,7 @@ export const AddFeatureModal: React.FC<AddFeatureModalProps> = ({ open, onClose,
               ))}
             </Tabs>
             <List sx={{ maxHeight: 400, overflow: "auto" }}>
-              {(savedFeatures[selectedList] as unknown[] || []).map((feature, index: number) => {
+              {((savedFeatures[selectedList] as unknown[]) || []).map((feature, index: number) => {
                 const props = (feature as Record<string, unknown>).properties as Record<string, unknown> | undefined
                 // eslint-disable-next-line react/prop-types
                 const primaryText = String((props && (props.name || props.title)) || "Unnamed Feature")
@@ -75,10 +78,7 @@ export const AddFeatureModal: React.FC<AddFeatureModalProps> = ({ open, onClose,
                     }}
                     onClick={() => handleAddFeature(feature)}
                   >
-                    <ListItemText
-                      primary={primaryText}
-                      secondary={secondaryText}
-                    />
+                    <ListItemText primary={primaryText} secondary={secondaryText} />
                   </ListItem>
                 )
               })}

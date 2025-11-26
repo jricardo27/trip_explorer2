@@ -12,10 +12,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          146.375,
-          -41.17190170288086
-        ]
+        "coordinates": [146.375, -41.17190170288086]
       },
       "properties": {
         "id": "TDEV",
@@ -55,10 +52,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          147.07127380371094,
-          -41.502872467041016
-        ]
+        "coordinates": [147.07127380371094, -41.502872467041016]
       },
       "properties": {
         "id": "TLAU",
@@ -94,10 +88,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          145.93783569335938,
-          -41.58018112182617
-        ]
+        "coordinates": [145.93783569335938, -41.58018112182617]
       },
       "properties": {
         "id": "TCRA",
@@ -141,10 +132,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          147.33689880371094,
-          -42.8135986328125
-        ]
+        "coordinates": [147.33689880371094, -42.8135986328125]
       },
       "properties": {
         "id": "THOB",
@@ -184,10 +172,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          147.3971710205078,
-          -42.855838775634766
-        ]
+        "coordinates": [147.3971710205078, -42.855838775634766]
       },
       "properties": {
         "id": "TMOR",

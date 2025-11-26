@@ -24,6 +24,11 @@ const mockContextValue = {
   updateFeature: vi.fn(),
   saveToLocalStorage: vi.fn(),
   loadFromLocalStorage: vi.fn(),
+  userId: "test-user",
+  setUserId: vi.fn(),
+  email: "test@example.com",
+  login: vi.fn(),
+  logout: vi.fn(),
 }
 
 describe("FeatureMapContextMenu", () => {

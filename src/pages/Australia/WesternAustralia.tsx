@@ -8,9 +8,16 @@ import { TTabMapping } from "../../data/types/TTabMapping"
 interface WesternAustraliaProps {
   drawerOpen: boolean
   closeDrawer: () => void
+  isPinned?: boolean
+  onTogglePin?: () => void
 }
 
-export const WesternAustralia = ({ drawerOpen, closeDrawer }: WesternAustraliaProps): React.ReactNode => {
+export const WesternAustralia = ({
+  drawerOpen,
+  closeDrawer,
+  isPinned,
+  onTogglePin,
+}: WesternAustraliaProps): React.ReactNode => {
   const geoJsonOverlaySources = useMemo(
     (): Record<string, TTabMapping> => ({
       "/markers/westernAustralia/gas_stations_openstreetmap.json": {
@@ -39,7 +46,10 @@ export const WesternAustralia = ({ drawerOpen, closeDrawer }: WesternAustraliaPr
       },
       "/markers/westernAustralia/western_australia_visitor_centre.json": {
         General: [
-          "name", "type", { key: "description", className: styles.scrollableContent }, { key: "pointOfDifference", className: styles.scrollableContent },
+          "name",
+          "type",
+          { key: "description", className: styles.scrollableContent },
+          { key: "pointOfDifference", className: styles.scrollableContent },
         ],
         Info: ["address", "hours", "email", "website"],
       },
@@ -55,7 +65,18 @@ export const WesternAustralia = ({ drawerOpen, closeDrawer }: WesternAustraliaPr
       "/markers/westernAustralia/places.json": {
         General: ["name"],
       },
-    }), [])
+    }),
+    [],
+  )
 
-  return <FeatureMap center={PERTH_LOCATION} geoJsonOverlaySources={geoJsonOverlaySources} drawerOpen={drawerOpen} closeDrawer={closeDrawer} />
+  return (
+    <FeatureMap
+      center={PERTH_LOCATION}
+      geoJsonOverlaySources={geoJsonOverlaySources}
+      drawerOpen={drawerOpen}
+      closeDrawer={closeDrawer}
+      isPinned={isPinned}
+      onTogglePin={onTogglePin}
+    />
+  )
 }

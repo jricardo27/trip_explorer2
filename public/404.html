@@ -1,40 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Redirecting...</title>
     <script>
-        /**
-         * This 404.html file exists to handle GitHub Pages routing limitations with SPAs.
-         *
-         * Problem:
-         * When hosting a React Single Page Application (SPA) on GitHub Pages,
-         * direct access to routes like /victoria or /queensland returns a 404
-         * because GitHub Pages doesn't know about our client-side routes.
-         *
-         * Solution:
-         * 1. GitHub Pages serves this 404.html when a route is not found
-         * 2. We capture the intended route (everything after /online_trip_explorer)
-         * 3. We redirect to the root with a hash (#) containing the intended route
-         * 4. The React app (using HashRouter) then handles the route correctly
-         */
+      /**
+       * This 404.html file exists to handle GitHub Pages routing limitations with SPAs.
+       *
+       * Problem:
+       * When hosting a React Single Page Application (SPA) on GitHub Pages,
+       * direct access to routes like /victoria or /queensland returns a 404
+       * because GitHub Pages doesn't know about our client-side routes.
+       *
+       * Solution:
+       * 1. GitHub Pages serves this 404.html when a route is not found
+       * 2. We capture the intended route (everything after /online_trip_explorer)
+       * 3. We redirect to the root with a hash (#) containing the intended route
+       * 4. The React app (using HashRouter) then handles the route correctly
+       */
 
-        // Extract the path segment after /online_trip_explorer
-        // e.g., /online_trip_explorer/victoria -> /victoria
-        const segment = window.location.pathname.replace("/online_trip_explorer", "");
+      // Extract the path segment after /online_trip_explorer
+      // e.g., /online_trip_explorer/victoria -> /victoria
+      const segment = window.location.pathname.replace("/online_trip_explorer", "")
 
-        // Store the referrer for potential back-navigation
-        if (document.referrer && document.referrer !== location.href) {
-            sessionStorage.setItem("referrer", document.referrer);
-        }
+      // Store the referrer for potential back-navigation
+      if (document.referrer && document.referrer !== location.href) {
+        sessionStorage.setItem("referrer", document.referrer)
+      }
 
-        // Redirect to the root with the path in the hash
-        // e.g., /online_trip_explorer/victoria -> /online_trip_explorer/#/victoria
-        window.location.replace("/online_trip_explorer/#" + segment);
+      // Redirect to the root with the path in the hash
+      // e.g., /online_trip_explorer/victoria -> /online_trip_explorer/#/victoria
+      window.location.replace("/online_trip_explorer/#" + segment)
     </script>
-</head>
-<body>
+  </head>
+  <body>
     Redirecting...
-</body>
+  </body>
 </html>

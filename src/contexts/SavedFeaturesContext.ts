@@ -12,7 +12,9 @@ export interface selectionInfo {
   index: number
 }
 
-export type setSavedFeaturesType = (newStateOrUpdater: SavedFeaturesStateType | ((prev: SavedFeaturesStateType) => SavedFeaturesStateType)) => void
+export type setSavedFeaturesType = (
+  newStateOrUpdater: SavedFeaturesStateType | ((prev: SavedFeaturesStateType) => SavedFeaturesStateType),
+) => void
 
 export type SavedFeaturesContextType = {
   savedFeatures: SavedFeaturesStateType

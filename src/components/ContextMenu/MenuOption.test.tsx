@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import React from "react"
 import { describe, it, expect, vi } from "vitest"
 
 import MenuOption from "./MenuOption"
@@ -16,14 +15,7 @@ describe("MenuOption", () => {
     const closeMenu = vi.fn()
     const payload = { coordinates: { lat: 10, lng: 20 } }
 
-    render(
-      <MenuOption
-        title="Test Option"
-        handler={handler}
-        closeMenu={closeMenu}
-        payload={payload}
-      />,
-    )
+    render(<MenuOption title="Test Option" handler={handler} closeMenu={closeMenu} payload={payload} />)
 
     const user = userEvent.setup()
     await user.click(screen.getByText("Test Option"))
@@ -36,13 +28,7 @@ describe("MenuOption", () => {
     const handler = vi.fn()
     const closeMenu = vi.fn()
 
-    render(
-      <MenuOption
-        title="Test Option"
-        handler={handler}
-        closeMenu={closeMenu}
-      />,
-    )
+    render(<MenuOption title="Test Option" handler={handler} closeMenu={closeMenu} />)
 
     const user = userEvent.setup()
     await user.click(screen.getByText("Test Option"))

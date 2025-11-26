@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from "@testing-library/react"
-import React from "react"
 import { describe, it, expect, vi } from "vitest"
 
 import { SortableFeatureItem } from "./SortableFeatureItem"
@@ -26,7 +25,11 @@ vi.mock("@dnd-kit/utilities", () => ({
 
 describe("SortableFeatureItem", () => {
   const defaultProps = {
-    feature: { type: "Feature" as const, properties: { name: "Test Feature" }, geometry: { type: "Point" as const, coordinates: [0, 0] } },
+    feature: {
+      type: "Feature" as const,
+      properties: { name: "Test Feature" },
+      geometry: { type: "Point" as const, coordinates: [0, 0] },
+    },
     id: "f1",
     index: 0,
     selectedTab: "list1",

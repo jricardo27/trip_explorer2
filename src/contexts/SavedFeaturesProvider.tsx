@@ -3,7 +3,11 @@ import React, { useState, useCallback, useEffect } from "react"
 import { GeoJsonFeature } from "../data/types"
 import idxFeat, { idxSel } from "../utils/idxFeat"
 
-import SavedFeaturesContext, { SavedFeaturesContextType, SavedFeaturesStateType, selectionInfo } from "./SavedFeaturesContext"
+import SavedFeaturesContext, {
+  SavedFeaturesContextType,
+  SavedFeaturesStateType,
+  selectionInfo,
+} from "./SavedFeaturesContext"
 
 interface SavedFeaturesProviderProps {
   children: React.ReactNode
@@ -45,73 +49,87 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     loadFromApi()
   }, [loadFromApi])
 
-  const setSavedFeatures = useCallback((arg: SavedFeaturesStateType | ((prev: SavedFeaturesStateType) => SavedFeaturesStateType)) => {
-    if (typeof arg === "function") {
-      setSavedFeaturesState((prevState: SavedFeaturesStateType) => arg(prevState))
-    } else {
-      setSavedFeaturesState(arg)
-    }
-  }, [setSavedFeaturesState])
+  const setSavedFeatures = useCallback(
+    (arg: SavedFeaturesStateType | ((prev: SavedFeaturesStateType) => SavedFeaturesStateType)) => {
+      if (typeof arg === "function") {
+        setSavedFeaturesState((prevState: SavedFeaturesStateType) => arg(prevState))
+      } else {
+        setSavedFeaturesState(arg)
+      }
+    },
+    [setSavedFeaturesState],
+  )
 
-  const addFeature = useCallback(async (listName: string, feature: GeoJsonFeature) => {
-    if (!feature || !userId) return
+  const addFeature = useCallback(
+    async (listName: string, feature: GeoJsonFeature) => {
+      if (!feature || !userId) return
 
-    try {
-      await fetch(`${API_URL}/api/features`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, list_name: listName, feature }),
-      })
+      try {
+        await fetch(`${API_URL}/api/features`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, list_name: listName, feature }),
+        })
 
-      // Optimistic update or reload
-      loadFromApi()
-    } catch (error) {
-      console.error("Failed to save feature:", error)
-    }
-  }, [userId, loadFromApi, API_URL])
+        // Optimistic update or reload
+        loadFromApi()
+      } catch (error) {
+        console.error("Failed to save feature:", error)
+      }
+    },
+    [userId, loadFromApi, API_URL],
+  )
 
-  const removeFeature = useCallback(async (listName: string, selection: selectionInfo | null) => {
-    if (!selection || !userId) {
-      console.error("No selection info or user ID")
-      return
-    }
+  const removeFeature = useCallback(
+    async (listName: string, selection: selectionInfo | null) => {
+      if (!selection || !userId) {
+        console.error("No selection info or user ID")
+        return
+      }
 
-    // We need the feature ID to remove it.
-    // The current selectionInfo might be an index or ID.
-    // Assuming we can find the feature in the current state to get its ID.
-    const featureToRemove = savedFeatures[listName]?.find((f: GeoJsonFeature, index: number) => idxFeat(index, f) === idxSel(selection))
+      // We need the feature ID to remove it.
+      // The current selectionInfo might be an index or ID.
+      // Assuming we can find the feature in the current state to get its ID.
+      const featureToRemove = savedFeatures[listName]?.find(
+        (f: GeoJsonFeature, index: number) => idxFeat(index, f) === idxSel(selection),
+      )
 
-    if (!featureToRemove?.properties?.id) {
-      console.error("Could not find feature ID to remove")
-      return
-    }
+      if (!featureToRemove?.properties?.id) {
+        console.error("Could not find feature ID to remove")
+        return
+      }
 
-    try {
-      await fetch(`${API_URL}/api/features`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, list_name: listName, feature_id: featureToRemove.properties.id }),
-      })
-      loadFromApi()
-    } catch (error) {
-      console.error("Failed to remove feature:", error)
-    }
-  }, [userId, savedFeatures, loadFromApi, API_URL])
+      try {
+        await fetch(`${API_URL}/api/features`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, list_name: listName, feature_id: featureToRemove.properties.id }),
+        })
+        loadFromApi()
+      } catch (error) {
+        console.error("Failed to remove feature:", error)
+      }
+    },
+    [userId, savedFeatures, loadFromApi, API_URL],
+  )
 
-  const updateFeature = useCallback(async (_oldFeature: GeoJsonFeature, newFeature: GeoJsonFeature) => {
-    if (!userId) return
+  const updateFeature = useCallback(
+    async (_oldFeature: GeoJsonFeature, newFeature: GeoJsonFeature) => {
+      if (!userId) return
 
-    try {
-      await fetch(`${API_URL}/api/features`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, feature: newFeature }),
-      })
-      loadFromApi()
-    } catch (error) {
-      console.error("Failed to update feature:", error)
-    }
-  }, [userId, loadFromApi, API_URL])
+      try {
+        await fetch(`${API_URL}/api/features`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, feature: newFeature }),
+        })
+        loadFromApi()
+      } catch (error) {
+        console.error("Failed to update feature:", error)
+      }
+    },
+    [userId, loadFromApi, API_URL],
+  )
 
   const contextValue: SavedFeaturesContextType = {
     savedFeatures,
@@ -119,7 +137,7 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     removeFeature,
     updateFeature,
     setSavedFeatures,
-    saveToLocalStorage: () => { }, // No-op for compatibility
+    saveToLocalStorage: () => {}, // No-op for compatibility
     loadFromLocalStorage: loadFromApi, // Mapped to API load
     userId,
     setUserId: (id: string) => {
@@ -143,11 +161,7 @@ const SavedFeaturesProvider: React.FC<SavedFeaturesProviderProps> = ({ children 
     },
   }
 
-  return (
-    <SavedFeaturesContext.Provider value={contextValue}>
-      {children}
-    </SavedFeaturesContext.Provider>
-  )
+  return <SavedFeaturesContext.Provider value={contextValue}>{children}</SavedFeaturesContext.Provider>
 }
 
 export default SavedFeaturesProvider

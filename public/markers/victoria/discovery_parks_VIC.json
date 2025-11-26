@@ -12,10 +12,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          146.9076385498047,
-          -36.69701385498047
-        ]
+        "coordinates": [146.9076385498047, -36.69701385498047]
       },
       "properties": {
         "id": "VBUF",
@@ -67,10 +64,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          147.03311157226562,
-          -36.773799896240234
-        ]
+        "coordinates": [147.03311157226562, -36.773799896240234]
       },
       "properties": {
         "id": "VBRT",
@@ -106,10 +100,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          145.1263885498047,
-          -36.79111099243164
-        ]
+        "coordinates": [145.1263885498047, -36.79111099243164]
       },
       "properties": {
         "id": "VNAG",
@@ -149,10 +140,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          144.8636932373047,
-          -37.78563690185547
-        ]
+        "coordinates": [144.8636932373047, -37.78563690185547]
       },
       "properties": {
         "id": "VMEL",
@@ -192,10 +180,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          147.01226806640625,
-          -36.14126205444336
-        ]
+        "coordinates": [147.01226806640625, -36.14126205444336]
       },
       "properties": {
         "id": "VHUM",
@@ -235,10 +220,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          144.337646484375,
-          -38.16716003417969
-        ]
+        "coordinates": [144.337646484375, -38.16716003417969]
       },
       "properties": {
         "id": "VGEE",
@@ -274,10 +256,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          144.7924346923828,
-          -36.12382507324219
-        ]
+        "coordinates": [144.7924346923828, -36.12382507324219]
       },
       "properties": {
         "id": "VECH",
@@ -317,10 +296,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          142.47479248046875,
-          -38.39508819580078
-        ]
+        "coordinates": [142.47479248046875, -38.39508819580078]
       },
       "properties": {
         "id": "VWAR",
@@ -364,10 +340,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          142.1699676513672,
-          -34.181034088134766
-        ]
+        "coordinates": [142.1699676513672, -34.181034088134766]
       },
       "properties": {
         "id": "NMIL",

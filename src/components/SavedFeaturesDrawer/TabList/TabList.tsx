@@ -24,12 +24,7 @@ export const TabList: React.FC<TabListProps> = ({ tabs, selectedTab, handleTabCh
       sx={{ height: "100%" }}
     >
       {tabs.map((tab) => (
-        <DroppableTab
-          key={tab}
-          tab={tab}
-          value={tab}
-          onContextMenu={(event) => handleTabContextMenu(event, tab)}
-        />
+        <DroppableTab key={tab} tab={tab} value={tab} onContextMenu={(event) => handleTabContextMenu(event, tab)} />
       ))}
     </Tabs>
   )

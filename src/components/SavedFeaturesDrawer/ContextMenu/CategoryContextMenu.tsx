@@ -81,11 +81,7 @@ export const CategoryContextMenu: React.FC<CategoryContextMenuProps> = ({
       onClose={handleClose}
       onContextMenu={preventDefaultAndClose} // Handle right-click on the menu itself
       anchorReference="anchorPosition"
-      anchorPosition={
-        contextMenu !== null
-          ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-          : undefined
-      }
+      anchorPosition={contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}
     >
       {menuItems}
     </Menu>

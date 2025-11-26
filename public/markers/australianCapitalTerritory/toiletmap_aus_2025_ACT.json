@@ -12,10 +12,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1493159,
-          -35.31934325
-        ]
+        "coordinates": [149.1493159, -35.31934325]
       },
       "properties": {
         "FacilityID": 4653,
@@ -75,10 +72,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0718544,
-          -35.238917
-        ]
+        "coordinates": [149.0718544, -35.238917]
       },
       "properties": {
         "FacilityID": 6170,
@@ -138,10 +132,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0743525,
-          -35.22863731
-        ]
+        "coordinates": [149.0743525, -35.22863731]
       },
       "properties": {
         "FacilityID": 6171,
@@ -201,10 +192,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0704019,
-          -35.2253852
-        ]
+        "coordinates": [149.0704019, -35.2253852]
       },
       "properties": {
         "FacilityID": 6173,
@@ -264,10 +252,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0747238,
-          -35.23594686
-        ]
+        "coordinates": [149.0747238, -35.23594686]
       },
       "properties": {
         "FacilityID": 6174,
@@ -327,10 +312,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0336173,
-          -35.20524697
-        ]
+        "coordinates": [149.0336173, -35.20524697]
       },
       "properties": {
         "FacilityID": 6175,
@@ -390,10 +372,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0204373,
-          -35.22212083
-        ]
+        "coordinates": [149.0204373, -35.22212083]
       },
       "properties": {
         "FacilityID": 6178,
@@ -453,10 +432,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1225383,
-          -35.2643417
-        ]
+        "coordinates": [149.1225383, -35.2643417]
       },
       "properties": {
         "FacilityID": 6179,
@@ -516,10 +492,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1252072,
-          -35.25202397
-        ]
+        "coordinates": [149.1252072, -35.25202397]
       },
       "properties": {
         "FacilityID": 6181,
@@ -579,10 +552,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1450945,
-          -35.24537364
-        ]
+        "coordinates": [149.1450945, -35.24537364]
       },
       "properties": {
         "FacilityID": 6182,
@@ -642,10 +612,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1364026,
-          -35.28239825
-        ]
+        "coordinates": [149.1364026, -35.28239825]
       },
       "properties": {
         "FacilityID": 6185,
@@ -705,10 +672,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1675281,
-          -35.30393439
-        ]
+        "coordinates": [149.1675281, -35.30393439]
       },
       "properties": {
         "FacilityID": 6190,
@@ -768,10 +732,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1318046,
-          -35.27013755
-        ]
+        "coordinates": [149.1318046, -35.27013755]
       },
       "properties": {
         "FacilityID": 6191,
@@ -831,10 +792,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1455003,
-          -35.26257134
-        ]
+        "coordinates": [149.1455003, -35.26257134]
       },
       "properties": {
         "FacilityID": 6192,
@@ -894,10 +852,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1012984,
-          -35.28733209
-        ]
+        "coordinates": [149.1012984, -35.28733209]
       },
       "properties": {
         "FacilityID": 6193,
@@ -957,10 +912,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1001302,
-          -35.29227652
-        ]
+        "coordinates": [149.1001302, -35.29227652]
       },
       "properties": {
         "FacilityID": 6194,
@@ -1020,10 +972,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0764359,
-          -35.35236271
-        ]
+        "coordinates": [149.0764359, -35.35236271]
       },
       "properties": {
         "FacilityID": 6196,
@@ -1083,10 +1032,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0936027,
-          -35.33313446
-        ]
+        "coordinates": [149.0936027, -35.33313446]
       },
       "properties": {
         "FacilityID": 6198,
@@ -1146,10 +1092,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0943826,
-          -35.36579135
-        ]
+        "coordinates": [149.0943826, -35.36579135]
       },
       "properties": {
         "FacilityID": 6199,
@@ -1209,10 +1152,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.087631,
-          -35.35240355
-        ]
+        "coordinates": [149.087631, -35.35240355]
       },
       "properties": {
         "FacilityID": 6200,
@@ -1272,10 +1212,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0911941,
-          -35.34035626
-        ]
+        "coordinates": [149.0911941, -35.34035626]
       },
       "properties": {
         "FacilityID": 6201,
@@ -1335,10 +1272,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.060386,
-          -35.38857943
-        ]
+        "coordinates": [149.060386, -35.38857943]
       },
       "properties": {
         "FacilityID": 6203,
@@ -1398,10 +1332,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.061915,
-          -35.39177884
-        ]
+        "coordinates": [149.061915, -35.39177884]
       },
       "properties": {
         "FacilityID": 6204,
@@ -1461,10 +1392,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.058429,
-          -35.3801274
-        ]
+        "coordinates": [149.058429, -35.3801274]
       },
       "properties": {
         "FacilityID": 6205,
@@ -1524,10 +1452,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0645081,
-          -35.41117193
-        ]
+        "coordinates": [149.0645081, -35.41117193]
       },
       "properties": {
         "FacilityID": 6206,
@@ -1587,10 +1512,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0848245,
-          -35.4554757
-        ]
+        "coordinates": [149.0848245, -35.4554757]
       },
       "properties": {
         "FacilityID": 6207,
@@ -1650,10 +1572,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1208495,
-          -35.41167269
-        ]
+        "coordinates": [149.1208495, -35.41167269]
       },
       "properties": {
         "FacilityID": 6209,
@@ -1713,10 +1632,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1307858,
-          -35.1792208
-        ]
+        "coordinates": [149.1307858, -35.1792208]
       },
       "properties": {
         "FacilityID": 6211,
@@ -1776,10 +1692,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1422565,
-          -35.21822603
-        ]
+        "coordinates": [149.1422565, -35.21822603]
       },
       "properties": {
         "FacilityID": 6213,
@@ -1839,10 +1752,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0693289,
-          -35.17197638
-        ]
+        "coordinates": [149.0693289, -35.17197638]
       },
       "properties": {
         "FacilityID": 6214,
@@ -1902,10 +1812,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0707183,
-          -35.25265113
-        ]
+        "coordinates": [149.0707183, -35.25265113]
       },
       "properties": {
         "FacilityID": 6216,
@@ -1965,10 +1872,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1540883,
-          -35.33299641
-        ]
+        "coordinates": [149.1540883, -35.33299641]
       },
       "properties": {
         "FacilityID": 6219,
@@ -2028,10 +1932,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0930442,
-          -35.34297071
-        ]
+        "coordinates": [149.0930442, -35.34297071]
       },
       "properties": {
         "FacilityID": 6220,
@@ -2091,10 +1992,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.124942,
-          -35.2867777
-        ]
+        "coordinates": [149.124942, -35.2867777]
       },
       "properties": {
         "FacilityID": 6223,
@@ -2154,10 +2052,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1773102,
-          -35.32744658
-        ]
+        "coordinates": [149.1773102, -35.32744658]
       },
       "properties": {
         "FacilityID": 6224,
@@ -2217,10 +2112,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1739615,
-          -35.30413889
-        ]
+        "coordinates": [149.1739615, -35.30413889]
       },
       "properties": {
         "FacilityID": 6225,
@@ -2280,10 +2172,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1422277,
-          -35.32818641
-        ]
+        "coordinates": [149.1422277, -35.32818641]
       },
       "properties": {
         "FacilityID": 6226,
@@ -2343,10 +2232,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1375341,
-          -35.31425553
-        ]
+        "coordinates": [149.1375341, -35.31425553]
       },
       "properties": {
         "FacilityID": 6229,
@@ -2406,10 +2292,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0897954,
-          -35.29185089
-        ]
+        "coordinates": [149.0897954, -35.29185089]
       },
       "properties": {
         "FacilityID": 6230,
@@ -2469,10 +2352,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1029339,
-          -35.29922465
-        ]
+        "coordinates": [149.1029339, -35.29922465]
       },
       "properties": {
         "FacilityID": 6232,
@@ -2532,10 +2412,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1171565,
-          -35.30030685
-        ]
+        "coordinates": [149.1171565, -35.30030685]
       },
       "properties": {
         "FacilityID": 6234,
@@ -2595,10 +2472,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1167765,
-          -35.32880707
-        ]
+        "coordinates": [149.1167765, -35.32880707]
       },
       "properties": {
         "FacilityID": 6235,
@@ -2658,10 +2532,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.08674546,
-          -35.28659569
-        ]
+        "coordinates": [149.08674546, -35.28659569]
       },
       "properties": {
         "FacilityID": 7201,
@@ -2721,10 +2592,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.11175265,
-          -35.29097779
-        ]
+        "coordinates": [149.11175265, -35.29097779]
       },
       "properties": {
         "FacilityID": 7202,
@@ -2784,10 +2652,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1307569,
-          -35.29023307
-        ]
+        "coordinates": [149.1307569, -35.29023307]
       },
       "properties": {
         "FacilityID": 7204,
@@ -2847,10 +2712,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.13058524,
-          -35.28799375
-        ]
+        "coordinates": [149.13058524, -35.28799375]
       },
       "properties": {
         "FacilityID": 7205,
@@ -2910,10 +2772,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.13758472,
-          -35.28966164
-        ]
+        "coordinates": [149.13758472, -35.28966164]
       },
       "properties": {
         "FacilityID": 7206,
@@ -2973,10 +2832,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.14387723,
-          -35.29794869
-        ]
+        "coordinates": [149.14387723, -35.29794869]
       },
       "properties": {
         "FacilityID": 7207,
@@ -3036,10 +2892,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1366804,
-          -35.30066638
-        ]
+        "coordinates": [149.1366804, -35.30066638]
       },
       "properties": {
         "FacilityID": 7208,
@@ -3099,10 +2952,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9598845,
-          -35.3192764
-        ]
+        "coordinates": [148.9598845, -35.3192764]
       },
       "properties": {
         "FacilityID": 7273,
@@ -3162,10 +3012,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.93831,
-          -35.32791545
-        ]
+        "coordinates": [148.93831, -35.32791545]
       },
       "properties": {
         "FacilityID": 7277,
@@ -3225,10 +3072,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9419794,
-          -35.32233962
-        ]
+        "coordinates": [148.9419794, -35.32233962]
       },
       "properties": {
         "FacilityID": 7278,
@@ -3288,10 +3132,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9511527,
-          -35.24248956
-        ]
+        "coordinates": [148.9511527, -35.24248956]
       },
       "properties": {
         "FacilityID": 7281,
@@ -3351,10 +3192,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9530796,
-          -35.24867217
-        ]
+        "coordinates": [148.9530796, -35.24867217]
       },
       "properties": {
         "FacilityID": 7282,
@@ -3414,10 +3252,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0695099,
-          -35.50917662
-        ]
+        "coordinates": [149.0695099, -35.50917662]
       },
       "properties": {
         "FacilityID": 7284,
@@ -3477,10 +3312,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0755517,
-          -35.45237734
-        ]
+        "coordinates": [149.0755517, -35.45237734]
       },
       "properties": {
         "FacilityID": 7286,
@@ -3540,10 +3372,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0655966,
-          -35.4318675
-        ]
+        "coordinates": [149.0655966, -35.4318675]
       },
       "properties": {
         "FacilityID": 7289,
@@ -3603,10 +3432,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9890528,
-          -35.66242156
-        ]
+        "coordinates": [148.9890528, -35.66242156]
       },
       "properties": {
         "FacilityID": 7290,
@@ -3666,10 +3492,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9886985,
-          -35.66569641
-        ]
+        "coordinates": [148.9886985, -35.66569641]
       },
       "properties": {
         "FacilityID": 7291,
@@ -3729,10 +3552,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9551735,
-          -35.62913668
-        ]
+        "coordinates": [148.9551735, -35.62913668]
       },
       "properties": {
         "FacilityID": 7292,
@@ -3792,10 +3612,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.8279916,
-          -35.4425276
-        ]
+        "coordinates": [148.8279916, -35.4425276]
       },
       "properties": {
         "FacilityID": 7296,
@@ -3855,10 +3672,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0103918,
-          -35.86491711
-        ]
+        "coordinates": [149.0103918, -35.86491711]
       },
       "properties": {
         "FacilityID": 7298,
@@ -3918,10 +3732,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.906847,
-          -35.46145893
-        ]
+        "coordinates": [148.906847, -35.46145893]
       },
       "properties": {
         "FacilityID": 7302,
@@ -3981,10 +3792,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9475409,
-          -35.32573686
-        ]
+        "coordinates": [148.9475409, -35.32573686]
       },
       "properties": {
         "FacilityID": 7303,
@@ -4044,10 +3852,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.138827,
-          -35.25957065
-        ]
+        "coordinates": [149.138827, -35.25957065]
       },
       "properties": {
         "FacilityID": 9546,
@@ -4107,10 +3912,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1377013,
-          -35.26226601
-        ]
+        "coordinates": [149.1377013, -35.26226601]
       },
       "properties": {
         "FacilityID": 9547,
@@ -4170,10 +3972,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0769121,
-          -35.25181456
-        ]
+        "coordinates": [149.0769121, -35.25181456]
       },
       "properties": {
         "FacilityID": 9549,
@@ -4233,10 +4032,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.11462822,
-          -35.43474523
-        ]
+        "coordinates": [149.11462822, -35.43474523]
       },
       "properties": {
         "FacilityID": 9551,
@@ -4296,10 +4092,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1249918,
-          -35.41484372
-        ]
+        "coordinates": [149.1249918, -35.41484372]
       },
       "properties": {
         "FacilityID": 9553,
@@ -4359,10 +4152,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0612714,
-          -35.25702363
-        ]
+        "coordinates": [149.0612714, -35.25702363]
       },
       "properties": {
         "FacilityID": 9554,
@@ -4422,10 +4212,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.094074,
-          -35.31653547
-        ]
+        "coordinates": [149.094074, -35.31653547]
       },
       "properties": {
         "FacilityID": 9557,
@@ -4485,10 +4272,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1482999,
-          -35.24844352
-        ]
+        "coordinates": [149.1482999, -35.24844352]
       },
       "properties": {
         "FacilityID": 9559,
@@ -4548,10 +4332,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0937876,
-          -35.21387677
-        ]
+        "coordinates": [149.0937876, -35.21387677]
       },
       "properties": {
         "FacilityID": 9563,
@@ -4611,10 +4392,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0962898,
-          -35.21666167
-        ]
+        "coordinates": [149.0962898, -35.21666167]
       },
       "properties": {
         "FacilityID": 9564,
@@ -4674,10 +4452,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0679662,
-          -35.41818665
-        ]
+        "coordinates": [149.0679662, -35.41818665]
       },
       "properties": {
         "FacilityID": 9567,
@@ -4737,10 +4512,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1418151,
-          -35.31996711
-        ]
+        "coordinates": [149.1418151, -35.31996711]
       },
       "properties": {
         "FacilityID": 9569,
@@ -4800,10 +4572,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0346207,
-          -35.24657901
-        ]
+        "coordinates": [149.0346207, -35.24657901]
       },
       "properties": {
         "FacilityID": 9573,
@@ -4863,10 +4632,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0367747,
-          -35.24148758
-        ]
+        "coordinates": [149.0367747, -35.24148758]
       },
       "properties": {
         "FacilityID": 9575,
@@ -4926,10 +4692,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.02001321,
-          -35.22204109
-        ]
+        "coordinates": [149.02001321, -35.22204109]
       },
       "properties": {
         "FacilityID": 9577,
@@ -4989,10 +4752,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1150182,
-          -35.22290413
-        ]
+        "coordinates": [149.1150182, -35.22290413]
       },
       "properties": {
         "FacilityID": 9581,
@@ -5052,10 +4812,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0637361,
-          -35.38842056
-        ]
+        "coordinates": [149.0637361, -35.38842056]
       },
       "properties": {
         "FacilityID": 9583,
@@ -5115,10 +4872,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.059903,
-          -35.38255286
-        ]
+        "coordinates": [149.059903, -35.38255286]
       },
       "properties": {
         "FacilityID": 9584,
@@ -5178,10 +4932,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1331651,
-          -35.24581443
-        ]
+        "coordinates": [149.1331651, -35.24581443]
       },
       "properties": {
         "FacilityID": 9587,
@@ -5241,10 +4992,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1320753,
-          -35.24764721
-        ]
+        "coordinates": [149.1320753, -35.24764721]
       },
       "properties": {
         "FacilityID": 9588,
@@ -5304,10 +5052,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0782444,
-          -35.3414972
-        ]
+        "coordinates": [149.0782444, -35.3414972]
       },
       "properties": {
         "FacilityID": 9589,
@@ -5367,10 +5112,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0953771,
-          -35.37034579
-        ]
+        "coordinates": [149.0953771, -35.37034579]
       },
       "properties": {
         "FacilityID": 9592,
@@ -5430,10 +5172,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0984374,
-          -35.36043805
-        ]
+        "coordinates": [149.0984374, -35.36043805]
       },
       "properties": {
         "FacilityID": 9593,
@@ -5493,10 +5232,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0533011,
-          -35.2144221
-        ]
+        "coordinates": [149.0533011, -35.2144221]
       },
       "properties": {
         "FacilityID": 9594,
@@ -5556,10 +5292,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.158589,
-          -35.33775981
-        ]
+        "coordinates": [149.158589, -35.33775981]
       },
       "properties": {
         "FacilityID": 9595,
@@ -5619,10 +5352,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1557975,
-          -35.33753436
-        ]
+        "coordinates": [149.1557975, -35.33753436]
       },
       "properties": {
         "FacilityID": 9618,
@@ -5682,10 +5412,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1456664,
-          -35.28230043
-        ]
+        "coordinates": [149.1456664, -35.28230043]
       },
       "properties": {
         "FacilityID": 9634,
@@ -5745,10 +5472,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0957182,
-          -35.34393658
-        ]
+        "coordinates": [149.0957182, -35.34393658]
       },
       "properties": {
         "FacilityID": 9635,
@@ -5808,10 +5532,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0388554,
-          -35.23029141
-        ]
+        "coordinates": [149.0388554, -35.23029141]
       },
       "properties": {
         "FacilityID": 9636,
@@ -5871,10 +5592,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0457601,
-          -35.35182879
-        ]
+        "coordinates": [149.0457601, -35.35182879]
       },
       "properties": {
         "FacilityID": 9639,
@@ -5934,10 +5652,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0560994,
-          -35.35567391
-        ]
+        "coordinates": [149.0560994, -35.35567391]
       },
       "properties": {
         "FacilityID": 9645,
@@ -5997,10 +5712,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.952178,
-          -35.36354999
-        ]
+        "coordinates": [148.952178, -35.36354999]
       },
       "properties": {
         "FacilityID": 11401,
@@ -6060,10 +5772,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9388503,
-          -35.48133499
-        ]
+        "coordinates": [148.9388503, -35.48133499]
       },
       "properties": {
         "FacilityID": 11402,
@@ -6123,10 +5832,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.940333,
-          -35.48068675
-        ]
+        "coordinates": [148.940333, -35.48068675]
       },
       "properties": {
         "FacilityID": 11403,
@@ -6186,10 +5892,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.2469088,
-          -35.3225067
-        ]
+        "coordinates": [149.2469088, -35.3225067]
       },
       "properties": {
         "FacilityID": 11405,
@@ -6249,10 +5952,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.2500902,
-          -35.32868286
-        ]
+        "coordinates": [149.2500902, -35.32868286]
       },
       "properties": {
         "FacilityID": 11406,
@@ -6312,10 +6012,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1089152,
-          -35.27889901
-        ]
+        "coordinates": [149.1089152, -35.27889901]
       },
       "properties": {
         "FacilityID": 12031,
@@ -6375,10 +6072,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.10819149,
-          -35.27467617
-        ]
+        "coordinates": [149.10819149, -35.27467617]
       },
       "properties": {
         "FacilityID": 12033,
@@ -6438,10 +6132,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.10852107,
-          -35.27185545
-        ]
+        "coordinates": [149.10852107, -35.27185545]
       },
       "properties": {
         "FacilityID": 12034,
@@ -6501,10 +6192,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.10958022,
-          -35.27783714
-        ]
+        "coordinates": [149.10958022, -35.27783714]
       },
       "properties": {
         "FacilityID": 12035,
@@ -6564,10 +6252,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.10880002,
-          -35.27898997
-        ]
+        "coordinates": [149.10880002, -35.27898997]
       },
       "properties": {
         "FacilityID": 12036,
@@ -6627,10 +6312,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1102328,
-          -35.27884953
-        ]
+        "coordinates": [149.1102328, -35.27884953]
       },
       "properties": {
         "FacilityID": 12037,
@@ -6690,10 +6372,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.13408767,
-          -35.27977879
-        ]
+        "coordinates": [149.13408767, -35.27977879]
       },
       "properties": {
         "FacilityID": 17397,
@@ -6753,10 +6432,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.05254084,
-          -35.3412972
-        ]
+        "coordinates": [149.05254084, -35.3412972]
       },
       "properties": {
         "FacilityID": 17399,
@@ -6816,10 +6492,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.09873925,
-          -35.40376869
-        ]
+        "coordinates": [149.09873925, -35.40376869]
       },
       "properties": {
         "FacilityID": 17401,
@@ -6879,10 +6552,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.06687773,
-          -35.41680576
-        ]
+        "coordinates": [149.06687773, -35.41680576]
       },
       "properties": {
         "FacilityID": 17403,
@@ -6942,10 +6612,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.093163,
-          -35.457491
-        ]
+        "coordinates": [149.093163, -35.457491]
       },
       "properties": {
         "FacilityID": 17405,
@@ -7005,10 +6672,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.13391892,
-          -35.32069395
-        ]
+        "coordinates": [149.13391892, -35.32069395]
       },
       "properties": {
         "FacilityID": 17407,
@@ -7068,10 +6732,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.131628,
-          -35.298559
-        ]
+        "coordinates": [149.131628, -35.298559]
       },
       "properties": {
         "FacilityID": 18964,
@@ -7131,10 +6792,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1423562,
-          -35.31641475
-        ]
+        "coordinates": [149.1423562, -35.31641475]
       },
       "properties": {
         "FacilityID": 19909,
@@ -7194,10 +6852,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.127619,
-          -35.41286633
-        ]
+        "coordinates": [149.127619, -35.41286633]
       },
       "properties": {
         "FacilityID": 35391,
@@ -7257,10 +6912,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0853342,
-          -35.35148072
-        ]
+        "coordinates": [149.0853342, -35.35148072]
       },
       "properties": {
         "FacilityID": 35399,
@@ -7320,10 +6972,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1502716,
-          -35.32243326
-        ]
+        "coordinates": [149.1502716, -35.32243326]
       },
       "properties": {
         "FacilityID": 35405,
@@ -7383,10 +7032,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.07292485,
-          -35.2533006
-        ]
+        "coordinates": [149.07292485, -35.2533006]
       },
       "properties": {
         "FacilityID": 35415,
@@ -7446,10 +7092,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.081882,
-          -35.32468
-        ]
+        "coordinates": [149.081882, -35.32468]
       },
       "properties": {
         "FacilityID": 37155,
@@ -7509,10 +7152,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.17699096,
-          -35.32815792
-        ]
+        "coordinates": [149.17699096, -35.32815792]
       },
       "properties": {
         "FacilityID": 37157,
@@ -7572,10 +7212,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.04415107,
-          -35.24411827
-        ]
+        "coordinates": [149.04415107, -35.24411827]
       },
       "properties": {
         "FacilityID": 37161,
@@ -7635,10 +7272,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.061089,
-          -35.239783
-        ]
+        "coordinates": [149.061089, -35.239783]
       },
       "properties": {
         "FacilityID": 37167,
@@ -7698,10 +7332,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.13518288,
-          -35.29755382
-        ]
+        "coordinates": [149.13518288, -35.29755382]
       },
       "properties": {
         "FacilityID": 37793,
@@ -7761,10 +7392,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.13375181,
-          -35.29676978
-        ]
+        "coordinates": [149.13375181, -35.29676978]
       },
       "properties": {
         "FacilityID": 37795,
@@ -7824,10 +7452,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.132127,
-          -35.298253
-        ]
+        "coordinates": [149.132127, -35.298253]
       },
       "properties": {
         "FacilityID": 37797,
@@ -7887,10 +7512,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.12824935,
-          -35.30188767
-        ]
+        "coordinates": [149.12824935, -35.30188767]
       },
       "properties": {
         "FacilityID": 37799,
@@ -7950,10 +7572,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.06553,
-          -35.41515
-        ]
+        "coordinates": [149.06553, -35.41515]
       },
       "properties": {
         "FacilityID": 39141,
@@ -8013,10 +7632,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0110538,
-          -35.39781594
-        ]
+        "coordinates": [149.0110538, -35.39781594]
       },
       "properties": {
         "FacilityID": 40533,
@@ -8076,10 +7692,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9537055,
-          -35.31983954
-        ]
+        "coordinates": [148.9537055, -35.31983954]
       },
       "properties": {
         "FacilityID": 40535,
@@ -8139,10 +7752,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0622264,
-          -35.42791832
-        ]
+        "coordinates": [149.0622264, -35.42791832]
       },
       "properties": {
         "FacilityID": 40537,
@@ -8202,10 +7812,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.985284,
-          -35.87573426
-        ]
+        "coordinates": [148.985284, -35.87573426]
       },
       "properties": {
         "FacilityID": 40539,
@@ -8265,10 +7872,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9737494,
-          -35.75723286
-        ]
+        "coordinates": [148.9737494, -35.75723286]
       },
       "properties": {
         "FacilityID": 40541,
@@ -8328,10 +7932,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9989553,
-          -35.68266321
-        ]
+        "coordinates": [148.9989553, -35.68266321]
       },
       "properties": {
         "FacilityID": 40543,
@@ -8391,10 +7992,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9747157,
-          -35.58308667
-        ]
+        "coordinates": [148.9747157, -35.58308667]
       },
       "properties": {
         "FacilityID": 40545,
@@ -8454,10 +8052,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9933626,
-          -35.56741189
-        ]
+        "coordinates": [148.9933626, -35.56741189]
       },
       "properties": {
         "FacilityID": 40547,
@@ -8517,10 +8112,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.06588066,
-          -35.53174789
-        ]
+        "coordinates": [149.06588066, -35.53174789]
       },
       "properties": {
         "FacilityID": 40549,
@@ -8580,10 +8172,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9339861,
-          -35.48787019
-        ]
+        "coordinates": [148.9339861, -35.48787019]
       },
       "properties": {
         "FacilityID": 40551,
@@ -8643,10 +8232,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.8350015,
-          -35.53418972
-        ]
+        "coordinates": [148.8350015, -35.53418972]
       },
       "properties": {
         "FacilityID": 40553,
@@ -8706,10 +8292,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.94261376,
-          -35.44123841
-        ]
+        "coordinates": [148.94261376, -35.44123841]
       },
       "properties": {
         "FacilityID": 40555,
@@ -8769,10 +8352,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9275746,
-          -35.44856646
-        ]
+        "coordinates": [148.9275746, -35.44856646]
       },
       "properties": {
         "FacilityID": 40557,
@@ -8832,10 +8412,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9195478,
-          -35.45979905
-        ]
+        "coordinates": [148.9195478, -35.45979905]
       },
       "properties": {
         "FacilityID": 40559,
@@ -8895,10 +8472,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9049729,
-          -35.46629397
-        ]
+        "coordinates": [148.9049729, -35.46629397]
       },
       "properties": {
         "FacilityID": 40561,
@@ -8958,10 +8532,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9295054,
-          -35.44403539
-        ]
+        "coordinates": [148.9295054, -35.44403539]
       },
       "properties": {
         "FacilityID": 40563,
@@ -9021,10 +8592,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1096089,
-          -35.58355969
-        ]
+        "coordinates": [149.1096089, -35.58355969]
       },
       "properties": {
         "FacilityID": 40565,
@@ -9084,10 +8652,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.16378637,
-          -35.32831666
-        ]
+        "coordinates": [149.16378637, -35.32831666]
       },
       "properties": {
         "FacilityID": 42507,
@@ -9147,10 +8712,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1297544,
-          -35.2966777
-        ]
+        "coordinates": [149.1297544, -35.2966777]
       },
       "properties": {
         "FacilityID": 43797,
@@ -9210,10 +8772,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.02570009,
-          -35.31990504
-        ]
+        "coordinates": [149.02570009, -35.31990504]
       },
       "properties": {
         "FacilityID": 44279,
@@ -9273,10 +8832,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.162736,
-          -35.330077
-        ]
+        "coordinates": [149.162736, -35.330077]
       },
       "properties": {
         "FacilityID": 44835,
@@ -9336,10 +8892,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.165556,
-          -35.2249378
-        ]
+        "coordinates": [149.165556, -35.2249378]
       },
       "properties": {
         "FacilityID": 45255,
@@ -9399,10 +8952,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.135881,
-          -35.250995
-        ]
+        "coordinates": [149.135881, -35.250995]
       },
       "properties": {
         "FacilityID": 45721,
@@ -9462,10 +9012,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.12591611,
-          -35.18376747
-        ]
+        "coordinates": [149.12591611, -35.18376747]
       },
       "properties": {
         "FacilityID": 45849,
@@ -9525,10 +9072,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.057352,
-          -35.378666
-        ]
+        "coordinates": [149.057352, -35.378666]
       },
       "properties": {
         "FacilityID": 45899,
@@ -9588,10 +9132,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.06658945,
-          -35.41882751
-        ]
+        "coordinates": [149.06658945, -35.41882751]
       },
       "properties": {
         "FacilityID": 47651,
@@ -9651,10 +9192,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.051885,
-          -35.340262
-        ]
+        "coordinates": [149.051885, -35.340262]
       },
       "properties": {
         "FacilityID": 47689,
@@ -9714,10 +9252,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.15013625,
-          -35.28191092
-        ]
+        "coordinates": [149.15013625, -35.28191092]
       },
       "properties": {
         "FacilityID": 48877,
@@ -9777,10 +9312,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1026888,
-          -35.20148669
-        ]
+        "coordinates": [149.1026888, -35.20148669]
       },
       "properties": {
         "FacilityID": 50965,
@@ -9840,10 +9372,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0719297,
-          -35.40574679
-        ]
+        "coordinates": [149.0719297, -35.40574679]
       },
       "properties": {
         "FacilityID": 51239,
@@ -9903,10 +9432,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1404606,
-          -35.25043196
-        ]
+        "coordinates": [149.1404606, -35.25043196]
       },
       "properties": {
         "FacilityID": 51975,
@@ -9966,10 +9492,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.14220268,
-          -35.15932966
-        ]
+        "coordinates": [149.14220268, -35.15932966]
       },
       "properties": {
         "FacilityID": 52223,
@@ -10029,10 +9552,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1418302,
-          -35.17237238
-        ]
+        "coordinates": [149.1418302, -35.17237238]
       },
       "properties": {
         "FacilityID": 52225,
@@ -10092,10 +9612,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1207218,
-          -35.15552644
-        ]
+        "coordinates": [149.1207218, -35.15552644]
       },
       "properties": {
         "FacilityID": 54415,
@@ -10155,10 +9672,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.190883,
-          -35.21124449
-        ]
+        "coordinates": [149.190883, -35.21124449]
       },
       "properties": {
         "FacilityID": 54417,
@@ -10218,10 +9732,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0971669,
-          -35.30721285
-        ]
+        "coordinates": [149.0971669, -35.30721285]
       },
       "properties": {
         "FacilityID": 54925,
@@ -10281,10 +9792,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0650422,
-          -35.2380765
-        ]
+        "coordinates": [149.0650422, -35.2380765]
       },
       "properties": {
         "FacilityID": 54931,
@@ -10344,10 +9852,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.13540341,
-          -35.18645934
-        ]
+        "coordinates": [149.13540341, -35.18645934]
       },
       "properties": {
         "FacilityID": 54933,
@@ -10407,10 +9912,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.08512643,
-          -35.34617605
-        ]
+        "coordinates": [149.08512643, -35.34617605]
       },
       "properties": {
         "FacilityID": 54935,
@@ -10470,10 +9972,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0399281,
-          -35.23364386
-        ]
+        "coordinates": [149.0399281, -35.23364386]
       },
       "properties": {
         "FacilityID": 55031,
@@ -10533,10 +10032,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1195319,
-          -35.2924813
-        ]
+        "coordinates": [149.1195319, -35.2924813]
       },
       "properties": {
         "FacilityID": 55163,
@@ -10596,10 +10092,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.14602054,
-          -35.298027
-        ]
+        "coordinates": [149.14602054, -35.298027]
       },
       "properties": {
         "FacilityID": 55355,
@@ -10659,10 +10152,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.13004023,
-          -35.30325008
-        ]
+        "coordinates": [149.13004023, -35.30325008]
       },
       "properties": {
         "FacilityID": 55356,
@@ -10722,10 +10212,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0179707,
-          -35.22010375
-        ]
+        "coordinates": [149.0179707, -35.22010375]
       },
       "properties": {
         "FacilityID": 55377,
@@ -10785,10 +10272,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.15410594,
-          -35.2895445
-        ]
+        "coordinates": [149.15410594, -35.2895445]
       },
       "properties": {
         "FacilityID": 55541,
@@ -10848,10 +10332,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.12035464,
-          -35.15579535
-        ]
+        "coordinates": [149.12035464, -35.15579535]
       },
       "properties": {
         "FacilityID": 55700,
@@ -10911,10 +10392,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0955227,
-          -35.17412861
-        ]
+        "coordinates": [149.0955227, -35.17412861]
       },
       "properties": {
         "FacilityID": 55701,
@@ -10974,10 +10452,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1438182,
-          -35.1977106
-        ]
+        "coordinates": [149.1438182, -35.1977106]
       },
       "properties": {
         "FacilityID": 55994,
@@ -11037,10 +10512,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1548168,
-          -35.3241127
-        ]
+        "coordinates": [149.1548168, -35.3241127]
       },
       "properties": {
         "FacilityID": 56343,
@@ -11100,10 +10572,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1567162,
-          -35.348307
-        ]
+        "coordinates": [149.1567162, -35.348307]
       },
       "properties": {
         "FacilityID": 56735,
@@ -11163,10 +10632,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.14556,
-          -35.23184
-        ]
+        "coordinates": [149.14556, -35.23184]
       },
       "properties": {
         "FacilityID": 57508,
@@ -11226,10 +10692,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1266025,
-          -35.18338433
-        ]
+        "coordinates": [149.1266025, -35.18338433]
       },
       "properties": {
         "FacilityID": 58325,
@@ -11289,10 +10752,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.08531222,
-          -35.39022422
-        ]
+        "coordinates": [149.08531222, -35.39022422]
       },
       "properties": {
         "FacilityID": 58560,
@@ -11352,10 +10812,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.17400862,
-          -35.30404316
-        ]
+        "coordinates": [149.17400862, -35.30404316]
       },
       "properties": {
         "FacilityID": 58637,
@@ -11415,10 +10872,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.99376099,
-          -35.22718331
-        ]
+        "coordinates": [148.99376099, -35.22718331]
       },
       "properties": {
         "FacilityID": 58881,
@@ -11478,10 +10932,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.08224403,
-          -35.32509034
-        ]
+        "coordinates": [149.08224403, -35.32509034]
       },
       "properties": {
         "FacilityID": 59120,
@@ -11541,10 +10992,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.12124707,
-          -35.43891696
-        ]
+        "coordinates": [149.12124707, -35.43891696]
       },
       "properties": {
         "FacilityID": 59594,
@@ -11604,10 +11052,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0645014,
-          -35.417053
-        ]
+        "coordinates": [149.0645014, -35.417053]
       },
       "properties": {
         "FacilityID": 59797,
@@ -11667,10 +11112,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.08530557,
-          -35.39124148
-        ]
+        "coordinates": [149.08530557, -35.39124148]
       },
       "properties": {
         "FacilityID": 59810,
@@ -11730,10 +11172,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0844531,
-          -35.19040242
-        ]
+        "coordinates": [149.0844531, -35.19040242]
       },
       "properties": {
         "FacilityID": 59973,
@@ -11793,10 +11232,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1273179,
-          -35.2244008
-        ]
+        "coordinates": [149.1273179, -35.2244008]
       },
       "properties": {
         "FacilityID": 60254,
@@ -11856,10 +11292,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.12543802,
-          -35.30763756
-        ]
+        "coordinates": [149.12543802, -35.30763756]
       },
       "properties": {
         "FacilityID": 60266,
@@ -11919,10 +11352,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.12841157,
-          -35.29865793
-        ]
+        "coordinates": [149.12841157, -35.29865793]
       },
       "properties": {
         "FacilityID": 60725,
@@ -11982,10 +11412,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0281214,
-          -35.30301846
-        ]
+        "coordinates": [149.0281214, -35.30301846]
       },
       "properties": {
         "FacilityID": 61251,
@@ -12045,10 +11472,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1036173,
-          -35.23419028
-        ]
+        "coordinates": [149.1036173, -35.23419028]
       },
       "properties": {
         "FacilityID": 61253,
@@ -12108,10 +11532,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0396039,
-          -35.27549828
-        ]
+        "coordinates": [149.0396039, -35.27549828]
       },
       "properties": {
         "FacilityID": 61254,
@@ -12171,10 +11592,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.19091627,
-          -35.30742567
-        ]
+        "coordinates": [149.19091627, -35.30742567]
       },
       "properties": {
         "FacilityID": 61682,
@@ -12234,10 +11652,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.19125373,
-          -35.29718046
-        ]
+        "coordinates": [149.19125373, -35.29718046]
       },
       "properties": {
         "FacilityID": 62163,
@@ -12297,10 +11712,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.06572254,
-          -35.24608172
-        ]
+        "coordinates": [149.06572254, -35.24608172]
       },
       "properties": {
         "FacilityID": 62321,
@@ -12360,10 +11772,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.165543,
-          -35.18631733
-        ]
+        "coordinates": [149.165543, -35.18631733]
       },
       "properties": {
         "FacilityID": 62696,
@@ -12423,10 +11832,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.05469003,
-          -35.22669952
-        ]
+        "coordinates": [149.05469003, -35.22669952]
       },
       "properties": {
         "FacilityID": 62755,
@@ -12486,10 +11892,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.12418968,
-          -35.28474876
-        ]
+        "coordinates": [149.12418968, -35.28474876]
       },
       "properties": {
         "FacilityID": 62944,
@@ -12549,10 +11952,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1301146,
-          -35.30226755
-        ]
+        "coordinates": [149.1301146, -35.30226755]
       },
       "properties": {
         "FacilityID": 62947,
@@ -12612,10 +12012,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.13206659,
-          -35.1649506
-        ]
+        "coordinates": [149.13206659, -35.1649506]
       },
       "properties": {
         "FacilityID": 63002,
@@ -12675,10 +12072,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.18996904,
-          -35.29423229
-        ]
+        "coordinates": [149.18996904, -35.29423229]
       },
       "properties": {
         "FacilityID": 63126,
@@ -12738,10 +12132,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1333324,
-          -35.1848258
-        ]
+        "coordinates": [149.1333324, -35.1848258]
       },
       "properties": {
         "FacilityID": 63350,
@@ -12801,10 +12192,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0861124,
-          -35.34460525
-        ]
+        "coordinates": [149.0861124, -35.34460525]
       },
       "properties": {
         "FacilityID": 63459,
@@ -12864,10 +12252,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1282961,
-          -35.41337115
-        ]
+        "coordinates": [149.1282961, -35.41337115]
       },
       "properties": {
         "FacilityID": 63460,
@@ -12927,10 +12312,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0894518,
-          -35.29692743
-        ]
+        "coordinates": [149.0894518, -35.29692743]
       },
       "properties": {
         "FacilityID": 63461,
@@ -12990,10 +12372,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0939116,
-          -35.29407093
-        ]
+        "coordinates": [149.0939116, -35.29407093]
       },
       "properties": {
         "FacilityID": 63462,
@@ -13053,10 +12432,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1229094,
-          -35.29747646
-        ]
+        "coordinates": [149.1229094, -35.29747646]
       },
       "properties": {
         "FacilityID": 63463,
@@ -13116,10 +12492,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1395838,
-          -35.30801106
-        ]
+        "coordinates": [149.1395838, -35.30801106]
       },
       "properties": {
         "FacilityID": 63464,
@@ -13179,10 +12552,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1076837,
-          -35.31469044
-        ]
+        "coordinates": [149.1076837, -35.31469044]
       },
       "properties": {
         "FacilityID": 63465,
@@ -13242,10 +12612,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1306911,
-          -35.17926812
-        ]
+        "coordinates": [149.1306911, -35.17926812]
       },
       "properties": {
         "FacilityID": 63466,
@@ -13305,10 +12672,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.063124,
-          -35.22776736
-        ]
+        "coordinates": [149.063124, -35.22776736]
       },
       "properties": {
         "FacilityID": 63467,
@@ -13368,10 +12732,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0433015,
-          -35.2437009
-        ]
+        "coordinates": [149.0433015, -35.2437009]
       },
       "properties": {
         "FacilityID": 63468,
@@ -13431,10 +12792,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1580014,
-          -35.16679038
-        ]
+        "coordinates": [149.1580014, -35.16679038]
       },
       "properties": {
         "FacilityID": 63469,
@@ -13494,10 +12852,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9068438,
-          -35.46266171
-        ]
+        "coordinates": [148.9068438, -35.46266171]
       },
       "properties": {
         "FacilityID": 63470,
@@ -13557,10 +12912,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9255447,
-          -35.45596167
-        ]
+        "coordinates": [148.9255447, -35.45596167]
       },
       "properties": {
         "FacilityID": 63471,
@@ -13620,10 +12972,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1546182,
-          -35.28932911
-        ]
+        "coordinates": [149.1546182, -35.28932911]
       },
       "properties": {
         "FacilityID": 63472,
@@ -13683,10 +13032,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1440889,
-          -35.19731521
-        ]
+        "coordinates": [149.1440889, -35.19731521]
       },
       "properties": {
         "FacilityID": 63473,
@@ -13746,10 +13092,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.2273588,
-          -35.34151073
-        ]
+        "coordinates": [149.2273588, -35.34151073]
       },
       "properties": {
         "FacilityID": 63474,
@@ -13809,10 +13152,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1463469,
-          -35.1371227
-        ]
+        "coordinates": [149.1463469, -35.1371227]
       },
       "properties": {
         "FacilityID": 63475,
@@ -13872,10 +13212,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0631031,
-          -35.25945561
-        ]
+        "coordinates": [149.0631031, -35.25945561]
       },
       "properties": {
         "FacilityID": 63476,
@@ -13935,10 +13272,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0760002,
-          -35.28689891
-        ]
+        "coordinates": [149.0760002, -35.28689891]
       },
       "properties": {
         "FacilityID": 63477,
@@ -13998,10 +13332,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1303777,
-          -35.27840885
-        ]
+        "coordinates": [149.1303777, -35.27840885]
       },
       "properties": {
         "FacilityID": 63478,
@@ -14061,10 +13392,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1306059,
-          -35.27765617
-        ]
+        "coordinates": [149.1306059, -35.27765617]
       },
       "properties": {
         "FacilityID": 63479,
@@ -14124,10 +13452,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1946524,
-          -35.2405296
-        ]
+        "coordinates": [149.1946524, -35.2405296]
       },
       "properties": {
         "FacilityID": 63480,
@@ -14187,10 +13512,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1319638,
-          -35.18598783
-        ]
+        "coordinates": [149.1319638, -35.18598783]
       },
       "properties": {
         "FacilityID": 63481,
@@ -14250,10 +13572,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0196647,
-          -35.71520806
-        ]
+        "coordinates": [149.0196647, -35.71520806]
       },
       "properties": {
         "FacilityID": 63482,
@@ -14313,10 +13632,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9586465,
-          -35.77529505
-        ]
+        "coordinates": [148.9586465, -35.77529505]
       },
       "properties": {
         "FacilityID": 63483,
@@ -14376,10 +13692,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0659453,
-          -35.82386598
-        ]
+        "coordinates": [149.0659453, -35.82386598]
       },
       "properties": {
         "FacilityID": 63484,
@@ -14439,10 +13752,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9436931,
-          -35.32593328
-        ]
+        "coordinates": [148.9436931, -35.32593328]
       },
       "properties": {
         "FacilityID": 63485,
@@ -14502,10 +13812,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0092804,
-          -35.39434824
-        ]
+        "coordinates": [149.0092804, -35.39434824]
       },
       "properties": {
         "FacilityID": 63486,
@@ -14565,10 +13872,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0547321,
-          -35.42561818
-        ]
+        "coordinates": [149.0547321, -35.42561818]
       },
       "properties": {
         "FacilityID": 63487,
@@ -14628,10 +13932,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0152075,
-          -35.86800292
-        ]
+        "coordinates": [149.0152075, -35.86800292]
       },
       "properties": {
         "FacilityID": 63488,
@@ -14691,10 +13992,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9710196,
-          -35.88699576
-        ]
+        "coordinates": [148.9710196, -35.88699576]
       },
       "properties": {
         "FacilityID": 63489,
@@ -14754,10 +14052,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.3512311,
-          -35.32834128
-        ]
+        "coordinates": [149.3512311, -35.32834128]
       },
       "properties": {
         "FacilityID": 63493,
@@ -14817,10 +14112,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.2872951,
-          -35.28927178
-        ]
+        "coordinates": [149.2872951, -35.28927178]
       },
       "properties": {
         "FacilityID": 63494,
@@ -14880,10 +14172,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0668034,
-          -35.50934542
-        ]
+        "coordinates": [149.0668034, -35.50934542]
       },
       "properties": {
         "FacilityID": 63495,
@@ -14943,10 +14232,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9265753,
-          -35.44210943
-        ]
+        "coordinates": [148.9265753, -35.44210943]
       },
       "properties": {
         "FacilityID": 63496,
@@ -15006,10 +14292,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9221103,
-          -35.42447692
-        ]
+        "coordinates": [148.9221103, -35.42447692]
       },
       "properties": {
         "FacilityID": 63497,
@@ -15069,10 +14352,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0690225,
-          -35.28740329
-        ]
+        "coordinates": [149.0690225, -35.28740329]
       },
       "properties": {
         "FacilityID": 63498,
@@ -15132,10 +14412,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0709325,
-          -35.31116215
-        ]
+        "coordinates": [149.0709325, -35.31116215]
       },
       "properties": {
         "FacilityID": 63499,
@@ -15195,10 +14472,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0703164,
-          -35.40861043
-        ]
+        "coordinates": [149.0703164, -35.40861043]
       },
       "properties": {
         "FacilityID": 63500,
@@ -15258,10 +14532,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9511231,
-          -35.24516522
-        ]
+        "coordinates": [148.9511231, -35.24516522]
       },
       "properties": {
         "FacilityID": 63501,
@@ -15321,10 +14592,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0733063,
-          -35.17019256
-        ]
+        "coordinates": [149.0733063, -35.17019256]
       },
       "properties": {
         "FacilityID": 63502,
@@ -15384,10 +14652,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0978233,
-          -35.17805459
-        ]
+        "coordinates": [149.0978233, -35.17805459]
       },
       "properties": {
         "FacilityID": 63503,
@@ -15447,10 +14712,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.9939978,
-          -35.22777019
-        ]
+        "coordinates": [148.9939978, -35.22777019]
       },
       "properties": {
         "FacilityID": 63504,
@@ -15510,10 +14772,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          148.8754752,
-          -35.2896602
-        ]
+        "coordinates": [148.8754752, -35.2896602]
       },
       "properties": {
         "FacilityID": 63505,
@@ -15573,10 +14832,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0899945,
-          -35.34391376
-        ]
+        "coordinates": [149.0899945, -35.34391376]
       },
       "properties": {
         "FacilityID": 63506,
@@ -15636,10 +14892,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1520356,
-          -35.33760806
-        ]
+        "coordinates": [149.1520356, -35.33760806]
       },
       "properties": {
         "FacilityID": 63507,
@@ -15699,10 +14952,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0375846,
-          -35.34679554
-        ]
+        "coordinates": [149.0375846, -35.34679554]
       },
       "properties": {
         "FacilityID": 63508,
@@ -15762,10 +15012,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1258592,
-          -35.16309043
-        ]
+        "coordinates": [149.1258592, -35.16309043]
       },
       "properties": {
         "FacilityID": 63509,
@@ -15825,10 +15072,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1545362,
-          -35.19949146
-        ]
+        "coordinates": [149.1545362, -35.19949146]
       },
       "properties": {
         "FacilityID": 63510,
@@ -15888,10 +15132,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1001289,
-          -35.18043518
-        ]
+        "coordinates": [149.1001289, -35.18043518]
       },
       "properties": {
         "FacilityID": 63511,
@@ -15951,10 +15192,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1233713,
-          -35.19765837
-        ]
+        "coordinates": [149.1233713, -35.19765837]
       },
       "properties": {
         "FacilityID": 63512,
@@ -16014,10 +15252,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1263811,
-          -35.1847668
-        ]
+        "coordinates": [149.1263811, -35.1847668]
       },
       "properties": {
         "FacilityID": 63513,
@@ -16077,10 +15312,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0463341,
-          -35.2495996
-        ]
+        "coordinates": [149.0463341, -35.2495996]
       },
       "properties": {
         "FacilityID": 63514,
@@ -16140,10 +15372,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.105104,
-          -35.2294972
-        ]
+        "coordinates": [149.105104, -35.2294972]
       },
       "properties": {
         "FacilityID": 63515,
@@ -16203,10 +15432,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1043258,
-          -35.22670392
-        ]
+        "coordinates": [149.1043258, -35.22670392]
       },
       "properties": {
         "FacilityID": 63516,
@@ -16266,10 +15492,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0234789,
-          -35.23002544
-        ]
+        "coordinates": [149.0234789, -35.23002544]
       },
       "properties": {
         "FacilityID": 63517,
@@ -16329,10 +15552,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.022822,
-          -35.22324349
-        ]
+        "coordinates": [149.022822, -35.22324349]
       },
       "properties": {
         "FacilityID": 63518,
@@ -16392,10 +15612,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0229943,
-          -35.22522181
-        ]
+        "coordinates": [149.0229943, -35.22522181]
       },
       "properties": {
         "FacilityID": 63519,
@@ -16455,10 +15672,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0241143,
-          -35.22617685
-        ]
+        "coordinates": [149.0241143, -35.22617685]
       },
       "properties": {
         "FacilityID": 63520,
@@ -16518,10 +15732,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0252231,
-          -35.20244344
-        ]
+        "coordinates": [149.0252231, -35.20244344]
       },
       "properties": {
         "FacilityID": 63521,
@@ -16581,10 +15792,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0358264,
-          -35.24375938
-        ]
+        "coordinates": [149.0358264, -35.24375938]
       },
       "properties": {
         "FacilityID": 63522,
@@ -16644,10 +15852,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.079192,
-          -35.25430062
-        ]
+        "coordinates": [149.079192, -35.25430062]
       },
       "properties": {
         "FacilityID": 63523,
@@ -16707,10 +15912,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0679112,
-          -35.24935181
-        ]
+        "coordinates": [149.0679112, -35.24935181]
       },
       "properties": {
         "FacilityID": 63524,
@@ -16770,10 +15972,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0907516,
-          -35.36793568
-        ]
+        "coordinates": [149.0907516, -35.36793568]
       },
       "properties": {
         "FacilityID": 63525,
@@ -16833,10 +16032,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1023367,
-          -35.34193016
-        ]
+        "coordinates": [149.1023367, -35.34193016]
       },
       "properties": {
         "FacilityID": 63526,
@@ -16896,10 +16092,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0798079,
-          -35.32981302
-        ]
+        "coordinates": [149.0798079, -35.32981302]
       },
       "properties": {
         "FacilityID": 63527,
@@ -16959,10 +16152,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0934982,
-          -35.47064948
-        ]
+        "coordinates": [149.0934982, -35.47064948]
       },
       "properties": {
         "FacilityID": 63528,
@@ -17022,10 +16212,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0836186,
-          -35.39644303
-        ]
+        "coordinates": [149.0836186, -35.39644303]
       },
       "properties": {
         "FacilityID": 63529,
@@ -17085,10 +16272,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0828383,
-          -35.3930304
-        ]
+        "coordinates": [149.0828383, -35.3930304]
       },
       "properties": {
         "FacilityID": 63530,
@@ -17148,10 +16332,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1526764,
-          -35.23650242
-        ]
+        "coordinates": [149.1526764, -35.23650242]
       },
       "properties": {
         "FacilityID": 63531,
@@ -17211,10 +16392,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1603018,
-          -35.25205389
-        ]
+        "coordinates": [149.1603018, -35.25205389]
       },
       "properties": {
         "FacilityID": 63532,
@@ -17274,10 +16452,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1433627,
-          -35.24650964
-        ]
+        "coordinates": [149.1433627, -35.24650964]
       },
       "properties": {
         "FacilityID": 63533,
@@ -17337,10 +16512,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0826833,
-          -35.42957446
-        ]
+        "coordinates": [149.0826833, -35.42957446]
       },
       "properties": {
         "FacilityID": 63534,
@@ -17400,10 +16572,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0987051,
-          -35.46301345
-        ]
+        "coordinates": [149.0987051, -35.46301345]
       },
       "properties": {
         "FacilityID": 63535,
@@ -17463,10 +16632,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.114642,
-          -35.41271698
-        ]
+        "coordinates": [149.114642, -35.41271698]
       },
       "properties": {
         "FacilityID": 63536,
@@ -17526,10 +16692,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0354221,
-          -35.33688842
-        ]
+        "coordinates": [149.0354221, -35.33688842]
       },
       "properties": {
         "FacilityID": 63537,
@@ -17589,10 +16752,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1234837,
-          -35.26077138
-        ]
+        "coordinates": [149.1234837, -35.26077138]
       },
       "properties": {
         "FacilityID": 63538,
@@ -17652,10 +16812,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.101003,
-          -35.30573803
-        ]
+        "coordinates": [149.101003, -35.30573803]
       },
       "properties": {
         "FacilityID": 63539,
@@ -17715,10 +16872,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0937448,
-          -35.30464185
-        ]
+        "coordinates": [149.0937448, -35.30464185]
       },
       "properties": {
         "FacilityID": 63540,
@@ -17778,10 +16932,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0800029,
-          -35.31831543
-        ]
+        "coordinates": [149.0800029, -35.31831543]
       },
       "properties": {
         "FacilityID": 63541,
@@ -17841,10 +16992,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0881426,
-          -35.45958116
-        ]
+        "coordinates": [149.0881426, -35.45958116]
       },
       "properties": {
         "FacilityID": 63542,
@@ -17904,10 +17052,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0935786,
-          -35.45961397
-        ]
+        "coordinates": [149.0935786, -35.45961397]
       },
       "properties": {
         "FacilityID": 63543,
@@ -17967,10 +17112,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1204743,
-          -35.43703025
-        ]
+        "coordinates": [149.1204743, -35.43703025]
       },
       "properties": {
         "FacilityID": 63544,
@@ -18030,10 +17172,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0883365,
-          -35.42547061
-        ]
+        "coordinates": [149.0883365, -35.42547061]
       },
       "properties": {
         "FacilityID": 63545,
@@ -18093,10 +17232,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0547511,
-          -35.38376709
-        ]
+        "coordinates": [149.0547511, -35.38376709]
       },
       "properties": {
         "FacilityID": 63546,
@@ -18156,10 +17292,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0906687,
-          -35.36338588
-        ]
+        "coordinates": [149.0906687, -35.36338588]
       },
       "properties": {
         "FacilityID": 63547,
@@ -18219,10 +17352,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1461712,
-          -35.33413375
-        ]
+        "coordinates": [149.1461712, -35.33413375]
       },
       "properties": {
         "FacilityID": 63548,
@@ -18282,10 +17412,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0915822,
-          -35.320814
-        ]
+        "coordinates": [149.0915822, -35.320814]
       },
       "properties": {
         "FacilityID": 63549,
@@ -18345,10 +17472,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1346164,
-          -35.3258004
-        ]
+        "coordinates": [149.1346164, -35.3258004]
       },
       "properties": {
         "FacilityID": 63550,
@@ -18408,10 +17532,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.089113,
-          -35.33244685
-        ]
+        "coordinates": [149.089113, -35.33244685]
       },
       "properties": {
         "FacilityID": 63551,
@@ -18471,10 +17592,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0854014,
-          -35.33970296
-        ]
+        "coordinates": [149.0854014, -35.33970296]
       },
       "properties": {
         "FacilityID": 63552,
@@ -18534,10 +17652,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0970905,
-          -35.34648112
-        ]
+        "coordinates": [149.0970905, -35.34648112]
       },
       "properties": {
         "FacilityID": 63553,
@@ -18597,10 +17712,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0461592,
-          -35.35712728
-        ]
+        "coordinates": [149.0461592, -35.35712728]
       },
       "properties": {
         "FacilityID": 63554,
@@ -18660,10 +17772,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0624876,
-          -35.42263568
-        ]
+        "coordinates": [149.0624876, -35.42263568]
       },
       "properties": {
         "FacilityID": 63555,
@@ -18723,10 +17832,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1544501,
-          -35.33939065
-        ]
+        "coordinates": [149.1544501, -35.33939065]
       },
       "properties": {
         "FacilityID": 63556,
@@ -18786,10 +17892,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1459521,
-          -35.28251791
-        ]
+        "coordinates": [149.1459521, -35.28251791]
       },
       "properties": {
         "FacilityID": 63557,
@@ -18849,10 +17952,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0343303,
-          -35.2181884
-        ]
+        "coordinates": [149.0343303, -35.2181884]
       },
       "properties": {
         "FacilityID": 63558,
@@ -18912,10 +18012,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.049267,
-          -35.23502378
-        ]
+        "coordinates": [149.049267, -35.23502378]
       },
       "properties": {
         "FacilityID": 63559,
@@ -18975,10 +18072,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1041197,
-          -35.37639454
-        ]
+        "coordinates": [149.1041197, -35.37639454]
       },
       "properties": {
         "FacilityID": 63560,
@@ -19038,10 +18132,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0839114,
-          -35.36159298
-        ]
+        "coordinates": [149.0839114, -35.36159298]
       },
       "properties": {
         "FacilityID": 63561,
@@ -19101,10 +18192,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.0752796,
-          -35.17178049
-        ]
+        "coordinates": [149.0752796, -35.17178049]
       },
       "properties": {
         "FacilityID": 63562,
@@ -19164,10 +18252,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          149.1390748,
-          -35.24974163
-        ]
+        "coordinates": [149.1390748, -35.24974163]
       },
       "properties": {
         "FacilityID": 63892,

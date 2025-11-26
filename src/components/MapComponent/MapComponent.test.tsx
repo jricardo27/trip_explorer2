@@ -10,10 +10,12 @@ vi.mock("react-leaflet", async () => {
 
   const LayersControlMock = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>
   LayersControlMock.displayName = "LayersControl"
-  LayersControlMock.BaseLayer = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>
-  LayersControlMock.BaseLayer.displayName = "LayersControl.BaseLayer"
-  LayersControlMock.Overlay = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>
-  LayersControlMock.Overlay.displayName = "LayersControl.Overlay"
+  const BaseLayer = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>
+  BaseLayer.displayName = "LayersControl.BaseLayer"
+  LayersControlMock.BaseLayer = BaseLayer
+  const Overlay = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>
+  Overlay.displayName = "LayersControl.Overlay"
+  LayersControlMock.Overlay = Overlay
 
   return {
     ...actual,

@@ -1,11 +1,20 @@
 repos:
   - repo: local
     hooks:
+      - id: prettier
+        name: prettier
+        entry: npx prettier --write --ignore-unknown
+        language: node
+        types_or: [css, html, javascript, json, jsx, markdown, ts, tsx, yaml]
+        exclude: ^public/tinymce/
+        additional_dependencies:
+          - prettier@3.4.1
       - id: node-eslint
         name: eslint
         entry: npx eslint --config eslint.config.js --fix --max-warnings 0 --no-warn-ignored
         language: node
         require_serial: true
         types_or: [html, javascript, json, jsx, ts, tsx]
+        exclude: ^public/tinymce/
         additional_dependencies:
           - eslint@9.16.0

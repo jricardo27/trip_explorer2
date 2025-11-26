@@ -40,11 +40,7 @@ export const FeatureContextMenu: React.FC<FeatureContextMenuProps> = ({
       onClose={handleClose}
       onContextMenu={preventDefault}
       anchorReference="anchorPosition"
-      anchorPosition={
-        contextMenu !== null
-          ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-          : undefined
-      }
+      anchorPosition={contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}
     >
       <MenuItem onClick={wrapper(handleDuplicate)}>Duplicate</MenuItem>
       {contextMenuFeature.category !== DEFAULT_CATEGORY && (

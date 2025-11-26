@@ -8,9 +8,16 @@ import { TTabMapping } from "../../data/types/TTabMapping"
 interface AustralianCapitalTerritoryProps {
   drawerOpen: boolean
   closeDrawer: () => void
+  isPinned?: boolean
+  onTogglePin?: () => void
 }
 
-export const AustralianCapitalTerritory = ({ drawerOpen, closeDrawer }: AustralianCapitalTerritoryProps): React.ReactNode => {
+export const AustralianCapitalTerritory = ({
+  drawerOpen,
+  closeDrawer,
+  isPinned,
+  onTogglePin,
+}: AustralianCapitalTerritoryProps): React.ReactNode => {
   const geoJsonOverlaySources = useMemo(
     (): Record<string, TTabMapping> => ({
       "/markers/australianCapitalTerritory/accommodation_ACT.json": {
@@ -24,7 +31,18 @@ export const AustralianCapitalTerritory = ({ drawerOpen, closeDrawer }: Australi
       "/markers/australianCapitalTerritory/toiletmap_aus_2025_ACT.json": {
         General: ["Name", "Male", "Female", "Unisex", "Shower", "OpeningHours", "OpeningHoursNote", "Address1", "URL"],
       },
-    }), [])
+    }),
+    [],
+  )
 
-  return <FeatureMap center={CANBERRA_LOCATION} geoJsonOverlaySources={geoJsonOverlaySources} drawerOpen={drawerOpen} closeDrawer={closeDrawer} />
+  return (
+    <FeatureMap
+      center={CANBERRA_LOCATION}
+      geoJsonOverlaySources={geoJsonOverlaySources}
+      drawerOpen={drawerOpen}
+      closeDrawer={closeDrawer}
+      isPinned={isPinned}
+      onTogglePin={onTogglePin}
+    />
+  )
 }

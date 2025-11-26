@@ -12,10 +12,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          133.8700714111328,
-          -23.733861923217773
-        ]
+        "coordinates": [133.8700714111328, -23.733861923217773]
       },
       "properties": {
         "id": "CALI",
@@ -55,10 +52,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          132.67294311523438,
-          -23.68581199645996
-        ]
+        "coordinates": [132.67294311523438, -23.68581199645996]
       },
       "properties": {
         "id": "CGLE",
@@ -98,10 +92,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          131.5120849609375,
-          -24.25031089782715
-        ]
+        "coordinates": [131.5120849609375, -24.25031089782715]
       },
       "properties": {
         "id": "CKIN",
@@ -141,10 +132,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          132.2954864501953,
-          -14.431013107299805
-        ]
+        "coordinates": [132.2954864501953, -14.431013107299805]
       },
       "properties": {
         "id": "CKAT",
@@ -184,10 +172,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          130.9010467529297,
-          -12.42701816558838
-        ]
+        "coordinates": [130.9010467529297, -12.42701816558838]
       },
       "properties": {
         "id": "CDAR",

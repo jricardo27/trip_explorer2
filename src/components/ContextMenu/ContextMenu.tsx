@@ -24,22 +24,20 @@ const ContextMenu: React.FC<IContextMenuProps> = ({ position, onClose, children,
     onClose?.()
   }
 
-  return isOpen
-    ? (
-        <div
-          className={styles.contextMenu}
-          style={{
-            position: "absolute",
-            left: position?.x,
-            top: position?.y,
-          }}
-        >
-          {React.Children.map(children, (child) =>
-            React.cloneElement(child as React.ReactElement<IMenuOptionsProps>, { closeMenu, payload }),
-          )}
-        </div>
-      )
-    : null
+  return isOpen ? (
+    <div
+      className={styles.contextMenu}
+      style={{
+        position: "absolute",
+        left: position?.x,
+        top: position?.y,
+      }}
+    >
+      {React.Children.map(children, (child) =>
+        React.cloneElement(child as React.ReactElement<IMenuOptionsProps>, { closeMenu, payload }),
+      )}
+    </div>
+  ) : null
 }
 
 export default ContextMenu

@@ -1,11 +1,4 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Tabs,
-  Tab,
-  Box,
-} from "@mui/material"
+import { Dialog, DialogTitle, DialogContent, Tabs, Tab, Box } from "@mui/material"
 import React, { useState } from "react"
 
 import About from "./About.tsx"

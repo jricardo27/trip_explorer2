@@ -12,10 +12,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          121.4887924194336,
-          -30.791751861572266
-        ]
+        "coordinates": [121.4887924194336, -30.791751861572266]
       },
       "properties": {
         "id": "WBOU",
@@ -55,10 +52,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          121.4697723388672,
-          -30.781888961791992
-        ]
+        "coordinates": [121.4697723388672, -30.781888961791992]
       },
       "properties": {
         "id": "WKAL",
@@ -98,10 +92,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.6457290649414,
-          -33.37461853027344
-        ]
+        "coordinates": [115.6457290649414, -33.37461853027344]
       },
       "properties": {
         "id": "WBUN",
@@ -145,10 +136,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.64505004882812,
-          -33.32086181640625
-        ]
+        "coordinates": [115.64505004882812, -33.32086181640625]
       },
       "properties": {
         "id": "WKOO",
@@ -188,10 +176,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.99776458740234,
-          -31.991907119750977
-        ]
+        "coordinates": [115.99776458740234, -31.991907119750977]
       },
       "properties": {
         "id": "WPER",
@@ -231,10 +216,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.2729034423828,
-          -33.658329010009766
-        ]
+        "coordinates": [115.2729034423828, -33.658329010009766]
       },
       "properties": {
         "id": "WBUS",
@@ -274,10 +256,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.96444702148438,
-          -31.876949310302734
-        ]
+        "coordinates": [115.96444702148438, -31.876949310302734]
       },
       "properties": {
         "id": "WPVY",
@@ -317,10 +296,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.1226577758789,
-          -33.81096649169922
-        ]
+        "coordinates": [115.1226577758789, -33.81096649169922]
       },
       "properties": {
         "id": "WMRG",
@@ -360,10 +336,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.76653289794922,
-          -32.12883377075195
-        ]
+        "coordinates": [115.76653289794922, -32.12883377075195]
       },
       "properties": {
         "id": "WWOO",
@@ -407,10 +380,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.76397705078124,
-          -32.11566162109375
-        ]
+        "coordinates": [115.76397705078124, -32.11566162109375]
       },
       "properties": {
         "id": "WCOO",
@@ -438,10 +408,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.5368423461914,
-          -31.99156188964844
-        ]
+        "coordinates": [115.5368423461914, -31.99156188964844]
       },
       "properties": {
         "id": "WROT",
@@ -481,10 +448,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          128.7398681640625,
-          -16.113033294677734
-        ]
+        "coordinates": [128.7398681640625, -16.113033294677734]
       },
       "properties": {
         "id": "WARG",
@@ -524,10 +488,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          128.72091674804688,
-          -15.791479110717772
-        ]
+        "coordinates": [128.72091674804688, -15.791479110717772]
       },
       "properties": {
         "id": "WKUN",
@@ -567,10 +528,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          122.23370361328124,
-          -17.96963882446289
-        ]
+        "coordinates": [122.23370361328124, -17.96963882446289]
       },
       "properties": {
         "id": "WBRO",
@@ -610,10 +568,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          118.63887786865234,
-          -20.30941390991211
-        ]
+        "coordinates": [118.63887786865234, -20.30941390991211]
       },
       "properties": {
         "id": "WHED",
@@ -661,10 +616,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          113.69632720947266,
-          -24.864572525024418
-        ]
+        "coordinates": [113.69632720947266, -24.864572525024418]
       },
       "properties": {
         "id": "WCAR",
@@ -704,10 +656,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          116.8222885131836,
-          -20.756149291992188
-        ]
+        "coordinates": [116.8222885131836, -20.756149291992188]
       },
       "properties": {
         "id": "WKAR",
@@ -751,10 +700,7 @@
       "type": "Feature",
       "geometry": {
         "type": "Point",
-        "coordinates": [
-          115.12918853759766,
-          -21.64823341369629
-        ]
+        "coordinates": [115.12918853759766, -21.64823341369629]
       },
       "properties": {
         "id": "WONS",

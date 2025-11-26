@@ -8,30 +8,35 @@ interface MapEventsProps {
   contextMenuHandler?: (event: L.LeafletMouseEvent) => void
 }
 
-const MapEvents = ({
-  setOverlayVisibility,
-  setActiveBaseLayer,
-  contextMenuHandler,
-}: MapEventsProps) => {
-  const handleOverlayAdd = useCallback((event: { layer: Layer; name: string }) => {
-    const layerName = event.name
-    setOverlayVisibility((prevVisibility) => ({
-      ...prevVisibility,
-      [layerName]: true,
-    }))
-  }, [setOverlayVisibility])
+const MapEvents = ({ setOverlayVisibility, setActiveBaseLayer, contextMenuHandler }: MapEventsProps) => {
+  const handleOverlayAdd = useCallback(
+    (event: { layer: Layer; name: string }) => {
+      const layerName = event.name
+      setOverlayVisibility((prevVisibility) => ({
+        ...prevVisibility,
+        [layerName]: true,
+      }))
+    },
+    [setOverlayVisibility],
+  )
 
-  const handleOverlayRemove = useCallback((event: { layer: Layer; name: string }) => {
-    const layerName = event.name
-    setOverlayVisibility((prevVisibility) => ({
-      ...prevVisibility,
-      [layerName]: false,
-    }))
-  }, [setOverlayVisibility])
+  const handleOverlayRemove = useCallback(
+    (event: { layer: Layer; name: string }) => {
+      const layerName = event.name
+      setOverlayVisibility((prevVisibility) => ({
+        ...prevVisibility,
+        [layerName]: false,
+      }))
+    },
+    [setOverlayVisibility],
+  )
 
-  const handleBaseLayerChange = useCallback((event: { name: string }) => {
-    setActiveBaseLayer(event.name)
-  }, [setActiveBaseLayer])
+  const handleBaseLayerChange = useCallback(
+    (event: { name: string }) => {
+      setActiveBaseLayer(event.name)
+    },
+    [setActiveBaseLayer],
+  )
 
   useMapEvents({
     overlayadd: handleOverlayAdd,

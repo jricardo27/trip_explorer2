@@ -26,14 +26,17 @@ const MapContextMenu = ({ ...props }: IMapContextMenuProps): React.ReactNode => 
     },
   })
 
-  const handleLatLng = useCallback((latlng: L.LatLng) => {
-    const { lat, lng } = latlng
-    setCoordinates({ lat, lng })
+  const handleLatLng = useCallback(
+    (latlng: L.LatLng) => {
+      const { lat, lng } = latlng
+      setCoordinates({ lat, lng })
 
-    // Convert the click position to container coordinates
-    const containerPoint = map.latLngToContainerPoint(latlng)
-    setMenuPosition({ x: containerPoint.x, y: containerPoint.y })
-  }, [map])
+      // Convert the click position to container coordinates
+      const containerPoint = map.latLngToContainerPoint(latlng)
+      setMenuPosition({ x: containerPoint.x, y: containerPoint.y })
+    },
+    [map],
+  )
 
   useEffect(() => {
     if (!props.latlng) {
@@ -46,13 +49,11 @@ const MapContextMenu = ({ ...props }: IMapContextMenuProps): React.ReactNode => 
 
   const payload = coordinates ? { coordinates } : null
 
-  return menuPosition
-    ? (
-        <ContextMenu position={menuPosition} onClose={() => setMenuPosition(null)} payload={payload}>
-          {props.children}
-        </ContextMenu>
-      )
-    : null
+  return menuPosition ? (
+    <ContextMenu position={menuPosition} onClose={() => setMenuPosition(null)} payload={payload}>
+      {props.children}
+    </ContextMenu>
+  ) : null
 }
 
 export default MapContextMenu
