@@ -1,9 +1,8 @@
 import React, { useMemo } from "react"
 
-import { FeatureMap } from "../../components/MapComponent/FeatureMap"
+import { FeatureMap, OverlaySourceConfig } from "../../components/MapComponent/FeatureMap"
 import styles from "../../components/PopupContent/PopupContent.module.css"
 import { CANBERRA_LOCATION } from "../../data/locations"
-import { TTabMapping } from "../../data/types/TTabMapping"
 
 interface AustralianCapitalTerritoryProps {
   drawerOpen: boolean
@@ -19,17 +18,36 @@ export const AustralianCapitalTerritory = ({
   onTogglePin,
 }: AustralianCapitalTerritoryProps): React.ReactNode => {
   const geoJsonOverlaySources = useMemo(
-    (): Record<string, TTabMapping> => ({
+    (): Record<string, OverlaySourceConfig> => ({
       "/markers/australianCapitalTerritory/accommodation_ACT.json": {
-        General: ["name", "website", "tarif", "isBookable"],
-        "More Info": ["operatorName", "GroupName", "CheckInTime", "CheckOutTime", "email", "address", "hours"],
+        name: "Accommodation in ACT",
+        tabMapping: {
+          General: ["name", "website", "tarif", "isBookable"],
+          "More Info": ["operatorName", "GroupName", "CheckInTime", "CheckOutTime", "email", "address", "hours"],
+        },
       },
       "/markers/australianCapitalTerritory/accommodation_campermate.json": {
-        General: ["name", "fees", "bookable", { key: "description", className: styles.scrollableContent }],
-        Score: ["score", "thumbs_up", "thumbs_down"],
+        name: "Accommodation (Campermate)",
+        tabMapping: {
+          General: ["name", "fees", "bookable", { key: "description", className: styles.scrollableContent }],
+          Score: ["score", "thumbs_up", "thumbs_down"],
+        },
       },
       "/markers/australianCapitalTerritory/toiletmap_aus_2025_ACT.json": {
-        General: ["Name", "Male", "Female", "Unisex", "Shower", "OpeningHours", "OpeningHoursNote", "Address1", "URL"],
+        name: "Toilets",
+        tabMapping: {
+          General: [
+            "Name",
+            "Male",
+            "Female",
+            "Unisex",
+            "Shower",
+            "OpeningHours",
+            "OpeningHoursNote",
+            "Address1",
+            "URL",
+          ],
+        },
       },
     }),
     [],

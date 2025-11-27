@@ -168,8 +168,15 @@ app.post("/api/features", async (req, res) => {
     }
 
     await query(
-      "INSERT INTO saved_features (user_id, list_name, feature, trip_day_id, visit_order) VALUES ($1, $2, $3, $4, $5)",
-      [user_id, list_name, feature, trip_day_id || null, trip_day_id ? nextOrder : null],
+      "INSERT INTO saved_features (user_id, list_name, feature, trip_day_id, visit_order, animation_config) VALUES ($1, $2, $3, $4, $5, $6)",
+      [
+        user_id,
+        list_name,
+        feature,
+        trip_day_id || null,
+        trip_day_id ? nextOrder : null,
+        feature.properties?.animation_config || {},
+      ],
     )
     res.status(201).json({ message: "Feature saved" })
   } catch (err) {
@@ -213,10 +220,11 @@ app.put("/api/features", async (req, res) => {
   try {
     await query(
       `UPDATE saved_features 
-             SET feature = $1 
-             WHERE user_id = $2 
-             AND feature->'properties'->>'id' = $3`,
-      [feature, user_id, feature.properties.id],
+             SET feature = $1,
+                 animation_config = $2
+             WHERE user_id = $3 
+             AND feature->'properties'->>'id' = $4`,
+      [feature, feature.properties?.animation_config || {}, user_id, feature.properties.id],
     )
     res.json({ message: "Feature updated" })
   } catch (err) {
@@ -242,8 +250,8 @@ app.post("/api/trips", async (req, res) => {
 
     // Create Trip
     const tripResult = await client.query(
-      "INSERT INTO trips (user_id, name, start_date, end_date) VALUES ($1, $2, $3, $4) RETURNING *",
-      [user_id, name, start_date, end_date],
+      "INSERT INTO trips (user_id, name, start_date, end_date, animation_config) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [user_id, name, start_date, end_date, req.body.animation_config || {}],
     )
     const trip = tripResult.rows[0]
 
@@ -367,6 +375,55 @@ app.delete("/api/trips/:id", async (req, res) => {
   }
 })
 
+// Update a trip
+app.put("/api/trips/:id", async (req, res) => {
+  const { id } = req.params
+  const { name, start_date, end_date, animation_config } = req.body
+
+  try {
+    const updates: string[] = []
+    const values: unknown[] = []
+    let paramCount = 1
+
+    if (name !== undefined) {
+      updates.push(`name = $${paramCount}`)
+      values.push(name)
+      paramCount++
+    }
+    if (start_date !== undefined) {
+      updates.push(`start_date = $${paramCount}`)
+      values.push(start_date)
+      paramCount++
+    }
+    if (end_date !== undefined) {
+      updates.push(`end_date = $${paramCount}`)
+      values.push(end_date)
+      paramCount++
+    }
+    if (animation_config !== undefined) {
+      updates.push(`animation_config = $${paramCount}`)
+      values.push(animation_config)
+      paramCount++
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: "No fields to update" })
+    }
+
+    values.push(id)
+    const result = await query(`UPDATE trips SET ${updates.join(", ")} WHERE id = $${paramCount} RETURNING *`, values)
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Trip not found" })
+    }
+
+    res.json(result.rows[0])
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
 // Get features for a specific trip day
 app.get("/api/trip-days/:id/features", async (req, res) => {
   const { id } = req.params
@@ -376,6 +433,10 @@ app.get("/api/trip-days/:id/features", async (req, res) => {
     res.json(
       result.rows.map((row) => ({
         ...row.feature,
+        properties: {
+          ...row.feature.properties,
+          trip_day_id: row.trip_day_id,
+        },
         saved_id: row.id,
         visit_order: row.visit_order,
       })),
@@ -439,6 +500,7 @@ app.post("/api/trip-days/:dayId/locations", async (req, res) => {
     transport_details,
     transport_cost,
     duration_minutes,
+    animation_config,
   } = req.body
 
   if (!country) {
@@ -476,8 +538,9 @@ app.post("/api/trip-days/:dayId/locations", async (req, res) => {
         transport_details,
         transport_cost,
         duration_minutes,
+        animation_config
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, ${locationCoords}, $8, $9, $10, $11, $12, $13)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, ${locationCoords}, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
       [
         dayId,
@@ -493,6 +556,7 @@ app.post("/api/trip-days/:dayId/locations", async (req, res) => {
         transport_details,
         transport_cost,
         duration_minutes,
+        animation_config || {},
       ],
     )
     res.status(201).json(result.rows[0])
@@ -612,6 +676,7 @@ app.put("/api/day-locations/:id", async (req, res) => {
     duration_minutes,
     start_time,
     end_time,
+    animation_config,
   } = req.body
 
   try {
@@ -623,8 +688,8 @@ app.put("/api/day-locations/:id", async (req, res) => {
            latitude = $5, longitude = $6, location_coords = ${locationCoords},
            visit_order = $7, notes = $8,
            transport_mode = $9, transport_details = $10, transport_cost = $11, duration_minutes = $12,
-           start_time = $13, end_time = $14
-       WHERE id = $15
+           start_time = $13, end_time = $14, animation_config = $15
+       WHERE id = $16
        RETURNING *`,
       [
         country,
@@ -641,6 +706,7 @@ app.put("/api/day-locations/:id", async (req, res) => {
         duration_minutes,
         start_time,
         end_time,
+        animation_config || {},
         id,
       ],
     )

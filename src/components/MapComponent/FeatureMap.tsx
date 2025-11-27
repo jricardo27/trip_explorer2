@@ -8,7 +8,7 @@ import { toast } from "react-toastify"
 import MapComponent, { MapComponentProps } from "../../components/MapComponent/MapComponent"
 import SavedFeaturesDrawer from "../../components/SavedFeaturesDrawer/SavedFeaturesDrawer"
 import SavedFeaturesContext, { DEFAULT_CATEGORY } from "../../contexts/SavedFeaturesContext"
-import { useTripContext, Trip } from "../../contexts/TripContext"
+import { useTripContext, Trip, DayLocation, TripFeature } from "../../contexts/TripContext"
 import { GeoJsonCollection, GeoJsonFeature } from "../../data/types"
 import { TLayerOverlay } from "../../data/types/TLayerOverlay"
 import { TTabMapping } from "../../data/types/TTabMapping"
@@ -18,10 +18,18 @@ import { iPopupContainerProps } from "../PopupContent/PopupContent.tsx"
 import StyledGeoJson, { contextMenuHandlerProps } from "../StyledGeoJson/StyledGeoJson"
 
 import FeatureMapContextMenu from "./FeatureMapContextMenu"
+import { TripAnimationControl } from "./TripAnimationControl"
+import { TripAnimationLayer } from "./TripAnimationLayer"
+import { TripAnimationSettingsModal } from "./TripAnimationSettingsModal"
 import TripRouteLayer from "./TripRouteLayer"
 
+export interface OverlaySourceConfig {
+  tabMapping: TTabMapping
+  name: string
+}
+
 interface FeatureMapProps extends MapComponentProps {
-  geoJsonOverlaySources: Record<string, TTabMapping>
+  geoJsonOverlaySources: Record<string, TTabMapping | OverlaySourceConfig> // Support both for backward compatibility or transition
   drawerOpen: boolean
   closeDrawer: () => void
   isPinned?: boolean
@@ -46,7 +54,7 @@ export const FeatureMap = ({
   ...mapProps
 }: FeatureMapProps): React.ReactNode => {
   const { addFeature, savedFeatures } = useContext(SavedFeaturesContext)!
-  const { trips, currentTrip, dayLocations } = useTripContext()
+  const { trips, currentTrip, dayLocations, dayFeatures, updateTrip } = useTripContext()
 
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
   const [bounds, setBounds] = useState<L.LatLngBounds | null>(null)
@@ -54,7 +62,32 @@ export const FeatureMap = ({
   const [selectedFeature, setSelectedFeature] = useState<GeoJsonFeature | null>(null)
   const [fixedOverlays, setFixedOverlays] = useState<TLayerOverlay[]>([])
   const [dynamicOverlays, setDynamicOverlays] = useState<TLayerOverlay[]>([])
-  const overlayFilePaths = useMemo(() => Object.keys(geoJsonOverlaySources), [geoJsonOverlaySources])
+
+  // Lifted visibility state
+  const [overlayVisibility, setOverlayVisibility] = useState<Record<string, boolean>>(() => {
+    const savedOverlayVisibility = localStorage.getItem("overlayVisibility")
+    return savedOverlayVisibility ? JSON.parse(savedOverlayVisibility) : {}
+  })
+
+  // Save visibility to localStorage
+  useEffect(() => {
+    localStorage.setItem("overlayVisibility", JSON.stringify(overlayVisibility))
+  }, [overlayVisibility])
+
+  // Determine which files to fetch based on visibility
+  const overlayFilePaths = useMemo(() => {
+    return Object.entries(geoJsonOverlaySources)
+      .filter(([, config]) => {
+        // Check if it matches OverlaySourceConfig shape
+        if (config && typeof config === "object" && "name" in config && "tabMapping" in config) {
+          const conf = config as OverlaySourceConfig
+          return overlayVisibility[conf.name] === true
+        }
+        return true // Fetch by default if no name provided (legacy behavior)
+      })
+      .map(([filename]) => filename)
+  }, [geoJsonOverlaySources, overlayVisibility])
+
   const overlayMarkers = useGeoJsonMarkers(overlayFilePaths, bounds)
 
   const theme = useTheme()
@@ -65,6 +98,55 @@ export const FeatureMap = ({
   const [popupContainerProps, setPopupContainerProps] = useState<iPopupContainerProps>({})
 
   const [filterMode, setFilterMode] = useState<"all" | "trip" | "past" | "future">("all")
+
+  // Animation State
+  const [isAnimationPlaying, setIsAnimationPlaying] = useState(false)
+  const [animationProgress, setAnimationProgress] = useState(0)
+  const [animationSpeed, setAnimationSpeed] = useState(1)
+  const [seekProgress, setSeekProgress] = useState<number | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+
+  const handleAnimationPlayPause = () => setIsAnimationPlaying((prev) => !prev)
+  const handleAnimationReset = () => {
+    setIsAnimationPlaying(false)
+    setAnimationProgress(0)
+    setSeekProgress(0)
+    // Reset seek after a tick to allow layer to react
+    setTimeout(() => setSeekProgress(null), 50)
+  }
+  const handleAnimationSeek = (value: number) => {
+    setSeekProgress(value)
+    setAnimationProgress(value)
+    // Reset seek null after update is handled by layer (layer listens to seekProgress change)
+    // But here we keep it to update UI? No, layer updates progress.
+    // We need a way to tell layer "jump to X".
+    // The layer effect handles seekProgress !== null.
+    // We should set it back to null after some time or let layer callback handle it?
+    // Simpler: Layer resets it? No, props are read-only.
+    // We'll use a timeout in the handler here or just let the layer react to the change.
+    // Actually, if we drag slider, we want continuous updates.
+  }
+  const handleAnimationSpeedChange = (value: number) => setAnimationSpeed(value)
+  const handleAnimationComplete = () => setIsAnimationPlaying(false)
+
+  // Prepare items for animation
+  const animationItems = useMemo(() => {
+    if (!currentTrip || !currentTrip.days) return []
+    const items: (DayLocation | TripFeature)[] = []
+
+    // Sort days by day_index to ensure correct order across multiple days
+    const sortedDays = [...currentTrip.days].sort((a, b) => a.day_index - b.day_index)
+
+    sortedDays.forEach((day) => {
+      const locs = dayLocations[day.id] || []
+      const ctxFeats = dayFeatures[day.id] || []
+
+      // Sort items within each day by visit_order
+      const dayItems = [...locs, ...ctxFeats].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
+      items.push(...dayItems)
+    })
+    return items
+  }, [currentTrip, dayLocations, dayFeatures])
 
   const handleFilterChange = (
     _event: React.MouseEvent<HTMLElement>,
@@ -124,8 +206,8 @@ export const FeatureMap = ({
 
   const onFeatureContextMenuHandler = useCallback(({ event, feature }: contextMenuHandlerProps) => {
     L.DomEvent.stopPropagation(event)
-    setContextMenuPosition(event.latlng)
     setSelectedFeature(feature)
+    setContextMenuPosition(event.latlng)
   }, [])
 
   const onSaveFeatureToList = useCallback(
@@ -142,34 +224,52 @@ export const FeatureMap = ({
       return
     }
 
-    if (!overlayMarkers.loading && !overlayMarkers.error) {
-      setFixedOverlays(
-        Object.entries(geoJsonOverlaySources).map(([filename, tabMapping]): TLayerOverlay => {
-          const data = overlayMarkers[filename]
-          const layerName = data?.properties?.style.layerName
+    // Iterate over SOURCES, not just fetched markers, to ensure layers appear in control
+    setFixedOverlays(
+      Object.entries(geoJsonOverlaySources).map(([filename, config]): TLayerOverlay => {
+        const data = overlayMarkers[filename]
 
-          return {
-            name: layerName,
-            children: (
-              <StyledGeoJson
-                data={data}
-                popupTabMapping={tabMapping}
-                contextMenuHandler={onFeatureContextMenuHandler}
-                popupProps={popupProps}
-                popupContainerProps={popupContainerProps}
-                popupActionButtons={[
-                  {
-                    label: "Save",
-                    startIcon: <MdAssignmentAdd />,
-                    onClick: onSaveFeatureToList,
-                  },
-                ]}
-              />
-            ),
-          }
-        }),
-      )
-    }
+        // Determine layer name: prefer config.name, fallback to data property, fallback to filename
+        let layerName = "Unknown Layer"
+        let tabMapping: TTabMapping
+
+        if (config && typeof config === "object" && "name" in config && "tabMapping" in config) {
+          const conf = config as OverlaySourceConfig
+          layerName = conf.name
+          tabMapping = conf.tabMapping
+        } else {
+          // Legacy support
+          layerName = data?.properties?.style?.layerName || filename
+          tabMapping = config as TTabMapping
+        }
+
+        // If data is not loaded yet (lazy loading), render empty group or nothing?
+        // We need to render SOMETHING so the layer control exists and can be toggled.
+        // If we render a LayerGroup with no children, it should work.
+
+        return {
+          name: layerName,
+          children: data ? (
+            <StyledGeoJson
+              data={data}
+              popupTabMapping={tabMapping}
+              contextMenuHandler={onFeatureContextMenuHandler}
+              popupProps={popupProps}
+              popupContainerProps={popupContainerProps}
+              popupActionButtons={[
+                {
+                  label: "Save",
+                  startIcon: <MdAssignmentAdd />,
+                  onClick: onSaveFeatureToList,
+                },
+              ]}
+            />
+          ) : (
+            <React.Fragment />
+          ), // Empty fragment when not loaded
+        }
+      }),
+    )
   }, [
     geoJsonOverlaySources,
     overlayMarkers,
@@ -181,18 +281,52 @@ export const FeatureMap = ({
   ])
 
   useEffect(() => {
+    // Combine savedFeatures and dayFeatures
+    const combinedFeatures: Record<string, GeoJsonFeature[]> = { ...savedFeatures }
+
+    // Add trip features if available
+    if (currentTrip && currentTrip.days) {
+      const tripFeats: GeoJsonFeature[] = []
+      currentTrip.days.forEach((day) => {
+        const feats = dayFeatures[day.id] || []
+        // Cast TripFeature to GeoJsonFeature (they are compatible)
+        tripFeats.push(...(feats as unknown as GeoJsonFeature[]))
+      })
+
+      if (tripFeats.length > 0) {
+        // Add to a specific category or merge?
+        // Let's add them as a "Trip Features" category if not already present,
+        // or just ensure they are included in the filtering logic.
+        // Actually, the previous logic iterated over `savedFeatures`.
+        // We should create a unified list for display.
+
+        // If we want them to show up under "Trip Features" layer:
+        combinedFeatures["Trip Features"] = tripFeats
+      }
+    }
+
     setDynamicOverlays(
-      Object.entries(savedFeatures).map(([category, features]): TLayerOverlay => {
+      Object.entries(combinedFeatures).map(([category, features]): TLayerOverlay => {
         const filteredFeatures = features.filter((feature) => {
           if (filterMode === "all") return true
 
           const dayId = feature.properties?.trip_day_id
           // If filtering by specific criteria, hide unassigned features
-          if (!dayId) return false
+          if (!dayId && category !== "Trip Features") return false // Keep generic saved features hidden if not assigned?
+          // Wait, logic before was: if (!dayId) return false. This hid unassigned features in "trip" mode?
+          // Let's look at previous logic:
+          // if (filterMode === "all") return true
+          // const dayId = feature.properties?.trip_day_id
+          // if (!dayId) return false
+
+          // If we are in "trip" mode, we definitely want to show things with dayId belonging to current trip.
 
           if (filterMode === "trip") {
+            if (!dayId) return false
             return currentTrip?.days?.some((d) => d.id === dayId) ?? false
           }
+
+          if (!dayId) return false // For past/future logic below
 
           const trip = dayIdToTripMap.get(dayId)
           if (!trip) return false
@@ -238,6 +372,7 @@ export const FeatureMap = ({
     filterMode,
     currentTrip,
     dayIdToTripMap,
+    dayFeatures,
   ])
 
   return (
@@ -246,11 +381,46 @@ export const FeatureMap = ({
         overlays={[...fixedOverlays, ...dynamicOverlays]}
         contextMenuHandler={onMapContextMenuHandler}
         onBoundsChange={setBounds}
+        externalOverlayVisibility={overlayVisibility}
+        onOverlayVisibilityChange={setOverlayVisibility}
         {...mapProps}
       >
         <MapCapture onMapReady={setMapInstance} />
         <FeatureMapContextMenu selectedFeature={selectedFeature} menuLatLng={contextMenuPosition} />
         <TripRouteLayer currentTrip={currentTrip} dayLocations={dayLocations} />
+
+        {currentTrip && filterMode === "trip" && (
+          <>
+            <TripAnimationLayer
+              items={animationItems}
+              isPlaying={isAnimationPlaying}
+              speed={animationSpeed}
+              onProgressUpdate={setAnimationProgress}
+              seekProgress={seekProgress}
+              onAnimationComplete={handleAnimationComplete}
+              globalConfig={currentTrip.animation_config}
+            />
+            <TripAnimationControl
+              isPlaying={isAnimationPlaying}
+              onPlayPause={handleAnimationPlayPause}
+              onReset={handleAnimationReset}
+              progress={animationProgress}
+              onSeek={handleAnimationSeek}
+              speed={animationSpeed}
+              onSpeedChange={handleAnimationSpeedChange}
+              onOpenSettings={() => setSettingsOpen(true)}
+            />
+            {currentTrip && (
+              <TripAnimationSettingsModal
+                open={settingsOpen}
+                onClose={() => setSettingsOpen(false)}
+                config={currentTrip.animation_config || {}}
+                onSave={(config) => updateTrip(currentTrip.id, { animation_config: config })}
+              />
+            )}
+          </>
+        )}
+
         <Box
           sx={{
             position: "absolute",

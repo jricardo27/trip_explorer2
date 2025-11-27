@@ -18,6 +18,8 @@ export interface MapComponentProps {
   overlays?: TLayerOverlay[]
   contextMenuHandler?: (event: L.LeafletMouseEvent) => void
   onBoundsChange?: (bounds: L.LatLngBounds) => void
+  externalOverlayVisibility?: Record<string, boolean>
+  onOverlayVisibilityChange?: (newVisibility: Record<string, boolean>) => void
 }
 
 const MapComponent = ({
@@ -26,6 +28,8 @@ const MapComponent = ({
   overlays,
   contextMenuHandler,
   onBoundsChange,
+  externalOverlayVisibility,
+  onOverlayVisibilityChange,
 }: MapComponentProps): React.ReactElement => {
   const [mapState, setMapState] = useState(() => {
     const saved = localStorage.getItem("mapState")
@@ -43,27 +47,49 @@ const MapComponent = ({
     }
   })
 
-  const [overlayVisibility, setOverlayVisibility] = useState<Record<string, boolean>>(() => {
+  const [internalOverlayVisibility, setInternalOverlayVisibility] = useState<Record<string, boolean>>(() => {
     const savedOverlayVisibility = localStorage.getItem("overlayVisibility")
     return savedOverlayVisibility ? JSON.parse(savedOverlayVisibility) : {}
   })
+
+  const overlayVisibility = externalOverlayVisibility ?? internalOverlayVisibility
 
   const [activeBaseLayer, setActiveBaseLayer] = useState<string>(() => {
     const savedBaseLayer = localStorage.getItem("activeBaseLayer")
     return savedBaseLayer ?? "Esri World Street Map"
   })
 
-  const memoizedSetOverlayVisibility = useCallback((newVisibility: React.SetStateAction<Record<string, boolean>>) => {
-    setOverlayVisibility(newVisibility)
-  }, [])
+  const memoizedSetOverlayVisibility = useCallback(
+    (newVisibilityOrUpdater: React.SetStateAction<Record<string, boolean>>) => {
+      if (onOverlayVisibilityChange) {
+        // Handle functional update if necessary, though MapEvents usually passes a function
+        // We need to calculate the new state to pass it up
+        // Since we can't easily access the 'current' state inside the updater if it's external without a ref or dependency,
+        // we rely on the fact that we have 'overlayVisibility' in scope.
+
+        let newVisibility: Record<string, boolean>
+        if (typeof newVisibilityOrUpdater === "function") {
+          newVisibility = newVisibilityOrUpdater(overlayVisibility)
+        } else {
+          newVisibility = newVisibilityOrUpdater
+        }
+        onOverlayVisibilityChange(newVisibility)
+      } else {
+        setInternalOverlayVisibility(newVisibilityOrUpdater)
+      }
+    },
+    [onOverlayVisibilityChange, overlayVisibility],
+  )
 
   const memoizedSetActiveBaseLayer = useCallback((newBaseLayer: React.SetStateAction<string>) => {
     setActiveBaseLayer(newBaseLayer)
   }, [])
 
   useEffect(() => {
-    localStorage.setItem("overlayVisibility", JSON.stringify(overlayVisibility))
-  }, [overlayVisibility])
+    if (!externalOverlayVisibility) {
+      localStorage.setItem("overlayVisibility", JSON.stringify(internalOverlayVisibility))
+    }
+  }, [internalOverlayVisibility, externalOverlayVisibility])
 
   useEffect(() => {
     localStorage.setItem("activeBaseLayer", activeBaseLayer)

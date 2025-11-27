@@ -100,3 +100,12 @@ CREATE TABLE IF NOT EXISTS day_locations (
 CREATE INDEX IF NOT EXISTS idx_day_locations_trip_day ON day_locations (trip_day_id);
 
 CREATE INDEX IF NOT EXISTS idx_day_locations_country ON day_locations (country_code);
+
+ALTER TABLE trips
+ADD COLUMN IF NOT EXISTS animation_config JSONB DEFAULT '{}';
+
+ALTER TABLE day_locations
+ADD COLUMN IF NOT EXISTS animation_config JSONB DEFAULT '{}';
+
+ALTER TABLE saved_features
+ADD COLUMN IF NOT EXISTS animation_config JSONB DEFAULT '{}';

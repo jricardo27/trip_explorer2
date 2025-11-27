@@ -775,6 +775,7 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
           onSave={handleSaveEdit}
           item={editingItem?.item || null}
           type={editingItem?.type === "Feature" ? "feature" : "location"}
+          globalAnimationConfig={currentTrip?.animation_config}
         />
         <FeatureDetailsModal open={!!viewingFeature} onClose={() => setViewingFeature(null)} feature={viewingFeature} />
         <Dialog

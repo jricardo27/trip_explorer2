@@ -8,24 +8,37 @@ export interface TripDay {
   date: string
 }
 
+export interface AnimationConfig {
+  showName?: boolean
+  showOnArrival?: boolean
+  zoomOnApproach?: boolean
+  speed?: number
+  defaultTravelIcon?: string
+  pauseOnArrival?: number // seconds to pause on arrival
+  zoomAtStart?: boolean // zoom in when animation starts
+  zoomOutAtEnd?: boolean // zoom out when animation completes
+}
+
 export interface Trip {
   id: string
   user_id: string
   name: string
   start_date: string
   end_date: string
+  created_at: string
   days?: TripDay[]
+  animation_config?: AnimationConfig
 }
 
 export interface DayLocation {
   id: string
   trip_day_id: string
   country: string
-  country_code?: string
-  city?: string
+  country_code: string
+  city: string
   town?: string
-  latitude?: number
-  longitude?: number
+  latitude: number
+  longitude: number
   visit_order: number
   notes?: string
   transport_mode?: string
@@ -35,6 +48,7 @@ export interface DayLocation {
   start_time?: string
   end_time?: string
   created_at: string
+  animation_config?: AnimationConfig
 }
 
 export interface TripFeature {
@@ -59,6 +73,7 @@ export interface TripFeature {
   duration_minutes?: number
   start_time?: string
   end_time?: string
+  animation_config?: AnimationConfig
 }
 
 interface TripContextType {
@@ -77,6 +92,7 @@ interface TripContextType {
   deleteFeature: (savedId: string, dayId: string) => Promise<void>
   createTrip: (name: string, startDate: string, endDate: string) => Promise<void>
   deleteTrip: (id: string) => Promise<void>
+  updateTrip: (id: string, updates: Partial<Trip>) => Promise<void>
   setCurrentTrip: (trip: Trip | null) => void
   reorderItems: (dayId: string, items: { id: string; type: "location" | "feature"; order: number }[]) => Promise<void>
 }
@@ -187,6 +203,26 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error("Failed to delete trip:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateTrip = async (id: string, updates: Partial<Trip>) => {
+    setLoading(true)
+    try {
+      const response = await fetch(`${API_URL}/api/trips/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      })
+      if (response.ok) {
+        const updatedTrip = await response.json()
+        setCurrentTrip((prev) => (prev?.id === id ? { ...prev, ...updatedTrip } : prev))
+        await fetchTrips()
+      }
+    } catch (error) {
+      console.error("Failed to update trip:", error)
     } finally {
       setLoading(false)
     }
@@ -328,6 +364,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteFeature,
         createTrip,
         deleteTrip,
+        updateTrip,
         setCurrentTrip,
         reorderItems,
       }}
