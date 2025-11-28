@@ -1,6 +1,6 @@
 import { query } from "../db"
 
-const addCityUniqueConstraint = async () => {
+export async function migrate() {
   try {
     console.log("Running migration: addCityUniqueConstraint...")
 
@@ -36,7 +36,13 @@ const addCityUniqueConstraint = async () => {
     }
   } catch (err) {
     console.error("Error in addCityUniqueConstraint:", err)
+    throw err
   }
 }
 
-addCityUniqueConstraint()
+if (require.main === module) {
+  migrate().catch((error) => {
+    console.error("Migration failed:", error)
+    process.exit(1)
+  })
+}

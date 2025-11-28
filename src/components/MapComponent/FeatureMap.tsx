@@ -102,31 +102,22 @@ export const FeatureMap = ({
   // Animation State
   const [isAnimationPlaying, setIsAnimationPlaying] = useState(false)
   const [animationProgress, setAnimationProgress] = useState(0)
-  const [animationSpeed, setAnimationSpeed] = useState(1)
-  const [seekProgress, setSeekProgress] = useState<number | null>(null)
+  const [animationSeekProgress, setAnimationSeekProgress] = useState<number | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
-  const handleAnimationPlayPause = () => setIsAnimationPlaying((prev) => !prev)
+  const handleAnimationPlayPause = () => setIsAnimationPlaying(!isAnimationPlaying)
+
   const handleAnimationReset = () => {
     setIsAnimationPlaying(false)
     setAnimationProgress(0)
-    setSeekProgress(0)
-    // Reset seek after a tick to allow layer to react
-    setTimeout(() => setSeekProgress(null), 50)
+    setAnimationSeekProgress(0)
   }
+
   const handleAnimationSeek = (value: number) => {
-    setSeekProgress(value)
+    setAnimationSeekProgress(value)
     setAnimationProgress(value)
-    // Reset seek null after update is handled by layer (layer listens to seekProgress change)
-    // But here we keep it to update UI? No, layer updates progress.
-    // We need a way to tell layer "jump to X".
-    // The layer effect handles seekProgress !== null.
-    // We should set it back to null after some time or let layer callback handle it?
-    // Simpler: Layer resets it? No, props are read-only.
-    // We'll use a timeout in the handler here or just let the layer react to the change.
-    // Actually, if we drag slider, we want continuous updates.
   }
-  const handleAnimationSpeedChange = (value: number) => setAnimationSpeed(value)
+
   const handleAnimationComplete = () => setIsAnimationPlaying(false)
 
   // Prepare items for animation
@@ -394,9 +385,8 @@ export const FeatureMap = ({
             <TripAnimationLayer
               items={animationItems}
               isPlaying={isAnimationPlaying}
-              speed={animationSpeed}
               onProgressUpdate={setAnimationProgress}
-              seekProgress={seekProgress}
+              seekProgress={animationSeekProgress}
               onAnimationComplete={handleAnimationComplete}
               globalConfig={currentTrip.animation_config}
             />
@@ -406,8 +396,6 @@ export const FeatureMap = ({
               onReset={handleAnimationReset}
               progress={animationProgress}
               onSeek={handleAnimationSeek}
-              speed={animationSpeed}
-              onSpeedChange={handleAnimationSpeedChange}
               onOpenSettings={() => setSettingsOpen(true)}
             />
             {currentTrip && (

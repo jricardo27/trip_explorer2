@@ -11,12 +11,34 @@ export interface TripDay {
 export interface AnimationConfig {
   showName?: boolean
   showOnArrival?: boolean
+  showNamesOnActiveOnly?: boolean // Default: false - if true, only show names on current/visited nodes
   zoomOnApproach?: boolean
   speed?: number
   defaultTravelIcon?: string
   pauseOnArrival?: number // seconds to pause on arrival
   zoomAtStart?: boolean // zoom in when animation starts
   zoomOutAtEnd?: boolean // zoom out when animation completes
+
+  // Zoom configuration
+  zoomLevel?: number // Default: 14
+  zoomPadding?: number // Default: 100 (pixels)
+  endZoomPadding?: number // Default: 50 (pixels)
+  zoomToStartDuration?: number // Default: 1 (seconds)
+  zoomOutToBothDuration?: number // Default: 2 (seconds)
+  zoomToDestDuration?: number // Default: 3 (seconds)
+  endZoomDuration?: number // Default: 3 (seconds)
+  endAnimationDelay?: number // Default: 0 (seconds) - wait before zooming out
+
+  // Speed configuration
+  baseSpeedMultiplier?: number // Default: 500000
+  minSegmentDuration?: number // Default: 3 (seconds)
+  maxSegmentDuration?: number // Default: 10 (seconds) - prevents long segments from being too fast
+  slowdownStartThreshold?: number // Default: 0.8 (80%)
+  slowdownIntensity?: number // Default: 0.7 (70% reduction)
+
+  // Phase configuration
+  zoomOutPhaseEnd?: number // Default: 0.33 (33%)
+  maintainPhaseEnd?: number // Default: 0.66 (66%)
 }
 
 export interface Trip {

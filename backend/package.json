@@ -7,6 +7,7 @@
     "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
     "migrate": "ts-node src/migrate.ts",
+    "migrate:all": "ts-node src/migrations/runner.ts",
     "migrate:markers": "ts-node src/migrations/loadMarkers.ts",
     "migrate:cities": "ts-node src/migrations/loadCities.ts",
     "migrate:unique": "ts-node src/migrations/addCityUniqueConstraint.ts",

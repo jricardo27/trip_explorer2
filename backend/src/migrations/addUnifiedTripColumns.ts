@@ -1,6 +1,6 @@
 import { pool } from "../db"
 
-const runMigration = async () => {
+export async function migrate() {
   const client = await pool.connect()
   try {
     console.log("Running migration: addUnifiedTripColumns")
@@ -31,10 +31,15 @@ const runMigration = async () => {
   } catch (err) {
     await client.query("ROLLBACK")
     console.error("Migration failed:", err)
-    process.exit(1)
+    throw err
   } finally {
     client.release()
   }
 }
 
-runMigration()
+if (require.main === module) {
+  migrate().catch((error) => {
+    console.error("Migration failed:", error)
+    process.exit(1)
+  })
+}

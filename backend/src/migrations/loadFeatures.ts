@@ -9,14 +9,14 @@ interface MarkerFile {
 }
 
 export async function migrate() {
-  console.log("Starting marker data migration...")
+  console.log("Starting features data migration...")
 
   const markersDir = "/app/public/markers"
   console.log(`Looking for markers in: ${markersDir}`)
 
   if (!fs.existsSync(markersDir)) {
     console.warn(`Markers directory not found: ${markersDir}`)
-    console.warn("Skipping marker migration - directory does not exist")
+    console.warn("Skipping features migration - directory does not exist")
     return
   }
 
@@ -54,17 +54,13 @@ export async function migrate() {
 
   for (const marker of markerFiles) {
     try {
-      // Check if marker already exists
-      const existing = await query("SELECT id FROM markers WHERE path = $1", [marker.path])
+      // Check if features for this source_path already exist
+      const existing = await query("SELECT id FROM geo_features WHERE source_path = $1 LIMIT 1", [marker.path])
 
       if (existing.rows.length > 0) {
-        console.log(`Skipping ${marker.path} (already exists)`)
+        console.log(`Skipping ${marker.path} (features already exist)`)
         skipped++
       } else {
-        // Insert into markers table (legacy support)
-        await query("INSERT INTO markers (path, data) VALUES ($1, $2)", [marker.path, marker.data])
-
-        // Insert individual features into geo_features table
         const featureCollection = marker.data as { features: { geometry: object; properties: object }[] }
         if (featureCollection.features && Array.isArray(featureCollection.features)) {
           let featureCount = 0
@@ -79,18 +75,18 @@ export async function migrate() {
             }
           }
           console.log(`Loaded ${marker.path} (${featureCount} features)`)
+          loaded++
         } else {
-          console.log(`Loaded ${marker.path} (no features found)`)
+          console.log(`Skipping ${marker.path} (no features found)`)
+          skipped++
         }
-
-        loaded++
       }
     } catch (error) {
-      console.error(`Error loading ${marker.path}:`, error)
+      console.error(`Error loading features for ${marker.path}:`, error)
     }
   }
 
-  console.log("\nMigration complete:")
+  console.log("\nFeatures migration complete:")
   console.log(`  - Loaded: ${loaded}`)
   console.log(`  - Skipped: ${skipped}`)
   console.log(`  - Total: ${markerFiles.length}`)

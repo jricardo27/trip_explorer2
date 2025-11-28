@@ -1,4 +1,4 @@
-import { Paper, IconButton, Tooltip, Box, Slider, Typography } from "@mui/material"
+import { Paper, IconButton, Tooltip, Box, Slider } from "@mui/material"
 import React from "react"
 import { MdPlayArrow, MdPause, MdReplay, MdSettings } from "react-icons/md"
 
@@ -8,8 +8,6 @@ interface TripAnimationControlProps {
   onReset: () => void
   progress: number
   onSeek: (value: number) => void
-  speed: number
-  onSpeedChange: (value: number) => void
   onOpenSettings: () => void
 }
 
@@ -19,15 +17,13 @@ export const TripAnimationControl: React.FC<TripAnimationControlProps> = ({
   onReset,
   progress,
   onSeek,
-  speed,
-  onSpeedChange,
   onOpenSettings,
 }) => {
   return (
     <Box
       sx={{
         position: "absolute",
-        bottom: 30,
+        bottom: 75,
         left: "50%",
         transform: "translateX(-50%)",
         zIndex: 1000,
@@ -75,21 +71,6 @@ export const TripAnimationControl: React.FC<TripAnimationControlProps> = ({
               <MdSettings />
             </IconButton>
           </Tooltip>
-        </Box>
-
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 1 }}>
-          <Typography variant="caption" color="text.secondary">
-            Speed: {speed}x
-          </Typography>
-          <Slider
-            value={speed}
-            min={0.5}
-            max={5}
-            step={0.5}
-            onChange={(_, value) => onSpeedChange(value as number)}
-            sx={{ width: 100 }}
-            size="small"
-          />
         </Box>
       </Paper>
     </Box>

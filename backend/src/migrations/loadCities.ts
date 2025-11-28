@@ -173,7 +173,8 @@ async function insertBatch(cities: CityRecord[], countryNames: Map<string, strin
 }
 
 // Main execution
-async function main() {
+// Main execution
+export async function migrate() {
   try {
     console.log("Starting cities data import...")
 
@@ -182,7 +183,7 @@ async function main() {
       const res = await pool.query("SELECT value FROM meta WHERE key = 'cities_imported'")
       if (res.rows.length > 0 && res.rows[0].value === "true") {
         console.log("Cities already imported (flag found). Skipping.")
-        process.exit(0)
+        return
       }
     } catch (e: unknown) {
       const error = e as { message?: string }
@@ -205,16 +206,16 @@ async function main() {
     }
 
     console.log("Import complete!")
-    process.exit(0)
   } catch (error) {
     console.error("Error importing cities:", error)
-    process.exit(1)
+    throw error // Re-throw for runner to catch
   }
 }
 
 // Run if called directly
 if (require.main === module) {
-  main()
+  migrate().catch((error) => {
+    console.error("Migration failed:", error)
+    process.exit(1)
+  })
 }
-
-export { main as loadCities }

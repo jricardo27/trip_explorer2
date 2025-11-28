@@ -11,7 +11,6 @@ import { DayLocation, TripFeature, AnimationConfig } from "../../contexts/TripCo
 interface TripAnimationLayerProps {
   items: (DayLocation | TripFeature)[]
   isPlaying: boolean
-  speed: number
   onProgressUpdate: (progress: number) => void
   seekProgress: number | null // 0-100
   onAnimationComplete: () => void
@@ -46,13 +45,15 @@ const getDistance = (p1: [number, number], p2: [number, number]) => {
 export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   items,
   isPlaying,
-  speed: globalSpeedMultiplier,
   onProgressUpdate,
   seekProgress,
   onAnimationComplete,
   globalConfig,
 }) => {
   const map = useMap()
+
+  // Global speed multiplier (fixed at 1 since speed slider was removed)
+  const globalSpeedMultiplier = 1
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0)
   const [segmentProgress, setSegmentProgress] = useState(0) // 0 to 1
   const [isPaused, setIsPaused] = useState(false)
@@ -103,17 +104,24 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     const origin = coords[currentSegmentIndex]
     const destination = coords[currentSegmentIndex + 1]
 
+    const zoomLevel = globalConfig?.zoomLevel ?? 14
+    const zoomPadding = globalConfig?.zoomPadding ?? 100
+    const zoomToStartDuration = globalConfig?.zoomToStartDuration ?? 1
+    const zoomOutToBothDuration = globalConfig?.zoomOutToBothDuration ?? 2
+    // const zoomToDestDuration = globalConfig?.zoomToDestDuration ?? 3 // No longer used as fixed value
+    const maintainPhaseEnd = globalConfig?.maintainPhaseEnd ?? 0.66
+
     switch (zoomPhase) {
       case ZoomPhase.INITIAL_ZOOM_OUT:
       case ZoomPhase.ZOOM_OUT_TO_BOTH: {
-        // Show both nodes - slower zoom (2 seconds)
+        // Show both nodes
         const bounds = L.latLngBounds([origin, destination])
-        map.fitBounds(bounds, { padding: [100, 100], animate: true, duration: 2 })
+        map.fitBounds(bounds, { padding: [zoomPadding, zoomPadding], animate: true, duration: zoomOutToBothDuration })
         break
       }
       case ZoomPhase.ZOOM_TO_START: {
         // Zoom to origin
-        map.flyTo(origin, 14, { animate: true, duration: 1 })
+        map.flyTo(origin, zoomLevel, { animate: true, duration: zoomToStartDuration })
         break
       }
       case ZoomPhase.MAINTAIN: {
@@ -122,13 +130,62 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       }
       case ZoomPhase.ZOOM_TO_DEST: {
         // Gradually zoom to destination - only trigger once when entering this phase
-        if (segmentProgress >= 0.66 && segmentProgress < 0.67) {
-          map.flyTo(destination, 14, { animate: true, duration: 3 })
+        const triggerEnd = maintainPhaseEnd + 0.01
+        if (segmentProgress >= maintainPhaseEnd && segmentProgress < triggerEnd) {
+          // Calculate remaining time to synchronize zoom with arrival
+          const p1 = coords[currentSegmentIndex]
+          const p2 = coords[currentSegmentIndex + 1]
+          const segmentDist = getDistance(p1, p2)
+
+          let estimatedDuration = 3 // Fallback default
+
+          if (segmentDist > 0) {
+            const currentItem = validItems[currentSegmentIndex]
+            const itemSpeed = currentItem.animation_config?.speed || globalConfig?.speed || 1
+            const baseSpeedMultiplier = globalConfig?.baseSpeedMultiplier ?? 500000
+            const minSegmentDuration = globalConfig?.minSegmentDuration ?? 3
+            const maxSegmentDuration = globalConfig?.maxSegmentDuration ?? 10
+
+            // Calculate speeds
+            const rawSpeed = baseSpeedMultiplier * 1 * itemSpeed // globalSpeedMultiplier is 1
+            const maxSpeedForMinTime = segmentDist / minSegmentDuration
+            const minSpeedForMaxTime = segmentDist / maxSegmentDuration
+
+            // 1. Clamp raw speed to max allowed speed (min duration constraint)
+            const clampedBaseSpeed = Math.min(rawSpeed, maxSpeedForMinTime)
+
+            // 2. Apply slowdown factor (simulate average slowdown effect)
+            // We assume we are in or approaching slowdown phase
+            // Average slowdown factor is approx (1 + (1-intensity))/2 = 1 - intensity/2
+            // e.g. intensity 0.7 -> factor 0.65
+            const averageSlowdownFactor = 1 - (globalConfig?.slowdownIntensity ?? 0.7) / 2
+
+            // 3. Apply slowdown to clamped speed
+            const slowedSpeed = clampedBaseSpeed * averageSlowdownFactor
+
+            // 4. Ensure we don't violate max duration (min speed constraint)
+            const finalEstimatedSpeed = Math.max(slowedSpeed, minSpeedForMaxTime)
+
+            const remainingProgress = 1 - segmentProgress
+            estimatedDuration = (segmentDist / finalEstimatedSpeed) * remainingProgress
+          }
+
+          // Ensure it's at least the configured min zoom duration (or 1s) to avoid instant snaps
+          // Use the LARGER of the two to ensure we don't finish too early
+          // But if estimatedDuration is very short (e.g. 0.5s), forcing 3s is bad.
+          // The user problem is "zoom finishes BEFORE arrival".
+          // So we want duration >= remainingTime.
+          // So we should use estimatedDuration.
+          // But if estimatedDuration is tiny, flyTo might look weird.
+          // Let's just use estimatedDuration, but clamped to a reasonable minimum for smoothness?
+          // Actually, if we are 0.5s away, we WANT it to be 0.5s.
+
+          map.flyTo(destination, zoomLevel, { animate: true, duration: estimatedDuration })
         }
         break
       }
     }
-  }, [zoomPhase, currentSegmentIndex, coords, map, isPlaying, segmentProgress])
+  }, [zoomPhase, currentSegmentIndex, coords, map, isPlaying, segmentProgress, validItems, globalConfig])
 
   // Animation Loop
   const animate = useCallback(
@@ -160,40 +217,62 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
         // Handle movement and phase transitions (only after initial zoom completes)
         if (!isPaused && initialZoomComplete && currentSegmentIndex < coords.length - 1) {
           const currentItem = validItems[currentSegmentIndex]
-          const itemSpeed = currentItem.animation_config?.speed || globalConfig?.speed || 1
+          const itemSpeed = Number(currentItem.animation_config?.speed || globalConfig?.speed || 1) || 1
 
-          let effectiveSpeed = 500000 * globalSpeedMultiplier * itemSpeed
+          const baseSpeedMultiplier = Number(globalConfig?.baseSpeedMultiplier) || 500000
+          const slowdownStartThreshold = Number(globalConfig?.slowdownStartThreshold) || 0.8
+          const slowdownIntensity = Number(globalConfig?.slowdownIntensity) || 0.7
+          const minSegmentDuration = Number(globalConfig?.minSegmentDuration) || 3
+          const maxSegmentDuration = Number(globalConfig?.maxSegmentDuration) || 10
 
-          // Slowdown when approaching (last 20% of segment)
-          if (segmentProgress > 0.8) {
-            const slowdownFactor = 1 - ((segmentProgress - 0.8) / 0.2) * 0.7
-            effectiveSpeed *= slowdownFactor
-          }
-
+          const effectiveSpeed = baseSpeedMultiplier * globalSpeedMultiplier * itemSpeed
           const p1 = coords[currentSegmentIndex]
           const p2 = coords[currentSegmentIndex + 1]
           const segmentDist = getDistance(p1, p2)
 
           if (segmentDist > 0) {
-            // Ensure minimum animation time of 3 seconds per segment
-            // Calculate max speed allowed to take at least 3 seconds
-            const maxSpeedForMinTime = segmentDist / 3 // meters per second
-            // Use the SLOWER of the two speeds (min of the speeds)
-            const actualSpeed = Math.min(effectiveSpeed, maxSpeedForMinTime)
-            const actualDistanceToTravel = (actualSpeed * deltaTime) / 1000
+            // Ensure minimum animation time per segment (prevents too fast on short segments)
+            const maxSpeedForMinTime = segmentDist / minSegmentDuration
+            // Ensure maximum animation time per segment (prevents too slow on long segments)
+            const minSpeedForMaxTime = segmentDist / maxSegmentDuration
+
+            // 1. Clamp raw speed to max allowed speed first
+            // This ensures that even if base speed is huge, we start from a reasonable baseline
+            let currentSpeed = Math.min(effectiveSpeed, maxSpeedForMinTime)
+
+            // 2. Apply slowdown to the CLAMPED speed
+            // This ensures slowdown is visible even on short segments
+            if (segmentProgress > slowdownStartThreshold) {
+              const slowdownRange = 1 - slowdownStartThreshold
+              const slowdownFactor =
+                1 - ((segmentProgress - slowdownStartThreshold) / slowdownRange) * slowdownIntensity
+              currentSpeed *= slowdownFactor
+            }
+
+            // 3. Ensure we don't go slower than min allowed speed (max duration constraint)
+            const constrainedSpeed = Math.max(currentSpeed, minSpeedForMaxTime)
+
+            const actualDistanceToTravel = (constrainedSpeed * deltaTime) / 1000
 
             const progressIncrement = actualDistanceToTravel / segmentDist
             const newProgress = segmentProgress + progressIncrement
 
             // Phase transitions based on progress
-            if (newProgress < 0.33) {
-              // First third - zoom out to both phase
+            const zoomOutPhaseEnd = globalConfig?.zoomOutPhaseEnd ?? 0.33
+            const maintainPhaseEnd = globalConfig?.maintainPhaseEnd ?? 0.66
+
+            if (newProgress < zoomOutPhaseEnd) {
+              // First phase - zoom out to both
               if (zoomPhase === ZoomPhase.INITIAL_ZOOM_OUT) {
                 setZoomPhase(ZoomPhase.ZOOM_OUT_TO_BOTH)
               }
-            } else if (newProgress >= 0.33 && newProgress < 0.66 && zoomPhase !== ZoomPhase.MAINTAIN) {
+            } else if (
+              newProgress >= zoomOutPhaseEnd &&
+              newProgress < maintainPhaseEnd &&
+              zoomPhase !== ZoomPhase.MAINTAIN
+            ) {
               setZoomPhase(ZoomPhase.MAINTAIN)
-            } else if (newProgress >= 0.66 && zoomPhase !== ZoomPhase.ZOOM_TO_DEST) {
+            } else if (newProgress >= maintainPhaseEnd && zoomPhase !== ZoomPhase.ZOOM_TO_DEST) {
               setZoomPhase(ZoomPhase.ZOOM_TO_DEST)
             }
 
@@ -222,6 +301,13 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       currentSegmentIndex,
       globalConfig?.pauseOnArrival,
       globalConfig?.speed,
+      globalConfig?.baseSpeedMultiplier,
+      globalConfig?.slowdownStartThreshold,
+      globalConfig?.slowdownIntensity,
+      globalConfig?.minSegmentDuration,
+      globalConfig?.maxSegmentDuration,
+      globalConfig?.zoomOutPhaseEnd,
+      globalConfig?.maintainPhaseEnd,
       globalSpeedMultiplier,
       initialZoomComplete,
       isPaused,
@@ -274,16 +360,22 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   useEffect(() => {
     if (coords.length < 2) return
 
+    const baseSpeedMultiplier = globalConfig?.baseSpeedMultiplier ?? 500000
+    const minSegmentDuration = globalConfig?.minSegmentDuration ?? 3
+    const maxSegmentDuration = globalConfig?.maxSegmentDuration ?? 10
+
     // Calculate total expected time for all segments
     let totalExpectedTime = 0
     for (let i = 0; i < coords.length - 1; i++) {
       const segDist = getDistance(coords[i], coords[i + 1])
       const item = validItems[i]
       const itemSpeed = item.animation_config?.speed || globalConfig?.speed || 1
-      const baseSpeed = 500000 * globalSpeedMultiplier * itemSpeed
-      const maxSpeedForMinTime = segDist / 3
+      const baseSpeed = baseSpeedMultiplier * globalSpeedMultiplier * itemSpeed
+      const maxSpeedForMinTime = segDist / minSegmentDuration
+      const minSpeedForMaxTime = segDist / maxSegmentDuration
       const actualSpeed = Math.min(baseSpeed, maxSpeedForMinTime)
-      const segmentTime = segDist / actualSpeed
+      const constrainedSpeed = Math.max(actualSpeed, minSpeedForMaxTime)
+      const segmentTime = segDist / constrainedSpeed
       totalExpectedTime += segmentTime
     }
 
@@ -293,10 +385,12 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       const segDist = getDistance(coords[i], coords[i + 1])
       const item = validItems[i]
       const itemSpeed = item.animation_config?.speed || globalConfig?.speed || 1
-      const baseSpeed = 500000 * globalSpeedMultiplier * itemSpeed
-      const maxSpeedForMinTime = segDist / 3
+      const baseSpeed = baseSpeedMultiplier * globalSpeedMultiplier * itemSpeed
+      const maxSpeedForMinTime = segDist / minSegmentDuration
+      const minSpeedForMaxTime = segDist / maxSegmentDuration
       const actualSpeed = Math.min(baseSpeed, maxSpeedForMinTime)
-      const segmentTime = segDist / actualSpeed
+      const constrainedSpeed = Math.max(actualSpeed, minSpeedForMaxTime)
+      const segmentTime = segDist / constrainedSpeed
       timeElapsed += segmentTime
     }
 
@@ -305,10 +399,12 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       const currentSegDist = getDistance(coords[currentSegmentIndex], coords[currentSegmentIndex + 1])
       const currentItem = validItems[currentSegmentIndex]
       const currentItemSpeed = currentItem.animation_config?.speed || globalConfig?.speed || 1
-      const currentBaseSpeed = 500000 * globalSpeedMultiplier * currentItemSpeed
-      const currentMaxSpeed = currentSegDist / 3
+      const currentBaseSpeed = baseSpeedMultiplier * globalSpeedMultiplier * currentItemSpeed
+      const currentMaxSpeed = currentSegDist / minSegmentDuration
+      const currentMinSpeed = currentSegDist / maxSegmentDuration
       const currentActualSpeed = Math.min(currentBaseSpeed, currentMaxSpeed)
-      const currentSegmentTime = currentSegDist / currentActualSpeed
+      const currentConstrainedSpeed = Math.max(currentActualSpeed, currentMinSpeed)
+      const currentSegmentTime = currentSegDist / currentConstrainedSpeed
       timeElapsed += currentSegmentTime * segmentProgress
     }
 
@@ -323,16 +419,19 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       if (currentSegmentIndex === 0 && segmentProgress === 0) {
         const shouldZoomAtStart = globalConfig?.zoomAtStart ?? true
         if (shouldZoomAtStart && coords.length > 1) {
+          const zoomToStartDuration = (globalConfig?.zoomToStartDuration ?? 1) * 1000
+          const zoomOutToBothDuration = (globalConfig?.zoomOutToBothDuration ?? 2) * 1000
+
           setInitialZoomComplete(false)
           setZoomPhase(ZoomPhase.ZOOM_TO_START)
-          // After 1 second, transition to zoom out to both
+          // After zoom to start duration, transition to zoom out to both
           setTimeout(() => {
             setZoomPhase(ZoomPhase.ZOOM_OUT_TO_BOTH)
-            // After 2 seconds (slower zoom), mark initial zoom as complete
+            // After zoom out to both duration, mark initial zoom as complete
             setTimeout(() => {
               setInitialZoomComplete(true)
-            }, 2000)
-          }, 1000)
+            }, zoomOutToBothDuration)
+          }, zoomToStartDuration)
         } else {
           // If not zooming at start, mark as complete immediately
           setInitialZoomComplete(true)
@@ -350,12 +449,21 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   }, [isPlaying, currentSegmentIndex, segmentProgress, globalConfig, coords])
 
   // Zoom out at end if configured
+  // Zoom out at end if configured
   useEffect(() => {
     if (currentSegmentIndex >= coords.length - 2 && segmentProgress >= 1) {
       const shouldZoomOutAtEnd = globalConfig?.zoomOutAtEnd ?? true
       if (shouldZoomOutAtEnd && coords.length > 1) {
-        const bounds = L.latLngBounds(coords)
-        map.fitBounds(bounds, { padding: [50, 50], animate: true, duration: 3 })
+        const endZoomPadding = globalConfig?.endZoomPadding ?? 50
+        const endZoomDuration = globalConfig?.endZoomDuration ?? 3
+        const endAnimationDelay = (globalConfig?.endAnimationDelay ?? 0) * 1000 // Convert to ms
+
+        const timer = setTimeout(() => {
+          const bounds = L.latLngBounds(coords)
+          map.fitBounds(bounds, { padding: [endZoomPadding, endZoomPadding], animate: true, duration: endZoomDuration })
+        }, endAnimationDelay)
+
+        return () => clearTimeout(timer)
       }
     }
   }, [currentSegmentIndex, segmentProgress, coords, map, globalConfig])
@@ -464,12 +572,25 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
         const position = getCoords(item)
         if (!position) return null
 
-        const config = item.animation_config || globalConfig || {}
-        const showName = config.showName ?? true
-        const showOnArrival = config.showOnArrival ?? true
+        const itemConfig = item.animation_config || {}
+        // Merge configs: item config overrides global config, but fallback to global if missing
+        const showName = itemConfig.showName ?? globalConfig?.showName ?? true
+        const showOnArrival = itemConfig.showOnArrival ?? globalConfig?.showOnArrival ?? true
+        const showNamesOnActiveOnly = itemConfig.showNamesOnActiveOnly ?? globalConfig?.showNamesOnActiveOnly ?? false
 
         const hasArrived = index <= currentSegmentIndex + (segmentProgress > 0.9 ? 1 : 0)
-        const shouldShowLabel = showName || (showOnArrival && hasArrived)
+        // Active nodes include all past nodes, the current start node, AND the current destination node
+        const isActive = index <= currentSegmentIndex + 1
+
+        // Determine if label should be shown
+        let shouldShowLabel = false
+        if (showNamesOnActiveOnly) {
+          // Only show names on nodes that are active (visited + current destination)
+          shouldShowLabel = isActive && (showName || showOnArrival)
+        } else {
+          // Original logic: show all names (if showName=true) or only on arrival
+          shouldShowLabel = showName || (showOnArrival && hasArrived)
+        }
 
         const isLocation = "city" in item
         const label = isLocation ? item.city : (item as TripFeature).properties?.name || "Unknown"

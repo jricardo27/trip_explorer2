@@ -1,6 +1,6 @@
 import { query } from "../db"
 
-const addTransportColumns = async () => {
+export async function migrate() {
   try {
     console.log("Adding transport columns to day_locations table...")
     await query(`
@@ -13,7 +13,13 @@ const addTransportColumns = async () => {
     console.log("Successfully added transport columns.")
   } catch (err) {
     console.error("Error adding transport columns:", err)
+    throw err
   }
 }
 
-addTransportColumns()
+if (require.main === module) {
+  migrate().catch((error) => {
+    console.error("Migration failed:", error)
+    process.exit(1)
+  })
+}
