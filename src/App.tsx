@@ -20,6 +20,7 @@ import { WesternAustralia } from "./pages/Australia/WesternAustralia"
 import Destinations from "./pages/Destinations/Destinations"
 import { NewZealand } from "./pages/NewZealand/NewZealand"
 import NotFound from "./pages/NotFound/NotFound"
+import { ToastContainer } from "./utils/notifications"
 
 const RedirectHandler = () => {
   const navigate = useNavigate()
@@ -200,6 +201,7 @@ function App(): React.ReactNode {
           </TripProvider>
         </SavedFeaturesProvider>
       </Box>
+      <ToastContainer />
       <WelcomeModal open={welcomeDialogOpen} onClose={handleClose} />
     </HashRouter>
   )
