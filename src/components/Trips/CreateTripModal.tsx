@@ -6,7 +6,7 @@ import { Trip } from "../../contexts/TripContext"
 interface CreateTripModalProps {
   open: boolean
   onClose: () => void
-  onCreateTrip: (tripData: Omit<Trip, "id" | "created_at" | "updated_at">) => Promise<void>
+  onCreateTrip: (tripData: Omit<Trip, "id" | "created_at" | "updated_at" | "user_id">) => Promise<void>
 }
 
 export const CreateTripModal: React.FC<CreateTripModalProps> = ({ open, onClose, onCreateTrip }) => {

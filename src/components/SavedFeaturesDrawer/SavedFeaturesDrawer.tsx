@@ -213,10 +213,10 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
 
   const availableTypes = useMemo(() => extractFeatureTypes(savedFeatures), [savedFeatures])
 
-  const handleCreateTrip = async (tripData: Omit<Trip, "id" | "created_at" | "updated_at">) => {
+  const handleCreateTrip = async (tripData: Omit<Trip, "id" | "created_at" | "updated_at" | "user_id">) => {
     setIsLoading(true)
     try {
-      await createTrip(tripData)
+      await createTrip(tripData.name, tripData.start_date, tripData.end_date)
       setIsCreateTripModalOpen(false)
       showSuccess("Trip created successfully!")
     } catch (error) {
