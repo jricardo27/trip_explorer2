@@ -19,9 +19,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Chip,
+  Stack,
+  Collapse,
 } from "@mui/material"
 import React, { useState, useContext, useCallback, useEffect, useMemo } from "react"
-import { FaDownload } from "react-icons/fa"
+import { FaDownload, FaFilter } from "react-icons/fa"
 import {
   MdContentCopy,
   MdDelete,
@@ -48,6 +51,7 @@ import { AddLocationModal } from "../Trips/AddLocationModal"
 import { CreateTripModal } from "../Trips/CreateTripModal"
 import { EditItemModal } from "../Trips/EditItemModal"
 
+import { filterFeaturesByType, extractFeatureTypes, FeatureFilters } from "./advancedFilterFeatures"
 import { CategoryContextMenu } from "./ContextMenu/CategoryContextMenu"
 import { FeatureContextMenu } from "./ContextMenu/FeatureContextMenu"
 import { FeatureDetailsModal } from "./FeatureDetailsModal"
@@ -95,6 +99,12 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
 }) => {
   const [selectedTab, setSelectedTab] = useState<string>(DEFAULT_CATEGORY)
   const [searchQuery, setSearchQuery] = useState<string>("")
+  const [advancedFilters, setAdvancedFilters] = useState<FeatureFilters>({
+    searchQuery: "",
+    types: [],
+    tags: [],
+  })
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
   const [inputUserId, setInputUserId] = useState<string>("")
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [viewMode, setViewMode] = useState<"lists" | "trips">("lists")
@@ -164,7 +174,16 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
   )
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value)
+    const value = event.target.value
+    setSearchQuery(value)
+    setAdvancedFilters((prev) => ({ ...prev, searchQuery: value }))
+  }
+
+  const handleTypeToggle = (type: string) => {
+    setAdvancedFilters((prev) => ({
+      ...prev,
+      types: prev.types.includes(type) ? prev.types.filter((t) => t !== type) : [...prev.types, type],
+    }))
   }
 
   useEffect(() => {
@@ -181,8 +200,14 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
   }, [savedFeatures, selectedTab])
 
   const filteredItems = useMemo(() => {
-    return filterFeatures(itemsWithOriginalIndex, searchQuery)
-  }, [itemsWithOriginalIndex, searchQuery])
+    const basicFiltered = filterFeatures(itemsWithOriginalIndex, searchQuery)
+    if (showAdvancedFilters) {
+      return filterFeaturesByType(basicFiltered, advancedFilters)
+    }
+    return basicFiltered
+  }, [itemsWithOriginalIndex, searchQuery, showAdvancedFilters, advancedFilters])
+
+  const availableTypes = useMemo(() => extractFeatureTypes(savedFeatures), [savedFeatures])
 
   const handleAddFeature = async (feature: unknown) => {
     if (selectedDayForFeature) {
@@ -358,8 +383,44 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
                         variant="outlined"
                         value={searchQuery}
                         onChange={handleSearchChange}
-                        sx={{ mb: 2 }}
+                        sx={{ mb: 1 }}
                       />
+                      <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 1 }}>
+                        <Button
+                          size="small"
+                          startIcon={<FaFilter />}
+                          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                          variant={showAdvancedFilters ? "contained" : "outlined"}
+                        >
+                          Filter by Type
+                        </Button>
+                        {advancedFilters.types.length > 0 && (
+                          <Typography variant="caption" color="text.secondary">
+                            ({advancedFilters.types.length} selected)
+                          </Typography>
+                        )}
+                      </Box>
+                      <Collapse in={showAdvancedFilters}>
+                        <Box sx={{ mb: 2 }}>
+                          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                            {availableTypes.slice(0, 20).map((type) => (
+                              <Chip
+                                key={type}
+                                label={type}
+                                onClick={() => handleTypeToggle(type)}
+                                color={advancedFilters.types.includes(type) ? "primary" : "default"}
+                                size="small"
+                                sx={{ mb: 1 }}
+                              />
+                            ))}
+                          </Stack>
+                          {availableTypes.length > 20 && (
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
+                              Showing 20 of {availableTypes.length} types
+                            </Typography>
+                          )}
+                        </Box>
+                      </Collapse>
                       <FeatureList
                         items={filteredItems}
                         setSavedFeatures={setSavedFeatures}
