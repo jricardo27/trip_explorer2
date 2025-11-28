@@ -1,20 +1,20 @@
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, Alert } from "@mui/material"
 import React, { useState } from "react"
 
-import { useTripContext } from "../../contexts/TripContext"
+import { Trip } from "../../contexts/TripContext"
 
 interface CreateTripModalProps {
   open: boolean
   onClose: () => void
+  onCreateTrip: (tripData: Omit<Trip, "id" | "created_at" | "updated_at">) => Promise<void>
 }
 
-export const CreateTripModal: React.FC<CreateTripModalProps> = ({ open, onClose }) => {
+export const CreateTripModal: React.FC<CreateTripModalProps> = ({ open, onClose, onCreateTrip }) => {
   const [name, setName] = useState("")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [error, setError] = useState<string | null>(null)
-
-  const { createTrip, loading } = useTripContext()
+  const [loading, setLoading] = useState(false)
 
   React.useEffect(() => {
     if (startDate) {
@@ -33,9 +33,15 @@ export const CreateTripModal: React.FC<CreateTripModalProps> = ({ open, onClose 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setLoading(true)
 
     try {
-      await createTrip(name, startDate, endDate)
+      await onCreateTrip({
+        name,
+        start_date: startDate,
+        end_date: endDate,
+        days: [],
+      })
       onClose()
       setName("")
       setStartDate("")
@@ -46,6 +52,8 @@ export const CreateTripModal: React.FC<CreateTripModalProps> = ({ open, onClose 
       } else {
         setError("Failed to create trip")
       }
+    } finally {
+      setLoading(false)
     }
   }
 
