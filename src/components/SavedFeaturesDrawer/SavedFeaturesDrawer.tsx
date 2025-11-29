@@ -158,7 +158,8 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
       showSuccess("Trip created successfully")
     } catch (error) {
       console.error("Error creating trip:", error)
-      showError("Failed to create trip")
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+      showError(`Failed to create trip: ${errorMessage}`)
     } finally {
       setIsLoading(false)
     }
@@ -183,7 +184,8 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         showSuccess("Trip deleted successfully")
       } catch (error) {
         console.error("Error deleting trip:", error)
-        showError("Failed to delete trip")
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+        showError(`Failed to delete trip: ${errorMessage}`)
       } finally {
         setIsLoading(false)
       }
@@ -198,7 +200,8 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         showSuccess("Feature added to trip day!")
       } catch (error) {
         console.error("Failed to add feature:", error)
-        showError("Failed to add feature to trip day.")
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+        showError(`Failed to add feature to trip day: ${errorMessage}`)
       } finally {
         setIsLoading(false)
         setSelectedDayForFeature(null)
@@ -214,7 +217,8 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         showSuccess("Location added to trip day!")
       } catch (error) {
         console.error("Failed to add location:", error)
-        showError("Failed to add location to trip day.")
+        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+        showError(`Failed to add location to trip day: ${errorMessage}`)
       } finally {
         setIsLoading(false)
         setSelectedDayForLocation(null)
@@ -256,7 +260,8 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
       await reorderItems(dayId, reorderPayload)
     } catch (error) {
       console.error("Error moving item:", error)
-      showError("Failed to move item")
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+      showError(`Failed to reorder item: ${errorMessage}`)
     } finally {
       setIsLoading(false)
     }
@@ -483,7 +488,8 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
                   })
                   .catch((error) => {
                     console.error("Error deleting location:", error)
-                    showError("Failed to delete location")
+                    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+                    showError(`Failed to delete location: ${errorMessage}`)
                   })
                   .finally(() => setIsLoading(false))
               } else if (deleteConfirmation.type === "feature") {
@@ -496,7 +502,8 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
                   })
                   .catch((error) => {
                     console.error("Error deleting feature:", error)
-                    showError("Failed to delete feature")
+                    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+                    showError(`Failed to delete feature: ${errorMessage}`)
                   })
                   .finally(() => setIsLoading(false))
               } else if (deleteConfirmation.type === "logout") {
