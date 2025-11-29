@@ -14,9 +14,11 @@ import {
 } from "react-icons/md"
 
 import { Trip, DayLocation, TripFeature } from "../../../contexts/TripContext"
+import { calculateDistance, formatDistance, estimateTravelTime, formatTravelTime } from "../../../utils/distanceUtils"
 import { calculateEndTime } from "../../../utils/timeUtils"
 import { exportTripToGeoJSON, exportTripToKML } from "../../TopMenu/exportTrip"
 import { exportTripToExcel } from "../../TopMenu/exportTripToExcel"
+import { TripSummary } from "../../Trips/TripSummary"
 
 interface TripDetailViewProps {
   trip: Trip
@@ -112,10 +114,15 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
           Export
         </Button>
       </Box>
-      <Typography variant="h6">{trip.name}</Typography>
-      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
+      <Typography variant="h5" gutterBottom>
+        {trip.name}
+      </Typography>
+      <Typography variant="body2" color="text.secondary" gutterBottom>
         {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
       </Typography>
+
+      {/* Trip Summary Statistics */}
+      <TripSummary dayLocations={dayLocations} dayFeatures={dayFeatures} />
 
       <List>
         {trip.days?.map((day) => {
@@ -181,144 +188,188 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
 
                       const endTime = item.end_time || calculateEndTime(item.start_time, item.duration_minutes)
 
-                      return (
-                        <ListItem
-                          key={key}
-                          sx={{
-                            pl: 0,
-                            borderBottom: idx < items.length - 1 ? 1 : 0,
-                            borderColor: "divider",
-                            flexDirection: "column",
-                            alignItems: "stretch",
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "flex-start",
-                              width: "100%",
-                            }}
-                          >
-                            <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-                              <Box sx={{ display: "flex", flexDirection: "column", mr: 1 }}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => onMoveItem(day.id, idx, "up", items)}
-                                  disabled={idx === 0}
-                                >
-                                  <MdArrowUpward fontSize="small" />
-                                </IconButton>
-                                <IconButton
-                                  size="small"
-                                  onClick={() => onMoveItem(day.id, idx, "down", items)}
-                                  disabled={idx === items.length - 1}
-                                >
-                                  <MdArrowDownward fontSize="small" />
-                                </IconButton>
-                              </Box>
-                              <ListItemText
-                                primary={
-                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    {primaryText}
-                                    {item.start_time && (
-                                      <Tooltip
-                                        title={`Start: ${item.start_time}${endTime ? ` - End: ${endTime}` : ""}`}
-                                      >
-                                        <Typography
-                                          variant="caption"
-                                          sx={{
-                                            bgcolor: "primary.main",
-                                            color: "white",
-                                            px: 0.5,
-                                            borderRadius: 0.5,
-                                            cursor: "help",
-                                          }}
-                                        >
-                                          {item.start_time.slice(0, 5)}
-                                          {endTime && ` - ${endTime.slice(0, 5)}`}
-                                        </Typography>
-                                      </Tooltip>
-                                    )}
-                                  </Box>
-                                }
-                                secondary={secondaryText}
-                              />
-                            </Box>
-                            <Box>
-                              <Tooltip title="Locate on Map">
-                                <IconButton
-                                  size="small"
-                                  onClick={() => {
-                                    if (isLocation) {
-                                      if (item.latitude && item.longitude) onFlyTo(item.latitude, item.longitude)
-                                    } else {
-                                      // Feature geometry
-                                      const coords = (item as TripFeature).geometry?.coordinates
-                                      if (coords) {
-                                        // GeoJSON is [lng, lat]
-                                        onFlyTo(coords[1], coords[0])
-                                      }
-                                    }
-                                  }}
-                                >
-                                  <MdMyLocation fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              {!isLocation && (
-                                <Tooltip title="View Details">
-                                  <IconButton size="small" onClick={() => onViewFeature(item as TripFeature)}>
-                                    <MdVisibility fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                              <IconButton size="small" onClick={() => onEditItem(item, item.type)}>
-                                <MdEdit fontSize="small" />
-                              </IconButton>
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  onDeleteItem(item, day.id)
-                                }}
-                              >
-                                <MdDelete fontSize="small" />
-                              </IconButton>
-                            </Box>
-                          </Box>
+                      // Calculate distance from previous item
+                      let distanceInfo: { distance: number; time: number } | null = null
+                      if (idx > 0) {
+                        const prevItem = items[idx - 1]
+                        const prevLat =
+                          prevItem.type === "location" ? prevItem.latitude : prevItem.geometry?.coordinates[1]
+                        const prevLng =
+                          prevItem.type === "location" ? prevItem.longitude : prevItem.geometry?.coordinates[0]
+                        const currLat = isLocation ? item.latitude : item.geometry?.coordinates[1]
+                        const currLng = isLocation ? item.longitude : item.geometry?.coordinates[0]
 
-                          {/* Transport Details */}
-                          {(item.transport_mode || item.transport_details || item.duration_minutes) && (
+                        if (prevLat && prevLng && currLat && currLng) {
+                          const distance = calculateDistance(prevLat, prevLng, currLat, currLng)
+                          const time = estimateTravelTime(distance, item.transport_mode)
+                          distanceInfo = { distance, time }
+                        }
+                      }
+
+                      return (
+                        <React.Fragment key={key}>
+                          {distanceInfo && (
                             <Box
                               sx={{
-                                mt: 1,
-                                ml: 5,
-                                p: 1,
-                                bgcolor: "action.hover",
-                                borderRadius: 1,
                                 display: "flex",
-                                flexDirection: "column",
-                                gap: 0.5,
+                                alignItems: "center",
+                                gap: 1,
+                                py: 0.5,
+                                px: 2,
+                                bgcolor: "action.hover",
+                                fontSize: "0.75rem",
+                                color: "text.secondary",
                               }}
                             >
-                              {item.transport_mode && (
-                                <Typography variant="caption" display="block">
-                                  <strong>Mode:</strong> {item.transport_mode}
-                                </Typography>
-                              )}
-                              {item.transport_details && (
-                                <Typography variant="caption" display="block">
-                                  <strong>Details:</strong> {item.transport_details}
-                                </Typography>
-                              )}
-                              {item.duration_minutes && (
-                                <Typography variant="caption" display="block">
-                                  <strong>Duration:</strong> {item.duration_minutes} min
-                                </Typography>
-                              )}
+                              <Typography variant="caption" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                ↓ {formatDistance(distanceInfo.distance)}
+                                {item.transport_mode && (
+                                  <>
+                                    {" "}
+                                    (~{formatTravelTime(distanceInfo.time)} by {item.transport_mode})
+                                  </>
+                                )}
+                              </Typography>
                             </Box>
                           )}
-                        </ListItem>
+                          <ListItem
+                            key={key}
+                            sx={{
+                              pl: 0,
+                              borderBottom: idx < items.length - 1 ? 1 : 0,
+                              borderColor: "divider",
+                              flexDirection: "column",
+                              alignItems: "stretch",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                width: "100%",
+                              }}
+                            >
+                              <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+                                <Box sx={{ display: "flex", flexDirection: "column", mr: 1 }}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => onMoveItem(day.id, idx, "up", items)}
+                                    disabled={idx === 0}
+                                  >
+                                    <MdArrowUpward fontSize="small" />
+                                  </IconButton>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => onMoveItem(day.id, idx, "down", items)}
+                                    disabled={idx === items.length - 1}
+                                  >
+                                    <MdArrowDownward fontSize="small" />
+                                  </IconButton>
+                                </Box>
+                                <ListItemText
+                                  primary={
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                      {primaryText}
+                                      {item.start_time && (
+                                        <Tooltip
+                                          title={`Start: ${item.start_time}${endTime ? ` - End: ${endTime}` : ""}`}
+                                        >
+                                          <Typography
+                                            variant="caption"
+                                            sx={{
+                                              bgcolor: "primary.main",
+                                              color: "white",
+                                              px: 0.5,
+                                              borderRadius: 0.5,
+                                              cursor: "help",
+                                            }}
+                                          >
+                                            {item.start_time.slice(0, 5)}
+                                            {endTime && ` - ${endTime.slice(0, 5)}`}
+                                          </Typography>
+                                        </Tooltip>
+                                      )}
+                                    </Box>
+                                  }
+                                  secondary={secondaryText}
+                                />
+                              </Box>
+                              <Box>
+                                <Tooltip title="Locate on Map">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      if (isLocation) {
+                                        if (item.latitude && item.longitude) onFlyTo(item.latitude, item.longitude)
+                                      } else {
+                                        // Feature geometry
+                                        const coords = (item as TripFeature).geometry?.coordinates
+                                        if (coords) {
+                                          // GeoJSON is [lng, lat]
+                                          onFlyTo(coords[1], coords[0])
+                                        }
+                                      }
+                                    }}
+                                  >
+                                    <MdMyLocation fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                {!isLocation && (
+                                  <Tooltip title="View Details">
+                                    <IconButton size="small" onClick={() => onViewFeature(item as TripFeature)}>
+                                      <MdVisibility fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
+                                <IconButton size="small" onClick={() => onEditItem(item, item.type)}>
+                                  <MdEdit fontSize="small" />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    onDeleteItem(item, day.id)
+                                  }}
+                                >
+                                  <MdDelete fontSize="small" />
+                                </IconButton>
+                              </Box>
+                            </Box>
+
+                            {/* Transport Details */}
+                            {(item.transport_mode || item.transport_details || item.duration_minutes) && (
+                              <Box
+                                sx={{
+                                  mt: 1,
+                                  ml: 5,
+                                  p: 1,
+                                  bgcolor: "action.hover",
+                                  borderRadius: 1,
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: 0.5,
+                                }}
+                              >
+                                {item.transport_mode && (
+                                  <Typography variant="caption" display="block">
+                                    <strong>Mode:</strong> {item.transport_mode}
+                                  </Typography>
+                                )}
+                                {item.transport_details && (
+                                  <Typography variant="caption" display="block">
+                                    <strong>Details:</strong> {item.transport_details}
+                                  </Typography>
+                                )}
+                                {item.duration_minutes && (
+                                  <Typography variant="caption" display="block">
+                                    <strong>Duration:</strong> {item.duration_minutes} min
+                                  </Typography>
+                                )}
+                              </Box>
+                            )}
+                          </ListItem>
+                        </React.Fragment>
                       )
                     })}
                   </List>
