@@ -8,3 +8,20 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Prevent trembling/ghosting of the trip animation marker */
+.trip-animation-icon {
+  /* Disable Leaflet's default transitions that can cause ghosting */
+  transition: none !important;
+  /* Use hardware acceleration for smoother rendering */
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  /* Prevent any visual artifacts */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Ensure the marker pane doesn't have transitions either */
+.leaflet-marker-pane .trip-animation-icon {
+  transition: none !important;
+}

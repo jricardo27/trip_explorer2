@@ -1,30 +1,25 @@
 import {
   Drawer,
   Box,
-  TextField,
-  useTheme,
-  useMediaQuery,
   Typography,
-  Button,
+  IconButton,
   Tabs,
   Tab,
-  IconButton,
-  Tooltip,
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
-  Chip,
-  Stack,
-  Collapse,
   CircularProgress,
+  Tooltip,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material"
-import React, { useState, useContext, useCallback, useEffect, useMemo } from "react"
-import { FaFilter } from "react-icons/fa"
-import { MdContentCopy, MdPushPin } from "react-icons/md"
+import React, { useState, useContext, useCallback, useMemo } from "react"
+import { MdPushPin, MdClose } from "react-icons/md"
 
-import SavedFeaturesContext, { DEFAULT_CATEGORY } from "../../contexts/SavedFeaturesContext"
+import SavedFeaturesContext from "../../contexts/SavedFeaturesContext"
 import { useTripContext, DayLocation, TripFeature, Trip } from "../../contexts/TripContext"
 import { showSuccess, showError } from "../../utils/notifications"
 import { AuthModal } from "../Auth/AuthModal"
@@ -33,25 +28,22 @@ import { AddLocationModal } from "../Trips/AddLocationModal"
 import { CreateTripModal } from "../Trips/CreateTripModal"
 import { EditItemModal } from "../Trips/EditItemModal"
 
-import { filterFeaturesByType, extractFeatureTypes, FeatureFilters } from "./advancedFilterFeatures"
 import { CategoryContextMenu } from "./ContextMenu/CategoryContextMenu"
 import { FeatureContextMenu } from "./ContextMenu/FeatureContextMenu"
 import { FeatureDetailsModal } from "./FeatureDetailsModal"
 import { FeatureDragContext } from "./FeatureList/FeatureDragContext"
-import { FeatureList } from "./FeatureList/FeatureList"
-import { filterFeatures } from "./filterFeatures"
+import { FeatureListView } from "./FeatureViews/FeatureListView"
 import { useCategoryManagement } from "./hooks/useCategoryManagement"
 import { useContextMenu } from "./hooks/useContextMenu"
 import { useFeatureManagement } from "./hooks/useFeatureManagement"
 import { useFeatureSelection } from "./hooks/useFeatureSelection"
-import { TabList } from "./TabList/TabList"
 import { TripDetailView } from "./TripViews/TripDetailView"
 import { TripListView } from "./TripViews/TripListView"
+import { UserAuthSection } from "./UserAuthSection"
 
 interface SavedFeaturesDrawerProps {
   drawerOpen: boolean
   onClose: () => void
-  setCurrentCategory?: (newState: string) => void
   isPinned: boolean
   onTogglePin: () => void
   onFlyTo: (lat: number, lng: number) => void
@@ -65,46 +57,16 @@ interface DeleteFeatureData {
   item: TripFeature
   dayId: string
 }
-interface DeleteTripData {
-  id: string
-}
-
-const excludedProperties = ["id", "images", "style"] as const
 
 const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
   drawerOpen,
   onClose,
-  setCurrentCategory,
   isPinned,
   onTogglePin,
   onFlyTo,
 }) => {
-  const [selectedTab, setSelectedTab] = useState<string>(DEFAULT_CATEGORY)
-  const [searchQuery, setSearchQuery] = useState<string>("")
-  const [advancedFilters, setAdvancedFilters] = useState<FeatureFilters>({
-    searchQuery: "",
-    types: [],
-    tags: [],
-  })
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
-  const [inputUserId, setInputUserId] = useState<string>("")
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const [viewMode, setViewMode] = useState<"lists" | "trips">("lists")
-  const [tripFilter, setTripFilter] = useState<"all" | "current" | "past" | "future">("all")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isCreateTripModalOpen, setIsCreateTripModalOpen] = useState(false)
-  const [selectedDayForFeature, setSelectedDayForFeature] = useState<{ id: string; date: string } | null>(null)
-  const [selectedDayForLocation, setSelectedDayForLocation] = useState<{ id: string; date: string } | null>(null)
-  const [editingItem, setEditingItem] = useState<{
-    item: DayLocation | TripFeature
-    type: "location" | "Feature"
-  } | null>(null)
-  const [viewingFeature, setViewingFeature] = useState<TripFeature | null>(null)
-  const [deleteConfirmation, setDeleteConfirmation] = useState<{
-    type: "trip" | "location" | "feature" | "logout" | null
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any
-  }>({ type: null, data: null })
+  const { savedFeatures, userId, setUserId, email, logout, setSavedFeatures, removeFeature } =
+    useContext(SavedFeaturesContext)!
 
   const {
     trips,
@@ -112,40 +74,24 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
     dayFeatures,
     dayLocations,
     fetchTripDetails,
+    addLocationToDay,
+    deleteLocation,
+    addFeatureToDay,
+    deleteFeature,
+    createTrip,
     deleteTrip,
     setCurrentTrip,
-    addFeatureToDay,
-    addLocationToDay,
-    createTrip, // Added createTrip
-    deleteLocation,
-    deleteFeature,
     reorderItems,
   } = useTripContext()
 
-  const { savedFeatures, setSavedFeatures, removeFeature, userId, setUserId, email, logout } =
-    useContext(SavedFeaturesContext)!
-  const { selectedFeature, setSelectedFeature } = useFeatureSelection()
+  const [tripFilter, setTripFilter] = useState<"all" | "future" | "past" | "current">("all")
+
   const { contextMenu, contextMenuTab, contextMenuFeature, handleContextMenu, handleTabContextMenu, handleClose } =
     useContextMenu()
-  const { moveCategory, handleRenameCategory, handleAddCategory, handleRemoveCategory } = useCategoryManagement(
-    setSavedFeatures,
-    setSelectedTab,
-    savedFeatures,
-    contextMenuTab,
-  )
-  const { handleDuplicate, handleRemoveFromList, handleRemoveCompletely } = useFeatureManagement(
-    setSavedFeatures,
-    selectedTab,
-    contextMenuFeature,
-    removeFeature,
-  )
 
-  const theme = useTheme()
-  const isXs = useMediaQuery(theme.breakpoints.down("sm"))
-  const isSm = useMediaQuery(theme.breakpoints.between("sm", "md"))
-  const isMd = useMediaQuery(theme.breakpoints.between("md", "lg"))
-
-  const drawerWidth = isMd ? "70%" : isSm ? "50%" : isXs ? "92%" : "50%"
+  const [viewMode, setViewMode] = useState("lists")
+  const [selectedTab, setSelectedTab] = useState<string>("all")
+  const { selectedFeature, setSelectedFeature } = useFeatureSelection(savedFeatures, selectedTab)
 
   const handleTabChange = useCallback(
     (_event: React.SyntheticEvent, newValue: string) => {
@@ -155,70 +101,92 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
     [setSelectedFeature],
   )
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    setSearchQuery(value)
-    setAdvancedFilters((prev) => ({ ...prev, searchQuery: value }))
-  }
+  const { moveCategory, handleRenameCategory, handleAddCategory, handleRemoveCategory } = useCategoryManagement(
+    setSavedFeatures,
+    setSelectedTab,
+    savedFeatures,
+    contextMenuTab,
+  )
 
-  const handleTypeToggle = (type: string) => {
-    setAdvancedFilters((prev) => ({
-      ...prev,
-      types: prev.types.includes(type) ? prev.types.filter((t) => t !== type) : [...prev.types, type],
-    }))
-  }
+  const { handleDuplicate, handleRemoveFromList, handleRemoveCompletely } = useFeatureManagement(
+    setSavedFeatures,
+    selectedTab,
+    contextMenuFeature,
+    removeFeature,
+  )
 
-  useEffect(() => {
-    if (setCurrentCategory) {
-      setCurrentCategory(selectedTab)
-    }
-  }, [selectedTab, setCurrentCategory])
+  // State for modals and interactions
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isCreateTripModalOpen, setIsCreateTripModalOpen] = useState(false)
+  const [selectedDayForLocation, setSelectedDayForLocation] = useState<{ id: string; date: string } | null>(null)
+  const [selectedDayForFeature, setSelectedDayForFeature] = useState<{ id: string; date: string } | null>(null)
+  const [editingItem, setEditingItem] = useState<{
+    item: DayLocation | TripFeature
+    type: "location" | "feature"
+  } | null>(null)
+  const [viewingFeature, setViewingFeature] = useState<TripFeature | null>(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    type: "trip" | "location" | "feature" | "logout" | null
+    data: { id: string } | DeleteLocationData | DeleteFeatureData | null
+  }>({ type: null, data: null })
+  const [isLoading, setIsLoading] = useState(false)
 
-  const itemsWithOriginalIndex = useMemo(() => {
-    return (savedFeatures[selectedTab] || []).map((feature, index) => ({
-      feature,
-      originalIndex: index,
-    }))
-  }, [savedFeatures, selectedTab])
-
-  const filteredItems = useMemo(() => {
-    const basicFiltered = filterFeatures(itemsWithOriginalIndex, searchQuery)
-    if (showAdvancedFilters) {
-      return filterFeaturesByType(basicFiltered, advancedFilters)
-    }
-    return basicFiltered
-  }, [itemsWithOriginalIndex, searchQuery, showAdvancedFilters, advancedFilters])
-
-  const availableTypes = useMemo(() => extractFeatureTypes(savedFeatures), [savedFeatures])
+  const filteredTrips = useMemo(() => {
+    if (!trips) return []
+    const now = new Date()
+    return trips.filter((trip) => {
+      const startDate = new Date(trip.start_date)
+      const endDate = new Date(trip.end_date)
+      switch (tripFilter) {
+        case "future":
+          return startDate > now
+        case "past":
+          return endDate < now
+        case "current":
+          return startDate <= now && endDate >= now
+        default:
+          return true
+      }
+    })
+  }, [trips, tripFilter])
 
   const handleCreateTrip = async (tripData: Omit<Trip, "id" | "created_at" | "updated_at" | "user_id">) => {
     setIsLoading(true)
     try {
       await createTrip(tripData.name, tripData.start_date, tripData.end_date)
       setIsCreateTripModalOpen(false)
-      showSuccess("Trip created successfully!")
+      showSuccess("Trip created successfully")
     } catch (error) {
       console.error("Error creating trip:", error)
-      showError("Failed to create trip. Please try again.")
+      showError("Failed to create trip")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleDeleteTrip = async (tripId: string) => {
-    setIsLoading(true)
-    try {
-      await deleteTrip(tripId)
-      setDeleteConfirmation({ type: null, data: null })
-      if (currentTrip && currentTrip.id === tripId) {
-        setCurrentTrip(null)
+  const handleDeleteTrip = (tripId: string) => {
+    setDeleteConfirmation({
+      type: "trip",
+      data: { id: tripId },
+    })
+  }
+
+  const confirmDeleteTrip = async () => {
+    if (deleteConfirmation.type === "trip" && deleteConfirmation.data) {
+      setIsLoading(true)
+      try {
+        await deleteTrip((deleteConfirmation.data as { id: string }).id)
+        setDeleteConfirmation({ type: null, data: null })
+        if (currentTrip && currentTrip.id === (deleteConfirmation.data as { id: string }).id) {
+          setCurrentTrip(null)
+        }
+        showSuccess("Trip deleted successfully")
+      } catch (error) {
+        console.error("Error deleting trip:", error)
+        showError("Failed to delete trip")
+      } finally {
+        setIsLoading(false)
       }
-      showSuccess("Trip deleted successfully")
-    } catch (error) {
-      console.error("Error deleting trip:", error)
-      showError("Failed to delete trip")
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -233,6 +201,7 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         showError("Failed to add feature to trip day.")
       } finally {
         setIsLoading(false)
+        setSelectedDayForFeature(null)
       }
     }
   }
@@ -248,6 +217,7 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         showError("Failed to add location to trip day.")
       } finally {
         setIsLoading(false)
+        setSelectedDayForLocation(null)
       }
     }
   }
@@ -258,400 +228,290 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
     direction: "up" | "down",
     items: (DayLocation | TripFeature)[],
   ) => {
-    if ((direction === "up" && index === 0) || (direction === "down" && index === items.length - 1)) return
+    if (!items || items.length === 0) return
 
+    const newIndex = direction === "up" ? index - 1 : index + 1
+    if (newIndex < 0 || newIndex >= items.length) return
+
+    setIsLoading(true)
+
+    // Create a new array with the moved item
     const newItems = [...items]
-    const swapIndex = direction === "up" ? index - 1 : index + 1
+    const [movedItem] = newItems.splice(index, 1)
+    newItems.splice(newIndex, 0, movedItem)
 
-    // Swap items
-    const temp = newItems[index]
-    newItems[index] = newItems[swapIndex]
-    newItems[swapIndex] = temp
-
-    // Update orders
-    const reorderedItems = newItems.map((item, idx) => {
-      // Determine type based on properties if 'type' is not present or reliable
-      // DayLocation has 'day_id' (or trip_day_id), TripFeature has 'saved_id' or 'geometry'
-      const isLocation = "city" in item || "town" in item || "country" in item
+    // Prepare the payload for reorderItems
+    const reorderPayload = newItems.map((item, idx) => {
+      const isFeature = "type" in item && item.type === "Feature"
       return {
-        id: isLocation ? (item as DayLocation).id : (item as TripFeature).saved_id,
-        type: isLocation ? "location" : "feature",
-        order: idx + 1,
+        id: isFeature
+          ? (item as TripFeature).saved_id || (item as TripFeature).properties.id
+          : (item as DayLocation).id,
+        type: isFeature ? "feature" : ("location" as "feature" | "location"),
+        order: idx,
       }
     })
 
-    setIsLoading(true)
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await reorderItems(dayId, reorderedItems as any)
-      showSuccess("Items reordered successfully!")
+      await reorderItems(dayId, reorderPayload)
     } catch (error) {
-      console.error("Failed to reorder items:", error)
-      showError("Failed to reorder items.")
-      throw error // Re-throw to let caller handle if needed, though we catch here
+      console.error("Error moving item:", error)
+      showError("Failed to move item")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const filteredTrips = useMemo(() => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    return trips.filter((trip) => {
-      const startDate = new Date(trip.start_date)
-      const endDate = new Date(trip.end_date)
-      startDate.setHours(0, 0, 0, 0)
-      endDate.setHours(0, 0, 0, 0)
-
-      switch (tripFilter) {
-        case "all":
-          return true
-        case "current":
-          return startDate <= today && endDate >= today
-        case "past":
-          return endDate < today
-        case "future":
-          return startDate > today
-        default:
-          return true
-      }
-    })
-  }, [trips, tripFilter])
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
 
   return (
-    <>
-      <FeatureDragContext savedFeatures={savedFeatures} selectedTab={selectedTab} setSavedFeatures={setSavedFeatures}>
-        <Drawer
-          anchor="left"
-          open={drawerOpen}
-          onClose={isPinned ? undefined : onClose} // Prevent closing if pinned
-          variant={isPinned ? "persistent" : "temporary"}
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            "& .MuiDrawer-paper": {
-              width: drawerWidth,
-              marginTop: "64px",
-              height: "calc(100% - 64px)",
-              boxSizing: "border-box",
-            },
-          }}
-        >
-          <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-            <Box sx={{ borderBottom: 1, borderColor: "divider", display: "flex", alignItems: "center" }}>
-              <Tabs
-                value={viewMode}
-                onChange={(_, newValue) => setViewMode(newValue)}
-                variant="standard"
-                sx={{ flexGrow: 1 }}
-              >
-                <Tab label="Lists" value="lists" />
-                <Tab label="Trips" value="trips" />
-              </Tabs>
-              <Tooltip title={isPinned ? "Unpin Sidebar" : "Pin Sidebar"}>
-                <IconButton onClick={onTogglePin} sx={{ mr: 1, color: isPinned ? "primary.main" : "text.secondary" }}>
-                  <MdPushPin />
-                </IconButton>
-              </Tooltip>
-            </Box>
+    <Drawer
+      anchor="left"
+      open={drawerOpen}
+      onClose={isPinned ? undefined : onClose}
+      variant={isPinned ? "persistent" : "temporary"}
+      PaperProps={{
+        sx: {
+          width: isPinned || !isMobile ? 400 : "100%",
+          maxWidth: isPinned || !isMobile ? 400 : "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          pointerEvents: "auto",
+        },
+      }}
+      ModalProps={{
+        keepMounted: true,
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", p: 2, borderBottom: 1, borderColor: "divider" }}>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          Saved Features
+        </Typography>
+        <Box>
+          <Tooltip title={isPinned ? "Unpin" : "Pin"}>
+            <IconButton onClick={onTogglePin}>
+              <MdPushPin style={{ transform: isPinned ? "rotate(45deg)" : "none" }} />
+            </IconButton>
+          </Tooltip>
+          {!isPinned && (
+            <Tooltip title="Close">
+              <IconButton onClick={onClose}>
+                <MdClose />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+      </Box>
 
-            {isLoading && (
-              <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", p: 2 }}>
-                <CircularProgress size={24} />
-                <Typography variant="body2" sx={{ ml: 2 }}>
-                  Loading...
-                </Typography>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Tabs value={viewMode} onChange={(_e, val) => setViewMode(val)} variant="fullWidth">
+          <Tab label="Lists" value="lists" />
+          <Tab label="Trips" value="trips" />
+        </Tabs>
+      </Box>
+
+      <Box sx={{ flexGrow: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        {isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            {viewMode === "lists" ? (
+              <FeatureDragContext
+                savedFeatures={savedFeatures}
+                selectedTab={selectedTab}
+                setSavedFeatures={setSavedFeatures}
+              >
+                <FeatureListView
+                  savedFeatures={savedFeatures}
+                  setSavedFeatures={setSavedFeatures}
+                  selectedTab={selectedTab}
+                  handleTabChange={handleTabChange}
+                  handleTabContextMenu={handleTabContextMenu}
+                  handleContextMenu={handleContextMenu}
+                  selectedFeature={selectedFeature}
+                  setSelectedFeature={setSelectedFeature}
+                />
+              </FeatureDragContext>
+            ) : (
+              <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                {!currentTrip && (
+                  <TripListView
+                    trips={filteredTrips}
+                    tripFilter={tripFilter}
+                    onTripFilterChange={setTripFilter}
+                    onTripSelect={fetchTripDetails}
+                    onTripDelete={handleDeleteTrip}
+                    onCreateTrip={() => setIsCreateTripModalOpen(true)}
+                  />
+                )}
+                {currentTrip && (
+                  <TripDetailView
+                    trip={currentTrip}
+                    dayLocations={dayLocations}
+                    dayFeatures={dayFeatures}
+                    onBack={() => setCurrentTrip(null)}
+                    onAddLocation={(id, date) => setSelectedDayForLocation({ id, date })}
+                    onAddFeature={(id, date) => setSelectedDayForFeature({ id, date })}
+                    onEditItem={(item, type) =>
+                      setEditingItem({ item, type: type === "Feature" ? "feature" : "location" })
+                    }
+                    onDeleteItem={(item, dayId) => {
+                      if ("type" in item && item.type === "Feature") {
+                        setDeleteConfirmation({
+                          type: "feature",
+                          data: { item: item as TripFeature, dayId },
+                        })
+                      } else {
+                        setDeleteConfirmation({
+                          type: "location",
+                          data: { id: (item as DayLocation).id, dayId },
+                        })
+                      }
+                    }}
+                    onMoveItem={handleMoveItem}
+                    onFlyTo={onFlyTo}
+                    onViewFeature={setViewingFeature}
+                  />
+                )}
               </Box>
             )}
+          </>
+        )}
+      </Box>
 
-            <Box sx={{ flexGrow: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-              {isLoading && (
-                <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
-                  <CircularProgress />
-                </Box>
-              )}
-              {!isLoading && viewMode === "lists" ? (
-                <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-                  <Box sx={{ width: 150, bgcolor: "background.paper", borderRight: 1, borderColor: "divider" }}>
-                    <TabList
-                      tabs={Object.keys(savedFeatures)}
-                      selectedTab={selectedTab}
-                      handleTabChange={handleTabChange}
-                      handleTabContextMenu={handleTabContextMenu}
-                    />
-                  </Box>
-                  <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", height: "100%" }}>
-                    <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
-                      <TextField
-                        fullWidth
-                        label="Search Features"
-                        variant="outlined"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        sx={{ mb: 1 }}
-                      />
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2, gap: 1 }}>
-                        <Button
-                          size="small"
-                          startIcon={<FaFilter />}
-                          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                          variant={showAdvancedFilters ? "contained" : "outlined"}
-                        >
-                          Filter by Type
-                        </Button>
-                        {advancedFilters.types.length > 0 && (
-                          <Typography variant="caption" color="text.secondary">
-                            ({advancedFilters.types.length} selected)
-                          </Typography>
-                        )}
-                      </Box>
-                      <Collapse in={showAdvancedFilters}>
-                        <Box sx={{ mb: 2 }}>
-                          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                            {availableTypes.slice(0, 20).map((type) => (
-                              <Chip
-                                key={type}
-                                label={type}
-                                onClick={() => handleTypeToggle(type)}
-                                color={advancedFilters.types.includes(type) ? "primary" : "default"}
-                                size="small"
-                                sx={{ mb: 1 }}
-                              />
-                            ))}
-                          </Stack>
-                          {availableTypes.length > 20 && (
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
-                              Showing 20 of {availableTypes.length} types
-                            </Typography>
-                          )}
-                        </Box>
-                      </Collapse>
-                      <FeatureList
-                        items={filteredItems}
-                        setSavedFeatures={setSavedFeatures}
-                        selectedTab={selectedTab}
-                        selectedFeature={selectedFeature}
-                        setSelectedFeature={setSelectedFeature}
-                        handleContextMenu={handleContextMenu}
-                        excludedProperties={Array.from(excludedProperties)}
-                      />
-                    </Box>
-                  </Box>
-                </Box>
-              ) : (
-                <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                  {!currentTrip && (
-                    <TripListView
-                      trips={filteredTrips}
-                      tripFilter={tripFilter}
-                      onTripFilterChange={setTripFilter}
-                      onTripSelect={fetchTripDetails}
-                      onTripDelete={handleDeleteTrip}
-                      onCreateTrip={() => setIsCreateTripModalOpen(true)}
-                    />
-                  )}
-                  {currentTrip && (
-                    <TripDetailView
-                      trip={currentTrip}
-                      dayLocations={dayLocations}
-                      dayFeatures={dayFeatures}
-                      onBack={() => setCurrentTrip(null)}
-                      onAddLocation={(id, date) => setSelectedDayForLocation({ id, date })}
-                      onAddFeature={(id, date) => setSelectedDayForFeature({ id, date })}
-                      onEditItem={(item, type) => setEditingItem({ item, type })}
-                      onDeleteItem={(item, dayId) => {
-                        if (item.type === "location") {
-                          setDeleteConfirmation({
-                            type: "location",
-                            data: { id: item.id, dayId },
-                          })
-                        } else {
-                          setDeleteConfirmation({
-                            type: "feature",
-                            data: { item: item as TripFeature, dayId },
-                          })
-                        }
-                      }}
-                      onMoveItem={handleMoveItem}
-                      onFlyTo={onFlyTo}
-                      onViewFeature={setViewingFeature}
-                    />
-                  )}
-                </Box>
-              )}
-            </Box>
+      <UserAuthSection
+        email={email}
+        userId={userId}
+        setUserId={setUserId}
+        logout={() => setDeleteConfirmation({ type: "logout", data: null })}
+        onLoginClick={() => setIsAuthModalOpen(true)}
+      />
 
-            <Box sx={{ p: 2, borderTop: 1, borderColor: "divider", bgcolor: "background.default" }}>
-              {email ? (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  <Typography variant="subtitle2">Logged in as:</Typography>
-                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                    {email}
-                  </Typography>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    color="error"
-                    onClick={() => {
-                      setDeleteConfirmation({ type: "logout", data: null })
-                    }}
-                  >
-                    Logout
-                  </Button>
-                </Box>
-              ) : (
-                <>
-                  <Box sx={{ mb: 2 }}>
-                    <Button fullWidth variant="contained" onClick={() => setIsAuthModalOpen(true)}>
-                      Login / Sign Up
-                    </Button>
-                  </Box>
-                  <Typography variant="subtitle2" gutterBottom>
-                    Guest Sync
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{ fontFamily: "monospace", bgcolor: "action.hover", p: 0.5, borderRadius: 1 }}
-                    >
-                      {userId}
-                    </Typography>
-                    <Button
-                      size="small"
-                      startIcon={<MdContentCopy />}
-                      onClick={() => {
-                        navigator.clipboard.writeText(userId)
-                      }}
-                    >
-                      Copy
-                    </Button>
-                  </Box>
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <TextField
-                      size="small"
-                      label="Enter ID to Sync"
-                      value={inputUserId}
-                      onChange={(e) => setInputUserId(e.target.value)}
-                      fullWidth
-                    />
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() => {
-                        if (inputUserId) {
-                          setUserId(inputUserId)
-                          setInputUserId("")
-                        }
-                      }}
-                    >
-                      Sync
-                    </Button>
-                  </Box>
-                </>
-              )}
-            </Box>
-          </Box>
-        </Drawer>
-        <AuthModal open={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-        <CreateTripModal
-          open={isCreateTripModalOpen}
-          onClose={() => setIsCreateTripModalOpen(false)}
-          onCreateTrip={handleCreateTrip}
-        />
-        <CategoryContextMenu
-          contextMenu={contextMenu}
-          contextMenuTab={contextMenuTab}
-          handleClose={handleClose}
-          moveCategory={moveCategory}
-          handleRenameCategory={handleRenameCategory}
-          handleAddCategory={handleAddCategory}
-          handleRemoveCategory={handleRemoveCategory}
-        />
-        <FeatureContextMenu
-          contextMenu={contextMenu}
-          contextMenuFeature={contextMenuFeature}
-          handleClose={handleClose}
-          handleDuplicate={handleDuplicate}
-          handleRemoveFromList={handleRemoveFromList}
-          handleRemoveCompletely={handleRemoveCompletely}
-        />
-        <AddFeatureModal
-          open={!!selectedDayForFeature}
-          onClose={() => setSelectedDayForFeature(null)}
-          onAddFeature={handleAddFeature}
-          dayDate={selectedDayForFeature?.date || ""}
-        />
-        <AddLocationModal
-          open={!!selectedDayForLocation}
-          onClose={() => setSelectedDayForLocation(null)}
-          onAddLocation={handleAddLocation}
-          dayDate={selectedDayForLocation?.date || ""}
-        />
-        <EditItemModal
-          open={!!editingItem}
-          onClose={() => setEditingItem(null)}
-          onSave={handleSaveEdit}
-          item={editingItem?.item || null}
-          type={editingItem?.type === "Feature" ? "feature" : "location"}
-          globalAnimationConfig={currentTrip?.animation_config}
-        />
-        <FeatureDetailsModal open={!!viewingFeature} onClose={() => setViewingFeature(null)} feature={viewingFeature} />
-        <Dialog
-          open={deleteConfirmation.type !== null}
-          onClose={() => setDeleteConfirmation({ type: null, data: null })}
-          disableEnforceFocus
-          disableRestoreFocus
-          sx={{ zIndex: (theme) => theme.zIndex.drawer + 2 }}
-        >
-          <DialogTitle>
-            {deleteConfirmation.type === "feature" && "Delete Feature?"}
-            {deleteConfirmation.type === "location" && "Delete Location?"}
-            {deleteConfirmation.type === "trip" && "Delete Trip?"}
-            {deleteConfirmation.type === "logout" && "Logout?"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {deleteConfirmation.type === "feature" &&
-                "Are you sure you want to remove this feature from the trip day?"}
-              {deleteConfirmation.type === "location" &&
-                "Are you sure you want to delete this location from the trip day?"}
-              {deleteConfirmation.type === "trip" &&
-                "Are you sure you want to delete this trip? This action cannot be undone."}
-              {deleteConfirmation.type === "logout" && "Are you sure you want to logout?"}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDeleteConfirmation({ type: null, data: null })}>Cancel</Button>
-            <Button
-              onClick={() => {
-                if (deleteConfirmation.type === "location") {
-                  const data = deleteConfirmation.data as DeleteLocationData
-                  deleteLocation(data.id, data.dayId)
-                } else if (deleteConfirmation.type === "feature") {
-                  // Delete feature from trip day using saved_id
-                  const data = deleteConfirmation.data as DeleteFeatureData
-                  const savedId = data.item.saved_id
-                  if (savedId) {
-                    deleteFeature(savedId, data.dayId)
-                  }
-                } else if (deleteConfirmation.type === "trip") {
-                  const data = deleteConfirmation.data as DeleteTripData
-                  deleteTrip(data.id)
-                } else if (deleteConfirmation.type === "logout") {
-                  logout()
-                }
+      <AuthModal open={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
+      <CreateTripModal
+        open={isCreateTripModalOpen}
+        onClose={() => setIsCreateTripModalOpen(false)}
+        onCreateTrip={handleCreateTrip}
+      />
+
+      <AddLocationModal
+        open={!!selectedDayForLocation}
+        onClose={() => setSelectedDayForLocation(null)}
+        onAddLocation={handleAddLocation}
+        dayDate={selectedDayForLocation?.date || ""}
+      />
+
+      <AddFeatureModal
+        open={!!selectedDayForFeature}
+        onClose={() => setSelectedDayForFeature(null)}
+        onAddFeature={handleAddFeature}
+        dayDate={selectedDayForFeature?.date || ""}
+      />
+
+      <EditItemModal
+        open={!!editingItem}
+        onClose={() => setEditingItem(null)}
+        item={editingItem?.item || null}
+        type={editingItem?.type || "location"}
+        onSave={(updatedItem) => {
+          // Implement save logic here or pass a handler
+          console.log("Save item:", updatedItem)
+          setEditingItem(null)
+        }}
+      />
+
+      <FeatureDetailsModal feature={viewingFeature} onClose={() => setViewingFeature(null)} open={!!viewingFeature} />
+
+      <CategoryContextMenu
+        contextMenu={contextMenu}
+        contextMenuTab={contextMenuTab}
+        handleClose={handleClose}
+        moveCategory={moveCategory}
+        handleRenameCategory={handleRenameCategory}
+        handleAddCategory={handleAddCategory}
+        handleRemoveCategory={handleRemoveCategory}
+      />
+
+      <FeatureContextMenu
+        contextMenu={contextMenu}
+        contextMenuFeature={contextMenuFeature}
+        handleClose={handleClose}
+        handleDuplicate={handleDuplicate}
+        handleRemoveFromList={handleRemoveFromList}
+        handleRemoveCompletely={handleRemoveCompletely}
+      />
+
+      <Dialog open={!!deleteConfirmation.type} onClose={() => setDeleteConfirmation({ type: null, data: null })}>
+        <DialogTitle>
+          {deleteConfirmation.type === "trip"
+            ? "Delete Trip"
+            : deleteConfirmation.type === "location"
+              ? "Delete Location"
+              : deleteConfirmation.type === "feature"
+                ? "Delete Feature"
+                : "Logout"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {deleteConfirmation.type === "trip"
+              ? "Are you sure you want to delete this trip? This action cannot be undone."
+              : deleteConfirmation.type === "location"
+                ? "Are you sure you want to delete this location from the day?"
+                : deleteConfirmation.type === "feature"
+                  ? "Are you sure you want to delete this feature from the day?"
+                  : "Are you sure you want to logout? Your unsaved local data might be lost."}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmation({ type: null, data: null })}>Cancel</Button>
+          <Button
+            onClick={() => {
+              if (deleteConfirmation.type === "trip") {
+                confirmDeleteTrip()
+              } else if (deleteConfirmation.type === "location") {
+                const { id, dayId } = deleteConfirmation.data as DeleteLocationData
+                setIsLoading(true)
+                deleteLocation(id, dayId)
+                  .then(() => {
+                    setDeleteConfirmation({ type: null, data: null })
+                    showSuccess("Location deleted successfully")
+                  })
+                  .catch((error) => {
+                    console.error("Error deleting location:", error)
+                    showError("Failed to delete location")
+                  })
+                  .finally(() => setIsLoading(false))
+              } else if (deleteConfirmation.type === "feature") {
+                const { item, dayId } = deleteConfirmation.data as DeleteFeatureData
+                setIsLoading(true)
+                deleteFeature(item.saved_id || item.properties.id, dayId)
+                  .then(() => {
+                    setDeleteConfirmation({ type: null, data: null })
+                    showSuccess("Feature deleted successfully")
+                  })
+                  .catch((error) => {
+                    console.error("Error deleting feature:", error)
+                    showError("Failed to delete feature")
+                  })
+                  .finally(() => setIsLoading(false))
+              } else if (deleteConfirmation.type === "logout") {
+                logout()
                 setDeleteConfirmation({ type: null, data: null })
-              }}
-              color="error"
-              variant="contained"
-            >
-              {deleteConfirmation.type === "logout" ? "Logout" : "Delete"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </FeatureDragContext>
-    </>
+              }
+            }}
+            color="error"
+            autoFocus
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Drawer>
   )
 }
 
