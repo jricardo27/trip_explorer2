@@ -126,6 +126,15 @@ export const FeatureListView: React.FC<FeatureListViewProps> = ({
           </Box>
           <Collapse in={showAdvancedFilters}>
             <Box sx={{ mb: 2 }}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Filter by Location"
+                placeholder="Country, state, city, or address..."
+                value={advancedFilters.locationQuery || ""}
+                onChange={(e) => setAdvancedFilters((prev) => ({ ...prev, locationQuery: e.target.value }))}
+                sx={{ mb: 2 }}
+              />
               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                 {availableTypes.slice(0, 20).map((type) => (
                   <Chip

@@ -6,6 +6,7 @@ export interface FeatureFilters {
   searchQuery: string
   types: string[]
   tags: string[]
+  locationQuery?: string
 }
 
 export const filterFeaturesByType = (
@@ -49,6 +50,26 @@ export const filterFeaturesByType = (
       const featureTags = (feat.properties.tags as string[]) || []
       const hasMatchingTag = filters.tags.some((tag) => featureTags.includes(tag))
       if (!hasMatchingTag) return false
+    }
+
+    // Location filter
+    if (filters.locationQuery) {
+      const query = filters.locationQuery.toLowerCase()
+      const country = (feat.properties.country as string)?.toLowerCase() || ""
+      const state = (feat.properties.state as string)?.toLowerCase() || ""
+      const city = (feat.properties.city as string)?.toLowerCase() || ""
+      const address = (feat.properties.address as string)?.toLowerCase() || ""
+      const region = (feat.properties.region as string)?.toLowerCase() || ""
+
+      if (
+        !country.includes(query) &&
+        !state.includes(query) &&
+        !city.includes(query) &&
+        !address.includes(query) &&
+        !region.includes(query)
+      ) {
+        return false
+      }
     }
 
     return true
