@@ -1,5 +1,5 @@
 import { Box, TextField, Button, Typography, Collapse, Stack, Chip } from "@mui/material"
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useEffect } from "react"
 import { FaFilter } from "react-icons/fa"
 
 import { SavedFeature, SavedFeatures } from "../../../contexts/SavedFeaturesContext"
@@ -21,6 +21,7 @@ interface FeatureListViewProps {
 }
 
 const excludedProperties = ["id", "images", "style"] as const
+const FILTER_STORAGE_KEY = "featureFilters"
 
 export const FeatureListView: React.FC<FeatureListViewProps> = ({
   savedFeatures,
@@ -32,13 +33,36 @@ export const FeatureListView: React.FC<FeatureListViewProps> = ({
   selectedFeature,
   setSelectedFeature,
 }) => {
-  const [searchQuery, setSearchQuery] = useState<string>("")
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
+  // Load saved filters from localStorage
+  const loadSavedFilters = (): FeatureFilters & { showAdvancedFilters?: boolean } => {
+    try {
+      const saved = localStorage.getItem(FILTER_STORAGE_KEY)
+      if (saved) {
+        return JSON.parse(saved)
+      }
+    } catch (error) {
+      console.error("Failed to load saved filters:", error)
+    }
+    return { searchQuery: "", types: [], tags: [], showAdvancedFilters: false }
+  }
+
+  const savedFilters = loadSavedFilters()
+  const [searchQuery, setSearchQuery] = useState<string>(savedFilters.searchQuery)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(savedFilters.showAdvancedFilters || false)
   const [advancedFilters, setAdvancedFilters] = useState<FeatureFilters>({
-    searchQuery: "",
-    types: [],
-    tags: [],
+    searchQuery: savedFilters.searchQuery,
+    types: savedFilters.types,
+    tags: savedFilters.tags,
   })
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    const filtersToSave = {
+      ...advancedFilters,
+      showAdvancedFilters,
+    }
+    localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filtersToSave))
+  }, [advancedFilters, showAdvancedFilters])
 
   const { itemsWithOriginalIndex } = useFeatureSelection(savedFeatures, selectedTab)
 
