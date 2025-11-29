@@ -21,9 +21,11 @@ import { MdHelpOutline, MdLocationOn } from "react-icons/md"
 import { useNavigate, Link } from "react-router-dom"
 
 import SavedFeaturesContext from "../../contexts/SavedFeaturesContext"
+import { useTripContext } from "../../contexts/TripContext"
 import WelcomeModal from "../WelcomeModal/WelcomeModal"
 
 import { importBackup } from "./importBackup"
+import { importTrip } from "./importTrip"
 import { saveAsBackup } from "./saveAsBackup"
 import { saveAsGeoJson } from "./saveAsGeoJson"
 import { saveAsKml } from "./saveAsKml"
@@ -55,6 +57,7 @@ const destinations = [
 const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
   const location = window.location.pathname
   const { savedFeatures, setSavedFeatures } = useContext(SavedFeaturesContext)!
+  const { createTrip, addLocationToDay, addFeatureToDay } = useTripContext()
   const navigate = useNavigate()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -156,6 +159,13 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
                 />
               </Tooltip>
               <Menu id="import-menu" anchorEl={importAnchorEl} open={importMenuIsOpen} onClose={closeImportMenu}>
+                <MenuItem
+                  onClick={closeMenuAfterAction(() => {
+                    importTrip(createTrip, addLocationToDay, addFeatureToDay)
+                  })}
+                >
+                  Import Trip
+                </MenuItem>
                 <MenuItem
                   onClick={closeMenuAfterAction(() => {
                     importBackup("override", setSavedFeatures)

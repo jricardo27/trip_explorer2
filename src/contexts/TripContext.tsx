@@ -112,7 +112,7 @@ interface TripContextType {
   deleteLocation: (locationId: string, dayId: string) => Promise<void>
   addFeatureToDay: (dayId: string, feature: unknown) => Promise<void>
   deleteFeature: (savedId: string, dayId: string) => Promise<void>
-  createTrip: (name: string, startDate: string, endDate: string) => Promise<void>
+  createTrip: (name: string, startDate: string, endDate: string) => Promise<Trip>
   deleteTrip: (id: string) => Promise<void>
   updateTrip: (id: string, updates: Partial<Trip>) => Promise<void>
   setCurrentTrip: (trip: Trip | null) => void
@@ -189,8 +189,8 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [API_URL],
   )
 
-  const createTrip = async (name: string, startDate: string, endDate: string) => {
-    if (!userId) return
+  const createTrip = async (name: string, startDate: string, endDate: string): Promise<Trip> => {
+    if (!userId) throw new Error("User ID is required")
     setLoading(true)
     try {
       const response = await fetch(`${API_URL}/api/trips`, {
@@ -199,7 +199,14 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({ user_id: userId, name, start_date: startDate, end_date: endDate }),
       })
       if (response.ok) {
+        const createdTrip = await response.json()
         await fetchTrips()
+        // Fetch full trip details including days
+        const detailsResponse = await fetch(`${API_URL}/api/trips/${createdTrip.id}`)
+        if (detailsResponse.ok) {
+          return await detailsResponse.json()
+        }
+        return createdTrip
       } else {
         throw new Error("Failed to create trip")
       }
