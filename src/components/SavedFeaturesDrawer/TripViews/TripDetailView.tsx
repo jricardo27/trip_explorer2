@@ -1,4 +1,15 @@
-import { Box, Typography, Button, List, ListItem, ListItemText, IconButton, Tooltip, Collapse } from "@mui/material"
+import {
+  Box,
+  Typography,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Tooltip,
+  Collapse,
+  Avatar,
+} from "@mui/material"
 import React, { useState } from "react"
 import { FaDownload } from "react-icons/fa"
 import {
@@ -16,7 +27,9 @@ import {
 } from "react-icons/md"
 
 import { Trip, DayLocation, TripFeature } from "../../../contexts/TripContext"
+import { getCategoryColor } from "../../../utils/colorUtils"
 import { calculateDistance, formatDistance, estimateTravelTime, formatTravelTime } from "../../../utils/distanceUtils"
+import { getFeatureThumbnail, getCategoryPlaceholder } from "../../../utils/imageUtils"
 import { calculateEndTime } from "../../../utils/timeUtils"
 import { exportTripToGeoJSON, exportTripToKML } from "../../TopMenu/exportTrip"
 import { exportTripToExcel } from "../../TopMenu/exportTripToExcel"
@@ -230,6 +243,25 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
 
                         const endTime = item.end_time || calculateEndTime(item.start_time, item.duration_minutes)
 
+                        // Determine color based on type
+                        const itemColor = isLocation
+                          ? "grey.400" // Locations get a neutral color
+                          : getCategoryColor(
+                              (item.properties.type as string) ||
+                                (item.properties.category as string) ||
+                                (item.properties.amenity as string),
+                            )
+
+                        // Get thumbnail
+                        const thumbnail = !isLocation ? getFeatureThumbnail(item.properties) : null
+                        const placeholder = !isLocation
+                          ? getCategoryPlaceholder(
+                              (item.properties.type as string) ||
+                                (item.properties.category as string) ||
+                                (item.properties.amenity as string),
+                            )
+                          : null
+
                         // Calculate distance from previous item
                         let distanceInfo: { distance: number; time: number } | null = null
                         if (idx > 0) {
@@ -282,6 +314,9 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                                 borderColor: "divider",
                                 flexDirection: "column",
                                 alignItems: "stretch",
+                                borderLeft: 4,
+                                borderLeftColor: itemColor,
+                                ml: 1, // Add margin to offset the border
                               }}
                             >
                               <Box
@@ -309,6 +344,18 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                                       <MdArrowDownward fontSize="small" />
                                     </IconButton>
                                   </Box>
+
+                                  {/* Thumbnail or Icon */}
+                                  {!isLocation && (
+                                    <Avatar
+                                      src={thumbnail || placeholder || undefined}
+                                      variant="rounded"
+                                      sx={{ mr: 2, width: 40, height: 40, bgcolor: itemColor }}
+                                    >
+                                      {!thumbnail && !placeholder && <MdLocationOn />}
+                                    </Avatar>
+                                  )}
+
                                   <ListItemText
                                     primary={
                                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
