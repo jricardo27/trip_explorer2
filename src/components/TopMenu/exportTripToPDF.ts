@@ -68,10 +68,9 @@ export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeat
         // Table for items
         const tableBody = items.map((item) => {
           const isLocation = "city" in item
-          const name = isLocation ? item.city : (item as TripFeature).properties?.name || "Unknown"
+          let name = isLocation ? item.city : (item as TripFeature).properties?.name || "Unknown"
           const type = isLocation ? "Location" : (item as TripFeature).properties?.type || "Feature"
-
-          let notes = isLocation ? item.notes || "" : (item as TripFeature).properties?.description || ""
+          const notes = isLocation ? item.notes || "" : (item as TripFeature).properties?.description || ""
 
           if (!isLocation) {
             const feat = item as TripFeature
@@ -82,8 +81,11 @@ export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeat
               (props.formatted_phone_number as string) ||
               (props.international_phone_number as string)
 
-            if (address) notes += `\nAddress: ${address}`
-            if (phone) notes += `\nPhone: ${phone}`
+            if (address || phone) {
+              name += "\n\n"
+              if (address) name += `Address: ${address}\n`
+              if (phone) name += `Phone: ${phone}`
+            }
           }
 
           let cost = ""
