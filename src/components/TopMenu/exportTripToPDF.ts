@@ -107,7 +107,7 @@ export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeat
           headStyles: { fillColor: [25, 118, 210] },
           margin: { left: 20 },
           columnStyles: {
-            0: { cellWidth: 50, fontStyle: "bold" },
+            0: { cellWidth: 50 },
             1: { cellWidth: 30 },
             2: { cellWidth: "auto" },
             3: { cellWidth: 20, halign: "right" },
