@@ -120,6 +120,7 @@ interface TripContextType {
   updateTrip: (id: string, updates: Partial<Trip>) => Promise<void>
   setCurrentTrip: (trip: Trip | null) => void
   reorderItems: (dayId: string, items: { id: string; type: "location" | "feature"; order: number }[]) => Promise<void>
+  copyTrip: (tripId: string, newName: string, startDate: string) => Promise<Trip>
 }
 
 const TripContext = createContext<TripContextType | undefined>(undefined)
@@ -255,6 +256,35 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error("Failed to update trip:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const copyTrip = async (tripId: string, newName: string, startDate: string): Promise<Trip> => {
+    if (!userId) throw new Error("User ID is required")
+    setLoading(true)
+    try {
+      const response = await fetch(`${API_URL}/api/trips/${tripId}/copy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, name: newName, start_date: startDate }),
+      })
+      if (response.ok) {
+        const copiedTrip = await response.json()
+        await fetchTrips()
+        // Fetch full trip details including days
+        const detailsResponse = await fetch(`${API_URL}/api/trips/${copiedTrip.id}`)
+        if (detailsResponse.ok) {
+          return await detailsResponse.json()
+        }
+        return copiedTrip
+      } else {
+        throw new Error("Failed to copy trip")
+      }
+    } catch (error) {
+      console.error(error)
+      throw error
     } finally {
       setLoading(false)
     }
@@ -399,6 +429,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateTrip,
         setCurrentTrip,
         reorderItems,
+        copyTrip,
       }}
     >
       {children}

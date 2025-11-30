@@ -6,7 +6,7 @@ import { useMap } from "react-leaflet"
 import { toast } from "react-toastify"
 
 import MapComponent, { MapComponentProps } from "../../components/MapComponent/MapComponent"
-import SavedFeaturesDrawer from "../../components/SavedFeaturesDrawer/SavedFeaturesDrawer"
+import { useMapControl } from "../../contexts/MapControlContext"
 import SavedFeaturesContext, { DEFAULT_CATEGORY } from "../../contexts/SavedFeaturesContext"
 import { useTripContext, Trip, DayLocation, TripFeature } from "../../contexts/TripContext"
 import { GeoJsonCollection, GeoJsonFeature } from "../../data/types"
@@ -45,16 +45,10 @@ const MapCapture = ({ onMapReady }: { onMapReady: (map: L.Map) => void }) => {
   return null
 }
 
-export const FeatureMap = ({
-  geoJsonOverlaySources,
-  drawerOpen,
-  closeDrawer,
-  isPinned,
-  onTogglePin,
-  ...mapProps
-}: FeatureMapProps): React.ReactNode => {
+export const FeatureMap = ({ geoJsonOverlaySources, ...mapProps }: FeatureMapProps): React.ReactNode => {
   const { addFeature, savedFeatures } = useContext(SavedFeaturesContext)!
   const { trips, currentTrip, dayLocations, dayFeatures, updateTrip } = useTripContext()
+  const { registerFlyTo, unregisterFlyTo } = useMapControl()
 
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
   const [bounds, setBounds] = useState<L.LatLngBounds | null>(null)
@@ -154,13 +148,22 @@ export const FeatureMap = ({
         mapInstance.flyTo([lat, lng], 15, { duration: 1.5 })
         // If on mobile/small screen, maybe close drawer? But user might want to keep it open.
         // If pinned, definitely keep open.
-        if (!isPinned && isXs) {
-          closeDrawer()
-        }
+        // Since drawer is now global, we might want to close it via a global action if needed,
+        // but for now we just fly.
       }
     },
-    [mapInstance, isPinned, isXs, closeDrawer],
+    [mapInstance],
   )
+
+  // Register flyTo when mapInstance changes
+  useEffect(() => {
+    if (mapInstance) {
+      registerFlyTo(handleFlyTo)
+    }
+    return () => {
+      unregisterFlyTo()
+    }
+  }, [mapInstance, registerFlyTo, unregisterFlyTo, handleFlyTo])
 
   const dayIdToTripMap = useMemo(() => {
     const map = new Map<string, Trip>()
@@ -444,13 +447,6 @@ export const FeatureMap = ({
           </Paper>
         </Box>
       </MapComponent>
-      <SavedFeaturesDrawer
-        drawerOpen={drawerOpen}
-        onClose={closeDrawer}
-        isPinned={!!isPinned}
-        onTogglePin={onTogglePin || (() => {})}
-        onFlyTo={handleFlyTo}
-      />
     </>
   )
 }

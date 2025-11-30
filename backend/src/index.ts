@@ -3,7 +3,6 @@ import cors from "cors"
 import express, { Request, Response } from "express"
 
 import { query } from "./db"
-import tripTemplatesRouter from "./routes/tripTemplates"
 
 const app = express()
 app.use(cors())
@@ -447,6 +446,134 @@ app.put("/api/trips/:id", async (req, res) => {
   }
 })
 
+// Copy a trip
+app.post("/api/trips/:id/copy", async (req, res) => {
+  const { id } = req.params
+  const { name, start_date, user_id } = req.body
+
+  if (!name || !start_date || !user_id) {
+    return res.status(400).json({ error: "name, start_date, and user_id are required" })
+  }
+
+  const client = await (await import("./db")).pool.connect()
+
+  try {
+    await client.query("BEGIN")
+
+    // Fetch the source trip
+    const tripResult = await client.query("SELECT * FROM trips WHERE id = $1", [id])
+    if (tripResult.rows.length === 0) {
+      await client.query("ROLLBACK")
+      return res.status(404).json({ error: "Trip not found" })
+    }
+    const sourceTrip = tripResult.rows[0]
+
+    // Fetch source trip days
+    const daysResult = await client.query("SELECT * FROM trip_days WHERE trip_id = $1 ORDER BY day_index", [id])
+
+    // Calculate new end date
+    const startDate = new Date(start_date)
+    const duration = daysResult.rows.length
+    const endDate = new Date(startDate)
+    endDate.setDate(endDate.getDate() + duration - 1)
+
+    // Create new trip
+    const newTripResult = await client.query(
+      "INSERT INTO trips (user_id, name, start_date, end_date, animation_config) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [user_id, name, start_date, endDate.toISOString().split("T")[0], sourceTrip.animation_config || {}],
+    )
+    const newTrip = newTripResult.rows[0]
+
+    // Copy days, locations, and features
+    for (let i = 0; i < daysResult.rows.length; i++) {
+      const sourceDay = daysResult.rows[i]
+      const newDayDate = new Date(startDate)
+      newDayDate.setDate(newDayDate.getDate() + i)
+
+      // Create new day
+      const newDayResult = await client.query(
+        "INSERT INTO trip_days (trip_id, day_index, date) VALUES ($1, $2, $3) RETURNING *",
+        [newTrip.id, i, newDayDate.toISOString().split("T")[0]],
+      )
+      const newDay = newDayResult.rows[0]
+
+      // Copy locations
+      const locationsResult = await client.query(
+        "SELECT * FROM day_locations WHERE trip_day_id = $1 ORDER BY visit_order",
+        [sourceDay.id],
+      )
+
+      for (const location of locationsResult.rows) {
+        await client.query(
+          `INSERT INTO day_locations (
+            trip_day_id, country, country_code, city, town, latitude, longitude,
+            visit_order, notes, transport_mode, transport_details, transport_cost,
+            duration_minutes, start_time, end_time, animation_config, location_coords
+          ) VALUES ($1, $2, $3, $4, $5, $6::DECIMAL, $7::DECIMAL, $8, $9, $10, $11, $12, $13, $14, $15, $16, 
+            ST_SetSRID(ST_MakePoint($7::float8, $6::float8), 4326))`,
+          [
+            newDay.id,
+            location.country,
+            location.country_code,
+            location.city,
+            location.town,
+            location.latitude,
+            location.longitude,
+            location.visit_order,
+            location.notes,
+            location.transport_mode,
+            location.transport_details,
+            location.transport_cost,
+            location.duration_minutes,
+            location.start_time,
+            location.end_time,
+            location.animation_config || {},
+          ],
+        )
+      }
+
+      // Copy features
+      const featuresResult = await client.query(
+        "SELECT * FROM saved_features WHERE trip_day_id = $1 ORDER BY visit_order",
+        [sourceDay.id],
+      )
+
+      for (const feature of featuresResult.rows) {
+        await client.query(
+          `INSERT INTO saved_features (
+            user_id, list_name, feature, trip_day_id, visit_order,
+            transport_mode, transport_details, transport_cost, duration_minutes,
+            start_time, end_time, animation_config
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+          [
+            user_id,
+            feature.list_name,
+            feature.feature,
+            newDay.id,
+            feature.visit_order,
+            feature.transport_mode,
+            feature.transport_details,
+            feature.transport_cost,
+            feature.duration_minutes,
+            feature.start_time,
+            feature.end_time,
+            feature.animation_config || {},
+          ],
+        )
+      }
+    }
+
+    await client.query("COMMIT")
+    res.status(201).json(newTrip)
+  } catch (err) {
+    await client.query("ROLLBACK")
+    console.error("Error copying trip:", err)
+    res.status(500).json({ error: "Internal server error" })
+  } finally {
+    client.release()
+  }
+})
+
 // Get features for a specific trip day
 app.get("/api/trip-days/:id/features", async (req, res) => {
   const { id } = req.params
@@ -783,9 +910,6 @@ app.delete("/api/trip-days/:dayId/features/:savedId", async (req, res) => {
     res.status(500).json({ error: "Internal server error" })
   }
 })
-
-// Trip Templates routes
-app.use("/api/trip-templates", tripTemplatesRouter)
 
 export { app }
 

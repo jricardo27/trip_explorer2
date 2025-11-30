@@ -148,37 +148,39 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsGeoJson(savedFeatures))}>To GeoJson</MenuItem>
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsKml(savedFeatures))}>To KML</MenuItem>
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsBackup(savedFeatures))}>Export backup</MenuItem>
-                {currentTrip && (
-                  <>
-                    <MenuItem divider />
-                    <MenuItem
-                      onClick={closeMenuAfterAction(() =>
-                        exportTripToGeoJSON({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
-                      )}
-                    >
-                      Export Trip (GeoJSON)
-                    </MenuItem>
-                    <MenuItem
-                      onClick={closeMenuAfterAction(() =>
-                        exportTripToKML({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
-                      )}
-                    >
-                      Export Trip (KML)
-                    </MenuItem>
-                    <MenuItem
-                      onClick={closeMenuAfterAction(() =>
-                        exportTripToExcel({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
-                      )}
-                    >
-                      Export Trip (Excel)
-                    </MenuItem>
-                    <MenuItem
-                      onClick={closeMenuAfterAction(() => exportTripToPDF(currentTrip, dayLocations, dayFeatures))}
-                    >
-                      Export Trip (PDF)
-                    </MenuItem>
-                  </>
-                )}
+                {currentTrip && [
+                  <MenuItem key="divider" divider />,
+                  <MenuItem
+                    key="geojson"
+                    onClick={closeMenuAfterAction(() =>
+                      exportTripToGeoJSON({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
+                    )}
+                  >
+                    Export Trip (GeoJSON)
+                  </MenuItem>,
+                  <MenuItem
+                    key="kml"
+                    onClick={closeMenuAfterAction(() =>
+                      exportTripToKML({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
+                    )}
+                  >
+                    Export Trip (KML)
+                  </MenuItem>,
+                  <MenuItem
+                    key="excel"
+                    onClick={closeMenuAfterAction(() =>
+                      exportTripToExcel({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
+                    )}
+                  >
+                    Export Trip (Excel)
+                  </MenuItem>,
+                  <MenuItem
+                    key="pdf"
+                    onClick={closeMenuAfterAction(() => exportTripToPDF(currentTrip, dayLocations, dayFeatures))}
+                  >
+                    Export Trip (PDF)
+                  </MenuItem>,
+                ]}
               </Menu>
             </Grid2>
             <Grid2 size={2}>

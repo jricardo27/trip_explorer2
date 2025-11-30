@@ -9,8 +9,13 @@ import {
   Tooltip,
   Collapse,
   Avatar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from "@mui/material"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { FaDownload } from "react-icons/fa"
 import {
   MdArrowBack,
@@ -24,9 +29,10 @@ import {
   MdVisibility,
   MdExpandMore,
   MdExpandLess,
+  MdContentCopy,
 } from "react-icons/md"
 
-import { Trip, DayLocation, TripFeature } from "../../../contexts/TripContext"
+import { Trip, DayLocation, TripFeature, useTripContext } from "../../../contexts/TripContext"
 import { getCategoryColor } from "../../../utils/colorUtils"
 import { calculateDistance, formatDistance, estimateTravelTime, formatTravelTime } from "../../../utils/distanceUtils"
 import { getFeatureThumbnail, getCategoryPlaceholder } from "../../../utils/imageUtils"
@@ -63,27 +69,38 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   onFlyTo,
   onViewFeature,
 }) => {
-  // State to track which days are expanded (all expanded by default)
-  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set(trip.days?.map((d) => d.id) || []))
+  const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
+  const [copyDialogOpen, setCopyDialogOpen] = useState(false)
+  const [newTripName, setNewTripName] = useState("")
+  const [newStartDate, setNewStartDate] = useState("")
+  const { copyTrip } = useTripContext()
+
+  // Initialize all days as expanded
+  useEffect(() => {
+    const initialExpandedState: Record<string, boolean> = {}
+    trip.days?.forEach((day) => {
+      initialExpandedState[day.id] = true
+    })
+    setExpandedDays(initialExpandedState)
+  }, [trip.days])
 
   const toggleDay = (dayId: string) => {
-    setExpandedDays((prev) => {
-      const next = new Set(prev)
-      if (next.has(dayId)) {
-        next.delete(dayId)
-      } else {
-        next.add(dayId)
-      }
-      return next
-    })
+    setExpandedDays((prev) => ({
+      ...prev,
+      [dayId]: !prev[dayId],
+    }))
   }
 
   const expandAll = () => {
-    setExpandedDays(new Set(trip.days?.map((d) => d.id) || []))
+    const next: Record<string, boolean> = {}
+    trip.days?.forEach((d) => {
+      next[d.id] = true
+    })
+    setExpandedDays(next)
   }
 
   const collapseAll = () => {
-    setExpandedDays(new Set())
+    setExpandedDays({})
   }
 
   const handleExport = (format: string) => {
@@ -116,22 +133,23 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
         <Button startIcon={<MdArrowBack />} onClick={onBack}>
           Back to Trips
         </Button>
-        <Button
-          variant="outlined"
-          size="small"
-          startIcon={<FaDownload />}
-          onClick={(e) => {
-            const menu = document.createElement("div")
-            const rect = e.currentTarget.getBoundingClientRect()
-            menu.style.position = "fixed"
-            menu.style.top = `${rect.bottom + 5}px`
-            menu.style.right = `${window.innerWidth - rect.right}px`
-            menu.style.zIndex = "9999"
-            menu.style.background = "white"
-            menu.style.border = "1px solid #ccc"
-            menu.style.borderRadius = "4px"
-            menu.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)"
-            menu.innerHTML = `
+        <Box>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FaDownload />}
+            onClick={(e) => {
+              const menu = document.createElement("div")
+              const rect = e.currentTarget.getBoundingClientRect()
+              menu.style.position = "fixed"
+              menu.style.top = `${rect.bottom + 5}px`
+              menu.style.right = `${window.innerWidth - rect.right}px`
+              menu.style.zIndex = "9999"
+              menu.style.background = "white"
+              menu.style.border = "1px solid #ccc"
+              menu.style.borderRadius = "4px"
+              menu.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)"
+              menu.innerHTML = `
               <div style="padding: 8px 0;">
                 <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="geojson">GeoJSON</div>
                 <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="kml">KML</div>
@@ -139,33 +157,88 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                 <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="pdf">PDF</div>
               </div>
             `
-            document.body.appendChild(menu)
+              document.body.appendChild(menu)
 
-            menu.querySelectorAll(".export-option").forEach((opt) => {
-              opt.addEventListener("mouseenter", () => {
-                ;(opt as HTMLElement).style.background = "#f5f5f5"
+              menu.querySelectorAll(".export-option").forEach((opt) => {
+                opt.addEventListener("mouseenter", () => {
+                  ;(opt as HTMLElement).style.background = "#f5f5f5"
+                })
+                opt.addEventListener("mouseleave", () => {
+                  ;(opt as HTMLElement).style.background = "white"
+                })
+                opt.addEventListener("click", () => {
+                  handleExport(opt.getAttribute("data-format")!)
+                  document.body.removeChild(menu)
+                })
               })
-              opt.addEventListener("mouseleave", () => {
-                ;(opt as HTMLElement).style.background = "white"
-              })
-              opt.addEventListener("click", () => {
-                handleExport(opt.getAttribute("data-format")!)
-                document.body.removeChild(menu)
-              })
-            })
 
-            const closeMenu = () => {
-              if (document.body.contains(menu)) {
-                document.body.removeChild(menu)
+              const closeMenu = () => {
+                if (document.body.contains(menu)) {
+                  document.body.removeChild(menu)
+                }
               }
-            }
-            setTimeout(() => {
-              document.addEventListener("click", closeMenu, { once: true })
-            }, 100)
-          }}
-        >
-          Export
-        </Button>
+              setTimeout(() => {
+                document.addEventListener("click", closeMenu, { once: true })
+              }, 100)
+            }}
+          >
+            Export
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<MdContentCopy />}
+            onClick={() => {
+              setCopyDialogOpen(true)
+              setNewTripName(`${trip.name} (Copy)`)
+              setNewStartDate(new Date().toISOString().split("T")[0])
+            }}
+            sx={{ ml: 1 }}
+          >
+            Copy Trip
+          </Button>
+          <Dialog open={copyDialogOpen} onClose={() => setCopyDialogOpen(false)}>
+            <DialogTitle>Copy Trip</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Trip Name"
+                fullWidth
+                value={newTripName}
+                onChange={(e) => setNewTripName(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                margin="dense"
+                label="Start Date"
+                type="date"
+                fullWidth
+                value={newStartDate}
+                onChange={(e) => setNewStartDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setCopyDialogOpen(false)}>Cancel</Button>
+              <Button
+                onClick={async () => {
+                  try {
+                    await copyTrip(trip.id, newTripName, newStartDate)
+                    setCopyDialogOpen(false)
+                    // Optionally navigate to the new trip or show success message
+                  } catch (error) {
+                    console.error("Failed to copy trip:", error)
+                  }
+                }}
+                variant="contained"
+                disabled={!newTripName || !newStartDate}
+              >
+                Copy
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
       </Box>
       <Typography variant="h5" gutterBottom>
         {trip.name}
@@ -212,7 +285,7 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                 onClick={() => toggleDay(day.id)}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <IconButton size="small">{expandedDays.has(day.id) ? <MdExpandLess /> : <MdExpandMore />}</IconButton>
+                  <IconButton size="small">{expandedDays[day.id] ? <MdExpandLess /> : <MdExpandMore />}</IconButton>
                   <Typography variant="subtitle2">
                     Day {day.day_index + 1} - {new Date(day.date).toLocaleDateString()}
                   </Typography>
@@ -221,7 +294,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                   <Button
                     size="small"
                     startIcon={<MdLocationOn />}
-                    onClick={() => onAddLocation(day.id, new Date(day.date).toLocaleDateString())}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onAddLocation(day.id, new Date(day.date).toLocaleDateString())
+                    }}
                     sx={{ mr: 1 }}
                   >
                     Add Loc
@@ -229,13 +305,16 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                   <Button
                     size="small"
                     startIcon={<MdAdd />}
-                    onClick={() => onAddFeature(day.id, new Date(day.date).toLocaleDateString())}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onAddFeature(day.id, new Date(day.date).toLocaleDateString())
+                    }}
                   >
                     Add Feat
                   </Button>
                 </Box>
               </Box>
-              <Collapse in={expandedDays.has(day.id)} timeout="auto" unmountOnExit>
+              <Collapse in={!!expandedDays[day.id]} timeout="auto" unmountOnExit>
                 <Box sx={{ p: 1 }}>
                   {items.length === 0 ? (
                     <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
