@@ -292,7 +292,29 @@ app.get("/api/trips", async (req, res) => {
 
   try {
     const result = await query("SELECT * FROM trips WHERE user_id = $1 ORDER BY start_date", [user_id])
-    res.json(result.rows)
+    const trips = result.rows
+
+    if (trips.length > 0) {
+      const tripIds = trips.map((t) => t.id)
+      const daysResult = await query(
+        "SELECT id, trip_id, day_index, date FROM trip_days WHERE trip_id = ANY($1) ORDER BY trip_id, day_index",
+        [tripIds],
+      )
+
+      const daysByTrip: Record<string, { id: string; trip_id: string; day_index: number; date: string }[]> = {}
+      daysResult.rows.forEach((day) => {
+        if (!daysByTrip[day.trip_id]) {
+          daysByTrip[day.trip_id] = []
+        }
+        daysByTrip[day.trip_id].push(day)
+      })
+
+      trips.forEach((trip) => {
+        trip.days = daysByTrip[trip.id] || []
+      })
+    }
+
+    res.json(trips)
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: "Internal server error" })

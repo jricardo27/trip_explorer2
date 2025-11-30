@@ -1,3 +1,5 @@
+import { GeoJsonFeature } from "../../data/types"
+
 interface FeatureProperties {
   [key: string]: unknown
 }
@@ -10,9 +12,9 @@ export interface FeatureFilters {
 }
 
 export const filterFeaturesByType = (
-  items: Array<{ feature: unknown; originalIndex: number }>,
+  items: Array<{ feature: GeoJsonFeature; originalIndex: number }>,
   filters: FeatureFilters,
-): Array<{ feature: unknown; originalIndex: number }> => {
+): Array<{ feature: GeoJsonFeature; originalIndex: number }> => {
   return items.filter(({ feature }) => {
     const feat = feature as { properties: FeatureProperties }
 

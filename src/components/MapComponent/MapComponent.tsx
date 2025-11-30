@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import { LayersControl, MapContainer, TileLayer } from "react-leaflet"
 
 import "leaflet/dist/leaflet.css"
-import { useThemeMode } from "../../contexts/ThemeContext"
+import { useThemeMode } from "../../contexts/useThemeMode"
 import { TCoordinate } from "../../data/types"
 import { TLayerOverlay } from "../../data/types/TLayerOverlay"
 

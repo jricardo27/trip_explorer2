@@ -24,6 +24,7 @@ import SavedFeaturesContext from "../../contexts/SavedFeaturesContext"
 import { useTripContext } from "../../contexts/TripContext"
 import WelcomeModal from "../WelcomeModal/WelcomeModal"
 
+import { exportTripToGeoJSON, exportTripToKML } from "./exportTrip"
 import { importBackup } from "./importBackup"
 import { importTrip } from "./importTrip"
 import { saveAsBackup } from "./saveAsBackup"
@@ -58,7 +59,7 @@ const destinations = [
 const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
   const location = window.location.pathname
   const { savedFeatures, setSavedFeatures } = useContext(SavedFeaturesContext)!
-  const { createTrip, addLocationToDay, addFeatureToDay } = useTripContext()
+  const { createTrip, addLocationToDay, addFeatureToDay, currentTrip, dayLocations, dayFeatures } = useTripContext()
   const navigate = useNavigate()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -145,6 +146,25 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsGeoJson(savedFeatures))}>To GeoJson</MenuItem>
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsKml(savedFeatures))}>To KML</MenuItem>
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsBackup(savedFeatures))}>Export backup</MenuItem>
+                {currentTrip && (
+                  <>
+                    <MenuItem divider />
+                    <MenuItem
+                      onClick={closeMenuAfterAction(() =>
+                        exportTripToGeoJSON({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
+                      )}
+                    >
+                      Export Trip (GeoJSON)
+                    </MenuItem>
+                    <MenuItem
+                      onClick={closeMenuAfterAction(() =>
+                        exportTripToKML({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
+                      )}
+                    >
+                      Export Trip (KML)
+                    </MenuItem>
+                  </>
+                )}
               </Menu>
             </Grid2>
             <Grid2 size={2}>

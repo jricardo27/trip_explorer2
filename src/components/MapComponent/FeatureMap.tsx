@@ -323,11 +323,14 @@ export const FeatureMap = ({
           if (!trip) return false
 
           const today = new Date().toISOString().split("T")[0]
+          const tripStart = trip.start_date.split("T")[0]
+          const tripEnd = trip.end_date.split("T")[0]
+
           if (filterMode === "past") {
-            return trip.end_date < today
+            return tripEnd < today
           }
           if (filterMode === "future") {
-            return trip.start_date > today
+            return tripStart > today
           }
           return true
         })

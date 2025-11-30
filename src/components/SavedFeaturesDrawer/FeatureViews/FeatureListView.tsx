@@ -2,7 +2,8 @@ import { Box, TextField, Button, Typography, Collapse, Stack, Chip } from "@mui/
 import React, { useState, useMemo, useEffect } from "react"
 import { FaFilter } from "react-icons/fa"
 
-import { SavedFeature, SavedFeatures } from "../../../contexts/SavedFeaturesContext"
+import { SavedFeaturesStateType, selectionInfo } from "../../../contexts/SavedFeaturesContext"
+import { GeoJsonFeature } from "../../../data/types"
 import { filterFeaturesByType, extractFeatureTypes, FeatureFilters } from "../advancedFilterFeatures"
 import { FeatureList } from "../FeatureList/FeatureList"
 import { filterFeatures } from "../filterFeatures"
@@ -10,14 +11,14 @@ import { useFeatureSelection } from "../hooks/useFeatureSelection"
 import { TabList } from "../TabList/TabList"
 
 interface FeatureListViewProps {
-  savedFeatures: SavedFeatures
-  setSavedFeatures: React.Dispatch<React.SetStateAction<SavedFeatures>>
+  savedFeatures: SavedFeaturesStateType
+  setSavedFeatures: React.Dispatch<React.SetStateAction<SavedFeaturesStateType>>
   selectedTab: string
   handleTabChange: (event: React.SyntheticEvent, newValue: string) => void
-  handleTabContextMenu: (event: React.MouseEvent, tab: string) => void
-  handleContextMenu: (event: React.MouseEvent, feature: SavedFeature) => void
-  selectedFeature: SavedFeature | null
-  setSelectedFeature: (feature: SavedFeature | null) => void
+  handleTabContextMenu: (event: React.MouseEvent | React.TouchEvent, tab: string) => void
+  handleContextMenu: (event: React.MouseEvent | React.TouchEvent, selection: selectionInfo) => void
+  selectedFeature: selectionInfo | null
+  setSelectedFeature: (selection: selectionInfo | null) => void
 }
 
 const excludedProperties = ["id", "images", "style"] as const
@@ -67,7 +68,10 @@ export const FeatureListView: React.FC<FeatureListViewProps> = ({
   const { itemsWithOriginalIndex } = useFeatureSelection(savedFeatures, selectedTab)
 
   const filteredItems = useMemo(() => {
-    const basicFiltered = filterFeatures(itemsWithOriginalIndex, searchQuery)
+    const basicFiltered = filterFeatures(
+      itemsWithOriginalIndex as { feature: GeoJsonFeature; originalIndex: number }[],
+      searchQuery,
+    )
     if (showAdvancedFilters) {
       return filterFeaturesByType(basicFiltered, advancedFilters)
     }
