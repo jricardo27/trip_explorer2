@@ -29,6 +29,7 @@ import { importTrip } from "./importTrip"
 import { saveAsBackup } from "./saveAsBackup"
 import { saveAsGeoJson } from "./saveAsGeoJson"
 import { saveAsKml } from "./saveAsKml"
+import { ThemeToggle } from "./ThemeToggle"
 
 interface TopMenuProps {
   onMenuClick: () => void
@@ -236,6 +237,7 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
               <Tooltip title="Help" aria-label="Help">
                 <Button onClick={handleOpenWelcomeModal} color="inherit" startIcon={<MdHelpOutline />} />
               </Tooltip>
+              <ThemeToggle />
               <WelcomeModal open={openWelcomeModal} onClose={handleCloseWelcomeModal} />
             </Grid2>
           </Grid2>

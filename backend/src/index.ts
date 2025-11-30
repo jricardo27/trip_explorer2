@@ -3,6 +3,7 @@ import cors from "cors"
 import express, { Request, Response } from "express"
 
 import { query } from "./db"
+import tripTemplatesRouter from "./routes/tripTemplates"
 
 const app = express()
 app.use(cors())
@@ -760,6 +761,9 @@ app.delete("/api/trip-days/:dayId/features/:savedId", async (req, res) => {
     res.status(500).json({ error: "Internal server error" })
   }
 })
+
+// Trip Templates routes
+app.use("/api/trip-templates", tripTemplatesRouter)
 
 export { app }
 

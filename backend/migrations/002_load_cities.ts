@@ -5,7 +5,7 @@ import * as readline from "readline"
 import AdmZip from "adm-zip"
 import axios from "axios"
 
-import { pool } from "../db"
+import { pool } from "../src/db"
 
 const COUNTRY_INFO_URL = "https://download.geonames.org/export/dump/countryInfo.txt"
 const DATA_DIR = path.join(__dirname, "../../data")

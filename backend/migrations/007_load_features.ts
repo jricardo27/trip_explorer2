@@ -1,7 +1,7 @@
 import fs from "fs"
 import path from "path"
 
-import { query } from "../db"
+import { query } from "../src/db"
 
 interface MarkerFile {
   path: string

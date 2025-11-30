@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import { LayersControl, MapContainer, TileLayer } from "react-leaflet"
 
 import "leaflet/dist/leaflet.css"
+import { useThemeMode } from "../../contexts/ThemeContext"
 import { TCoordinate } from "../../data/types"
 import { TLayerOverlay } from "../../data/types/TLayerOverlay"
 
@@ -11,6 +12,19 @@ import MapEvents from "./MapEvents"
 import MapStateManager from "./MapStateManager"
 import MapViewUpdater from "./MapViewUpdater"
 import ZoomLevelDisplay from "./ZoomLevelDisplay"
+
+// Theme-aware default tile layers
+const LIGHT_TILES = {
+  url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+}
+
+const DARK_TILES = {
+  url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ' +
+    '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+}
 
 export interface MapComponentProps {
   children?: React.ReactNode
@@ -31,6 +45,9 @@ const MapComponent = ({
   externalOverlayVisibility,
   onOverlayVisibilityChange,
 }: MapComponentProps): React.ReactElement => {
+  const { mode } = useThemeMode()
+  const tiles = mode === "light" ? LIGHT_TILES : DARK_TILES
+
   const [mapState, setMapState] = useState(() => {
     const saved = localStorage.getItem("mapState")
 
@@ -119,6 +136,7 @@ const MapComponent = ({
         <MapStateManager onMapMove={handleMapMove} />
         <MapViewUpdater center={mapState.center} zoom={mapState.zoom} />
         <ZoomLevelDisplay />
+        <TileLayer key={mode} attribution={tiles.attribution} url={tiles.url} maxZoom={20} />
         <LayersControl position="topright">
           {Object.entries(BaseLayers).map(([key, layer]) => (
             <LayersControl.BaseLayer key={key} name={layer.name} checked={activeBaseLayer === layer.name}>
