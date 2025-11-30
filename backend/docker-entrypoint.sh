@@ -5,12 +5,9 @@ until nc -z postgres 5432; do
   sleep 1
 done
 
-echo "Running unique constraint migration..."
-npm run migrate:unique
+echo "Running database migrations..."
+npm run migrate
 
-echo "Running marker data migration..."
-npm run migrate:markers
-npm run migrate:cities
 MIGRATION_EXIT_CODE=$?
 
 if [ $MIGRATION_EXIT_CODE -ne 0 ]; then
@@ -18,11 +15,6 @@ if [ $MIGRATION_EXIT_CODE -ne 0 ]; then
   echo "Continuing to start server..."
 fi
 
-echo "Running transport columns migration..."
-npm run migrate:transport
-
-echo "Running unified columns migration..."
-npm run migrate:unified
-
 echo "Starting server..."
 exec npm run dev
+
