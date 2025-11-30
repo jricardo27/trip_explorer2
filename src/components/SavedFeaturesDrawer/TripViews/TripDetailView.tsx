@@ -104,13 +104,9 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
       case "excel":
         exportTripToExcel(exportData)
         break
-      case "pdf": {
-        // Convert Records to flat arrays for PDF export
-        const flatLocations = Object.values(dayLocations).flat()
-        const flatFeatures = Object.values(dayFeatures).flat()
-        exportTripToPDF(trip, flatLocations, flatFeatures)
+      case "pdf":
+        exportTripToPDF(trip, dayLocations, dayFeatures)
         break
-      }
     }
   }
 

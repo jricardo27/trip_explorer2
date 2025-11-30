@@ -4,22 +4,11 @@ import autoTable from "jspdf-autotable"
 
 import { Trip, DayLocation, TripFeature } from "../../contexts/TripContext"
 
-// Helper to get day items
-const getDayItems = (
-  dayId: string,
-  locations: DayLocation[],
-  features: TripFeature[],
-): (DayLocation | TripFeature)[] => {
-  const dayLocs = locations
-    .filter((l) => l.trip_day_id === dayId)
-    .sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
-  const dayFeats = features
-    .filter((f) => f.trip_day_id === dayId)
-    .sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
-  return [...dayLocs, ...dayFeats].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
-}
-
-export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeatures: TripFeature[]) => {
+export const exportTripToPDF = (
+  trip: Trip,
+  locations: Record<string, DayLocation[]>,
+  features: Record<string, TripFeature[]>,
+) => {
   const doc = new jsPDF()
 
   // --- Cover Page ---
@@ -32,8 +21,11 @@ export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeat
   const dateRange = `${new Date(trip.start_date).toLocaleDateString()} - ${new Date(trip.end_date).toLocaleDateString()}`
   doc.text(dateRange, 20, 40)
 
-  doc.text(`Total Locations: ${dayLocations.length}`, 20, 55)
-  doc.text(`Total Features: ${dayFeatures.length}`, 20, 62)
+  const totalLocations = Object.values(locations).reduce((acc, curr) => acc + curr.length, 0)
+  const totalFeatures = Object.values(features).reduce((acc, curr) => acc + curr.length, 0)
+
+  doc.text(`Total Locations: ${totalLocations}`, 20, 55)
+  doc.text(`Total Features: ${totalFeatures}`, 20, 62)
 
   // Add a horizontal line
   doc.setDrawColor(200)
@@ -58,7 +50,9 @@ export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeat
       doc.text(`Day ${index + 1}: ${new Date(day.date).toLocaleDateString()}`, 20, yPos)
       yPos += 10
 
-      const items = getDayItems(day.id, dayLocations, dayFeatures)
+      const dayLocs = locations[day.id] || []
+      const dayFeats = features[day.id] || []
+      const items = [...dayLocs, ...dayFeats].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
 
       if (items.length === 0) {
         doc.setFontSize(10)

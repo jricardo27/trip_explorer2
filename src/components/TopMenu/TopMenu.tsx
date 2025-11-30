@@ -25,6 +25,8 @@ import { useTripContext } from "../../contexts/TripContext"
 import WelcomeModal from "../WelcomeModal/WelcomeModal"
 
 import { exportTripToGeoJSON, exportTripToKML } from "./exportTrip"
+import { exportTripToExcel } from "./exportTripToExcel"
+import { exportTripToPDF } from "./exportTripToPDF"
 import { importBackup } from "./importBackup"
 import { importTrip } from "./importTrip"
 import { saveAsBackup } from "./saveAsBackup"
@@ -162,6 +164,18 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
                       )}
                     >
                       Export Trip (KML)
+                    </MenuItem>
+                    <MenuItem
+                      onClick={closeMenuAfterAction(() =>
+                        exportTripToExcel({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
+                      )}
+                    >
+                      Export Trip (Excel)
+                    </MenuItem>
+                    <MenuItem
+                      onClick={closeMenuAfterAction(() => exportTripToPDF(currentTrip, dayLocations, dayFeatures))}
+                    >
+                      Export Trip (PDF)
                     </MenuItem>
                   </>
                 )}
