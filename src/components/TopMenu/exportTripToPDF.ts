@@ -70,7 +70,22 @@ export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeat
           const isLocation = "city" in item
           const name = isLocation ? item.city : (item as TripFeature).properties?.name || "Unknown"
           const type = isLocation ? "Location" : (item as TripFeature).properties?.type || "Feature"
-          const notes = isLocation ? item.notes || "" : (item as TripFeature).properties?.description || ""
+
+          let notes = isLocation ? item.notes || "" : (item as TripFeature).properties?.description || ""
+
+          if (!isLocation) {
+            const feat = item as TripFeature
+            const props = feat.properties || {}
+            const address = (props.address as string) || (props.formatted_address as string)
+            const phone =
+              (props.phone as string) ||
+              (props.formatted_phone_number as string) ||
+              (props.international_phone_number as string)
+
+            if (address) notes += `\nAddress: ${address}`
+            if (phone) notes += `\nPhone: ${phone}`
+          }
+
           let cost = ""
           if (isLocation) {
             cost = item.transport_cost ? `$${item.transport_cost}` : ""
