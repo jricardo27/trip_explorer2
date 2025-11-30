@@ -16,7 +16,7 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material"
-import React, { useState, useContext, useCallback, useMemo } from "react"
+import React, { useState, useContext, useCallback } from "react"
 import { MdPushPin, MdClose } from "react-icons/md"
 
 import SavedFeaturesContext from "../../contexts/SavedFeaturesContext"
@@ -130,25 +130,6 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
     data: { id: string } | DeleteLocationData | DeleteFeatureData | null
   }>({ type: null, data: null })
   const [isLoading, setIsLoading] = useState(false)
-
-  const filteredTrips = useMemo(() => {
-    if (!trips) return []
-    const now = new Date()
-    return trips.filter((trip) => {
-      const startDate = new Date(trip.start_date)
-      const endDate = new Date(trip.end_date)
-      switch (tripFilter) {
-        case "future":
-          return startDate > now
-        case "past":
-          return endDate < now
-        case "current":
-          return startDate <= now && endDate >= now
-        default:
-          return true
-      }
-    })
-  }, [trips, tripFilter])
 
   const handleCreateTrip = async (tripData: Omit<Trip, "id" | "created_at" | "updated_at" | "user_id">) => {
     setIsLoading(true)
@@ -341,48 +322,41 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
                   setSelectedFeature={setSelectedFeature}
                 />
               </FeatureDragContext>
+            ) : currentTrip ? (
+              <TripDetailView
+                trip={currentTrip}
+                dayLocations={dayLocations}
+                dayFeatures={dayFeatures}
+                onBack={() => setCurrentTrip(null)}
+                onAddLocation={(id, date) => setSelectedDayForLocation({ id, date })}
+                onAddFeature={(id, date) => setSelectedDayForFeature({ id, date })}
+                onEditItem={(item, type) => setEditingItem({ item, type: type === "Feature" ? "feature" : "location" })}
+                onDeleteItem={(item, dayId) => {
+                  if ("type" in item && item.type === "Feature") {
+                    setDeleteConfirmation({
+                      type: "feature",
+                      data: { item: item as TripFeature, dayId },
+                    })
+                  } else {
+                    setDeleteConfirmation({
+                      type: "location",
+                      data: { id: (item as DayLocation).id, dayId },
+                    })
+                  }
+                }}
+                onMoveItem={handleMoveItem}
+                onFlyTo={onFlyTo}
+                onViewFeature={setViewingFeature}
+              />
             ) : (
-              <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                {!currentTrip && (
-                  <TripListView
-                    trips={filteredTrips}
-                    tripFilter={tripFilter}
-                    onTripFilterChange={setTripFilter}
-                    onTripSelect={fetchTripDetails}
-                    onTripDelete={handleDeleteTrip}
-                    onCreateTrip={() => setIsCreateTripModalOpen(true)}
-                  />
-                )}
-                {currentTrip && (
-                  <TripDetailView
-                    trip={currentTrip}
-                    dayLocations={dayLocations}
-                    dayFeatures={dayFeatures}
-                    onBack={() => setCurrentTrip(null)}
-                    onAddLocation={(id, date) => setSelectedDayForLocation({ id, date })}
-                    onAddFeature={(id, date) => setSelectedDayForFeature({ id, date })}
-                    onEditItem={(item, type) =>
-                      setEditingItem({ item, type: type === "Feature" ? "feature" : "location" })
-                    }
-                    onDeleteItem={(item, dayId) => {
-                      if ("type" in item && item.type === "Feature") {
-                        setDeleteConfirmation({
-                          type: "feature",
-                          data: { item: item as TripFeature, dayId },
-                        })
-                      } else {
-                        setDeleteConfirmation({
-                          type: "location",
-                          data: { id: (item as DayLocation).id, dayId },
-                        })
-                      }
-                    }}
-                    onMoveItem={handleMoveItem}
-                    onFlyTo={onFlyTo}
-                    onViewFeature={setViewingFeature}
-                  />
-                )}
-              </Box>
+              <TripListView
+                trips={trips}
+                tripFilter={tripFilter}
+                onTripFilterChange={setTripFilter}
+                onTripSelect={fetchTripDetails}
+                onTripDelete={handleDeleteTrip}
+                onCreateTrip={() => setIsCreateTripModalOpen(true)}
+              />
             )}
           </>
         )}

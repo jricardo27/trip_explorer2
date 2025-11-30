@@ -33,6 +33,7 @@ import { getFeatureThumbnail, getCategoryPlaceholder } from "../../../utils/imag
 import { calculateEndTime } from "../../../utils/timeUtils"
 import { exportTripToGeoJSON, exportTripToKML } from "../../TopMenu/exportTrip"
 import { exportTripToExcel } from "../../TopMenu/exportTripToExcel"
+import { exportTripToPDF } from "../../TopMenu/exportTripToPDF"
 import { TripSummary } from "../../Trips/TripSummary"
 
 interface TripDetailViewProps {
@@ -86,18 +87,35 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   }
 
   const handleExport = (format: string) => {
+    // dayLocations and dayFeatures are already Records
     const exportData = {
       trip,
       locations: dayLocations,
       features: dayFeatures,
     }
-    if (format === "geojson") exportTripToGeoJSON(exportData)
-    else if (format === "kml") exportTripToKML(exportData)
-    else if (format === "excel") exportTripToExcel(exportData)
+
+    switch (format) {
+      case "geojson":
+        exportTripToGeoJSON(exportData)
+        break
+      case "kml":
+        exportTripToKML(exportData)
+        break
+      case "excel":
+        exportTripToExcel(exportData)
+        break
+      case "pdf": {
+        // Convert Records to flat arrays for PDF export
+        const flatLocations = Object.values(dayLocations).flat()
+        const flatFeatures = Object.values(dayFeatures).flat()
+        exportTripToPDF(trip, flatLocations, flatFeatures)
+        break
+      }
+    }
   }
 
   return (
-    <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
+    <Box sx={{ flexGrow: 1, minHeight: 0, overflowY: "auto", p: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Button startIcon={<MdArrowBack />} onClick={onBack}>
           Back to Trips
@@ -122,6 +140,7 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                 <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="geojson">GeoJSON</div>
                 <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="kml">KML</div>
                 <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="excel">Excel</div>
+                <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="pdf">PDF</div>
               </div>
             `
             document.body.appendChild(menu)

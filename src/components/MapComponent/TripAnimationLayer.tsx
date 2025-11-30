@@ -7,6 +7,8 @@ import { Marker, Polyline, useMap, Tooltip as LeafletTooltip } from "react-leafl
 import { getTransportIconComponent } from "../../constants/transportModes"
 import { getTravelIcon } from "../../constants/travelIcons"
 import { DayLocation, TripFeature, AnimationConfig } from "../../contexts/TripContext"
+import { getGreatCirclePoint, getGreatCirclePath } from "../../utils/geodesicUtils"
+import { fetchRoute, interpolateAlongPath } from "../../utils/routingUtils"
 
 interface TripAnimationLayerProps {
   items: (DayLocation | TripFeature)[]
@@ -60,6 +62,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   const [pauseStartTime, setPauseStartTime] = useState<number | null>(null)
   const [zoomPhase, setZoomPhase] = useState<ZoomPhase>(ZoomPhase.INITIAL_ZOOM_OUT)
   const [initialZoomComplete, setInitialZoomComplete] = useState(false)
+  const [cachedRoutes, setCachedRoutes] = useState<Record<string, [number, number][]>>({})
   const requestRef = useRef<number | null>(null)
   const previousTimeRef = useRef<number | undefined>(undefined)
 
@@ -75,6 +78,44 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     }
     return dist
   }, [coords])
+
+  // Fetch routes for segments
+  useEffect(() => {
+    const loadRoutes = async () => {
+      if (globalConfig?.useRouting === false) return
+
+      const newRoutes: Record<string, [number, number][]> = {}
+      let hasUpdates = false
+
+      for (let i = 0; i < coords.length - 1; i++) {
+        const key = `${i}-${coords[i].join(",")}-${coords[i + 1].join(",")}`
+        // Skip if already cached
+        if (cachedRoutes[key]) continue
+
+        // Logic: Moving FROM item i TO item i+1. Mode is usually stored on item i+1 (how we got there) or item i (how we leave)?
+        // In TripDetailView, transport_mode is on the item.
+        // Let's assume transport_mode on item i+1 represents how we travel TO it.
+        // But for the first segment (0 -> 1), we need mode.
+        // Let's check validItems[i+1].transport_mode
+        const nextItem = validItems[i + 1]
+        const mode = nextItem.transport_mode
+
+        if (mode) {
+          const route = await fetchRoute(coords[i], coords[i + 1], mode)
+          if (route) {
+            newRoutes[key] = route
+            hasUpdates = true
+          }
+        }
+      }
+
+      if (hasUpdates) {
+        setCachedRoutes((prev) => ({ ...prev, ...newRoutes }))
+      }
+    }
+
+    loadRoutes()
+  }, [coords, validItems, cachedRoutes, globalConfig?.useRouting])
 
   // Handle seeking
   useEffect(() => {
@@ -342,19 +383,39 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     animate,
   ])
 
-  // Calculate current position
+  // Calculate current position using Route or Geodesic interpolation
   const currentPosition = useMemo(() => {
     if (coords.length < 2) return null
     if (currentSegmentIndex >= coords.length - 1) return coords[coords.length - 1]
 
     const p1 = coords[currentSegmentIndex]
     const p2 = coords[currentSegmentIndex + 1]
+    const key = `${currentSegmentIndex}-${p1.join(",")}-${p2.join(",")}`
+    const route = cachedRoutes[key]
 
-    const lat = p1[0] + (p2[0] - p1[0]) * segmentProgress
-    const lng = p1[1] + (p2[1] - p1[1]) * segmentProgress
+    if (route) {
+      return interpolateAlongPath(route, segmentProgress)
+    }
 
-    return [lat, lng] as [number, number]
-  }, [coords, currentSegmentIndex, segmentProgress])
+    return getGreatCirclePoint(p1, p2, segmentProgress)
+  }, [coords, currentSegmentIndex, segmentProgress, cachedRoutes])
+
+  // Generate path segments for visualization (Curved or Routed)
+  const pathSegments = useMemo(() => {
+    if (coords.length < 2) return []
+    const segments: [number, number][][] = []
+
+    for (let i = 0; i < coords.length - 1; i++) {
+      const key = `${i}-${coords[i].join(",")}-${coords[i + 1].join(",")}`
+      if (cachedRoutes[key]) {
+        segments.push(cachedRoutes[key])
+      } else {
+        // Generate 20 intermediate points for smoothness if no route
+        segments.push(getGreatCirclePath(coords[i], coords[i + 1], 20))
+      }
+    }
+    return segments
+  }, [coords, cachedRoutes])
 
   // Update global progress (time-based to account for minimum segment duration)
   useEffect(() => {
@@ -549,7 +610,26 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       {/* Animated Path - draws from start to current position (only after initial zoom) */}
       {currentPosition && coords.length > 0 && initialZoomComplete && (
         <Polyline
-          positions={[coords[0], ...coords.slice(1, currentSegmentIndex + 1), currentPosition]}
+          positions={[
+            ...pathSegments.slice(0, currentSegmentIndex).flat(),
+            // For current segment, we need to slice the path up to current progress
+            // This is complex for pre-calculated routes.
+            // Simplification: Just draw the full path for the current segment? No, that looks bad.
+            // We need to slice the current segment's path.
+            ...(cachedRoutes[
+              `${currentSegmentIndex}-${coords[currentSegmentIndex].join(",")}-${coords[currentSegmentIndex + 1].join(",")}`
+            ]
+              ? (() => {
+                  const route =
+                    cachedRoutes[
+                      `${currentSegmentIndex}-${coords[currentSegmentIndex].join(",")}-${coords[currentSegmentIndex + 1].join(",")}`
+                    ]
+                  const cutoffIndex = Math.floor(route.length * segmentProgress)
+                  return route.slice(0, cutoffIndex + 1)
+                })()
+              : getGreatCirclePath(coords[currentSegmentIndex], currentPosition, Math.ceil(20 * segmentProgress))),
+            currentPosition, // Ensure we connect to the exact current position
+          ]}
           pathOptions={{ color: "#1976d2", weight: 4, opacity: 0.8 }}
         />
       )}
@@ -557,7 +637,26 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       {/* Remaining path preview (faint dashed line) */}
       {coords.length > currentSegmentIndex + 1 && currentPosition && (
         <Polyline
-          positions={[currentPosition, ...coords.slice(currentSegmentIndex + 1)]}
+          positions={[
+            currentPosition,
+            ...(cachedRoutes[
+              `${currentSegmentIndex}-${coords[currentSegmentIndex].join(",")}-${coords[currentSegmentIndex + 1].join(",")}`
+            ]
+              ? (() => {
+                  const route =
+                    cachedRoutes[
+                      `${currentSegmentIndex}-${coords[currentSegmentIndex].join(",")}-${coords[currentSegmentIndex + 1].join(",")}`
+                    ]
+                  const cutoffIndex = Math.floor(route.length * segmentProgress)
+                  return route.slice(cutoffIndex)
+                })()
+              : getGreatCirclePath(
+                  currentPosition,
+                  coords[currentSegmentIndex + 1],
+                  Math.ceil(20 * (1 - segmentProgress)),
+                )),
+            ...pathSegments.slice(currentSegmentIndex + 1).flat(),
+          ]}
           pathOptions={{ color: "#1976d2", weight: 2, opacity: 0.3, dashArray: "5, 10" }}
         />
       )}

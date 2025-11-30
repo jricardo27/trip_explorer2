@@ -39,6 +39,9 @@ export interface AnimationConfig {
   // Phase configuration
   zoomOutPhaseEnd?: number // Default: 0.33 (33%)
   maintainPhaseEnd?: number // Default: 0.66 (66%)
+
+  // Routing
+  useRouting?: boolean // Default: true - follow roads where possible
 }
 
 export interface Trip {
