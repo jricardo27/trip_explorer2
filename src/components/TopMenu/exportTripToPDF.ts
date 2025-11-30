@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 
@@ -66,11 +67,22 @@ export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeat
         yPos += 15
       } else {
         // Table for items
-        const tableBody = items.map((item) => {
+        const tableBody = items.flatMap((item) => {
           const isLocation = "city" in item
-          let name = isLocation ? item.city : (item as TripFeature).properties?.name || "Unknown"
+          const name = isLocation ? item.city : (item as TripFeature).properties?.name || "Unknown"
           const type = isLocation ? "Location" : (item as TripFeature).properties?.type || "Feature"
           const notes = isLocation ? item.notes || "" : (item as TripFeature).properties?.description || ""
+
+          let cost = ""
+          if (isLocation) {
+            cost = item.transport_cost ? `$${item.transport_cost}` : ""
+          } else {
+            const feat = item as TripFeature
+            cost = feat.transport_cost ? `$${feat.transport_cost}` : ""
+          }
+
+          const mainRow = [name, type, notes, cost]
+          const rows: (string[] | { content: string; colSpan: number; styles: object }[])[] = [mainRow as string[]]
 
           if (!isLocation) {
             const feat = item as TripFeature
@@ -82,21 +94,18 @@ export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeat
               (props.international_phone_number as string)
 
             if (address || phone) {
-              name += "\n\n"
-              if (address) name += `Address: ${address}\n`
-              if (phone) name += `Phone: ${phone}`
+              let details = ""
+              if (address) details += `Address: ${address}`
+              if (address && phone) details += "   |   "
+              if (phone) details += `Phone: ${phone}`
+
+              rows.push([
+                { content: details, colSpan: 4, styles: { fontStyle: "normal", textColor: 100, fontSize: 9 } },
+              ])
             }
           }
 
-          let cost = ""
-          if (isLocation) {
-            cost = item.transport_cost ? `$${item.transport_cost}` : ""
-          } else {
-            const feat = item as TripFeature
-            cost = feat.transport_cost ? `$${feat.transport_cost}` : ""
-          }
-
-          return [name, type, notes, cost]
+          return rows
         })
 
         autoTable(doc, {
@@ -112,11 +121,30 @@ export const exportTripToPDF = (trip: Trip, dayLocations: DayLocation[], dayFeat
             2: { cellWidth: "auto" },
             3: { cellWidth: 20, halign: "right" },
           },
+          didDrawCell: (data) => {
+            if (data.column.index === 3 && data.section === "body" && data.row.index >= 0) {
+              // Check if this is a main row (not a details row which spans)
+              // Details rows have colSpan, main rows don't (in our logic, or we check content)
+              // Actually, details row has colSpan: 4, so it starts at column 0.
+              // Column 3 will only be drawn for the main row.
+
+              const { x, y, width, height } = data.cell
+              const text = data.cell.text || []
+
+              const textField = new (doc as any).AcroForm.TextField()
+              textField.Rect = [x + 1, y + 1, width - 2, height - 2]
+              textField.fieldName = `cost_${data.row.index}_${index}` // Unique name per row/day
+              textField.value = Array.isArray(text) ? text.join("") : text
+              textField.multiline = false
+              textField.fontSize = 10
+              textField.textAlign = "right"
+              ;(doc as any).addField(textField)
+            }
+          },
         })
 
         // Update yPos after table
-        // @ts-expect-error - lastAutoTable is added by the plugin
-        yPos = doc.lastAutoTable.finalY + 15
+        yPos = (doc as any).lastAutoTable.finalY + 15
       }
     })
   }
