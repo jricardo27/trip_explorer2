@@ -74,6 +74,8 @@ export interface DayLocation {
   end_time?: string
   created_at: string
   animation_config?: AnimationConfig
+  visited?: boolean
+  planned?: boolean
 }
 
 export interface TripFeature {
@@ -99,6 +101,29 @@ export interface TripFeature {
   start_time?: string
   end_time?: string
   animation_config?: AnimationConfig
+  visited?: boolean
+  planned?: boolean
+}
+
+export interface TravelStats {
+  total_trips: number
+  total_days: number
+  total_places: number
+  countries_count: number
+  cities_count: number
+  countries: { country: string; country_code: string }[]
+  cities: { city: string; country: string }[]
+  places: { name: string; country: string; type: "location" | "feature"; lat: number; lng: number }[]
+  trips: {
+    id: string
+    name: string
+    start_date: string
+    end_date: string
+    duration_days: number
+    countries: string[]
+    cities: string[]
+  }[]
+  available_years: number[]
 }
 
 interface TripContextType {
@@ -113,7 +138,7 @@ interface TripContextType {
   fetchDayLocations: (dayId: string) => Promise<void>
   addLocationToDay: (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => Promise<void>
   deleteLocation: (locationId: string, dayId: string) => Promise<void>
-  addFeatureToDay: (dayId: string, feature: unknown) => Promise<void>
+  addFeatureToDay: (dayId: string, feature: unknown, visited?: boolean, planned?: boolean) => Promise<void>
   deleteFeature: (savedId: string, dayId: string) => Promise<void>
   createTrip: (name: string, startDate: string, endDate: string) => Promise<Trip>
   deleteTrip: (id: string) => Promise<void>
@@ -121,6 +146,9 @@ interface TripContextType {
   setCurrentTrip: (trip: Trip | null) => void
   reorderItems: (dayId: string, items: { id: string; type: "location" | "feature"; order: number }[]) => Promise<void>
   copyTrip: (tripId: string, newName: string, startDate: string) => Promise<Trip>
+  fetchTravelStats: (year?: number | string) => Promise<TravelStats | null>
+  updateLocationVisitStatus: (locationId: string, dayId: string, visited: boolean, planned: boolean) => Promise<void>
+  updateFeatureVisitStatus: (featureId: string, dayId: string, visited: boolean, planned: boolean) => Promise<void>
 }
 
 const TripContext = createContext<TripContextType | undefined>(undefined)
@@ -305,7 +333,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [API_URL],
   )
 
-  const addFeatureToDay = async (dayId: string, feature: unknown) => {
+  const addFeatureToDay = async (dayId: string, feature: unknown, visited?: boolean, planned?: boolean) => {
     if (!userId) return
     try {
       const response = await fetch(`${API_URL}/api/features`, {
@@ -316,6 +344,8 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
           list_name: "trip_features",
           feature,
           trip_day_id: dayId,
+          visited: visited !== undefined ? visited : true,
+          planned: planned !== undefined ? planned : false,
         }),
       })
       if (response.ok) {
@@ -408,6 +438,63 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchTrips()
   }, [fetchTrips])
 
+  const fetchTravelStats = async (year?: number | string): Promise<TravelStats | null> => {
+    if (!userId) return null
+    try {
+      const query = year ? `?user_id=${userId}&year=${year}` : `?user_id=${userId}`
+      const response = await fetch(`${API_URL}/api/reports/travel-stats${query}`)
+      if (response.ok) {
+        return await response.json()
+      }
+      return null
+    } catch (error) {
+      console.error("Failed to fetch travel stats:", error)
+      return null
+    }
+  }
+
+  const updateLocationVisitStatus = async (
+    locationId: string,
+    dayId: string,
+    visited: boolean,
+    planned: boolean,
+  ): Promise<void> => {
+    try {
+      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/locations/${locationId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visited, planned }),
+      })
+      if (response.ok) {
+        await fetchDayLocations(dayId)
+      }
+    } catch (error) {
+      console.error("Failed to update location visit status:", error)
+      throw error
+    }
+  }
+
+  const updateFeatureVisitStatus = async (
+    featureId: string,
+    dayId: string,
+    visited: boolean,
+    planned: boolean,
+  ): Promise<void> => {
+    try {
+      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features/${featureId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visited, planned }),
+      })
+      if (response.ok) {
+        await fetchDayFeatures(dayId)
+      }
+    } catch (error) {
+      console.error("Failed to update feature visit status:", error)
+      throw error
+    }
+  }
+
   return (
     <TripContext.Provider
       value={{
@@ -430,6 +517,9 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCurrentTrip,
         reorderItems,
         copyTrip,
+        fetchTravelStats,
+        updateLocationVisitStatus,
+        updateFeatureVisitStatus,
       }}
     >
       {children}

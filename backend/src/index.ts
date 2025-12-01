@@ -3,7 +3,7 @@ import cors from "cors"
 import express, { Request, Response } from "express"
 
 import { query } from "./db"
-
+import reportsRouter from "./routes/reports"
 const app = express()
 app.use(cors())
 app.use(express.json())
@@ -147,7 +147,7 @@ app.get("/api/features", async (req, res) => {
 
 // Add a saved feature
 app.post("/api/features", async (req, res) => {
-  const { user_id, list_name, feature, trip_day_id } = req.body
+  const { user_id, list_name, feature, trip_day_id, visited = true, planned = false } = req.body
 
   if (!user_id || !list_name || !feature) {
     return res.status(400).json({ error: "Missing required fields" })
@@ -168,7 +168,9 @@ app.post("/api/features", async (req, res) => {
     }
 
     await query(
-      "INSERT INTO saved_features (user_id, list_name, feature, trip_day_id, visit_order, animation_config) VALUES ($1, $2, $3, $4, $5, $6)",
+      `INSERT INTO saved_features (
+        user_id, list_name, feature, trip_day_id, visit_order, animation_config, visited, planned
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [
         user_id,
         list_name,
@@ -176,6 +178,8 @@ app.post("/api/features", async (req, res) => {
         trip_day_id || null,
         trip_day_id ? nextOrder : null,
         feature.properties?.animation_config || {},
+        visited,
+        planned,
       ],
     )
     res.status(201).json({ message: "Feature saved" })
@@ -371,6 +375,8 @@ app.get("/api/trips/:id", async (req, res) => {
         duration_minutes: row.duration_minutes,
         start_time: row.start_time,
         end_time: row.end_time,
+        visited: row.visited,
+        planned: row.planned,
       }))
     } else {
       trip.allLocations = []
@@ -508,9 +514,9 @@ app.post("/api/trips/:id/copy", async (req, res) => {
           `INSERT INTO day_locations (
             trip_day_id, country, country_code, city, town, latitude, longitude,
             visit_order, notes, transport_mode, transport_details, transport_cost,
-            duration_minutes, start_time, end_time, animation_config, location_coords
+            duration_minutes, start_time, end_time, animation_config, location_coords, visited, planned
           ) VALUES ($1, $2, $3, $4, $5, $6::DECIMAL, $7::DECIMAL, $8, $9, $10, $11, $12, $13, $14, $15, $16, 
-            ST_SetSRID(ST_MakePoint($7::float8, $6::float8), 4326))`,
+            ST_SetSRID(ST_MakePoint($7::float8, $6::float8), 4326), $17, $18)`,
           [
             newDay.id,
             location.country,
@@ -528,6 +534,8 @@ app.post("/api/trips/:id/copy", async (req, res) => {
             location.start_time,
             location.end_time,
             location.animation_config || {},
+            location.visited !== undefined ? location.visited : true,
+            location.planned !== undefined ? location.planned : false,
           ],
         )
       }
@@ -543,8 +551,8 @@ app.post("/api/trips/:id/copy", async (req, res) => {
           `INSERT INTO saved_features (
             user_id, list_name, feature, trip_day_id, visit_order,
             transport_mode, transport_details, transport_cost, duration_minutes,
-            start_time, end_time, animation_config
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+            start_time, end_time, animation_config, visited, planned
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
           [
             user_id,
             feature.list_name,
@@ -558,6 +566,8 @@ app.post("/api/trips/:id/copy", async (req, res) => {
             feature.start_time,
             feature.end_time,
             feature.animation_config || {},
+            feature.visited !== undefined ? feature.visited : true,
+            feature.planned !== undefined ? feature.planned : false,
           ],
         )
       }
@@ -589,6 +599,8 @@ app.get("/api/trip-days/:id/features", async (req, res) => {
         },
         saved_id: row.id,
         visit_order: row.visit_order,
+        visited: row.visited,
+        planned: row.planned,
       })),
     )
   } catch (err) {
@@ -651,6 +663,8 @@ app.post("/api/trip-days/:dayId/locations", async (req, res) => {
     transport_cost,
     duration_minutes,
     animation_config,
+    visited = true,
+    planned = false,
   } = req.body
 
   if (!country) {
@@ -688,9 +702,11 @@ app.post("/api/trip-days/:dayId/locations", async (req, res) => {
         transport_details,
         transport_cost,
         duration_minutes,
-        animation_config
+        animation_config,
+        visited,
+        planned
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, ${locationCoords}, $8, $9, $10, $11, $12, $13, $14)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, ${locationCoords}, $8, $9, $10, $11, $12, $13, $14, $15, $16)
        RETURNING *`,
       [
         dayId,
@@ -707,6 +723,8 @@ app.post("/api/trip-days/:dayId/locations", async (req, res) => {
         transport_cost,
         duration_minutes,
         animation_config || {},
+        visited,
+        planned,
       ],
     )
     res.status(201).json(result.rows[0])
@@ -827,6 +845,8 @@ app.put("/api/day-locations/:id", async (req, res) => {
     start_time,
     end_time,
     animation_config,
+    visited,
+    planned,
   } = req.body
 
   try {
@@ -838,8 +858,9 @@ app.put("/api/day-locations/:id", async (req, res) => {
            latitude = $5, longitude = $6, location_coords = ${locationCoords},
            visit_order = $7, notes = $8,
            transport_mode = $9, transport_details = $10, transport_cost = $11, duration_minutes = $12,
-           start_time = $13, end_time = $14, animation_config = $15
-       WHERE id = $16
+           start_time = $13, end_time = $14, animation_config = $15,
+           visited = $16, planned = $17
+       WHERE id = $18
        RETURNING *`,
       [
         country,
@@ -857,6 +878,8 @@ app.put("/api/day-locations/:id", async (req, res) => {
         start_time,
         end_time,
         animation_config || {},
+        visited,
+        planned,
         id,
       ],
     )
@@ -910,6 +933,31 @@ app.delete("/api/trip-days/:dayId/features/:savedId", async (req, res) => {
     res.status(500).json({ error: "Internal server error" })
   }
 })
+
+// Update a feature in a trip day (for visit status)
+app.put("/api/trip-days/:dayId/features/:savedId", async (req, res) => {
+  const { dayId, savedId } = req.params
+  const { visited, planned } = req.body
+
+  try {
+    const result = await query(
+      "UPDATE saved_features SET visited = $1, planned = $2 WHERE id = $3 AND trip_day_id = $4 RETURNING *",
+      [visited, planned, savedId, dayId],
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Feature not found in this trip day" })
+    }
+
+    res.json(result.rows[0])
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Reports routes
+app.use("/api/reports", reportsRouter)
 
 export { app }
 

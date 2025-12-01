@@ -85,6 +85,7 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
   } = useTripContext()
 
   const [tripFilter, setTripFilter] = useState<"all" | "future" | "past" | "current">("all")
+  const [isPlanningMode, setIsPlanningMode] = useState(false)
 
   const { contextMenu, contextMenuTab, contextMenuFeature, handleContextMenu, handleTabContextMenu, handleClose } =
     useContextMenu()
@@ -177,7 +178,7 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
     if (selectedDayForFeature) {
       setIsLoading(true)
       try {
-        await addFeatureToDay(selectedDayForFeature.id, feature)
+        await addFeatureToDay(selectedDayForFeature.id, feature, !isPlanningMode, isPlanningMode)
         showSuccess("Feature added to trip day!")
       } catch (error) {
         console.error("Failed to add feature:", error)
@@ -328,6 +329,8 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
                 dayLocations={dayLocations}
                 dayFeatures={dayFeatures}
                 onBack={() => setCurrentTrip(null)}
+                isPlanningMode={isPlanningMode}
+                onTogglePlanningMode={() => setIsPlanningMode((prev) => !prev)}
                 onAddLocation={(id, date) => setSelectedDayForLocation({ id, date })}
                 onAddFeature={(id, date) => setSelectedDayForFeature({ id, date })}
                 onEditItem={(item, type) => setEditingItem({ item, type: type === "Feature" ? "feature" : "location" })}
@@ -383,6 +386,7 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         onClose={() => setSelectedDayForLocation(null)}
         onAddLocation={handleAddLocation}
         dayDate={selectedDayForLocation?.date || ""}
+        isPlanningMode={isPlanningMode}
       />
 
       <AddFeatureModal

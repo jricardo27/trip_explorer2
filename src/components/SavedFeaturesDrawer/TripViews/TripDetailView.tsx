@@ -14,6 +14,8 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Switch,
+  FormControlLabel,
 } from "@mui/material"
 import React, { useState, useEffect } from "react"
 import { FaDownload } from "react-icons/fa"
@@ -30,6 +32,8 @@ import {
   MdExpandMore,
   MdExpandLess,
   MdContentCopy,
+  MdCheckBox,
+  MdCheckBoxOutlineBlank,
 } from "react-icons/md"
 
 import { Trip, DayLocation, TripFeature, useTripContext } from "../../../contexts/TripContext"
@@ -40,6 +44,7 @@ import { calculateEndTime } from "../../../utils/timeUtils"
 import { exportTripToGeoJSON, exportTripToKML } from "../../TopMenu/exportTrip"
 import { exportTripToExcel } from "../../TopMenu/exportTripToExcel"
 import { exportTripToPDF } from "../../TopMenu/exportTripToPDF"
+import { TripComparisonModal } from "../../TripComparison/TripComparisonModal"
 import { TripSummary } from "../../Trips/TripSummary"
 
 interface TripDetailViewProps {
@@ -54,6 +59,8 @@ interface TripDetailViewProps {
   onMoveItem: (dayId: string, index: number, direction: "up" | "down", items: (DayLocation | TripFeature)[]) => void
   onFlyTo: (lat: number, lng: number) => void
   onViewFeature: (feature: TripFeature) => void
+  isPlanningMode: boolean
+  onTogglePlanningMode: () => void
 }
 
 export const TripDetailView: React.FC<TripDetailViewProps> = ({
@@ -68,12 +75,15 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   onMoveItem,
   onFlyTo,
   onViewFeature,
+  isPlanningMode,
+  onTogglePlanningMode,
 }) => {
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
   const [copyDialogOpen, setCopyDialogOpen] = useState(false)
+  const [comparisonModalOpen, setComparisonModalOpen] = useState(false)
   const [newTripName, setNewTripName] = useState("")
   const [newStartDate, setNewStartDate] = useState("")
-  const { copyTrip } = useTripContext()
+  const { copyTrip, updateLocationVisitStatus, updateFeatureVisitStatus } = useTripContext()
 
   // Initialize all days as expanded
   useEffect(() => {
@@ -101,6 +111,24 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
 
   const collapseAll = () => {
     setExpandedDays({})
+  }
+
+  const handleToggleVisit = async (item: DayLocation | TripFeature, dayId: string) => {
+    const isVisited = item.visited !== undefined ? item.visited : true
+    const isPlanned = item.planned !== undefined ? item.planned : false
+
+    const newVisited = !isVisited
+
+    if ("type" in item && item.type === "Feature") {
+      const feature = item as TripFeature
+      const id = feature.saved_id || feature.properties.id
+      if (id) {
+        await updateFeatureVisitStatus(id, dayId, newVisited, isPlanned)
+      }
+    } else {
+      const location = item as DayLocation
+      await updateLocationVisitStatus(location.id, dayId, newVisited, isPlanned)
+    }
   }
 
   const handleExport = (format: string) => {
@@ -133,7 +161,14 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
         <Button startIcon={<MdArrowBack />} onClick={onBack}>
           Back to Trips
         </Button>
-        <Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <FormControlLabel
+            control={<Switch checked={isPlanningMode} onChange={onTogglePlanningMode} color="primary" />}
+            label="Planning Mode"
+          />
+          <Button variant="outlined" size="small" onClick={() => setComparisonModalOpen(true)}>
+            Compare Plan vs. Actual
+          </Button>
           <Button
             variant="outlined"
             size="small"
@@ -337,14 +372,25 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
 
                         const endTime = item.end_time || calculateEndTime(item.start_time, item.duration_minutes)
 
+                        const isVisited = item.visited !== undefined ? item.visited : true
+                        const isPlanned = item.planned !== undefined ? item.planned : false
+
                         // Determine color based on type
-                        const itemColor = isLocation
+                        const categoryColor = isLocation
                           ? "grey.400" // Locations get a neutral color
                           : getCategoryColor(
                               (item.properties.type as string) ||
                                 (item.properties.category as string) ||
                                 (item.properties.amenity as string),
                             )
+
+                        // Determine status color for border
+                        let statusColor = categoryColor
+                        if (isPlanned && !isVisited) statusColor = "primary.main"
+                        else if (isVisited) statusColor = "success.main"
+                        else statusColor = "text.disabled"
+
+                        const itemColor = categoryColor // Keep itemColor for avatar background
 
                         // Get thumbnail
                         const thumbnail = !isLocation ? getFeatureThumbnail(item.properties) : null
@@ -409,7 +455,7 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                                 flexDirection: "column",
                                 alignItems: "stretch",
                                 borderLeft: 4,
-                                borderLeftColor: itemColor,
+                                borderLeftColor: statusColor,
                                 ml: 1, // Add margin to offset the border
                               }}
                             >
@@ -423,6 +469,14 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                               >
                                 <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
                                   <Box sx={{ display: "flex", flexDirection: "column", mr: 1 }}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() => handleToggleVisit(item, day.id)}
+                                      color={isVisited ? "success" : "default"}
+                                      title={isVisited ? "Mark as not visited" : "Mark as visited"}
+                                    >
+                                      {isVisited ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
+                                    </IconButton>
                                     <IconButton
                                       size="small"
                                       onClick={() => onMoveItem(day.id, idx, "up", items)}
@@ -563,6 +617,14 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
           )
         })}
       </List>
+
+      <TripComparisonModal
+        open={comparisonModalOpen}
+        onClose={() => setComparisonModalOpen(false)}
+        trip={trip}
+        dayLocations={dayLocations}
+        dayFeatures={dayFeatures}
+      />
     </Box>
   )
 }

@@ -24,9 +24,16 @@ interface AddLocationModalProps {
   onClose: () => void
   onAddLocation: (location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => void
   dayDate: string
+  isPlanningMode?: boolean
 }
 
-export const AddLocationModal: React.FC<AddLocationModalProps> = ({ open, onClose, onAddLocation, dayDate }) => {
+export const AddLocationModal: React.FC<AddLocationModalProps> = ({
+  open,
+  onClose,
+  onAddLocation,
+  dayDate,
+  isPlanningMode = false,
+}) => {
   const [selectedCity, setSelectedCity] = useState<CityOption | null>(null)
   const [notes, setNotes] = useState("")
   const [visitOrder, setVisitOrder] = useState(1)
@@ -48,12 +55,14 @@ export const AddLocationModal: React.FC<AddLocationModalProps> = ({ open, onClos
       longitude: parseFloat(selectedCity.longitude),
       visit_order: visitOrder,
       notes: notes.trim() || undefined,
-      transport_mode: transportMode.trim() || undefined,
-      transport_details: transportDetails.trim() || undefined,
+      transport_mode: transportMode || undefined,
+      transport_details: transportDetails || undefined,
       transport_cost: transportCost ? parseFloat(transportCost) : undefined,
       duration_minutes: durationMinutes ? parseInt(durationMinutes) : undefined,
       start_time: startTime || undefined,
       end_time: endTime || undefined,
+      visited: !isPlanningMode,
+      planned: isPlanningMode,
     }
 
     onAddLocation(location)

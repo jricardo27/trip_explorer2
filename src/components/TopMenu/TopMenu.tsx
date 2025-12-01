@@ -14,14 +14,17 @@ import {
   Tooltip,
   Typography,
   alpha,
+  Fade,
+  ListItemIcon,
 } from "@mui/material"
 import React, { useContext, useState } from "react"
 import { FaDownload, FaUpload } from "react-icons/fa"
-import { MdHelpOutline, MdLocationOn } from "react-icons/md"
+import { MdHelpOutline, MdLocationOn, MdAssessment } from "react-icons/md"
 import { useNavigate, Link } from "react-router-dom"
 
 import SavedFeaturesContext from "../../contexts/SavedFeaturesContext"
 import { useTripContext } from "../../contexts/TripContext"
+import { TravelReportModal } from "../Reports/TravelReportModal"
 import WelcomeModal from "../WelcomeModal/WelcomeModal"
 
 import { exportTripToGeoJSON, exportTripToKML } from "./exportTrip"
@@ -68,16 +71,19 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
   const [openWelcomeModal, setOpenWelcomeModal] = useState<boolean>(false)
   const [importAnchorEl, setImportAnchorEl] = useState<null | HTMLElement>(null)
   const [destinationAnchorEl, setDestinationAnchorEl] = useState<null | HTMLElement>(null)
+  const [reportModalOpen, setReportModalOpen] = useState(false) // Added
+  const [exportMenuIsOpen, setExportMenuIsOpen] = useState(false) // Changed from Boolean(anchorEl)
   const importMenuIsOpen = Boolean(importAnchorEl)
-  const exportMenuIsOpen = Boolean(anchorEl)
   const destinationMenuIsOpen = Boolean(destinationAnchorEl)
 
   const openExportMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
+    setExportMenuIsOpen(true) // Added
   }
 
   const closeExportMenu = () => {
     setAnchorEl(null)
+    setExportMenuIsOpen(false) // Added
   }
 
   const openImportMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -113,6 +119,11 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
     closeDestinationMenu()
   }
 
+  // Added for the new menu item structure
+  const handleImport = () => {
+    importTrip(createTrip, addLocationToDay, addFeatureToDay)
+  }
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -133,6 +144,11 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
               </Tooltip>
             </Grid2>
             <Grid2 size={2}>
+              <Tooltip title="Travel Report" aria-label="Travel Report">
+                <Button onClick={() => setReportModalOpen(true)} color="inherit" startIcon={<MdAssessment />} />
+              </Tooltip>
+            </Grid2>
+            <Grid2 size={2}>
               <Tooltip title="Export" aria-label="Export">
                 <Button
                   id="fade-button"
@@ -144,7 +160,16 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
                   startIcon={<FaDownload />}
                 />
               </Tooltip>
-              <Menu id="fade-menu" anchorEl={anchorEl} open={exportMenuIsOpen} onClose={closeExportMenu}>
+              <Menu
+                id="fade-menu"
+                MenuListProps={{
+                  "aria-labelledby": "fade-button",
+                }}
+                anchorEl={anchorEl}
+                open={exportMenuIsOpen}
+                onClose={closeExportMenu}
+                TransitionComponent={Fade}
+              >
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsGeoJson(savedFeatures))}>To GeoJson</MenuItem>
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsKml(savedFeatures))}>To KML</MenuItem>
                 <MenuItem onClick={closeMenuAfterAction(() => saveAsBackup(savedFeatures))}>Export backup</MenuItem>
@@ -181,7 +206,16 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
                     Export Trip (PDF)
                   </MenuItem>,
                 ]}
+                {/* The following MenuItem was part of the instruction snippet but seems misplaced in an "Export" menu.
+                    Keeping it as per instruction, but noting it might be a logical error in the instruction. */}
+                <MenuItem onClick={closeMenuAfterAction(handleImport)}>
+                  <ListItemIcon>
+                    <FaUpload fontSize="small" />
+                  </ListItemIcon>
+                  Import Trip (GeoJSON/KML)
+                </MenuItem>
               </Menu>
+              <TravelReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false)} />
             </Grid2>
             <Grid2 size={2}>
               <Tooltip title="Import" aria-label="Import">

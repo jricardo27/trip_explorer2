@@ -11,6 +11,7 @@ export const TripDetailWrapper: React.FC = () => {
   const { trips, fetchTrips, dayLocations, dayFeatures, deleteLocation, deleteFeature, reorderItems } = useTripContext()
 
   const [loading, setLoading] = useState(true)
+  const [isPlanningMode, setIsPlanningMode] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -90,6 +91,8 @@ export const TripDetailWrapper: React.FC = () => {
         onMoveItem={handleMoveItem}
         onFlyTo={(lat, lng) => console.log("Fly to", lat, lng)}
         onViewFeature={(feature) => console.log("View feature", feature)}
+        isPlanningMode={isPlanningMode}
+        onTogglePlanningMode={() => setIsPlanningMode((prev) => !prev)}
       />
     </Box>
   )
