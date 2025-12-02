@@ -1,7 +1,10 @@
 import express, { Request, Response } from "express"
 
-import { query } from "../db"
+import { query, pool } from "../db"
 import { authMiddleware, AuthRequest } from "../middleware/auth"
+import { calculateRoute, calculateRouteAlternatives, estimateRouteDuration } from "../services/routing"
+import { calculateScheduleImpact, applyScheduleUpdates } from "../services/scheduleAdjustment"
+import { validateTransportAlternative } from "../services/transportValidation"
 
 const router = express.Router()
 
@@ -173,12 +176,15 @@ router.post("/transport-alternatives/:id/select", async (req: Request, res: Resp
 
     await client.query("COMMIT")
 
-    // TODO: Calculate time impact on downstream activities
-    // This would be implemented in a service layer
+    // Calculate schedule impact
+    const impact = await calculateScheduleImpact(id)
+
+    await client.query("COMMIT")
 
     res.json({
       message: "Transport alternative selected successfully",
       alternative: { ...alternative, is_selected: true },
+      impact,
     })
   } catch (error) {
     await client.query("ROLLBACK")
@@ -186,6 +192,96 @@ router.post("/transport-alternatives/:id/select", async (req: Request, res: Resp
     res.status(500).json({ error: "Internal server error" })
   } finally {
     client.release()
+  }
+})
+
+// Validate transport alternative (Week 5)
+router.get("/transport-alternatives/:id/validate", async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  try {
+    const validation = await validateTransportAlternative(id)
+    res.json(validation)
+  } catch (error) {
+    console.error("Error validating transport:", error)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Calculate route using OSRM (Week 5)
+router.post("/calculate-route", async (req: Request, res: Response) => {
+  const { from, to, mode } = req.body
+
+  if (!from || !to || !from.lat || !from.lng || !to.lat || !to.lng) {
+    return res.status(400).json({
+      error: "Missing required fields: from {lat, lng}, to {lat, lng}",
+    })
+  }
+
+  try {
+    const route = await calculateRoute({ from, to, mode })
+    res.json(route)
+  } catch (error) {
+    console.error("Error calculating route:", error)
+
+    // Fallback to estimation
+    const estimated = estimateRouteDuration(from, to, mode || "driving")
+    res.json({
+      duration_minutes: estimated,
+      distance_meters: null,
+      geometry: null,
+      estimated: true,
+      error: "Route calculation failed, using estimation",
+    })
+  }
+})
+
+// Calculate multiple route alternatives (Week 5)
+router.post("/calculate-route-alternatives", async (req: Request, res: Response) => {
+  const { from, to } = req.body
+
+  if (!from || !to || !from.lat || !from.lng || !to.lat || !to.lng) {
+    return res.status(400).json({
+      error: "Missing required fields: from {lat, lng}, to {lat, lng}",
+    })
+  }
+
+  try {
+    const routes = await calculateRouteAlternatives(from, to)
+    res.json(routes)
+  } catch (error) {
+    console.error("Error calculating route alternatives:", error)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Preview schedule impact (Week 5)
+router.get("/transport-alternatives/:id/impact-preview", async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  try {
+    const impact = await calculateScheduleImpact(id)
+    res.json(impact)
+  } catch (error) {
+    console.error("Error calculating impact:", error)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Apply schedule updates (Week 5)
+router.post("/apply-schedule-updates", async (req: Request, res: Response) => {
+  const { updates } = req.body
+
+  if (!Array.isArray(updates)) {
+    return res.status(400).json({ error: "Updates must be an array" })
+  }
+
+  try {
+    await applyScheduleUpdates(updates)
+    res.json({ message: "Schedule updates applied successfully" })
+  } catch (error) {
+    console.error("Error applying updates:", error)
+    res.status(500).json({ error: "Internal server error" })
   }
 })
 
