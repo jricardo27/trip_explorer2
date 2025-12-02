@@ -94,57 +94,84 @@ app.use("/api", expensesRouter)
 app.use("/api", budgetsRouter)
 app.use("/api", photosRouter)
 
-// Get all markers for a specific path
-// Get all markers for a specific path, optionally filtered by bounds
+// Optimized marker loading endpoint (Week 4)
 app.get("/api/markers", async (req: Request, res: Response) => {
-  const { path, min_lon, min_lat, max_lon, max_lat } = req.query
+  const { path, min_lon, min_lat, max_lon, max_lat, zoom } = req.query
 
   if (!path || typeof path !== "string") {
     return res.status(400).json({ error: "Path query parameter is required" })
   }
 
+  // REQUIRE bounds - no more full file loading!
+  if (!min_lon || !min_lat || !max_lon || !max_lat) {
+    return res.status(400).json({
+      error: "Bounds are required (min_lon, min_lat, max_lon, max_lat)",
+    })
+  }
+
   try {
-    // If bounds are provided, use spatial query on geo_features
-    if (min_lon && min_lat && max_lon && max_lat) {
-      // Get top-level properties from markers table
-      const propsResult = await query("SELECT data->'properties' as properties FROM markers WHERE path = $1", [path])
-      const collectionProperties = propsResult.rows[0]?.properties || {}
+    // Get top-level properties from markers table
+    const propsResult = await query("SELECT data->'properties' as properties FROM markers WHERE path = $1", [path])
+    const collectionProperties = propsResult.rows[0]?.properties || {}
 
-      console.log(`[API] Path: ${path}, Bounds: ${min_lon},${min_lat},${max_lon},${max_lat}`)
-      console.log("[API] Found properties:", collectionProperties ? "Yes" : "No")
+    const zoomLevel = zoom ? parseInt(zoom as string) : 12
+    const shouldCluster = zoomLevel < 12
 
-      const queryText = `
-        SELECT properties, ST_AsGeoJSON(geom) as geometry 
-        FROM geo_features 
-        WHERE source_path = $1 
-        AND geom && ST_MakeEnvelope($2, $3, $4, $5, 4326)
+    let queryText: string
+    const values = [path, Number(min_lon), Number(min_lat), Number(max_lon), Number(max_lat)]
+
+    if (shouldCluster) {
+      // Cluster markers for better performance at low zoom levels
+      queryText = `
+        SELECT 
+          COUNT(*) as point_count,
+          ST_AsGeoJSON(ST_Centroid(ST_Collect(geom))) as geometry,
+          jsonb_build_object(
+            'cluster', true,
+            'point_count', COUNT(*),
+            'point_count_abbreviated', 
+              CASE 
+                WHEN COUNT(*) >= 1000 THEN (COUNT(*) / 1000)::text || 'k'
+                ELSE COUNT(*)::text
+              END
+          ) as properties
+        FROM geo_features
+        WHERE source_path = $1
+          AND geom && ST_MakeEnvelope($2, $3, $4, $5, 4326)
+        GROUP BY ST_SnapToGrid(geom, 0.01)
+        LIMIT 1000
       `
-      const values = [path, Number(min_lon), Number(min_lat), Number(max_lon), Number(max_lat)]
-
-      const result = await query(queryText, values)
-      console.log(`[API] Found ${result.rows.length} features`)
-
-      // Reconstruct FeatureCollection
-      const features = result.rows.map((row) => ({
-        type: "Feature",
-        properties: row.properties,
-        geometry: JSON.parse(row.geometry),
-      }))
-
-      res.json({
-        type: "FeatureCollection",
-        properties: collectionProperties,
-        features,
-      })
     } else {
-      // Fallback to full file fetch (legacy)
-      const result = await query("SELECT data FROM markers WHERE path = $1", [path])
-      if (result.rows.length > 0) {
-        res.json(result.rows[0].data)
-      } else {
-        res.status(404).json({ error: "Markers not found" })
-      }
+      // Return individual features at high zoom levels
+      queryText = `
+        SELECT properties, ST_AsGeoJSON(geom) as geometry
+        FROM geo_features
+        WHERE source_path = $1
+          AND geom && ST_MakeEnvelope($2, $3, $4, $5, 4326)
+        LIMIT 1000
+      `
     }
+
+    const result = await query(queryText, values)
+
+    // Reconstruct FeatureCollection
+    const features = result.rows.map((row) => ({
+      type: "Feature",
+      properties: row.properties,
+      geometry: JSON.parse(row.geometry),
+    }))
+
+    // Set caching headers to reduce bandwidth
+    res.set({
+      "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+      ETag: `"${path}-${min_lon}-${min_lat}-${max_lon}-${max_lat}-${zoomLevel}"`,
+    })
+
+    res.json({
+      type: "FeatureCollection",
+      properties: collectionProperties,
+      features,
+    })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: "Internal server error" })

@@ -5,7 +5,8 @@ import { useEffect, useState, useMemo } from "react"
 import { GeoJsonCollection, GeoJsonDataMap, GeoJsonFeature, GeoJsonProperties, TAny } from "../data/types"
 import deepMerge from "../utils/deepmerge.ts"
 
-const useGeoJsonMarkers = (filenames: string[], bounds?: LatLngBounds | null): GeoJsonDataMap => {
+// Week 4: Updated to require bounds (API now requires them)
+const useGeoJsonMarkers = (filenames: string[], bounds?: LatLngBounds | null, zoom?: number): GeoJsonDataMap => {
   const [geoJsonData, setGeoJsonData] = useState<GeoJsonDataMap>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -17,7 +18,16 @@ const useGeoJsonMarkers = (filenames: string[], bounds?: LatLngBounds | null): G
         return
       }
 
+      // Week 4: Bounds are now REQUIRED by the API
+      if (!bounds) {
+        setError("Bounds are required for marker loading")
+        setLoading(false)
+        return
+      }
+
       setLoading(true)
+      setError(null)
+
       try {
         const params: Record<string, string | number> = {}
 
@@ -27,12 +37,15 @@ const useGeoJsonMarkers = (filenames: string[], bounds?: LatLngBounds | null): G
           params["t"] = Date.now()
         }
 
-        // Add bounds to query params if available
-        if (bounds) {
-          params["min_lon"] = bounds.getWest()
-          params["min_lat"] = bounds.getSouth()
-          params["max_lon"] = bounds.getEast()
-          params["max_lat"] = bounds.getNorth()
+        // Add bounds to query params (now required)
+        params["min_lon"] = bounds.getWest()
+        params["min_lat"] = bounds.getSouth()
+        params["max_lon"] = bounds.getEast()
+        params["max_lat"] = bounds.getNorth()
+
+        // Add zoom level if provided (for clustering optimization)
+        if (zoom !== undefined) {
+          params["zoom"] = zoom
         }
 
         const promises = filenames.map(async (filename): Promise<[string, GeoJsonCollection]> => {
@@ -110,7 +123,7 @@ const useGeoJsonMarkers = (filenames: string[], bounds?: LatLngBounds | null): G
     }, 300)
 
     return () => clearTimeout(timeoutId)
-  }, [filenames, bounds]) // Re-fetch when filenames or bounds change
+  }, [filenames, bounds, zoom]) // Re-fetch when filenames, bounds, or zoom change
 
   return useMemo(() => {
     if (loading) {
