@@ -1,10 +1,10 @@
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter } from "@dnd-kit/core"
 import { Box, Typography } from "@mui/material"
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useRef } from "react"
 
 import { DayLocation, Trip, TripFeature } from "../../contexts/TripContext"
 
-import { CalendarDayCell } from "./CalendarDayCell"
+import { CalendarDayColumn, CalendarDayHeader } from "./CalendarDayCell"
 import { CalendarItem } from "./CalendarItem"
 import { TimeGrid } from "./TimeGrid"
 
@@ -33,6 +33,9 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
     item: DayLocation | TripFeature
     type: "location" | "feature"
   } | null>(null)
+
+  const headerRef = useRef<HTMLDivElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
 
   const pixelsPerMinute = 2
 
@@ -84,6 +87,12 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
     setActiveItem(null)
   }
 
+  const handleScroll = () => {
+    if (headerRef.current && bodyRef.current) {
+      headerRef.current.scrollLeft = bodyRef.current.scrollLeft
+    }
+  }
+
   if (!trip.days || trip.days.length === 0) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
@@ -99,31 +108,58 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           height: "calc(100vh - 200px)",
-          overflow: "auto",
+          border: 1,
+          borderColor: "divider",
+          bgcolor: "background.default",
         }}
       >
-        {/* Time Axis */}
-        <TimeGrid pixelsPerMinute={pixelsPerMinute} />
-
-        {/* Day Columns */}
+        {/* Fixed Header Row */}
         <Box
+          ref={headerRef}
           sx={{
             display: "flex",
-            gap: 2,
-            p: 2,
-            flexGrow: 1,
+            overflow: "hidden", // Hide scrollbar, controlled by body scroll
+            ml: "60px", // Offset for TimeGrid width
+            borderBottom: 1,
+            borderColor: "divider",
+            bgcolor: "background.paper",
+            flexShrink: 0,
           }}
         >
           {trip.days.map((day) => (
-            <CalendarDayCell
-              key={day.id}
-              day={day}
-              items={dayItems[day.id] || []}
-              onItemClick={(item) => onItemClick(item, "city" in item ? "location" : "feature")}
-              pixelsPerMinute={pixelsPerMinute}
-            />
+            <CalendarDayHeader key={day.id} day={day} />
           ))}
+        </Box>
+
+        {/* Scrollable Body */}
+        <Box
+          ref={bodyRef}
+          onScroll={handleScroll}
+          sx={{
+            display: "flex",
+            overflow: "auto",
+            flexGrow: 1,
+          }}
+        >
+          {/* Sticky Time Axis */}
+          <Box sx={{ position: "sticky", left: 0, zIndex: 10, bgcolor: "background.default" }}>
+            <TimeGrid pixelsPerMinute={pixelsPerMinute} />
+          </Box>
+
+          {/* Day Columns */}
+          <Box sx={{ display: "flex" }}>
+            {trip.days.map((day) => (
+              <CalendarDayColumn
+                key={day.id}
+                day={day}
+                items={dayItems[day.id] || []}
+                onItemClick={(item) => onItemClick(item, "city" in item ? "location" : "feature")}
+                pixelsPerMinute={pixelsPerMinute}
+              />
+            ))}
+          </Box>
         </Box>
       </Box>
 

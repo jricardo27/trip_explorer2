@@ -61,7 +61,38 @@ function detectOverlaps(items: PositionedItem[]): PositionedItem[] {
   return result
 }
 
-export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({ day, items, onItemClick, pixelsPerMinute = 2 }) => {
+export const CalendarDayHeader: React.FC<{ day: TripDay }> = ({ day }) => {
+  const dayDate = new Date(day.date)
+  const dayName = dayDate.toLocaleDateString("en-US", { weekday: "short" })
+  const dayNumber = dayDate.getDate()
+  const monthName = dayDate.toLocaleDateString("en-US", { month: "short" })
+
+  return (
+    <Paper
+      sx={{
+        minWidth: 250,
+        p: 2,
+        pb: 1,
+        borderBottom: 2,
+        borderColor: "divider",
+        bgcolor: "background.paper",
+        borderRadius: 0,
+        borderRight: 1,
+        borderRightColor: "divider",
+      }}
+      elevation={0}
+    >
+      <Typography variant="caption" color="text.secondary">
+        {dayName}
+      </Typography>
+      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        {monthName} {dayNumber}
+      </Typography>
+    </Paper>
+  )
+}
+
+export const CalendarDayColumn: React.FC<CalendarDayCellProps> = ({ day, items, onItemClick, pixelsPerMinute = 2 }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: day.id,
     data: { dayId: day.id, date: day.date },
@@ -69,11 +100,6 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({ day, items, on
 
   const hourHeight = 60 * pixelsPerMinute
   const totalHeight = 24 * hourHeight
-
-  const dayDate = new Date(day.date)
-  const dayName = dayDate.toLocaleDateString("en-US", { weekday: "short" })
-  const dayNumber = dayDate.getDate()
-  const monthName = dayDate.toLocaleDateString("en-US", { month: "short" })
 
   // Separate scheduled and unscheduled items
   const { scheduledItems, unscheduledItems } = useMemo(() => {
@@ -103,27 +129,17 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({ day, items, on
   }, [items, pixelsPerMinute])
 
   return (
-    <Paper
+    <Box
       sx={{
         minWidth: 250,
         display: "flex",
         flexDirection: "column",
-        border: 2,
-        borderColor: isOver ? "primary.main" : "divider",
-        transition: "all 0.2s",
-        bgcolor: "background.paper",
+        borderRight: 1,
+        borderColor: "divider",
+        bgcolor: isOver ? "action.hover" : "background.default",
+        position: "relative",
       }}
     >
-      {/* Day Header */}
-      <Box sx={{ p: 2, pb: 1, borderBottom: 2, borderColor: "divider", bgcolor: "background.paper", zIndex: 5 }}>
-        <Typography variant="caption" color="text.secondary">
-          {dayName}
-        </Typography>
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          {monthName} {dayNumber}
-        </Typography>
-      </Box>
-
       {/* Unscheduled Section */}
       {unscheduledItems.length > 0 && (
         <Box sx={{ p: 1, borderBottom: 1, borderColor: "divider", bgcolor: "action.hover" }}>
@@ -143,7 +159,6 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({ day, items, on
         sx={{
           position: "relative",
           height: totalHeight,
-          bgcolor: isOver ? "action.hover" : "background.paper",
           flexGrow: 1,
           overflow: "hidden",
         }}
@@ -180,6 +195,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({ day, items, on
                 width,
                 height: Math.max(posItem.height, 30), // Minimum height
                 px: 0.5,
+                zIndex: 1,
               }}
             >
               <CalendarItem item={posItem.item} onClick={() => onItemClick(posItem.item)} />
@@ -187,6 +203,6 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({ day, items, on
           )
         })}
       </Box>
-    </Paper>
+    </Box>
   )
 }

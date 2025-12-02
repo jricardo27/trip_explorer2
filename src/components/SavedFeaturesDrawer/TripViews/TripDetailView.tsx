@@ -16,9 +16,11 @@ import {
   TextField,
   Switch,
   FormControlLabel,
+  Stack,
+  Menu,
+  MenuItem,
 } from "@mui/material"
 import React, { useState, useEffect } from "react"
-import { FaDownload } from "react-icons/fa"
 import {
   MdArrowBack,
   MdLocationOn,
@@ -37,6 +39,8 @@ import {
   MdViewList,
   MdCalendarToday,
   MdAccessTime,
+  MdCompareArrows,
+  MdFileDownload,
 } from "react-icons/md"
 
 import { Trip, DayLocation, TripFeature, useTripContext } from "../../../contexts/TripContext"
@@ -89,6 +93,7 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list")
   const [newTripName, setNewTripName] = useState("")
   const [newStartDate, setNewStartDate] = useState("")
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
   const [editTimeModalOpen, setEditTimeModalOpen] = useState(false)
   const [editingTimeItem, setEditingTimeItem] = useState<DayLocation | TripFeature | null>(null)
   const { copyTrip, updateLocationVisitStatus, updateFeatureVisitStatus, reorderItems, updateLocation, updateFeature } =
@@ -166,19 +171,22 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
 
   return (
     <Box sx={{ flexGrow: 1, minHeight: 0, overflowY: "auto", p: 2 }}>
+      {/* Header Row 1: Navigation & Main Actions */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-        <Button startIcon={<MdArrowBack />} onClick={onBack}>
-          Back to Trips
+        <Button startIcon={<MdArrowBack />} onClick={onBack} size="small">
+          Back
         </Button>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <FormControlLabel
-            control={<Switch checked={isPlanningMode} onChange={onTogglePlanningMode} color="primary" />}
-            label="Planning Mode"
-          />
-          <Button variant="outlined" size="small" onClick={() => setComparisonModalOpen(true)}>
-            Compare Plan vs. Actual
-          </Button>
-          <Box sx={{ display: "flex", gap: 0.5, border: 1, borderColor: "divider", borderRadius: 1 }}>
+        <Typography variant="h6" noWrap sx={{ mx: 2, flexGrow: 1, textAlign: "center" }}>
+          {trip.name}
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1 }}>{/* Add Trip Edit/Delete actions here if needed in future */}</Box>
+      </Box>
+
+      {/* Header Row 2: Toolbar */}
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2, flexWrap: "wrap" }}>
+        {/* View Toggle */}
+        <Box sx={{ display: "flex", border: 1, borderColor: "divider", borderRadius: 1 }}>
+          <Tooltip title="List View">
             <IconButton
               size="small"
               onClick={() => setViewMode("list")}
@@ -187,6 +195,8 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
             >
               <MdViewList />
             </IconButton>
+          </Tooltip>
+          <Tooltip title="Calendar View">
             <IconButton
               size="small"
               onClick={() => setViewMode("calendar")}
@@ -195,117 +205,128 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
             >
               <MdCalendarToday />
             </IconButton>
-          </Box>
+          </Tooltip>
+        </Box>
+
+        {/* Planning Mode */}
+        <FormControlLabel
+          control={<Switch checked={isPlanningMode} onChange={onTogglePlanningMode} size="small" color="primary" />}
+          label={<Typography variant="body2">Planning Mode</Typography>}
+          sx={{ mr: 0 }}
+        />
+
+        <Box sx={{ flexGrow: 1 }} />
+
+        {/* Compare */}
+        <Tooltip title="Compare Plan vs. Actual">
+          <IconButton onClick={() => setComparisonModalOpen(true)} size="small" color="primary">
+            <MdCompareArrows />
+          </IconButton>
+        </Tooltip>
+
+        {/* Export */}
+        <Box>
           <Button
             variant="outlined"
             size="small"
-            startIcon={<FaDownload />}
-            onClick={(e) => {
-              const menu = document.createElement("div")
-              const rect = e.currentTarget.getBoundingClientRect()
-              menu.style.position = "fixed"
-              menu.style.top = `${rect.bottom + 5}px`
-              menu.style.right = `${window.innerWidth - rect.right}px`
-              menu.style.zIndex = "9999"
-              menu.style.background = "white"
-              menu.style.border = "1px solid #ccc"
-              menu.style.borderRadius = "4px"
-              menu.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)"
-              menu.innerHTML = `
-              <div style="padding: 8px 0;">
-                <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="geojson">GeoJSON</div>
-                <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="kml">KML</div>
-                <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="excel">Excel</div>
-                <div class="export-option" style="padding: 8px 16px; cursor: pointer;" data-format="pdf">PDF</div>
-              </div>
-            `
-              document.body.appendChild(menu)
-
-              menu.querySelectorAll(".export-option").forEach((opt) => {
-                opt.addEventListener("mouseenter", () => {
-                  ;(opt as HTMLElement).style.background = "#f5f5f5"
-                })
-                opt.addEventListener("mouseleave", () => {
-                  ;(opt as HTMLElement).style.background = "white"
-                })
-                opt.addEventListener("click", () => {
-                  handleExport(opt.getAttribute("data-format")!)
-                  document.body.removeChild(menu)
-                })
-              })
-
-              const closeMenu = () => {
-                if (document.body.contains(menu)) {
-                  document.body.removeChild(menu)
-                }
-              }
-              setTimeout(() => {
-                document.addEventListener("click", closeMenu, { once: true })
-              }, 100)
-            }}
+            startIcon={<MdFileDownload />}
+            onClick={(e) => setExportAnchorEl(e.currentTarget)}
           >
             Export
           </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<MdContentCopy />}
-            onClick={() => {
-              setCopyDialogOpen(true)
-              setNewTripName(`${trip.name} (Copy)`)
-              setNewStartDate(new Date().toISOString().split("T")[0])
-            }}
-            sx={{ ml: 1 }}
-          >
-            Copy Trip
-          </Button>
-          <Dialog open={copyDialogOpen} onClose={() => setCopyDialogOpen(false)}>
-            <DialogTitle>Copy Trip</DialogTitle>
-            <DialogContent>
-              <TextField
-                autoFocus
-                margin="dense"
-                label="Trip Name"
-                fullWidth
-                value={newTripName}
-                onChange={(e) => setNewTripName(e.target.value)}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                margin="dense"
-                label="Start Date"
-                type="date"
-                fullWidth
-                value={newStartDate}
-                onChange={(e) => setNewStartDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setCopyDialogOpen(false)}>Cancel</Button>
-              <Button
-                onClick={async () => {
-                  try {
-                    await copyTrip(trip.id, newTripName, newStartDate)
-                    setCopyDialogOpen(false)
-                    // Optionally navigate to the new trip or show success message
-                  } catch (error) {
-                    console.error("Failed to copy trip:", error)
-                  }
-                }}
-                variant="contained"
-                disabled={!newTripName || !newStartDate}
-              >
-                Copy
-              </Button>
-            </DialogActions>
-          </Dialog>
+          <Menu anchorEl={exportAnchorEl} open={Boolean(exportAnchorEl)} onClose={() => setExportAnchorEl(null)}>
+            <MenuItem
+              onClick={() => {
+                handleExport("geojson")
+                setExportAnchorEl(null)
+              }}
+            >
+              GeoJSON
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleExport("kml")
+                setExportAnchorEl(null)
+              }}
+            >
+              KML
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleExport("excel")
+                setExportAnchorEl(null)
+              }}
+            >
+              Excel
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleExport("pdf")
+                setExportAnchorEl(null)
+              }}
+            >
+              PDF
+            </MenuItem>
+          </Menu>
         </Box>
-      </Box>
-      <Typography variant="h5" gutterBottom>
-        {trip.name}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" gutterBottom>
+
+        {/* Copy Trip */}
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<MdContentCopy />}
+          onClick={() => {
+            setCopyDialogOpen(true)
+            setNewTripName(`${trip.name} (Copy)`)
+            setNewStartDate(new Date().toISOString().split("T")[0])
+          }}
+        >
+          Copy
+        </Button>
+      </Stack>
+      <Dialog open={copyDialogOpen} onClose={() => setCopyDialogOpen(false)}>
+        <DialogTitle>Copy Trip</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Trip Name"
+            fullWidth
+            value={newTripName}
+            onChange={(e) => setNewTripName(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            margin="dense"
+            label="Start Date"
+            type="date"
+            fullWidth
+            value={newStartDate}
+            onChange={(e) => setNewStartDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCopyDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={async () => {
+              try {
+                await copyTrip(trip.id, newTripName, newStartDate)
+                setCopyDialogOpen(false)
+                // Optionally navigate to the new trip or show success message
+              } catch (error) {
+                console.error("Failed to copy trip:", error)
+              }
+            }}
+            variant="contained"
+            disabled={!newTripName || !newStartDate}
+          >
+            Copy
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Typography variant="body2" color="text.secondary" gutterBottom sx={{ textAlign: "center", mb: 2 }}>
         {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
       </Typography>
 
