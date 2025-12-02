@@ -36,6 +36,7 @@ import {
   MdCheckBoxOutlineBlank,
   MdViewList,
   MdCalendarToday,
+  MdAccessTime,
 } from "react-icons/md"
 
 import { Trip, DayLocation, TripFeature, useTripContext } from "../../../contexts/TripContext"
@@ -48,6 +49,7 @@ import { exportTripToExcel } from "../../TopMenu/exportTripToExcel"
 import { exportTripToPDF } from "../../TopMenu/exportTripToPDF"
 import { TripCalendarView } from "../../TripCalendar/TripCalendarView"
 import { TripComparisonModal } from "../../TripComparison/TripComparisonModal"
+import { EditTimeModal } from "../../Trips/EditTimeModal"
 import { TripSummary } from "../../Trips/TripSummary"
 
 interface TripDetailViewProps {
@@ -87,7 +89,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list")
   const [newTripName, setNewTripName] = useState("")
   const [newStartDate, setNewStartDate] = useState("")
-  const { copyTrip, updateLocationVisitStatus, updateFeatureVisitStatus, reorderItems } = useTripContext()
+  const [editTimeModalOpen, setEditTimeModalOpen] = useState(false)
+  const [editingTimeItem, setEditingTimeItem] = useState<DayLocation | TripFeature | null>(null)
+  const { copyTrip, updateLocationVisitStatus, updateFeatureVisitStatus, reorderItems, updateLocation, updateFeature } =
+    useTripContext()
 
   // Initialize all days as expanded
   useEffect(() => {
@@ -639,6 +644,17 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                                         </IconButton>
                                       </Tooltip>
                                     )}
+                                    <Tooltip title="Edit Logistics">
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => {
+                                          setEditingTimeItem(item)
+                                          setEditTimeModalOpen(true)
+                                        }}
+                                      >
+                                        <MdAccessTime fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
                                     <IconButton size="small" onClick={() => onEditItem(item, item.type)}>
                                       <MdEdit fontSize="small" />
                                     </IconButton>
@@ -705,6 +721,26 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
         trip={trip}
         dayLocations={dayLocations}
         dayFeatures={dayFeatures}
+      />
+
+      <EditTimeModal
+        open={editTimeModalOpen}
+        onClose={() => {
+          setEditTimeModalOpen(false)
+          setEditingTimeItem(null)
+        }}
+        item={editingTimeItem}
+        onSave={async (updates) => {
+          if (!editingTimeItem) return
+          const isLocation = "city" in editingTimeItem
+          const dayId = editingTimeItem.trip_day_id || ""
+          if (isLocation) {
+            await updateLocation(editingTimeItem.id, dayId, updates as Partial<DayLocation>)
+          } else {
+            const savedId = (editingTimeItem as TripFeature).saved_id || (editingTimeItem as TripFeature).properties.id
+            await updateFeature(savedId, dayId, updates as Partial<TripFeature>)
+          }
+        }}
       />
     </Box>
   )

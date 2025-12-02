@@ -147,7 +147,18 @@ app.get("/api/features", async (req, res) => {
 
 // Add a saved feature
 app.post("/api/features", async (req, res) => {
-  const { user_id, list_name, feature, trip_day_id, visited = true, planned = false } = req.body
+  const {
+    user_id,
+    list_name,
+    feature,
+    trip_day_id,
+    visited = true,
+    planned = false,
+    duration_minutes,
+    travel_time_minutes,
+    is_locked = false,
+    subtype,
+  } = req.body
 
   if (!user_id || !list_name || !feature) {
     return res.status(400).json({ error: "Missing required fields" })
@@ -169,8 +180,9 @@ app.post("/api/features", async (req, res) => {
 
     await query(
       `INSERT INTO saved_features (
-        user_id, list_name, feature, trip_day_id, visit_order, animation_config, visited, planned
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        user_id, list_name, feature, trip_day_id, visit_order, animation_config, visited, planned,
+        duration_minutes, travel_time_minutes, is_locked, subtype
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
       [
         user_id,
         list_name,
@@ -180,6 +192,10 @@ app.post("/api/features", async (req, res) => {
         feature.properties?.animation_config || {},
         visited,
         planned,
+        duration_minutes || null,
+        travel_time_minutes || null,
+        is_locked,
+        subtype || null,
       ],
     )
     res.status(201).json({ message: "Feature saved" })
@@ -514,9 +530,10 @@ app.post("/api/trips/:id/copy", async (req, res) => {
           `INSERT INTO day_locations (
             trip_day_id, country, country_code, city, town, latitude, longitude,
             visit_order, notes, transport_mode, transport_details, transport_cost,
-            duration_minutes, start_time, end_time, animation_config, location_coords, visited, planned
+            duration_minutes, start_time, end_time, animation_config, location_coords, visited, planned,
+            travel_time_minutes, is_locked, subtype
           ) VALUES ($1, $2, $3, $4, $5, $6::DECIMAL, $7::DECIMAL, $8, $9, $10, $11, $12, $13, $14, $15, $16, 
-            ST_SetSRID(ST_MakePoint($7::float8, $6::float8), 4326), $17, $18)`,
+            ST_SetSRID(ST_MakePoint($7::float8, $6::float8), 4326), $17, $18, $19, $20, $21)`,
           [
             newDay.id,
             location.country,
@@ -536,6 +553,9 @@ app.post("/api/trips/:id/copy", async (req, res) => {
             location.animation_config || {},
             location.visited !== undefined ? location.visited : true,
             location.planned !== undefined ? location.planned : false,
+            location.travel_time_minutes || null,
+            location.is_locked || false,
+            location.subtype || null,
           ],
         )
       }
@@ -551,8 +571,9 @@ app.post("/api/trips/:id/copy", async (req, res) => {
           `INSERT INTO saved_features (
             user_id, list_name, feature, trip_day_id, visit_order,
             transport_mode, transport_details, transport_cost, duration_minutes,
-            start_time, end_time, animation_config, visited, planned
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+            start_time, end_time, animation_config, visited, planned,
+            travel_time_minutes, is_locked, subtype
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
           [
             user_id,
             feature.list_name,
@@ -568,6 +589,9 @@ app.post("/api/trips/:id/copy", async (req, res) => {
             feature.animation_config || {},
             feature.visited !== undefined ? feature.visited : true,
             feature.planned !== undefined ? feature.planned : false,
+            feature.travel_time_minutes || null,
+            feature.is_locked || false,
+            feature.subtype || null,
           ],
         )
       }
@@ -702,11 +726,14 @@ app.post("/api/trip-days/:dayId/locations", async (req, res) => {
         transport_details,
         transport_cost,
         duration_minutes,
+        travel_time_minutes,
         animation_config,
         visited,
-        planned
+        planned,
+        is_locked,
+        subtype
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, ${locationCoords}, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, ${locationCoords}, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
        RETURNING *`,
       [
         dayId,
@@ -722,9 +749,12 @@ app.post("/api/trip-days/:dayId/locations", async (req, res) => {
         transport_details,
         transport_cost,
         duration_minutes,
+        travel_time_minutes || null,
         animation_config || {},
         visited,
         planned,
+        is_locked || false,
+        subtype || null,
       ],
     )
     res.status(201).json(result.rows[0])
@@ -847,6 +877,9 @@ app.put("/api/day-locations/:id", async (req, res) => {
     animation_config,
     visited,
     planned,
+    travel_time_minutes,
+    is_locked,
+    subtype,
   } = req.body
 
   try {
@@ -859,8 +892,9 @@ app.put("/api/day-locations/:id", async (req, res) => {
            visit_order = $7, notes = $8,
            transport_mode = $9, transport_details = $10, transport_cost = $11, duration_minutes = $12,
            start_time = $13, end_time = $14, animation_config = $15,
-           visited = $16, planned = $17
-       WHERE id = $18
+           visited = $16, planned = $17,
+           travel_time_minutes = $18, is_locked = $19, subtype = $20
+       WHERE id = $21
        RETURNING *`,
       [
         country,
@@ -880,6 +914,9 @@ app.put("/api/day-locations/:id", async (req, res) => {
         animation_config || {},
         visited,
         planned,
+        travel_time_minutes || null,
+        is_locked || false,
+        subtype || null,
         id,
       ],
     )
@@ -937,12 +974,24 @@ app.delete("/api/trip-days/:dayId/features/:savedId", async (req, res) => {
 // Update a feature in a trip day (for visit status)
 app.put("/api/trip-days/:dayId/features/:savedId", async (req, res) => {
   const { dayId, savedId } = req.params
-  const { visited, planned } = req.body
+  const { visited, planned, duration_minutes, travel_time_minutes, is_locked, subtype } = req.body
 
   try {
     const result = await query(
-      "UPDATE saved_features SET visited = $1, planned = $2 WHERE id = $3 AND trip_day_id = $4 RETURNING *",
-      [visited, planned, savedId, dayId],
+      `UPDATE saved_features 
+       SET visited = $1, planned = $2, duration_minutes = $3, travel_time_minutes = $4, is_locked = $5, subtype = $6
+       WHERE id = $7 AND trip_day_id = $8 
+       RETURNING *`,
+      [
+        visited,
+        planned,
+        duration_minutes || null,
+        travel_time_minutes || null,
+        is_locked || false,
+        subtype || null,
+        savedId,
+        dayId,
+      ],
     )
 
     if (result.rows.length === 0) {

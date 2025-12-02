@@ -76,6 +76,9 @@ export interface DayLocation {
   animation_config?: AnimationConfig
   visited?: boolean
   planned?: boolean
+  travel_time_minutes?: number
+  is_locked?: boolean
+  subtype?: string
 }
 
 export interface TripFeature {
@@ -103,6 +106,9 @@ export interface TripFeature {
   animation_config?: AnimationConfig
   visited?: boolean
   planned?: boolean
+  travel_time_minutes?: number
+  is_locked?: boolean
+  subtype?: string
 }
 
 export interface TravelStats {
@@ -137,8 +143,21 @@ interface TripContextType {
   fetchDayFeatures: (dayId: string) => Promise<void>
   fetchDayLocations: (dayId: string) => Promise<void>
   addLocationToDay: (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => Promise<void>
+  updateLocation: (id: string, dayId: string, updates: Partial<DayLocation>) => Promise<void>
   deleteLocation: (locationId: string, dayId: string) => Promise<void>
-  addFeatureToDay: (dayId: string, feature: unknown, visited?: boolean, planned?: boolean) => Promise<void>
+  addFeatureToDay: (
+    dayId: string,
+    feature: unknown,
+    options?: {
+      visited?: boolean
+      planned?: boolean
+      duration_minutes?: number
+      travel_time_minutes?: number
+      is_locked?: boolean
+      subtype?: string
+    },
+  ) => Promise<void>
+  updateFeature: (id: string, dayId: string, updates: Partial<TripFeature>) => Promise<void>
   deleteFeature: (savedId: string, dayId: string) => Promise<void>
   createTrip: (name: string, startDate: string, endDate: string) => Promise<Trip>
   deleteTrip: (id: string) => Promise<void>
@@ -333,7 +352,18 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [API_URL],
   )
 
-  const addFeatureToDay = async (dayId: string, feature: unknown, visited?: boolean, planned?: boolean) => {
+  const addFeatureToDay = async (
+    dayId: string,
+    feature: unknown,
+    options: {
+      visited?: boolean
+      planned?: boolean
+      duration_minutes?: number
+      travel_time_minutes?: number
+      is_locked?: boolean
+      subtype?: string
+    } = {},
+  ) => {
     if (!userId) return
     try {
       const response = await fetch(`${API_URL}/api/features`, {
@@ -344,8 +374,12 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
           list_name: "trip_features",
           feature,
           trip_day_id: dayId,
-          visited: visited !== undefined ? visited : true,
-          planned: planned !== undefined ? planned : false,
+          visited: options.visited !== undefined ? options.visited : true,
+          planned: options.planned !== undefined ? options.planned : false,
+          duration_minutes: options.duration_minutes,
+          travel_time_minutes: options.travel_time_minutes,
+          is_locked: options.is_locked,
+          subtype: options.subtype,
         }),
       })
       if (response.ok) {
@@ -388,6 +422,22 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
+  const updateLocation = async (id: string, dayId: string, updates: Partial<DayLocation>) => {
+    try {
+      const response = await fetch(`${API_URL}/api/day-locations/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      })
+      if (response.ok) {
+        await fetchDayLocations(dayId)
+      }
+    } catch (error) {
+      console.error("Failed to update location:", error)
+      throw error
+    }
+  }
+
   const deleteLocation = async (locationId: string, dayId: string) => {
     try {
       const response = await fetch(`${API_URL}/api/day-locations/${locationId}`, {
@@ -412,6 +462,22 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error("Failed to delete feature:", error)
+      throw error
+    }
+  }
+
+  const updateFeature = async (id: string, dayId: string, updates: Partial<TripFeature>) => {
+    try {
+      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      })
+      if (response.ok) {
+        await fetchDayFeatures(dayId)
+      }
+    } catch (error) {
+      console.error("Failed to update feature:", error)
       throw error
     }
   }
@@ -508,8 +574,10 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fetchDayFeatures,
         fetchDayLocations,
         addLocationToDay,
+        updateLocation,
         deleteLocation,
         addFeatureToDay,
+        updateFeature,
         deleteFeature,
         createTrip,
         deleteTrip,

@@ -178,7 +178,10 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
     if (selectedDayForFeature) {
       setIsLoading(true)
       try {
-        await addFeatureToDay(selectedDayForFeature.id, feature, !isPlanningMode, isPlanningMode)
+        await addFeatureToDay(selectedDayForFeature.id, feature, {
+          visited: !isPlanningMode,
+          planned: isPlanningMode,
+        })
         showSuccess("Feature added to trip day!")
       } catch (error) {
         console.error("Failed to add feature:", error)
