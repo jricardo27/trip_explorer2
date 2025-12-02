@@ -34,6 +34,8 @@ import {
   MdContentCopy,
   MdCheckBox,
   MdCheckBoxOutlineBlank,
+  MdViewList,
+  MdCalendarToday,
 } from "react-icons/md"
 
 import { Trip, DayLocation, TripFeature, useTripContext } from "../../../contexts/TripContext"
@@ -44,6 +46,7 @@ import { calculateEndTime } from "../../../utils/timeUtils"
 import { exportTripToGeoJSON, exportTripToKML } from "../../TopMenu/exportTrip"
 import { exportTripToExcel } from "../../TopMenu/exportTripToExcel"
 import { exportTripToPDF } from "../../TopMenu/exportTripToPDF"
+import { TripCalendarView } from "../../TripCalendar/TripCalendarView"
 import { TripComparisonModal } from "../../TripComparison/TripComparisonModal"
 import { TripSummary } from "../../Trips/TripSummary"
 
@@ -81,9 +84,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
   const [copyDialogOpen, setCopyDialogOpen] = useState(false)
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list")
   const [newTripName, setNewTripName] = useState("")
   const [newStartDate, setNewStartDate] = useState("")
-  const { copyTrip, updateLocationVisitStatus, updateFeatureVisitStatus } = useTripContext()
+  const { copyTrip, updateLocationVisitStatus, updateFeatureVisitStatus, reorderItems } = useTripContext()
 
   // Initialize all days as expanded
   useEffect(() => {
@@ -169,6 +173,24 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
           <Button variant="outlined" size="small" onClick={() => setComparisonModalOpen(true)}>
             Compare Plan vs. Actual
           </Button>
+          <Box sx={{ display: "flex", gap: 0.5, border: 1, borderColor: "divider", borderRadius: 1 }}>
+            <IconButton
+              size="small"
+              onClick={() => setViewMode("list")}
+              color={viewMode === "list" ? "primary" : "default"}
+              sx={{ borderRadius: 0 }}
+            >
+              <MdViewList />
+            </IconButton>
+            <IconButton
+              size="small"
+              onClick={() => setViewMode("calendar")}
+              color={viewMode === "calendar" ? "primary" : "default"}
+              sx={{ borderRadius: 0 }}
+            >
+              <MdCalendarToday />
+            </IconButton>
+          </Box>
           <Button
             variant="outlined"
             size="small"
@@ -295,328 +317,387 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
         </Button>
       </Box>
 
-      <List>
-        {trip.days?.map((day) => {
-          const locs = (dayLocations[day.id] || []).map((l) => ({ ...l, type: "location" as const }))
-          const feats = (dayFeatures[day.id] || []).map((f) => ({ ...f, type: "Feature" as const }))
-          const items = [...locs, ...feats].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
+      {/* Calendar/List View Conditional Rendering */}
+      {viewMode === "calendar" ? (
+        <TripCalendarView
+          trip={trip}
+          dayLocations={dayLocations}
+          dayFeatures={dayFeatures}
+          onItemMoved={async (itemId, _itemType, fromDayId, toDayId) => {
+            // Get items from both days
+            const fromItems = [
+              ...(dayLocations[fromDayId] || []).map((l) => ({ ...l, type: "location" as const })),
+              ...(dayFeatures[fromDayId] || []).map((f) => ({ ...f, type: "Feature" as const })),
+            ].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
 
-          return (
-            <ListItem
-              key={day.id}
-              disablePadding
-              sx={{ mb: 2, display: "block", border: 1, borderColor: "divider", borderRadius: 1 }}
-            >
-              <Box
-                sx={{
-                  bgcolor: "action.hover",
-                  p: 1,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  "&:hover": { bgcolor: "action.selected" },
-                }}
-                onClick={() => toggleDay(day.id)}
+            const toItems = [
+              ...(dayLocations[toDayId] || []).map((l) => ({ ...l, type: "location" as const })),
+              ...(dayFeatures[toDayId] || []).map((f) => ({ ...f, type: "Feature" as const })),
+            ].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
+
+            // Remove item from source
+            const movedItem = fromItems.find((item) => {
+              const id = item.type === "location" ? item.id : item.saved_id || item.properties.id
+              return id === itemId
+            })
+
+            if (!movedItem) return
+
+            const updatedFromItems = fromItems.filter((item) => {
+              const id = item.type === "location" ? item.id : item.saved_id || item.properties.id
+              return id !== itemId
+            })
+
+            // Add item to target
+            const updatedToItems = [...toItems, movedItem]
+
+            // Reorder source day
+            const fromPayload = updatedFromItems.map((item, idx) => ({
+              id: item.type === "location" ? item.id : item.saved_id || item.properties.id,
+              type: item.type === "location" ? ("location" as const) : ("feature" as const),
+              order: idx,
+            }))
+
+            // Reorder target day
+            const toPayload = updatedToItems.map((item, idx) => ({
+              id: item.type === "location" ? item.id : item.saved_id || item.properties.id,
+              type: item.type === "location" ? ("location" as const) : ("feature" as const),
+              order: idx,
+            }))
+
+            // Update both days
+            await reorderItems(fromDayId, fromPayload)
+            await reorderItems(toDayId, toPayload)
+          }}
+          onItemClick={(item, type) => onEditItem(item, type === "location" ? "location" : "Feature")}
+        />
+      ) : (
+        <List>
+          {trip.days?.map((day) => {
+            const locs = (dayLocations[day.id] || []).map((l) => ({ ...l, type: "location" as const }))
+            const feats = (dayFeatures[day.id] || []).map((f) => ({ ...f, type: "Feature" as const }))
+            const items = [...locs, ...feats].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
+
+            return (
+              <ListItem
+                key={day.id}
+                disablePadding
+                sx={{ mb: 2, display: "block", border: 1, borderColor: "divider", borderRadius: 1 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <IconButton size="small">{expandedDays[day.id] ? <MdExpandLess /> : <MdExpandMore />}</IconButton>
-                  <Typography variant="subtitle2">
-                    Day {day.day_index + 1} - {new Date(day.date).toLocaleDateString()}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Button
-                    size="small"
-                    startIcon={<MdLocationOn />}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onAddLocation(day.id, new Date(day.date).toLocaleDateString())
-                    }}
-                    sx={{ mr: 1 }}
-                  >
-                    Add Loc
-                  </Button>
-                  <Button
-                    size="small"
-                    startIcon={<MdAdd />}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onAddFeature(day.id, new Date(day.date).toLocaleDateString())
-                    }}
-                  >
-                    Add Feat
-                  </Button>
-                </Box>
-              </Box>
-              <Collapse in={!!expandedDays[day.id]} timeout="auto" unmountOnExit>
-                <Box sx={{ p: 1 }}>
-                  {items.length === 0 ? (
-                    <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
-                      No items added yet.
+                <Box
+                  sx={{
+                    bgcolor: "action.hover",
+                    p: 1,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    "&:hover": { bgcolor: "action.selected" },
+                  }}
+                  onClick={() => toggleDay(day.id)}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <IconButton size="small">{expandedDays[day.id] ? <MdExpandLess /> : <MdExpandMore />}</IconButton>
+                    <Typography variant="subtitle2">
+                      Day {day.day_index + 1} - {new Date(day.date).toLocaleDateString()}
                     </Typography>
-                  ) : (
-                    <List dense>
-                      {items.map((item, idx) => {
-                        const isLocation = item.type === "location"
-                        const primaryText = isLocation
-                          ? `${item.city || item.town || "Unknown"}, ${item.country}`
-                          : item.properties.name || item.properties.title || "Unnamed Feature"
+                  </Box>
+                  <Box>
+                    <Button
+                      size="small"
+                      startIcon={<MdLocationOn />}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onAddLocation(day.id, new Date(day.date).toLocaleDateString())
+                      }}
+                      sx={{ mr: 1 }}
+                    >
+                      Add Loc
+                    </Button>
+                    <Button
+                      size="small"
+                      startIcon={<MdAdd />}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onAddFeature(day.id, new Date(day.date).toLocaleDateString())
+                      }}
+                    >
+                      Add Feat
+                    </Button>
+                  </Box>
+                </Box>
+                <Collapse in={!!expandedDays[day.id]} timeout="auto" unmountOnExit>
+                  <Box sx={{ p: 1 }}>
+                    {items.length === 0 ? (
+                      <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
+                        No items added yet.
+                      </Typography>
+                    ) : (
+                      <List dense>
+                        {items.map((item, idx) => {
+                          const isLocation = item.type === "location"
+                          const primaryText = isLocation
+                            ? `${item.city || item.town || "Unknown"}, ${item.country}`
+                            : item.properties.name || item.properties.title || "Unnamed Feature"
 
-                        const secondaryText = isLocation
-                          ? item.notes
-                          : (item.properties.description as string) || (item.properties.address as string) || ""
+                          const secondaryText = isLocation
+                            ? item.notes
+                            : (item.properties.description as string) || (item.properties.address as string) || ""
 
-                        // Use saved_id for features to ensure uniqueness
-                        const key = isLocation ? item.id : item.saved_id || item.properties.id
+                          // Use saved_id for features to ensure uniqueness
+                          const key = isLocation ? item.id : item.saved_id || item.properties.id
 
-                        const endTime = item.end_time || calculateEndTime(item.start_time, item.duration_minutes)
+                          const endTime = item.end_time || calculateEndTime(item.start_time, item.duration_minutes)
 
-                        const isVisited = item.visited !== undefined ? item.visited : true
-                        const isPlanned = item.planned !== undefined ? item.planned : false
+                          const isVisited = item.visited !== undefined ? item.visited : true
+                          const isPlanned = item.planned !== undefined ? item.planned : false
 
-                        // Determine color based on type
-                        const categoryColor = isLocation
-                          ? "grey.400" // Locations get a neutral color
-                          : getCategoryColor(
-                              (item.properties.type as string) ||
-                                (item.properties.category as string) ||
-                                (item.properties.amenity as string),
-                            )
+                          // Determine color based on type
+                          const categoryColor = isLocation
+                            ? "grey.400" // Locations get a neutral color
+                            : getCategoryColor(
+                                (item.properties.type as string) ||
+                                  (item.properties.category as string) ||
+                                  (item.properties.amenity as string),
+                              )
 
-                        // Determine status color for border
-                        let statusColor = categoryColor
-                        if (isPlanned && !isVisited) statusColor = "primary.main"
-                        else if (isVisited) statusColor = "success.main"
-                        else statusColor = "text.disabled"
+                          // Determine status color for border
+                          let statusColor = categoryColor
+                          if (isPlanned && !isVisited) statusColor = "primary.main"
+                          else if (isVisited) statusColor = "success.main"
+                          else statusColor = "text.disabled"
 
-                        const itemColor = categoryColor // Keep itemColor for avatar background
+                          const itemColor = categoryColor // Keep itemColor for avatar background
 
-                        // Get thumbnail
-                        const thumbnail = !isLocation ? getFeatureThumbnail(item.properties) : null
-                        const placeholder = !isLocation
-                          ? getCategoryPlaceholder(
-                              (item.properties.type as string) ||
-                                (item.properties.category as string) ||
-                                (item.properties.amenity as string),
-                            )
-                          : null
+                          // Get thumbnail
+                          const thumbnail = !isLocation ? getFeatureThumbnail(item.properties) : null
+                          const placeholder = !isLocation
+                            ? getCategoryPlaceholder(
+                                (item.properties.type as string) ||
+                                  (item.properties.category as string) ||
+                                  (item.properties.amenity as string),
+                              )
+                            : null
 
-                        // Calculate distance from previous item
-                        let distanceInfo: { distance: number; time: number } | null = null
-                        if (idx > 0) {
-                          const prevItem = items[idx - 1]
-                          const prevLat =
-                            prevItem.type === "location" ? prevItem.latitude : prevItem.geometry?.coordinates[1]
-                          const prevLng =
-                            prevItem.type === "location" ? prevItem.longitude : prevItem.geometry?.coordinates[0]
-                          const currLat = isLocation ? item.latitude : item.geometry?.coordinates[1]
-                          const currLng = isLocation ? item.longitude : item.geometry?.coordinates[0]
+                          // Calculate distance from previous item
+                          let distanceInfo: { distance: number; time: number } | null = null
+                          if (idx > 0) {
+                            const prevItem = items[idx - 1]
+                            const prevLat =
+                              prevItem.type === "location" ? prevItem.latitude : prevItem.geometry?.coordinates[1]
+                            const prevLng =
+                              prevItem.type === "location" ? prevItem.longitude : prevItem.geometry?.coordinates[0]
+                            const currLat = isLocation ? item.latitude : item.geometry?.coordinates[1]
+                            const currLng = isLocation ? item.longitude : item.geometry?.coordinates[0]
 
-                          if (prevLat && prevLng && currLat && currLng) {
-                            const distance = calculateDistance(prevLat, prevLng, currLat, currLng)
-                            const time = estimateTravelTime(distance, item.transport_mode)
-                            distanceInfo = { distance, time }
+                            if (prevLat && prevLng && currLat && currLng) {
+                              const distance = calculateDistance(prevLat, prevLng, currLat, currLng)
+                              const time = estimateTravelTime(distance, item.transport_mode)
+                              distanceInfo = { distance, time }
+                            }
                           }
-                        }
 
-                        return (
-                          <React.Fragment key={key}>
-                            {distanceInfo && (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: 1,
-                                  py: 0.5,
-                                  px: 2,
-                                  bgcolor: "action.hover",
-                                  fontSize: "0.75rem",
-                                  color: "text.secondary",
-                                }}
-                              >
-                                <Typography variant="caption" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                                  ↓ {formatDistance(distanceInfo.distance)}
-                                  {item.transport_mode && (
-                                    <>
-                                      {" "}
-                                      (~{formatTravelTime(distanceInfo.time)} by {item.transport_mode})
-                                    </>
-                                  )}
-                                </Typography>
-                              </Box>
-                            )}
-                            <ListItem
-                              key={key}
-                              sx={{
-                                pl: 0,
-                                borderBottom: idx < items.length - 1 ? 1 : 0,
-                                borderColor: "divider",
-                                flexDirection: "column",
-                                alignItems: "stretch",
-                                borderLeft: 4,
-                                borderLeftColor: statusColor,
-                                ml: 1, // Add margin to offset the border
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "flex-start",
-                                  width: "100%",
-                                }}
-                              >
-                                <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-                                  <Box sx={{ display: "flex", flexDirection: "column", mr: 1 }}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => handleToggleVisit(item, day.id)}
-                                      color={isVisited ? "success" : "default"}
-                                      title={isVisited ? "Mark as not visited" : "Mark as visited"}
-                                    >
-                                      {isVisited ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
-                                    </IconButton>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => onMoveItem(day.id, idx, "up", items)}
-                                      disabled={idx === 0}
-                                    >
-                                      <MdArrowUpward fontSize="small" />
-                                    </IconButton>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => onMoveItem(day.id, idx, "down", items)}
-                                      disabled={idx === items.length - 1}
-                                    >
-                                      <MdArrowDownward fontSize="small" />
-                                    </IconButton>
-                                  </Box>
-
-                                  {/* Thumbnail or Icon */}
-                                  {!isLocation && (
-                                    <Avatar
-                                      src={thumbnail || placeholder || undefined}
-                                      variant="rounded"
-                                      sx={{ mr: 2, width: 40, height: 40, bgcolor: itemColor }}
-                                    >
-                                      {!thumbnail && !placeholder && <MdLocationOn />}
-                                    </Avatar>
-                                  )}
-
-                                  <ListItemText
-                                    primary={
-                                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                        {primaryText}
-                                        {item.start_time && (
-                                          <Tooltip
-                                            title={`Start: ${item.start_time}${endTime ? ` - End: ${endTime}` : ""}`}
-                                          >
-                                            <Typography
-                                              variant="caption"
-                                              sx={{
-                                                bgcolor: "primary.main",
-                                                color: "white",
-                                                px: 0.5,
-                                                borderRadius: 0.5,
-                                                cursor: "help",
-                                              }}
-                                            >
-                                              {item.start_time.slice(0, 5)}
-                                              {endTime && ` - ${endTime.slice(0, 5)}`}
-                                            </Typography>
-                                          </Tooltip>
-                                        )}
-                                      </Box>
-                                    }
-                                    secondary={secondaryText}
-                                  />
-                                </Box>
-                                <Box>
-                                  <Tooltip title="Locate on Map">
-                                    <IconButton
-                                      size="small"
-                                      onClick={() => {
-                                        if (isLocation) {
-                                          if (item.latitude && item.longitude) onFlyTo(item.latitude, item.longitude)
-                                        } else {
-                                          // Feature geometry
-                                          const coords = (item as TripFeature).geometry?.coordinates
-                                          if (coords) {
-                                            // GeoJSON is [lng, lat]
-                                            onFlyTo(coords[1], coords[0])
-                                          }
-                                        }
-                                      }}
-                                    >
-                                      <MdMyLocation fontSize="small" />
-                                    </IconButton>
-                                  </Tooltip>
-                                  {!isLocation && (
-                                    <Tooltip title="View Details">
-                                      <IconButton size="small" onClick={() => onViewFeature(item as TripFeature)}>
-                                        <MdVisibility fontSize="small" />
-                                      </IconButton>
-                                    </Tooltip>
-                                  )}
-                                  <IconButton size="small" onClick={() => onEditItem(item, item.type)}>
-                                    <MdEdit fontSize="small" />
-                                  </IconButton>
-                                  <IconButton
-                                    size="small"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      onDeleteItem(item, day.id)
-                                    }}
-                                  >
-                                    <MdDelete fontSize="small" />
-                                  </IconButton>
-                                </Box>
-                              </Box>
-
-                              {/* Transport Details */}
-                              {(item.transport_mode || item.transport_details || item.duration_minutes) && (
+                          return (
+                            <React.Fragment key={key}>
+                              {distanceInfo && (
                                 <Box
                                   sx={{
-                                    mt: 1,
-                                    ml: 5,
-                                    p: 1,
-                                    bgcolor: "action.hover",
-                                    borderRadius: 1,
                                     display: "flex",
-                                    flexDirection: "column",
-                                    gap: 0.5,
+                                    alignItems: "center",
+                                    gap: 1,
+                                    py: 0.5,
+                                    px: 2,
+                                    bgcolor: "action.hover",
+                                    fontSize: "0.75rem",
+                                    color: "text.secondary",
                                   }}
                                 >
-                                  {item.transport_mode && (
-                                    <Typography variant="caption" display="block">
-                                      <strong>Mode:</strong> {item.transport_mode}
-                                    </Typography>
-                                  )}
-                                  {item.transport_details && (
-                                    <Typography variant="caption" display="block">
-                                      <strong>Details:</strong> {item.transport_details}
-                                    </Typography>
-                                  )}
-                                  {item.duration_minutes && (
-                                    <Typography variant="caption" display="block">
-                                      <strong>Duration:</strong> {item.duration_minutes} min
-                                    </Typography>
-                                  )}
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                                  >
+                                    ↓ {formatDistance(distanceInfo.distance)}
+                                    {item.transport_mode && (
+                                      <>
+                                        {" "}
+                                        (~{formatTravelTime(distanceInfo.time)} by {item.transport_mode})
+                                      </>
+                                    )}
+                                  </Typography>
                                 </Box>
                               )}
-                            </ListItem>
-                          </React.Fragment>
-                        )
-                      })}
-                    </List>
-                  )}
-                </Box>
-              </Collapse>
-            </ListItem>
-          )
-        })}
-      </List>
+                              <ListItem
+                                key={key}
+                                sx={{
+                                  pl: 0,
+                                  borderBottom: idx < items.length - 1 ? 1 : 0,
+                                  borderColor: "divider",
+                                  flexDirection: "column",
+                                  alignItems: "stretch",
+                                  borderLeft: 4,
+                                  borderLeftColor: statusColor,
+                                  ml: 1, // Add margin to offset the border
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "flex-start",
+                                    width: "100%",
+                                  }}
+                                >
+                                  <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+                                    <Box sx={{ display: "flex", flexDirection: "column", mr: 1 }}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => handleToggleVisit(item, day.id)}
+                                        color={isVisited ? "success" : "default"}
+                                        title={isVisited ? "Mark as not visited" : "Mark as visited"}
+                                      >
+                                        {isVisited ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
+                                      </IconButton>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => onMoveItem(day.id, idx, "up", items)}
+                                        disabled={idx === 0}
+                                      >
+                                        <MdArrowUpward fontSize="small" />
+                                      </IconButton>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => onMoveItem(day.id, idx, "down", items)}
+                                        disabled={idx === items.length - 1}
+                                      >
+                                        <MdArrowDownward fontSize="small" />
+                                      </IconButton>
+                                    </Box>
+
+                                    {/* Thumbnail or Icon */}
+                                    {!isLocation && (
+                                      <Avatar
+                                        src={thumbnail || placeholder || undefined}
+                                        variant="rounded"
+                                        sx={{ mr: 2, width: 40, height: 40, bgcolor: itemColor }}
+                                      >
+                                        {!thumbnail && !placeholder && <MdLocationOn />}
+                                      </Avatar>
+                                    )}
+
+                                    <ListItemText
+                                      primary={
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                          {primaryText}
+                                          {item.start_time && (
+                                            <Tooltip
+                                              title={`Start: ${item.start_time}${endTime ? ` - End: ${endTime}` : ""}`}
+                                            >
+                                              <Typography
+                                                variant="caption"
+                                                sx={{
+                                                  bgcolor: "primary.main",
+                                                  color: "white",
+                                                  px: 0.5,
+                                                  borderRadius: 0.5,
+                                                  cursor: "help",
+                                                }}
+                                              >
+                                                {item.start_time.slice(0, 5)}
+                                                {endTime && ` - ${endTime.slice(0, 5)}`}
+                                              </Typography>
+                                            </Tooltip>
+                                          )}
+                                        </Box>
+                                      }
+                                      secondary={secondaryText}
+                                    />
+                                  </Box>
+                                  <Box>
+                                    <Tooltip title="Locate on Map">
+                                      <IconButton
+                                        size="small"
+                                        onClick={() => {
+                                          if (isLocation) {
+                                            if (item.latitude && item.longitude) onFlyTo(item.latitude, item.longitude)
+                                          } else {
+                                            // Feature geometry
+                                            const coords = (item as TripFeature).geometry?.coordinates
+                                            if (coords) {
+                                              // GeoJSON is [lng, lat]
+                                              onFlyTo(coords[1], coords[0])
+                                            }
+                                          }
+                                        }}
+                                      >
+                                        <MdMyLocation fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                    {!isLocation && (
+                                      <Tooltip title="View Details">
+                                        <IconButton size="small" onClick={() => onViewFeature(item as TripFeature)}>
+                                          <MdVisibility fontSize="small" />
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                    <IconButton size="small" onClick={() => onEditItem(item, item.type)}>
+                                      <MdEdit fontSize="small" />
+                                    </IconButton>
+                                    <IconButton
+                                      size="small"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        onDeleteItem(item, day.id)
+                                      }}
+                                    >
+                                      <MdDelete fontSize="small" />
+                                    </IconButton>
+                                  </Box>
+                                </Box>
+
+                                {/* Transport Details */}
+                                {(item.transport_mode || item.transport_details || item.duration_minutes) && (
+                                  <Box
+                                    sx={{
+                                      mt: 1,
+                                      ml: 5,
+                                      p: 1,
+                                      bgcolor: "action.hover",
+                                      borderRadius: 1,
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    {item.transport_mode && (
+                                      <Typography variant="caption" display="block">
+                                        <strong>Mode:</strong> {item.transport_mode}
+                                      </Typography>
+                                    )}
+                                    {item.transport_details && (
+                                      <Typography variant="caption" display="block">
+                                        <strong>Details:</strong> {item.transport_details}
+                                      </Typography>
+                                    )}
+                                    {item.duration_minutes && (
+                                      <Typography variant="caption" display="block">
+                                        <strong>Duration:</strong> {item.duration_minutes} min
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                )}
+                              </ListItem>
+                            </React.Fragment>
+                          )
+                        })}
+                      </List>
+                    )}
+                  </Box>
+                </Collapse>
+              </ListItem>
+            )
+          })}
+        </List>
+      )}
 
       <TripComparisonModal
         open={comparisonModalOpen}
