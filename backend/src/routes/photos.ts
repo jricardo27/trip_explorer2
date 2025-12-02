@@ -59,7 +59,7 @@ router.get("/trips/:tripId/photos", async (req: Request, res: Response) => {
 
     if (activity_id) {
       queryText += " AND activity_id = $2"
-      values.push(activity_id)
+      values.push(activity_id as string)
     }
 
     queryText += " ORDER BY taken_at DESC NULLS LAST, created_at DESC"

@@ -173,7 +173,7 @@ router.put("/activities/:activityId", async (req: AuthRequest, res: Response) =>
     }
 
     fields.push(`updated_by = $${paramCount}`)
-    values.push(req.user?.userId)
+    values.push(req.user?.userId || null)
     paramCount++
 
     values.push(activityId)

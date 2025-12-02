@@ -85,15 +85,6 @@ const PORT = process.env.PORT || 3001
 // Apply rate limiting to all API routes
 app.use("/api", apiLimiter)
 
-// Mount new API routes
-app.use("/api", activitiesRouter)
-app.use("/api/currency", currencyRouter)
-app.use("/api", membersRouter)
-app.use("/api", transportRouter)
-app.use("/api", expensesRouter)
-app.use("/api", budgetsRouter)
-app.use("/api", photosRouter)
-
 // Optimized marker loading endpoint (Week 4)
 app.get("/api/markers", async (req: Request, res: Response) => {
   const { path, min_lon, min_lat, max_lon, max_lat, zoom } = req.query
@@ -1069,6 +1060,15 @@ app.put("/api/trip-days/:dayId/features/:savedId", async (req, res) => {
 
 // Reports routes
 app.use("/api/reports", reportsRouter)
+
+// Mount new API routes
+app.use("/api", activitiesRouter)
+app.use("/api/currency", currencyRouter)
+app.use("/api", membersRouter)
+app.use("/api", transportRouter)
+app.use("/api", expensesRouter)
+app.use("/api", budgetsRouter)
+app.use("/api", photosRouter)
 
 export { app }
 

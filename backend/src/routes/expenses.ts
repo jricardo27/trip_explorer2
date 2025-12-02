@@ -108,19 +108,19 @@ router.get("/trips/:tripId/expenses", async (req: Request, res: Response) => {
 
     if (category) {
       queryText += ` AND e.category = $${paramCount}`
-      values.push(category)
+      values.push(category as string)
       paramCount++
     }
 
     if (start_date) {
       queryText += ` AND e.payment_date >= $${paramCount}`
-      values.push(start_date)
+      values.push(start_date as string)
       paramCount++
     }
 
     if (end_date) {
       queryText += ` AND e.payment_date <= $${paramCount}`
-      values.push(end_date)
+      values.push(end_date as string)
       paramCount++
     }
 
