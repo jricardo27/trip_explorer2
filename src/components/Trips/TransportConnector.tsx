@@ -1,118 +1,133 @@
+import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike"
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
+import DirectionsTransitIcon from "@mui/icons-material/DirectionsTransit"
+import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk"
+import FlightIcon from "@mui/icons-material/Flight"
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import { Box, Typography, IconButton, Tooltip } from "@mui/material"
-import React from "react"
-import {
-  MdDirectionsCar,
-  MdDirectionsTransit,
-  MdDirectionsBus,
-  MdFlight,
-  MdDirectionsBoat,
-  MdDirectionsWalk,
-  MdDirectionsBike,
-  MdMoreHoriz,
-} from "react-icons/md"
+import React, { useState } from "react"
 
-import { DayLocation, TripFeature } from "../../contexts/TripContext"
-import { formatTravelTime } from "../../utils/distanceUtils"
+import TransportAlternativesPanel from "../Transport/TransportAlternativesPanel"
 
 interface TransportConnectorProps {
-  item: DayLocation | TripFeature
-  distance?: number
-  onClick: () => void
+  tripId: string
+  fromActivityId: string
+  toActivityId: string
+  transportMode?: string
+  durationMinutes?: number
+  cost?: number
+  currency?: string
+  onUpdate?: () => void
 }
 
-const getTransportIcon = (mode: string | undefined) => {
-  switch (mode?.toLowerCase()) {
-    case "car":
-      return <MdDirectionsCar />
-    case "train":
-      return <MdDirectionsTransit />
-    case "bus":
-      return <MdDirectionsBus />
+const getTransportIcon = (mode: string) => {
+  switch (mode) {
+    case "driving":
+      return <DirectionsCarIcon fontSize="small" />
+    case "walking":
+      return <DirectionsWalkIcon fontSize="small" />
+    case "cycling":
+      return <DirectionsBikeIcon fontSize="small" />
+    case "transit":
+      return <DirectionsTransitIcon fontSize="small" />
     case "flight":
-      return <MdFlight />
-    case "ferry":
-      return <MdDirectionsBoat />
-    case "walk":
-      return <MdDirectionsWalk />
-    case "bike":
-      return <MdDirectionsBike />
+      return <FlightIcon fontSize="small" />
     default:
-      return <MdMoreHoriz />
+      return <DirectionsCarIcon fontSize="small" />
   }
 }
 
-export const TransportConnector: React.FC<TransportConnectorProps> = ({ item, distance, onClick }) => {
-  const hasTransportInfo = item.transport_mode || item.travel_time_minutes || item.transport_cost
+const TransportConnector: React.FC<TransportConnectorProps> = ({
+  tripId,
+  fromActivityId,
+  toActivityId,
+  transportMode,
+  durationMinutes,
+  cost,
+  currency,
+  onUpdate,
+}) => {
+  const [panelOpen, setPanelOpen] = useState(false)
+
+  const hasTransport = !!transportMode
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 1,
-        py: 0.5,
-        px: 2,
-        bgcolor: hasTransportInfo ? "action.hover" : "transparent",
-        borderLeft: 3,
-        borderLeftColor: "divider",
-        ml: 1,
-        cursor: "pointer",
-        transition: "background-color 0.2s",
-        "&:hover": {
-          bgcolor: "action.selected",
-        },
-      }}
-      onClick={onClick}
-    >
-      {/* Vertical connector line */}
+    <>
       <Box
         sx={{
-          width: 2,
-          height: 20,
-          bgcolor: "divider",
-          mr: 1,
+          display: "flex",
+          alignItems: "center",
+          py: 1,
+          px: 2,
+          ml: 4,
+          borderLeft: "2px dashed #ccc",
+          position: "relative",
         }}
-      />
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            left: -11,
+            top: "50%",
+            marginTop: "-10px",
+            bgcolor: "background.paper",
+          }}
+        >
+          <IconButton
+            size="small"
+            onClick={() => setPanelOpen(true)}
+            sx={{
+              border: "1px solid #e0e0e0",
+              width: 20,
+              height: 20,
+              p: 0,
+            }}
+          >
+            <MoreHorizIcon sx={{ fontSize: 14 }} />
+          </IconButton>
+        </Box>
 
-      {/* Transport icon */}
-      <Tooltip title="Click to edit transport details">
-        <IconButton size="small" sx={{ p: 0.5 }}>
-          {getTransportIcon(item.transport_mode)}
-        </IconButton>
-      </Tooltip>
-
-      {/* Transport info */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexGrow: 1 }}>
-        {distance !== undefined && (
-          <Typography variant="caption" color="text.secondary">
-            {distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`}
-          </Typography>
-        )}
-
-        {item.transport_mode && (
-          <Typography variant="caption" color="text.secondary" sx={{ textTransform: "capitalize" }}>
-            {item.transport_mode}
-          </Typography>
-        )}
-
-        {item.travel_time_minutes && (
-          <Typography variant="caption" color="text.secondary">
-            ~{formatTravelTime(item.travel_time_minutes)}
-          </Typography>
-        )}
-
-        {item.transport_cost && (
-          <Typography variant="caption" color="text.secondary">
-            ${item.transport_cost}
-          </Typography>
-        )}
-
-        {!hasTransportInfo && (
-          <Typography variant="caption" color="text.disabled" sx={{ fontStyle: "italic" }}>
-            Click to add transport details
-          </Typography>
+        {hasTransport ? (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              "&:hover": { bgcolor: "action.hover", borderRadius: 1 },
+            }}
+            onClick={() => setPanelOpen(true)}
+          >
+            <Box sx={{ color: "text.secondary", mr: 1, display: "flex" }}>{getTransportIcon(transportMode)}</Box>
+            <Typography variant="caption" color="text.secondary">
+              {durationMinutes} min • {currency} {cost}
+            </Typography>
+          </Box>
+        ) : (
+          <Tooltip title="Add transport">
+            <Typography
+              variant="caption"
+              color="text.disabled"
+              sx={{ cursor: "pointer", fontStyle: "italic" }}
+              onClick={() => setPanelOpen(true)}
+            >
+              Add transport...
+            </Typography>
+          </Tooltip>
         )}
       </Box>
-    </Box>
+
+      <TransportAlternativesPanel
+        tripId={tripId}
+        fromActivityId={fromActivityId}
+        toActivityId={toActivityId}
+        isOpen={panelOpen}
+        onClose={() => setPanelOpen(false)}
+        onTransportSelected={() => {
+          if (onUpdate) onUpdate()
+        }}
+      />
+    </>
   )
 }
+
+export default TransportConnector
