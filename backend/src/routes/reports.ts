@@ -19,7 +19,7 @@ router.get("/travel-stats", async (req, res) => {
       dateFilter = "AND t.start_date > NOW()"
     } else if (year && year !== "all") {
       dateFilter = "AND EXTRACT(YEAR FROM t.start_date) = $2"
-      params.push(year)
+      params.push(String(year))
     } else {
       // Default "all" -> Past trips (trips that have ended)
       dateFilter = "AND t.end_date <= NOW()"

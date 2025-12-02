@@ -689,6 +689,9 @@ app.post("/api/trip-days/:dayId/locations", async (req, res) => {
     animation_config,
     visited = true,
     planned = false,
+    travel_time_minutes,
+    is_locked,
+    subtype,
   } = req.body
 
   if (!country) {

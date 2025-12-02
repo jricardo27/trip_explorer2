@@ -16,8 +16,8 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material"
-import React, { useState, useContext, useCallback } from "react"
-import { MdPushPin, MdClose } from "react-icons/md"
+import React, { useState, useContext, useCallback, useEffect } from "react"
+import { MdPushPin, MdClose, MdDragIndicator } from "react-icons/md"
 
 import SavedFeaturesContext from "../../contexts/SavedFeaturesContext"
 import { useTripContext, DayLocation, TripFeature, Trip } from "../../contexts/TripContext"
@@ -86,6 +86,39 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
 
   const [tripFilter, setTripFilter] = useState<"all" | "future" | "past" | "current">("all")
   const [isPlanningMode, setIsPlanningMode] = useState(false)
+  const [drawerWidth, setDrawerWidth] = useState(() => {
+    const saved = localStorage.getItem("drawerWidth")
+    return saved ? parseInt(saved) : 500
+  })
+  const [isResizing, setIsResizing] = useState(false)
+
+  // Handle resize
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return
+      const newWidth = e.clientX
+      if (newWidth >= 400 && newWidth <= 800) {
+        setDrawerWidth(newWidth)
+      }
+    }
+
+    const handleMouseUp = () => {
+      if (isResizing) {
+        setIsResizing(false)
+        localStorage.setItem("drawerWidth", drawerWidth.toString())
+      }
+    }
+
+    if (isResizing) {
+      document.addEventListener("mousemove", handleMouseMove)
+      document.addEventListener("mouseup", handleMouseUp)
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove)
+      document.removeEventListener("mouseup", handleMouseUp)
+    }
+  }, [isResizing, drawerWidth])
 
   const { contextMenu, contextMenuTab, contextMenuFeature, handleContextMenu, handleTabContextMenu, handleClose } =
     useContextMenu()
@@ -263,12 +296,13 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
       variant={isPinned ? "persistent" : "temporary"}
       PaperProps={{
         sx: {
-          width: isPinned || !isMobile ? 400 : "100%",
-          maxWidth: isPinned || !isMobile ? 400 : "100%",
+          width: isPinned || !isMobile ? drawerWidth : "100%",
+          maxWidth: isPinned || !isMobile ? drawerWidth : "100%",
           height: "100%",
           display: "flex",
           flexDirection: "column",
           pointerEvents: "auto",
+          position: "relative",
         },
       }}
       ModalProps={{
@@ -499,6 +533,37 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Resize Handle */}
+      {(isPinned || !isMobile) && (
+        <Box
+          onMouseDown={() => setIsResizing(true)}
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: 8,
+            cursor: "ew-resize",
+            bgcolor: isResizing ? "primary.main" : "transparent",
+            "&:hover": {
+              bgcolor: "primary.light",
+            },
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "background-color 0.2s",
+            zIndex: 1300,
+          }}
+        >
+          <MdDragIndicator
+            style={{
+              opacity: isResizing ? 1 : 0.3,
+              transition: "opacity 0.2s",
+            }}
+          />
+        </Box>
+      )}
     </Drawer>
   )
 }

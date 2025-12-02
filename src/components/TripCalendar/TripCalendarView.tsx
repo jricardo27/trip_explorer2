@@ -6,6 +6,7 @@ import { DayLocation, Trip, TripFeature } from "../../contexts/TripContext"
 
 import { CalendarDayCell } from "./CalendarDayCell"
 import { CalendarItem } from "./CalendarItem"
+import { TimeGrid } from "./TimeGrid"
 
 interface TripCalendarViewProps {
   trip: Trip
@@ -32,6 +33,8 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
     item: DayLocation | TripFeature
     type: "location" | "feature"
   } | null>(null)
+
+  const pixelsPerMinute = 2
 
   // Combine locations and features for each day
   const dayItems = useMemo(() => {
@@ -96,20 +99,32 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
       <Box
         sx={{
           display: "flex",
-          gap: 2,
-          overflowX: "auto",
-          p: 2,
-          minHeight: 500,
+          height: "calc(100vh - 200px)",
+          overflow: "auto",
         }}
       >
-        {trip.days.map((day) => (
-          <CalendarDayCell
-            key={day.id}
-            day={day}
-            items={dayItems[day.id] || []}
-            onItemClick={(item) => onItemClick(item, "city" in item ? "location" : "feature")}
-          />
-        ))}
+        {/* Time Axis */}
+        <TimeGrid pixelsPerMinute={pixelsPerMinute} />
+
+        {/* Day Columns */}
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            p: 2,
+            flexGrow: 1,
+          }}
+        >
+          {trip.days.map((day) => (
+            <CalendarDayCell
+              key={day.id}
+              day={day}
+              items={dayItems[day.id] || []}
+              onItemClick={(item) => onItemClick(item, "city" in item ? "location" : "feature")}
+              pixelsPerMinute={pixelsPerMinute}
+            />
+          ))}
+        </Box>
       </Box>
 
       <DragOverlay>{activeItem && <CalendarItem item={activeItem.item} isDragging />}</DragOverlay>
