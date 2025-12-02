@@ -45,7 +45,7 @@ import {
 
 import { Trip, DayLocation, TripFeature, useTripContext } from "../../../contexts/TripContext"
 import { getCategoryColor } from "../../../utils/colorUtils"
-import { calculateDistance, formatDistance, estimateTravelTime, formatTravelTime } from "../../../utils/distanceUtils"
+import { calculateDistance, estimateTravelTime } from "../../../utils/distanceUtils"
 import { getFeatureThumbnail, getCategoryPlaceholder } from "../../../utils/imageUtils"
 import { calculateEndTime } from "../../../utils/timeUtils"
 import { exportTripToGeoJSON, exportTripToKML } from "../../TopMenu/exportTrip"
@@ -54,6 +54,8 @@ import { exportTripToPDF } from "../../TopMenu/exportTripToPDF"
 import { TripCalendarView } from "../../TripCalendar/TripCalendarView"
 import { TripComparisonModal } from "../../TripComparison/TripComparisonModal"
 import { EditTimeModal } from "../../Trips/EditTimeModal"
+import { EditTransportModal } from "../../Trips/EditTransportModal"
+import { TransportConnector } from "../../Trips/TransportConnector"
 import { TripSummary } from "../../Trips/TripSummary"
 
 interface TripDetailViewProps {
@@ -96,6 +98,8 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
   const [editTimeModalOpen, setEditTimeModalOpen] = useState(false)
   const [editingTimeItem, setEditingTimeItem] = useState<DayLocation | TripFeature | null>(null)
+  const [editTransportModalOpen, setEditTransportModalOpen] = useState(false)
+  const [editingTransportItem, setEditingTransportItem] = useState<DayLocation | TripFeature | null>(null)
   const { copyTrip, updateLocationVisitStatus, updateFeatureVisitStatus, reorderItems, updateLocation, updateFeature } =
     useTripContext()
 
@@ -525,32 +529,15 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
 
                           return (
                             <React.Fragment key={key}>
-                              {distanceInfo && (
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 1,
-                                    py: 0.5,
-                                    px: 2,
-                                    bgcolor: "action.hover",
-                                    fontSize: "0.75rem",
-                                    color: "text.secondary",
+                              {idx > 0 && (
+                                <TransportConnector
+                                  item={item}
+                                  distance={distanceInfo?.distance}
+                                  onClick={() => {
+                                    setEditingTransportItem(item)
+                                    setEditTransportModalOpen(true)
                                   }}
-                                >
-                                  <Typography
-                                    variant="caption"
-                                    sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-                                  >
-                                    ↓ {formatDistance(distanceInfo.distance)}
-                                    {item.transport_mode && (
-                                      <>
-                                        {" "}
-                                        (~{formatTravelTime(distanceInfo.time)} by {item.transport_mode})
-                                      </>
-                                    )}
-                                  </Typography>
-                                </Box>
+                                />
                               )}
                               <ListItem
                                 key={key}
@@ -759,6 +746,27 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
             await updateLocation(editingTimeItem.id, dayId, updates as Partial<DayLocation>)
           } else {
             const savedId = (editingTimeItem as TripFeature).saved_id || (editingTimeItem as TripFeature).properties.id
+            await updateFeature(savedId, dayId, updates as Partial<TripFeature>)
+          }
+        }}
+      />
+
+      <EditTransportModal
+        open={editTransportModalOpen}
+        onClose={() => {
+          setEditTransportModalOpen(false)
+          setEditingTransportItem(null)
+        }}
+        item={editingTransportItem}
+        onSave={async (updates) => {
+          if (!editingTransportItem) return
+          const isLocation = "city" in editingTransportItem
+          const dayId = editingTransportItem.trip_day_id || ""
+          if (isLocation) {
+            await updateLocation(editingTransportItem.id, dayId, updates as Partial<DayLocation>)
+          } else {
+            const savedId =
+              (editingTransportItem as TripFeature).saved_id || (editingTransportItem as TripFeature).properties.id
             await updateFeature(savedId, dayId, updates as Partial<TripFeature>)
           }
         }}

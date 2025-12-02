@@ -3,13 +3,23 @@ import cors from "cors"
 import express, { Request, Response } from "express"
 
 import { query } from "./db"
+import { generateToken } from "./middleware/auth"
+import { apiLimiter, authLimiter } from "./middleware/rateLimit"
+import activitiesRouter from "./routes/activities"
+import budgetsRouter from "./routes/budgets"
+import currencyRouter from "./routes/currency"
+import expensesRouter from "./routes/expenses"
+import membersRouter from "./routes/members"
+import photosRouter from "./routes/photos"
 import reportsRouter from "./routes/reports"
+import transportRouter from "./routes/transport"
+
 const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Auth endpoints
-app.post("/api/auth/signup", async (req: Request, res: Response) => {
+// Auth endpoints (with rate limiting)
+app.post("/api/auth/signup", authLimiter, async (req: Request, res: Response) => {
   const { email, password } = req.body
 
   if (!email || !password) {
@@ -17,17 +27,25 @@ app.post("/api/auth/signup", async (req: Request, res: Response) => {
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 12) // Increased from 10 to 12 rounds
     const result = await query("INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email", [
       email,
       hashedPassword,
     ])
-    res.json(result.rows[0])
+
+    const user = result.rows[0]
+    const token = generateToken(user.id, user.email)
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      token,
+    })
   } catch (err: unknown) {
     const error = err as { code?: string }
     if (error.code === "23505") {
       // Unique violation
-      res.status(490).json({ error: "Email already exists" })
+      res.status(400).json({ error: "Email already exists" })
     } else {
       console.error(err)
       res.status(500).json({ error: "Internal server error" })
@@ -35,7 +53,7 @@ app.post("/api/auth/signup", async (req: Request, res: Response) => {
   }
 })
 
-app.post("/api/auth/login", async (req: Request, res: Response) => {
+app.post("/api/auth/login", authLimiter, async (req: Request, res: Response) => {
   const { email, password } = req.body
 
   if (!email || !password) {
@@ -47,7 +65,12 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
     const user = result.rows[0]
 
     if (user && (await bcrypt.compare(password, user.password_hash))) {
-      res.json({ id: user.id, email: user.email })
+      const token = generateToken(user.id, user.email)
+      res.json({
+        id: user.id,
+        email: user.email,
+        token,
+      })
     } else {
       res.status(401).json({ error: "Invalid credentials" })
     }
@@ -59,8 +82,17 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
 
 const PORT = process.env.PORT || 3001
 
-app.use(cors())
-app.use(express.json())
+// Apply rate limiting to all API routes
+app.use("/api", apiLimiter)
+
+// Mount new API routes
+app.use("/api", activitiesRouter)
+app.use("/api/currency", currencyRouter)
+app.use("/api", membersRouter)
+app.use("/api", transportRouter)
+app.use("/api", expensesRouter)
+app.use("/api", budgetsRouter)
+app.use("/api", photosRouter)
 
 // Get all markers for a specific path
 // Get all markers for a specific path, optionally filtered by bounds

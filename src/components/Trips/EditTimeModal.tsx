@@ -12,7 +12,7 @@ import {
   InputAdornment,
 } from "@mui/material"
 import React, { useState, useEffect } from "react"
-import { MdAccessTime, MdLock, MdLockOpen, MdDirectionsCar } from "react-icons/md"
+import { MdAccessTime, MdLock, MdLockOpen } from "react-icons/md"
 
 import { DayLocation, TripFeature } from "../../contexts/TripContext"
 
@@ -36,7 +36,6 @@ const SUBTYPES = [
 export const EditTimeModal: React.FC<EditTimeModalProps> = ({ open, onClose, item, onSave }) => {
   const [startTime, setStartTime] = useState("")
   const [duration, setDuration] = useState("")
-  const [travelTime, setTravelTime] = useState("")
   const [isLocked, setIsLocked] = useState(false)
   const [subtype, setSubtype] = useState("")
 
@@ -44,17 +43,31 @@ export const EditTimeModal: React.FC<EditTimeModalProps> = ({ open, onClose, ite
     if (item) {
       setStartTime(item.start_time || "")
       setDuration(item.duration_minutes?.toString() || "")
-      setTravelTime(item.travel_time_minutes?.toString() || "")
       setIsLocked(item.is_locked || false)
       setSubtype(item.subtype || "")
     }
   }, [item])
 
+  // Calculate departure time
+  const calculateDepartureTime = (): string => {
+    if (!startTime || !duration) return ""
+
+    const [hours, minutes] = startTime.split(":").map(Number)
+    const durationNum = parseInt(duration)
+
+    const totalMinutes = hours * 60 + minutes + durationNum
+    const departureHours = Math.floor(totalMinutes / 60) % 24
+    const departureMinutes = totalMinutes % 60
+
+    return `${String(departureHours).padStart(2, "0")}:${String(departureMinutes).padStart(2, "0")}`
+  }
+
+  const departureTime = calculateDepartureTime()
+
   const handleSave = async () => {
     await onSave({
       start_time: startTime || undefined,
       duration_minutes: duration ? parseInt(duration) : undefined,
-      travel_time_minutes: travelTime ? parseInt(travelTime) : undefined,
       is_locked: isLocked,
       subtype: subtype || undefined,
     })
@@ -68,7 +81,7 @@ export const EditTimeModal: React.FC<EditTimeModalProps> = ({ open, onClose, ite
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
           <Grid item xs={12}>
             <TextField
-              label="Start Time"
+              label="Arrival Time"
               type="time"
               fullWidth
               value={startTime}
@@ -83,32 +96,35 @@ export const EditTimeModal: React.FC<EditTimeModalProps> = ({ open, onClose, ite
               }}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <TextField
-              label="Duration (min)"
+              label="Stay Duration (min)"
               type="number"
               fullWidth
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
             />
           </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Travel Time (min)"
-              type="number"
-              fullWidth
-              value={travelTime}
-              onChange={(e) => setTravelTime(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MdDirectionsCar />
-                  </InputAdornment>
-                ),
-              }}
-              helperText="Time to reach here"
-            />
-          </Grid>
+          {departureTime && (
+            <Grid item xs={12}>
+              <TextField
+                label="Departure Time"
+                value={departureTime}
+                fullWidth
+                InputProps={{
+                  readOnly: true,
+                }}
+                InputLabelProps={{ shrink: true }}
+                helperText="Calculated: Arrival + Stay Duration"
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "text.secondary",
+                    fontStyle: "italic",
+                  },
+                }}
+              />
+            </Grid>
+          )}
           <Grid item xs={12}>
             <TextField select label="Type" fullWidth value={subtype} onChange={(e) => setSubtype(e.target.value)}>
               <MenuItem value="">None</MenuItem>

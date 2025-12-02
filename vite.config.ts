@@ -45,6 +45,7 @@ export default defineConfig({
     port: 5173, // you can replace this port with any port
     watch: {
       usePolling: true, // needed for Docker on macOS/Windows
+      ignored: ["**/node_modules/**", "**/.antigravity/**"],
     },
     proxy: {
       "/api": {

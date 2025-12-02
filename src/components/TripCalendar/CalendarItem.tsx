@@ -1,14 +1,56 @@
-import { Box, Paper, Typography } from "@mui/material"
+import { Box, Paper, Typography, Chip } from "@mui/material"
 import React from "react"
-import { MdLocationOn, MdPlace, MdCheckBox, MdCheckBoxOutlineBlank } from "react-icons/md"
+import {
+  MdLocationOn,
+  MdPlace,
+  MdCheckBox,
+  MdCheckBoxOutlineBlank,
+  MdDirectionsCar,
+  MdDirectionsTransit,
+  MdDirectionsBus,
+  MdFlight,
+  MdDirectionsBoat,
+  MdDirectionsWalk,
+  MdDirectionsBike,
+} from "react-icons/md"
 
 import { DayLocation, TripFeature } from "../../contexts/TripContext"
 import { getCategoryColor } from "../../utils/colorUtils"
+import { calculateEndTime } from "../../utils/timeUtils"
 
 interface CalendarItemProps {
   item: DayLocation | TripFeature
   onClick?: () => void
   isDragging?: boolean
+}
+
+const getTransportIcon = (mode: string | undefined) => {
+  switch (mode?.toLowerCase()) {
+    case "car":
+      return <MdDirectionsCar size={14} />
+    case "train":
+      return <MdDirectionsTransit size={14} />
+    case "bus":
+      return <MdDirectionsBus size={14} />
+    case "flight":
+      return <MdFlight size={14} />
+    case "ferry":
+      return <MdDirectionsBoat size={14} />
+    case "walk":
+      return <MdDirectionsWalk size={14} />
+    case "bike":
+      return <MdDirectionsBike size={14} />
+    default:
+      return null
+  }
+}
+
+const formatDuration = (minutes: number): string => {
+  const hours = Math.floor(minutes / 60)
+  const mins = minutes % 60
+  if (hours > 0 && mins > 0) return `${hours}h ${mins}m`
+  if (hours > 0) return `${hours}h`
+  return `${mins}m`
 }
 
 export const CalendarItem: React.FC<CalendarItemProps> = ({ item, onClick, isDragging = false }) => {
@@ -33,7 +75,11 @@ export const CalendarItem: React.FC<CalendarItemProps> = ({ item, onClick, isDra
     ? `${(item as DayLocation).city}, ${(item as DayLocation).country}`
     : (item as TripFeature).properties.name || "Unnamed Feature"
 
-  const time = item.start_time || ""
+  const startTime = item.start_time || ""
+  const endTime =
+    item.end_time || (startTime && item.duration_minutes ? calculateEndTime(startTime, item.duration_minutes) : "")
+  const timeRange =
+    startTime && endTime ? `${startTime.slice(0, 5)} - ${endTime.slice(0, 5)}` : startTime ? startTime.slice(0, 5) : ""
 
   return (
     <Paper
@@ -59,11 +105,28 @@ export const CalendarItem: React.FC<CalendarItemProps> = ({ item, onClick, isDra
           <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
             {name}
           </Typography>
-          {time && (
-            <Typography variant="caption" color="text.secondary">
-              {time}
-            </Typography>
-          )}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+            {timeRange && (
+              <Typography variant="caption" color="text.secondary">
+                {timeRange}
+              </Typography>
+            )}
+            {item.duration_minutes && (
+              <Chip
+                label={formatDuration(item.duration_minutes)}
+                size="small"
+                sx={{ height: 18, fontSize: "0.7rem" }}
+              />
+            )}
+            {item.transport_mode && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "text.secondary" }}>
+                {getTransportIcon(item.transport_mode)}
+                <Typography variant="caption" sx={{ textTransform: "capitalize" }}>
+                  {item.transport_mode}
+                </Typography>
+              </Box>
+            )}
+          </Box>
         </Box>
 
         {/* Visit status icon */}
