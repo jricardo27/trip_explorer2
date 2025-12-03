@@ -693,7 +693,9 @@ app.get("/api/locations/search", async (req, res) => {
 
   try {
     const result = await query(
-      `SELECT id, name, country_name, country_code, latitude, longitude
+      `SELECT id, name, country_name, country_code, 
+              ST_X(location_coords) as longitude, 
+              ST_Y(location_coords) as latitude
        FROM cities
        WHERE name ILIKE $1 OR ascii_name ILIKE $1
        ORDER BY population DESC NULLS LAST
@@ -940,13 +942,25 @@ app.put("/api/day-locations/:id", async (req, res) => {
 
     const result = await query(
       `UPDATE day_locations
-       SET country = $1, country_code = $2, city = $3, town = $4,
-           location_coords = ${locationCoords},
-           visit_order = $5, notes = $6,
-           transport_mode = $7, transport_details = $8, transport_cost = $9, duration_minutes = $10,
-           start_time = $11, end_time = $12, animation_config = $13,
-           visited = $14, planned = $15,
-           travel_time_minutes = $16, is_locked = $17, subtype = $18
+       SET country = COALESCE($1, country), 
+           country_code = COALESCE($2, country_code), 
+           city = COALESCE($3, city), 
+           town = COALESCE($4, town),
+           location_coords = COALESCE(${locationCoords}, location_coords),
+           visit_order = COALESCE($5, visit_order), 
+           notes = COALESCE($6, notes),
+           transport_mode = COALESCE($7, transport_mode), 
+           transport_details = COALESCE($8, transport_details), 
+           transport_cost = COALESCE($9, transport_cost), 
+           duration_minutes = COALESCE($10, duration_minutes),
+           start_time = COALESCE($11, start_time), 
+           end_time = COALESCE($12, end_time), 
+           animation_config = COALESCE($13, animation_config),
+           visited = COALESCE($14, visited), 
+           planned = COALESCE($15, planned),
+           travel_time_minutes = COALESCE($16, travel_time_minutes), 
+           is_locked = COALESCE($17, is_locked), 
+           subtype = COALESCE($18, subtype)
        WHERE id = $19
        RETURNING *,
          ST_X(location_coords) as longitude,
