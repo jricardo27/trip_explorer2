@@ -941,21 +941,21 @@ app.put("/api/day-locations/:id", async (req, res) => {
     const result = await query(
       `UPDATE day_locations
        SET country = $1, country_code = $2, city = $3, town = $4,
-           latitude = $5, longitude = $6, location_coords = ${locationCoords},
-           visit_order = $7, notes = $8,
-           transport_mode = $9, transport_details = $10, transport_cost = $11, duration_minutes = $12,
-           start_time = $13, end_time = $14, animation_config = $15,
-           visited = $16, planned = $17,
-           travel_time_minutes = $18, is_locked = $19, subtype = $20
-       WHERE id = $21
-       RETURNING *`,
+           location_coords = ${locationCoords},
+           visit_order = $5, notes = $6,
+           transport_mode = $7, transport_details = $8, transport_cost = $9, duration_minutes = $10,
+           start_time = $11, end_time = $12, animation_config = $13,
+           visited = $14, planned = $15,
+           travel_time_minutes = $16, is_locked = $17, subtype = $18
+       WHERE id = $19
+       RETURNING *,
+         ST_X(location_coords) as longitude,
+         ST_Y(location_coords) as latitude`,
       [
         country,
         country_code,
         city,
         town,
-        latitude,
-        longitude,
         visit_order,
         notes,
         transport_mode,
