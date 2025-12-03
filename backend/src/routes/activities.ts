@@ -1,15 +1,15 @@
 import express, { Request, Response } from "express"
 
 import { query } from "../db"
-import { authMiddleware, AuthRequest } from "../middleware/auth"
+// import { authMiddleware, AuthRequest } from "../middleware/auth"
 
 const router = express.Router()
 
-// All routes require authentication
-router.use(authMiddleware)
+// Auth disabled for development - all routes are public
+// router.use(authMiddleware)
 
 // Create activity
-router.post("/trips/:tripId/activities", async (req: AuthRequest, res: Response) => {
+router.post("/trips/:tripId/activities", async (req: Request, res: Response) => {
   const { tripId } = req.params
   const {
     trip_day_id,
@@ -56,7 +56,7 @@ router.post("/trips/:tripId/activities", async (req: AuthRequest, res: Response)
         status,
         priority,
         is_flexible,
-        req.user?.userId,
+        null, // created_by - auth disabled for development
       ],
     )
 
@@ -146,7 +146,7 @@ router.get("/activities/:activityId", async (req: Request, res: Response) => {
 })
 
 // Update activity
-router.put("/activities/:activityId", async (req: AuthRequest, res: Response) => {
+router.put("/activities/:activityId", async (req: Request, res: Response) => {
   const { activityId } = req.params
   const updates = req.body
 
@@ -173,7 +173,7 @@ router.put("/activities/:activityId", async (req: AuthRequest, res: Response) =>
     }
 
     fields.push(`updated_by = $${paramCount}`)
-    values.push(req.user?.userId || null)
+    values.push(null) // auth disabled for development
     paramCount++
 
     values.push(activityId)
