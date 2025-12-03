@@ -67,8 +67,8 @@ router.get("/travel-stats", async (req, res) => {
         dl.city, 
         dl.town, 
         dl.country,
-        dl.latitude,
-        dl.longitude,
+        ST_Y(dl.location_coords) as latitude,
+        ST_X(dl.location_coords) as longitude,
         'location' as type
       FROM day_locations dl
       JOIN trip_days td ON dl.trip_day_id = td.id

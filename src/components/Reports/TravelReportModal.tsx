@@ -3,7 +3,7 @@ import {
   DialogTitle,
   DialogContent,
   IconButton,
-  Grid2 as Grid,
+  Grid,
   Paper,
   Typography,
   Box,
@@ -247,7 +247,7 @@ export const TravelReportModal: React.FC<TravelReportModalProps> = ({ open, onCl
           </Box>
 
           <Grid container spacing={2} sx={{ mb: 4 }}>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid item xs={12} sm={6} md={4}>
               <StatCard
                 icon={<MdPublic size={32} color="#1976d2" />}
                 label="Countries"
@@ -256,7 +256,7 @@ export const TravelReportModal: React.FC<TravelReportModalProps> = ({ open, onCl
                 selected={tabValue === 0}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid item xs={12} sm={6} md={4}>
               <StatCard
                 icon={<MdLocationCity size={32} color="#2e7d32" />}
                 label="Cities"
@@ -265,7 +265,7 @@ export const TravelReportModal: React.FC<TravelReportModalProps> = ({ open, onCl
                 selected={tabValue === 1}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid item xs={12} sm={6} md={4}>
               <StatCard
                 icon={<MdPlace size={32} color="#ed6c02" />}
                 label="Places Visited"
@@ -274,7 +274,7 @@ export const TravelReportModal: React.FC<TravelReportModalProps> = ({ open, onCl
                 selected={tabValue === 2}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+            <Grid item xs={12} sm={6} md={6}>
               <StatCard
                 icon={<MdFlightTakeoff size={32} color="#9c27b0" />}
                 label="Trips Taken"
@@ -283,7 +283,7 @@ export const TravelReportModal: React.FC<TravelReportModalProps> = ({ open, onCl
                 selected={tabValue === 3}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+            <Grid item xs={12} sm={6} md={6}>
               <StatCard
                 icon={<MdDateRange size={32} color="#d32f2f" />}
                 label="Days Traveled"

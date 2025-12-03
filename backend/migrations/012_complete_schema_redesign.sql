@@ -21,9 +21,18 @@ ALTER TABLE cities DROP COLUMN IF EXISTS longitude;
 -- ============================================
 
 -- Fix trips.user_id to be proper FK
-ALTER TABLE trips
-ALTER COLUMN user_id TYPE UUID USING user_id::UUID;
+-- First, clean up any invalid UUIDs (like 'test-user-123')
+DELETE FROM trips
+WHERE
+    user_id !~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
 
+-- Convert to UUID type
+ALTER TABLE trips ALTER COLUMN user_id TYPE UUID USING user_id::UUID;
+
+-- Delete trips where user_id doesn't exist in users table (orphaned trips)
+DELETE FROM trips WHERE user_id NOT IN ( SELECT id FROM users );
+
+-- Now add the foreign key constraint
 ALTER TABLE trips
 ADD CONSTRAINT fk_trips_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
 
@@ -155,9 +164,7 @@ CREATE TABLE IF NOT EXISTS activities (
   trip_day_id UUID REFERENCES trip_days(id) ON DELETE CASCADE,
 
 -- Type & Classification
-activity_type TEXT NOT NULL,
-activity_subtype TEXT,
-category TEXT,
+activity_type TEXT NOT NULL, activity_subtype TEXT, category TEXT,
 
 -- Basic Info
 name TEXT NOT NULL,
@@ -220,6 +227,8 @@ is_group_activity BOOLEAN DEFAULT TRUE,
 source TEXT DEFAULT 'manual', external_id TEXT, tags TEXT [],
 
 -- Legacy compatibility (for migration)
+
+
 legacy_location_id UUID,
   legacy_feature_id INTEGER,
   
@@ -306,16 +315,22 @@ booking_reference TEXT,
 is_feasible BOOLEAN DEFAULT TRUE, infeasibility_reason TEXT,
 
 -- Metadata
+
+
 source TEXT DEFAULT 'manual',
   confidence_score NUMERIC(3, 2),
   last_validated_at TIMESTAMPTZ,
   
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  
-  CONSTRAINT one_selected_per_connection UNIQUE (from_activity_id, to_activity_id, is_selected) 
-    WHERE is_selected = TRUE
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE UNIQUE INDEX one_selected_per_connection ON transport_alternatives (
+    from_activity_id,
+    to_activity_id
+)
+WHERE
+    is_selected = TRUE;
 
 CREATE INDEX IF NOT EXISTS idx_transport_alternatives_from ON transport_alternatives (from_activity_id);
 
@@ -340,6 +355,8 @@ CREATE TABLE IF NOT EXISTS trip_members (
 name TEXT NOT NULL, email TEXT, role TEXT DEFAULT 'member',
 
 -- Preferences
+
+
 avatar_url TEXT,
   color TEXT,
   
@@ -385,9 +402,7 @@ activity_id UUID REFERENCES activities (id) ON DELETE SET NULL,
 transport_alternative_id UUID REFERENCES transport_alternatives (id) ON DELETE SET NULL,
 
 -- Basic Info
-description TEXT NOT NULL,
-category TEXT NOT NULL,
-subcategory TEXT,
+description TEXT NOT NULL, category TEXT NOT NULL, subcategory TEXT,
 
 -- Amount (with currency and conversion)
 amount NUMERIC(10, 2) NOT NULL,
@@ -413,6 +428,8 @@ receipt_url TEXT, receipt_number TEXT,
 is_shared BOOLEAN DEFAULT FALSE, split_type TEXT DEFAULT 'equal',
 
 -- Metadata
+
+
 tags TEXT[],
   notes TEXT,
   
@@ -487,6 +504,8 @@ caption TEXT, taken_at TIMESTAMPTZ,
 cloud_provider TEXT, cloud_photo_id TEXT,
 
 -- Uploaded by
+
+
 uploaded_by UUID REFERENCES users(id),
   
   created_at TIMESTAMPTZ DEFAULT NOW(),

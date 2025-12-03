@@ -17,6 +17,7 @@ INSERT INTO
         country,
         country_code,
         scheduled_start,
+        scheduled_end,
         duration_minutes,
         status,
         notes,
@@ -45,6 +46,22 @@ SELECT
         )::TIMESTAMPTZ
         ELSE NULL
     END as scheduled_start,
+    CASE
+        WHEN dl.start_time IS NOT NULL
+        AND dl.duration_minutes IS NOT NULL THEN (
+            (
+                td.date || ' ' || dl.start_time
+            )::TIMESTAMPTZ + (
+                dl.duration_minutes || ' minutes'
+            )::INTERVAL
+        )
+        WHEN dl.start_time IS NOT NULL THEN (
+            (
+                td.date || ' ' || dl.start_time
+            )::TIMESTAMPTZ + INTERVAL '1 hour'
+        )
+        ELSE NULL
+    END as scheduled_end,
     dl.duration_minutes,
     CASE
         WHEN dl.visited = TRUE THEN 'completed'
@@ -78,6 +95,7 @@ INSERT INTO
         location_coords,
         description,
         scheduled_start,
+        scheduled_end,
         duration_minutes,
         status,
         legacy_feature_id,
@@ -122,6 +140,22 @@ SELECT
         )::TIMESTAMPTZ
         ELSE NULL
     END as scheduled_start,
+    CASE
+        WHEN sf.start_time IS NOT NULL
+        AND sf.duration_minutes IS NOT NULL THEN (
+            (
+                td.date || ' ' || sf.start_time
+            )::TIMESTAMPTZ + (
+                sf.duration_minutes || ' minutes'
+            )::INTERVAL
+        )
+        WHEN sf.start_time IS NOT NULL THEN (
+            (
+                td.date || ' ' || sf.start_time
+            )::TIMESTAMPTZ + INTERVAL '1 hour'
+        )
+        ELSE NULL
+    END as scheduled_end,
     sf.duration_minutes,
     CASE
         WHEN sf.visited = TRUE THEN 'completed'

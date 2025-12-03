@@ -130,4 +130,4 @@ const TransportConnector: React.FC<TransportConnectorProps> = ({
   )
 }
 
-export default TransportConnector
+export { TransportConnector }

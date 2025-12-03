@@ -8,28 +8,7 @@ export default defineConfig({
   base: "",
   build: {
     rollupOptions: {
-      external: [
-        "axios",
-        "file-saver",
-        "jszip",
-        "geojson-to-kml",
-        "leaflet",
-        "react",
-        "react-ga4",
-        "react-image-gallery",
-        "react-leaflet",
-        "react-router-dom",
-        "tinymce",
-        "turndown",
-        "uuid",
-        /^@dnd-kit\/.*/,
-        /^@emotion\/.*/,
-        /^@mui\/.*/,
-        /^@tinymce\/.*/,
-        /^react-dom\/?.*/,
-        /^react\/jsx-runtime/,
-        /^react-toastify\/?.*/,
-      ],
+      // external: [] // Removed to force bundling of all dependencies
     },
   },
   plugins: [

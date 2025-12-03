@@ -41,6 +41,7 @@ import {
   MdAccessTime,
   MdCompareArrows,
   MdFileDownload,
+  MdViewModule,
 } from "react-icons/md"
 
 import { Trip, DayLocation, TripFeature, useTripContext } from "../../../contexts/TripContext"
@@ -48,6 +49,7 @@ import { getCategoryColor } from "../../../utils/colorUtils"
 import { calculateDistance, estimateTravelTime } from "../../../utils/distanceUtils"
 import { getFeatureThumbnail, getCategoryPlaceholder } from "../../../utils/imageUtils"
 import { calculateEndTime } from "../../../utils/timeUtils"
+import CalendarViews from "../../Calendar/CalendarViews"
 import { exportTripToGeoJSON, exportTripToKML } from "../../TopMenu/exportTrip"
 import { exportTripToExcel } from "../../TopMenu/exportTripToExcel"
 import { exportTripToPDF } from "../../TopMenu/exportTripToPDF"
@@ -92,7 +94,7 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
   const [copyDialogOpen, setCopyDialogOpen] = useState(false)
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false)
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list")
+  const [viewMode, setViewMode] = useState<"list" | "calendar" | "newCalendar">("list")
   const [newTripName, setNewTripName] = useState("")
   const [newStartDate, setNewStartDate] = useState("")
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
@@ -200,7 +202,7 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
               <MdViewList />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Calendar View">
+          <Tooltip title="Calendar View (Old)">
             <IconButton
               size="small"
               onClick={() => setViewMode("calendar")}
@@ -208,6 +210,16 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
               sx={{ borderRadius: 0 }}
             >
               <MdCalendarToday />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Calendar Views (New)">
+            <IconButton
+              size="small"
+              onClick={() => setViewMode("newCalendar")}
+              color={viewMode === "newCalendar" ? "primary" : "default"}
+              sx={{ borderRadius: 0 }}
+            >
+              <MdViewModule />
             </IconButton>
           </Tooltip>
         </Box>
@@ -348,7 +360,9 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
       </Box>
 
       {/* Calendar/List View Conditional Rendering */}
-      {viewMode === "calendar" ? (
+      {viewMode === "newCalendar" ? (
+        <CalendarViews tripId={trip.id} />
+      ) : viewMode === "calendar" ? (
         <TripCalendarView
           trip={trip}
           dayLocations={dayLocations}
