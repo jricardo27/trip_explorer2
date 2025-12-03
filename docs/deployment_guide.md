@@ -20,36 +20,43 @@ This guide details the steps to deploy the Trip Explorer application to Google C
 - Billing enabled (required for Cloud Build/Cloud Run, even if using free tier)
 - `gcloud` CLI installed and authenticated
 
-## Step 1: Database Setup (Cloud SQL)
+## Step 1: Database Setup (Choose One)
+
+### Option A: Supabase (Recommended for Ease/Cost)
+
+Supabase provides a generous free tier and comes with PostGIS pre-installed.
+
+1. Create a new project at [supabase.com](https://supabase.com).
+2. Go to **Database** -> **Extensions** and enable `postgis`.
+3. Go to **Settings** -> **Database** and copy the **Connection String** (Node.js format).
+4. You will use this connection string for the `DATABASE_URL` environment variable.
+
+### Option B: Compute Engine VM (Self-Managed)
+
+Cheaper than Cloud SQL but requires manual maintenance.
+
+1. Create a VM instance (e.g., e2-micro) in GCP.
+2. SSH into the VM and install Docker.
+3. Run PostGIS container:
+
+   ```bash
+   docker run --name trip-db -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 -v pgdata:/var/lib/postgresql/data postgis/postgis:15-3.3-alpine
+   ```
+
+4. Configure firewall rules to allow traffic on port 5432 (restrict to your backend service account if possible).
+
+### Option C: Cloud SQL (Managed GCP)
+
+Native GCP integration but higher cost.
 
 1. Create a PostgreSQL instance:
 
    ```bash
-   gcloud sql instances create trip-explorer-db \
-       --database-version=POSTGRES_15 \
-       --tier=db-f1-micro \
-       --region=us-central1
+   gcloud sql instances create trip-explorer-db --database-version=POSTGRES_15 --tier=db-f1-micro --region=us-central1
    ```
 
-2. Set the password for the `postgres` user:
-
-   ```bash
-   gcloud sql users set-password postgres \
-       --instance=trip-explorer-db \
-       --password=YOUR_SECURE_PASSWORD
-   ```
-
-3. Create the database:
-
-   ```bash
-   gcloud sql databases create trip_explorer --instance=trip-explorer-db
-   ```
-
-4. Enable PostGIS extension (connect via Cloud Shell or proxy):
-
-   ```sql
-   CREATE EXTENSION postgis;
-   ```
+2. Create database `trip_explorer` and user `postgres`.
+3. Enable PostGIS: `CREATE EXTENSION postgis;`
 
 ## Step 2: Backend Deployment (Cloud Run)
 
@@ -68,7 +75,7 @@ This guide details the steps to deploy the Trip Explorer application to Google C
        --platform managed \
        --region us-central1 \
        --allow-unauthenticated \
-       --set-env-vars DB_HOST=/cloudsql/PROJECT_ID:us-central1:trip-explorer-db,DB_USER=postgres,DB_PASS=YOUR_PASSWORD,DB_NAME=trip_explorer
+       --set-env-vars POSTGRES_HOST=YOUR_DB_HOST,POSTGRES_USER=YOUR_DB_USER,POSTGRES_PASSWORD=YOUR_DB_PASS,POSTGRES_DB=trip_explorer,POSTGRES_PORT=5432
    ```
 
 ## Step 3: Frontend Deployment (Cloud Storage + CDN)

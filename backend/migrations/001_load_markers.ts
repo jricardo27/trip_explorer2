@@ -11,7 +11,16 @@ interface MarkerFile {
 export async function migrate() {
   console.log("Starting marker data migration...")
 
-  const markersDir = "/app/public/markers"
+  // Determine markers directory based on execution context
+  // When running locally: ../../public/markers
+  // When running in Docker: /app/public/markers
+  let markersDir = path.join(__dirname, "../../../public/markers")
+
+  if (!fs.existsSync(markersDir)) {
+    // Fallback for Docker or different structure
+    markersDir = "/app/public/markers"
+  }
+
   console.log(`Looking for markers in: ${markersDir}`)
 
   if (!fs.existsSync(markersDir)) {

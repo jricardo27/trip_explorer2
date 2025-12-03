@@ -7,12 +7,15 @@
 # Update these variables before running!
 PROJECT_ID="your-project-id"
 REGION="us-central1"
-DB_INSTANCE="trip-explorer-db"
-DB_NAME="trip_explorer"
-DB_USER="postgres"
-DB_PASS="your-db-password" # Consider using Secret Manager in production
 BACKEND_SERVICE="trip-explorer-backend"
 FRONTEND_BUCKET="gs://trip-explorer-frontend"
+
+# Database Configuration (Works with Supabase, Compute Engine, or Cloud SQL)
+DB_HOST="your-db-host"      # e.g., db.xyz.supabase.co or 34.x.x.x
+DB_PORT="5432"
+DB_NAME="trip_explorer"
+DB_USER="postgres"
+DB_PASS="your-db-password"
 # ---------------------
 
 set -e
@@ -41,7 +44,7 @@ function deploy_backend {
         --platform managed \
         --region $REGION \
         --allow-unauthenticated \
-        --set-env-vars POSTGRES_HOST=/cloudsql/$PROJECT_ID:$REGION:$DB_INSTANCE,POSTGRES_USER=$DB_USER,POSTGRES_PASSWORD=$DB_PASS,POSTGRES_DB=$DB_NAME
+        --set-env-vars POSTGRES_HOST=$DB_HOST,POSTGRES_PORT=$DB_PORT,POSTGRES_USER=$DB_USER,POSTGRES_PASSWORD=$DB_PASS,POSTGRES_DB=$DB_NAME
         
     echo "Backend deployed successfully!"
 }
