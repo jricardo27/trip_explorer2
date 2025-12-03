@@ -1,12 +1,14 @@
-import { Box, Typography, Paper } from "@mui/material"
+import { Box, Typography, Paper, Tooltip } from "@mui/material"
 import axios from "axios"
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useMemo } from "react"
 
 interface Activity {
   id: string
   name: string
   scheduled_start: string | null
   scheduled_end: string | null
+  activity_type: string
+  description?: string
 }
 
 interface GanttViewProps {
@@ -30,7 +32,7 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
   }, [fetchActivities])
 
   // Calculate timeline bounds
-  const getTimelineBounds = () => {
+  const bounds = useMemo(() => {
     if (activities.length === 0) return { start: new Date(), end: new Date() }
     const validActivities = activities.filter((a) => a.scheduled_start && a.scheduled_end)
     if (validActivities.length === 0) return { start: new Date(), end: new Date() }
@@ -39,9 +41,8 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
       start: new Date(Math.min(...times.map((t) => t.getTime()))),
       end: new Date(Math.max(...times.map((t) => t.getTime()))),
     }
-  }
+  }, [activities])
 
-  const bounds = getTimelineBounds()
   const totalDuration = bounds.end.getTime() - bounds.start.getTime()
 
   const getActivityPosition = (activity: Activity) => {
@@ -50,11 +51,41 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
     const duration = new Date(activity.scheduled_end).getTime() - new Date(activity.scheduled_start).getTime()
     return {
       left: `${(start / totalDuration) * 100}%`,
-      width: `${(duration / totalDuration) * 100}%`,
+      width: `${Math.max((duration / totalDuration) * 100, 2)}%`, // Minimum 2% width for visibility
     }
   }
 
-  const validActivities = activities.filter((a) => a.scheduled_start && a.scheduled_end)
+  const getActivityColor = (type: string) => {
+    const colors: Record<string, string> = {
+      accommodation: "#4CAF50",
+      transport: "#2196F3",
+      dining: "#FF9800",
+      activity: "#9C27B0",
+      sightseeing: "#F44336",
+    }
+    return colors[type] || "#757575"
+  }
+
+  const formatDateTime = (dateStr: string) => {
+    return new Date(dateStr).toLocaleString([], {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+
+  const formatDuration = (start: string, end: string) => {
+    const duration = new Date(end).getTime() - new Date(start).getTime()
+    const hours = Math.floor(duration / (1000 * 60 * 60))
+    const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60))
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`
+    }
+    return `${minutes}m`
+  }
+
+  const validActivities = useMemo(() => activities.filter((a) => a.scheduled_start && a.scheduled_end), [activities])
 
   if (validActivities.length === 0) {
     return (
@@ -67,26 +98,52 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
     )
   }
 
+  // Calculate day markers
+  const dayMarkers: Date[] = []
+  const currentDay = new Date(bounds.start)
+  currentDay.setHours(0, 0, 0, 0)
+  while (currentDay <= bounds.end) {
+    dayMarkers.push(new Date(currentDay))
+    currentDay.setDate(currentDay.getDate() + 1)
+  }
+
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
         Gantt Chart
       </Typography>
-      <Box sx={{ position: "relative", minHeight: validActivities.length * 60 + 40 }}>
-        {/* Timeline header */}
-        <Box sx={{ display: "flex", mb: 2, px: 2 }}>
-          <Typography variant="caption" color="text.secondary">
-            {bounds.start.toLocaleDateString()}
-          </Typography>
-          <Box sx={{ flexGrow: 1 }} />
-          <Typography variant="caption" color="text.secondary">
-            {bounds.end.toLocaleDateString()}
-          </Typography>
+      <Box sx={{ position: "relative", minHeight: validActivities.length * 60 + 80, overflowX: "auto" }}>
+        {/* Timeline header with day markers */}
+        <Box sx={{ position: "relative", height: 40, mb: 2 }}>
+          {dayMarkers.map((day, index) => {
+            const dayStart = day.getTime() - bounds.start.getTime()
+            const position = (dayStart / totalDuration) * 100
+            return (
+              <Box
+                key={index}
+                sx={{
+                  position: "absolute",
+                  left: `calc(160px + ${position}%)`,
+                  top: 0,
+                  borderLeft: "1px dashed",
+                  borderColor: "divider",
+                  height: "100%",
+                  pl: 0.5,
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  {day.toLocaleDateString([], { month: "short", day: "numeric" })}
+                </Typography>
+              </Box>
+            )
+          })}
         </Box>
 
         {/* Activity bars */}
         {validActivities.map((activity) => {
           const position = getActivityPosition(activity)
+          const color = getActivityColor(activity.activity_type)
+
           return (
             <Box key={activity.id} sx={{ position: "relative", height: 50, mb: 1 }}>
               <Typography
@@ -100,32 +157,74 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
+                  fontWeight: "medium",
                 }}
               >
                 {activity.name}
               </Typography>
-              <Paper
-                sx={{
-                  position: "absolute",
-                  left: `calc(160px + ${position.left})`,
-                  width: position.width,
-                  height: 30,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  bgcolor: "primary.main",
-                  display: "flex",
-                  alignItems: "center",
-                  px: 1,
-                  minWidth: 50,
-                }}
+              <Tooltip
+                title={
+                  <Box>
+                    <Typography variant="subtitle2">{activity.name}</Typography>
+                    <Typography variant="caption" display="block">
+                      Type: {activity.activity_type}
+                    </Typography>
+                    <Typography variant="caption" display="block">
+                      Start: {formatDateTime(activity.scheduled_start!)}
+                    </Typography>
+                    <Typography variant="caption" display="block">
+                      End: {formatDateTime(activity.scheduled_end!)}
+                    </Typography>
+                    <Typography variant="caption" display="block">
+                      Duration: {formatDuration(activity.scheduled_start!, activity.scheduled_end!)}
+                    </Typography>
+                    {activity.description && (
+                      <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
+                        {activity.description}
+                      </Typography>
+                    )}
+                  </Box>
+                }
+                arrow
               >
-                <Typography variant="caption" sx={{ color: "white", fontSize: "0.7rem" }}>
-                  {new Date(activity.scheduled_start!).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Typography>
-              </Paper>
+                <Paper
+                  sx={{
+                    position: "absolute",
+                    left: `calc(160px + ${position.left})`,
+                    width: position.width,
+                    height: 30,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    bgcolor: color,
+                    display: "flex",
+                    alignItems: "center",
+                    px: 1,
+                    minWidth: 50,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    "&:hover": {
+                      transform: "translateY(-50%) scale(1.05)",
+                      boxShadow: 3,
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "white",
+                      fontSize: "0.7rem",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {new Date(activity.scheduled_start!).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Typography>
+                </Paper>
+              </Tooltip>
             </Box>
           )
         })}
