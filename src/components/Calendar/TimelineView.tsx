@@ -137,18 +137,92 @@ const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
     )
   }, [activities])
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (active.id !== over?.id) {
-      setActivities((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over?.id)
+    if (!over || active.id === over.id) return
 
-        // TODO: Update backend with new order/times
-        // For now, just reorder locally
-        return arrayMove(items, oldIndex, newIndex)
+    // Find the active item and over item
+    const activeId = active.id as string
+    const overId = over.id as string
+
+    // Find which day group these belong to
+    // Note: This simple implementation assumes dragging within the same day for now
+    // Cross-day dragging would require finding source and destination containers
+    let activeDay: string | undefined
+    let activeActivity: Activity | undefined
+
+    Object.entries(groupedActivities).forEach(([date, items]) => {
+      const found = items.find((a) => a.id === activeId)
+      if (found) {
+        activeDay = date
+        activeActivity = found
+      }
+    })
+
+    if (!activeDay || !activeActivity) return
+
+    const dayActivities = groupedActivities[activeDay]
+    const oldIndex = dayActivities.findIndex((item) => item.id === activeId)
+    const newIndex = dayActivities.findIndex((item) => item.id === overId)
+
+    if (oldIndex === -1 || newIndex === -1) return
+
+    // Calculate new order locally for optimistic update
+    const newOrder = arrayMove(dayActivities, oldIndex, newIndex)
+
+    // Calculate new time based on position
+    // If moved to index i, it should start after i-1 (or day start)
+    // and before i+1 (if exists)
+
+    const prevActivity = newIndex > 0 ? newOrder[newIndex - 1] : null
+    // const nextActivity = newIndex < newOrder.length - 1 ? newOrder[newIndex + 1] : null
+
+    let newStartTime = new Date(activeActivity.scheduled_start)
+    const durationMs = activeActivity.scheduled_end
+      ? new Date(activeActivity.scheduled_end).getTime() - new Date(activeActivity.scheduled_start).getTime()
+      : 60 * 60 * 1000 // Default 1 hour if no end time
+
+    if (prevActivity && prevActivity.scheduled_end) {
+      // Start 15 mins after previous activity ends
+      const prevEnd = new Date(prevActivity.scheduled_end).getTime()
+      newStartTime = new Date(prevEnd + 15 * 60 * 1000)
+    } else if (prevActivity) {
+      // Start 1 hour after previous activity starts (if no end time)
+      const prevStart = new Date(prevActivity.scheduled_start).getTime()
+      newStartTime = new Date(prevStart + 60 * 60 * 1000)
+    } else {
+      // First item in list - keep same day but set to 09:00 or keep current time if earlier?
+      // For simplicity, let's keep the date but set time to 09:00 if it was later,
+      // or just subtract 1 hour from original?
+      // Let's set to 09:00 of that day
+      newStartTime.setHours(9, 0, 0, 0)
+    }
+
+    const newEndTime = new Date(newStartTime.getTime() + durationMs)
+
+    // Optimistic update
+    const updatedActivity = {
+      ...activeActivity,
+      scheduled_start: newStartTime.toISOString(),
+      scheduled_end: newEndTime.toISOString(),
+    }
+
+    const updatedActivities = activities.map((a) => (a.id === activeId ? updatedActivity : a))
+    setActivities(updatedActivities)
+
+    // Backend update
+    try {
+      await axios.put(`/api/activities/${activeId}`, {
+        scheduled_start: newStartTime.toISOString(),
+        scheduled_end: newEndTime.toISOString(),
       })
+      // Refresh to ensure sync
+      fetchActivities()
+    } catch (error) {
+      console.error("Failed to update activity time:", error)
+      // Revert on error
+      fetchActivities()
     }
   }
 

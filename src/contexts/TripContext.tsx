@@ -132,6 +132,17 @@ export interface TravelStats {
   available_years: number[]
 }
 
+export interface Conflict {
+  activity1_id: string
+  activity1_name: string
+  activity1_start: string
+  activity1_end: string
+  activity2_id: string
+  activity2_name: string
+  activity2_start: string
+  activity2_end: string
+}
+
 interface TripContextType {
   trips: Trip[]
   currentTrip: Trip | null
@@ -168,6 +179,7 @@ interface TripContextType {
   fetchTravelStats: (year?: number | string) => Promise<TravelStats | null>
   updateLocationVisitStatus: (locationId: string, dayId: string, visited: boolean, planned: boolean) => Promise<void>
   updateFeatureVisitStatus: (featureId: string, dayId: string, visited: boolean, planned: boolean) => Promise<void>
+  fetchConflicts: (tripId: string) => Promise<Conflict[]>
 }
 
 const TripContext = createContext<TripContextType | undefined>(undefined)
@@ -561,6 +573,19 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
+  const fetchConflicts = async (tripId: string): Promise<Conflict[]> => {
+    try {
+      const response = await fetch(`${API_URL}/api/trips/${tripId}/activities/conflicts`)
+      if (response.ok) {
+        return await response.json()
+      }
+      return []
+    } catch (error) {
+      console.error("Failed to fetch conflicts:", error)
+      return []
+    }
+  }
+
   return (
     <TripContext.Provider
       value={{
@@ -588,6 +613,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fetchTravelStats,
         updateLocationVisitStatus,
         updateFeatureVisitStatus,
+        fetchConflicts,
       }}
     >
       {children}
