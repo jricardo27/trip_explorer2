@@ -100,7 +100,10 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({
       updates.notes = notes.trim() || null
     }
 
-    const itemId = type === "feature" ? (item as TripFeature).properties.id : (item as DayLocation).id
+    const itemId =
+      type === "feature"
+        ? (item as TripFeature).saved_id || (item as TripFeature).properties.id
+        : (item as DayLocation).id
     onSave(itemId, updates)
     onClose()
   }
