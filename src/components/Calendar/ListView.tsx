@@ -1,8 +1,19 @@
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
-import { Box, List, ListItem, ListItemText, Typography, Chip, IconButton, Divider } from "@mui/material"
+import ExpandLessIcon from "@mui/icons-material/ExpandLess"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  Chip,
+  IconButton,
+  Divider,
+  Collapse,
+  Paper,
+} from "@mui/material"
 import axios from "axios"
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useMemo } from "react"
 
 interface Activity {
   id: string
@@ -21,6 +32,7 @@ interface ListViewProps {
 
 const ListView: React.FC<ListViewProps> = ({ tripId }) => {
   const [activities, setActivities] = useState<Activity[]>([])
+  const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
 
   const fetchActivities = useCallback(async () => {
     try {
@@ -35,13 +47,52 @@ const ListView: React.FC<ListViewProps> = ({ tripId }) => {
     fetchActivities()
   }, [fetchActivities])
 
-  const formatDateTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleString([], {
-      month: "short",
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString([], {
+      weekday: "long",
+      month: "long",
       day: "numeric",
+      year: "numeric",
+    })
+  }
+
+  const formatTime = (dateStr: string) => {
+    return new Date(dateStr).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     })
+  }
+
+  // Group activities by day
+  const groupedActivities = useMemo(() => {
+    return activities.reduce(
+      (acc, activity) => {
+        if (!activity.scheduled_start) return acc
+        const date = new Date(activity.scheduled_start).toDateString()
+        if (!acc[date]) {
+          acc[date] = []
+        }
+        acc[date].push(activity)
+        return acc
+      },
+      {} as Record<string, Activity[]>,
+    )
+  }, [activities])
+
+  // Initialize all days as expanded
+  useEffect(() => {
+    const initialExpanded: Record<string, boolean> = {}
+    Object.keys(groupedActivities).forEach((date) => {
+      initialExpanded[date] = true
+    })
+    setExpandedDays(initialExpanded)
+  }, [groupedActivities])
+
+  const toggleDay = (date: string) => {
+    setExpandedDays((prev) => ({
+      ...prev,
+      [date]: !prev[date],
+    }))
   }
 
   if (activities.length === 0) {
@@ -52,53 +103,79 @@ const ListView: React.FC<ListViewProps> = ({ tripId }) => {
     )
   }
 
+  const sortedDates = Object.keys(groupedActivities).sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+
   return (
     <Box>
-      <List>
-        {activities.map((activity, index) => (
-          <React.Fragment key={activity.id}>
-            <ListItem
-              secondaryAction={
-                <Box>
-                  <IconButton edge="end" aria-label="edit">
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton edge="end" aria-label="delete">
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-              }
+      {sortedDates.map((date) => {
+        const dayActivities = groupedActivities[date]
+        const isExpanded = expandedDays[date] ?? true
+
+        return (
+          <Paper key={date} sx={{ mb: 2 }} elevation={1}>
+            {/* Day Header */}
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: "primary.main",
+                color: "primary.contrastText",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                cursor: "pointer",
+              }}
+              onClick={() => toggleDay(date)}
             >
-              <ListItemText
-                primary={
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="subtitle1">{activity.name}</Typography>
-                    {activity.is_flexible && <Chip label="Flexible" size="small" variant="outlined" />}
-                    <Chip label={activity.activity_type} size="small" color="primary" variant="outlined" />
-                  </Box>
-                }
-                secondary={
-                  <>
-                    <Typography component="span" variant="body2" color="text.secondary">
-                      {formatDateTime(activity.scheduled_start)}
-                      {activity.scheduled_end && ` - ${formatDateTime(activity.scheduled_end)}`}
-                    </Typography>
-                    {(activity.latitude || activity.longitude) && (
-                      <>
-                        <br />
-                        <Typography component="span" variant="body2" color="text.secondary">
-                          📍 {activity.latitude?.toFixed(4)}, {activity.longitude?.toFixed(4)}
-                        </Typography>
-                      </>
-                    )}
-                  </>
-                }
-              />
-            </ListItem>
-            {index < activities.length - 1 && <Divider />}
-          </React.Fragment>
-        ))}
-      </List>
+              <Box>
+                <Typography variant="h6">{formatDate(dayActivities[0].scheduled_start)}</Typography>
+                <Typography variant="caption">
+                  {dayActivities.length} {dayActivities.length === 1 ? "activity" : "activities"}
+                </Typography>
+              </Box>
+              <IconButton size="small" sx={{ color: "inherit" }}>
+                {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+            </Box>
+
+            {/* Activities List */}
+            <Collapse in={isExpanded}>
+              <List disablePadding>
+                {dayActivities.map((activity, index) => (
+                  <React.Fragment key={activity.id}>
+                    <ListItem sx={{ py: 2 }}>
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+                            <Typography variant="subtitle1" fontWeight="medium">
+                              {activity.name}
+                            </Typography>
+                            {activity.is_flexible && <Chip label="Flexible" size="small" variant="outlined" />}
+                            <Chip label={activity.activity_type} size="small" color="primary" variant="outlined" />
+                          </Box>
+                        }
+                        secondary={
+                          <>
+                            <Typography component="span" variant="body2" color="text.secondary" display="block">
+                              🕐 {formatTime(activity.scheduled_start)}
+                              {activity.scheduled_end && ` - ${formatTime(activity.scheduled_end)}`}
+                            </Typography>
+                            {(activity.latitude || activity.longitude) && (
+                              <Typography component="span" variant="body2" color="text.secondary" display="block">
+                                📍 {activity.latitude?.toFixed(4)}, {activity.longitude?.toFixed(4)}
+                              </Typography>
+                            )}
+                          </>
+                        }
+                      />
+                    </ListItem>
+                    {index < dayActivities.length - 1 && <Divider />}
+                  </React.Fragment>
+                ))}
+              </List>
+            </Collapse>
+          </Paper>
+        )
+      })}
     </Box>
   )
 }
