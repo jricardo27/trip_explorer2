@@ -1,0 +1,36 @@
+# Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+# Copy backend package files
+COPY backend/package*.json ./backend/
+
+# Install dependencies
+WORKDIR /app/backend
+RUN npm install
+
+# Copy source code
+COPY backend/ .
+# Copy public markers from root (assuming build context is root)
+COPY public/markers ../public/markers
+
+# Build TypeScript
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine
+WORKDIR /app
+
+# Install production dependencies
+COPY backend/package*.json ./
+RUN npm install --production
+
+# Copy built artifacts
+COPY --from=builder /app/backend/dist ./dist
+# Copy public assets
+COPY --from=builder /app/public ./public
+# Copy schema for migrations
+COPY --from=builder /app/backend/src/schema.sql ./src/schema.sql
+
+EXPOSE 3001
+CMD ["npm", "start"]
