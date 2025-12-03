@@ -15,8 +15,13 @@ interface GanttViewProps {
   tripId: string
 }
 
+import { useTripContext, Conflict } from "../../contexts/TripContext"
+
 const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
   const [activities, setActivities] = useState<Activity[]>([])
+  const [conflicts, setConflicts] = useState<Conflict[]>([])
+
+  const { fetchConflicts } = useTripContext()
 
   const fetchActivities = useCallback(async () => {
     try {
@@ -27,9 +32,19 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
     }
   }, [tripId])
 
+  const loadConflicts = useCallback(async () => {
+    const data = await fetchConflicts(tripId)
+    setConflicts(data)
+  }, [tripId, fetchConflicts])
+
   useEffect(() => {
     fetchActivities()
-  }, [fetchActivities])
+    loadConflicts()
+  }, [fetchActivities, loadConflicts])
+
+  const getConflictForActivity = (activityId: string) => {
+    return conflicts.find((c) => c.activity1_id === activityId || c.activity2_id === activityId)
+  }
 
   // Calculate timeline bounds
   const bounds = useMemo(() => {
@@ -143,6 +158,7 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
         {validActivities.map((activity) => {
           const position = getActivityPosition(activity)
           const color = getActivityColor(activity.activity_type)
+          const conflict = getConflictForActivity(activity.id)
 
           return (
             <Box key={activity.id} sx={{ position: "relative", height: 50, mb: 1 }}>
@@ -196,6 +212,7 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
                     top: "50%",
                     transform: "translateY(-50%)",
                     bgcolor: color,
+                    border: conflict ? "2px solid #d32f2f" : "none",
                     display: "flex",
                     alignItems: "center",
                     px: 1,
@@ -208,6 +225,28 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
                     },
                   }}
                 >
+                  {conflict && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: -8,
+                        right: -8,
+                        bgcolor: "#d32f2f",
+                        borderRadius: "50%",
+                        width: 16,
+                        height: 16,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: "10px",
+                        fontWeight: "bold",
+                        zIndex: 1,
+                      }}
+                    >
+                      !
+                    </Box>
+                  )}
                   <Typography
                     variant="caption"
                     sx={{

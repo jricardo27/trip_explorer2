@@ -15,10 +15,14 @@ interface CalendarViewsProps {
 }
 
 const CalendarViews: React.FC<CalendarViewsProps> = ({ tripId }) => {
-  const [currentView, setCurrentView] = useState(0)
+  const [currentView, setCurrentView] = useState(() => {
+    const saved = localStorage.getItem("calendarViewPreference")
+    return saved ? parseInt(saved, 10) : 0
+  })
 
   const handleViewChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentView(newValue)
+    localStorage.setItem("calendarViewPreference", newValue.toString())
   }
 
   return (

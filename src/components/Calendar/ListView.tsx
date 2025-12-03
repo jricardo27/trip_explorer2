@@ -1,5 +1,6 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import WarningIcon from "@mui/icons-material/Warning"
 import {
   Box,
   List,
@@ -11,9 +12,12 @@ import {
   Divider,
   Collapse,
   Paper,
+  Tooltip,
 } from "@mui/material"
 import axios from "axios"
 import React, { useState, useEffect, useCallback, useMemo } from "react"
+
+import { useTripContext, Conflict } from "../../contexts/TripContext"
 
 interface Activity {
   id: string
@@ -33,6 +37,9 @@ interface ListViewProps {
 const ListView: React.FC<ListViewProps> = ({ tripId }) => {
   const [activities, setActivities] = useState<Activity[]>([])
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
+  const [conflicts, setConflicts] = useState<Conflict[]>([])
+
+  const { fetchConflicts } = useTripContext()
 
   const fetchActivities = useCallback(async () => {
     try {
@@ -43,9 +50,15 @@ const ListView: React.FC<ListViewProps> = ({ tripId }) => {
     }
   }, [tripId])
 
+  const loadConflicts = useCallback(async () => {
+    const data = await fetchConflicts(tripId)
+    setConflicts(data)
+  }, [tripId, fetchConflicts])
+
   useEffect(() => {
     fetchActivities()
-  }, [fetchActivities])
+    loadConflicts()
+  }, [fetchActivities, loadConflicts])
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString([], {
@@ -95,6 +108,10 @@ const ListView: React.FC<ListViewProps> = ({ tripId }) => {
     }))
   }
 
+  const getConflictForActivity = (activityId: string) => {
+    return conflicts.find((c) => c.activity1_id === activityId || c.activity2_id === activityId)
+  }
+
   if (activities.length === 0) {
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>
@@ -140,37 +157,53 @@ const ListView: React.FC<ListViewProps> = ({ tripId }) => {
             {/* Activities List */}
             <Collapse in={isExpanded}>
               <List disablePadding>
-                {dayActivities.map((activity, index) => (
-                  <React.Fragment key={activity.id}>
-                    <ListItem sx={{ py: 2 }}>
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
-                            <Typography variant="subtitle1" fontWeight="medium">
-                              {activity.name}
-                            </Typography>
-                            {activity.is_flexible && <Chip label="Flexible" size="small" variant="outlined" />}
-                            <Chip label={activity.activity_type} size="small" color="primary" variant="outlined" />
-                          </Box>
-                        }
-                        secondary={
-                          <>
-                            <Typography component="span" variant="body2" color="text.secondary" display="block">
-                              🕐 {formatTime(activity.scheduled_start)}
-                              {activity.scheduled_end && ` - ${formatTime(activity.scheduled_end)}`}
-                            </Typography>
-                            {(activity.latitude || activity.longitude) && (
-                              <Typography component="span" variant="body2" color="text.secondary" display="block">
-                                📍 {activity.latitude?.toFixed(4)}, {activity.longitude?.toFixed(4)}
+                {dayActivities.map((activity, index) => {
+                  const conflict = getConflictForActivity(activity.id)
+
+                  return (
+                    <React.Fragment key={activity.id}>
+                      <ListItem sx={{ py: 2 }}>
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+                              <Typography variant="subtitle1" fontWeight="medium">
+                                {activity.name}
                               </Typography>
-                            )}
-                          </>
-                        }
-                      />
-                    </ListItem>
-                    {index < dayActivities.length - 1 && <Divider />}
-                  </React.Fragment>
-                ))}
+                              {activity.is_flexible && <Chip label="Flexible" size="small" variant="outlined" />}
+                              <Chip label={activity.activity_type} size="small" color="primary" variant="outlined" />
+                              {conflict && (
+                                <Tooltip
+                                  title={`Conflict with ${
+                                    conflict.activity1_id === activity.id
+                                      ? conflict.activity2_name
+                                      : conflict.activity1_name
+                                  }`}
+                                  arrow
+                                >
+                                  <WarningIcon color="error" fontSize="small" />
+                                </Tooltip>
+                              )}
+                            </Box>
+                          }
+                          secondary={
+                            <>
+                              <Typography component="span" variant="body2" color="text.secondary" display="block">
+                                🕐 {formatTime(activity.scheduled_start)}
+                                {activity.scheduled_end && ` - ${formatTime(activity.scheduled_end)}`}
+                              </Typography>
+                              {(activity.latitude || activity.longitude) && (
+                                <Typography component="span" variant="body2" color="text.secondary" display="block">
+                                  📍 {activity.latitude?.toFixed(4)}, {activity.longitude?.toFixed(4)}
+                                </Typography>
+                              )}
+                            </>
+                          }
+                        />
+                      </ListItem>
+                      {index < dayActivities.length - 1 && <Divider />}
+                    </React.Fragment>
+                  )
+                })}
               </List>
             </Collapse>
           </Paper>

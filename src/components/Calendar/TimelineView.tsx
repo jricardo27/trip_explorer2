@@ -15,9 +15,12 @@ import {
   useSortable,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Box, Typography, Paper, Stack } from "@mui/material"
+import WarningIcon from "@mui/icons-material/Warning"
+import { Box, Typography, Paper, Stack, Tooltip } from "@mui/material"
 import axios from "axios"
 import React, { useState, useEffect, useCallback, useMemo } from "react"
+
+import { useTripContext, Conflict } from "../../contexts/TripContext"
 
 interface Activity {
   id: string
@@ -35,7 +38,15 @@ interface TimelineViewProps {
 }
 
 // Sortable Item Component
-const SortableActivityItem = ({ activity, formatTime }: { activity: Activity; formatTime: (d: string) => string }) => {
+const SortableActivityItem = ({
+  activity,
+  formatTime,
+  conflict,
+}: {
+  activity: Activity
+  formatTime: (d: string) => string
+  conflict?: Conflict
+}) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: activity.id })
 
   const style = {
@@ -50,7 +61,7 @@ const SortableActivityItem = ({ activity, formatTime }: { activity: Activity; fo
           p: 2,
           ml: 4,
           borderLeft: "4px solid",
-          borderLeftColor: "primary.main",
+          borderLeftColor: conflict ? "error.main" : "primary.main",
           position: "relative",
           cursor: "grab",
           "&:active": { cursor: "grabbing" },
@@ -69,8 +80,18 @@ const SortableActivityItem = ({ activity, formatTime }: { activity: Activity; fo
             border: "3px solid white",
           }}
         />
-        <Typography variant="subtitle1" fontWeight="bold">
+        <Typography variant="subtitle1" fontWeight="bold" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           {activity.name}
+          {conflict && (
+            <Tooltip
+              title={`Conflict with ${
+                conflict.activity1_id === activity.id ? conflict.activity2_name : conflict.activity1_name
+              }`}
+              arrow
+            >
+              <WarningIcon color="error" fontSize="small" />
+            </Tooltip>
+          )}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {formatTime(activity.scheduled_start)}
@@ -88,6 +109,9 @@ const SortableActivityItem = ({ activity, formatTime }: { activity: Activity; fo
 
 const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
   const [activities, setActivities] = useState<Activity[]>([])
+  const [conflicts, setConflicts] = useState<Conflict[]>([])
+
+  const { fetchConflicts } = useTripContext()
 
   const fetchActivities = useCallback(async () => {
     try {
@@ -98,9 +122,19 @@ const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
     }
   }, [tripId])
 
+  const loadConflicts = useCallback(async () => {
+    const data = await fetchConflicts(tripId)
+    setConflicts(data)
+  }, [tripId, fetchConflicts])
+
   useEffect(() => {
     fetchActivities()
-  }, [fetchActivities])
+    loadConflicts()
+  }, [fetchActivities, loadConflicts])
+
+  const getConflictForActivity = (activityId: string) => {
+    return conflicts.find((c) => c.activity1_id === activityId || c.activity2_id === activityId)
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -245,7 +279,12 @@ const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
             <SortableContext items={dayActivities.map((a) => a.id)} strategy={verticalListSortingStrategy}>
               <Stack spacing={2}>
                 {dayActivities.map((activity) => (
-                  <SortableActivityItem key={activity.id} activity={activity} formatTime={formatTime} />
+                  <SortableActivityItem
+                    key={activity.id}
+                    activity={activity}
+                    formatTime={formatTime}
+                    conflict={getConflictForActivity(activity.id)}
+                  />
                 ))}
               </Stack>
             </SortableContext>
