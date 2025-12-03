@@ -4,11 +4,13 @@ import React, { useState, useEffect, useCallback } from "react"
 
 interface Activity {
   id: string
-  title: string
-  start_time: string
-  end_time: string
-  location_name?: string
+  name: string
+  scheduled_start: string
+  scheduled_end: string | null
+  location_coords?: unknown
   activity_type: string
+  latitude?: number
+  longitude?: number
 }
 
 interface TimelineViewProps {
@@ -46,7 +48,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
   // Group activities by date
   const groupedActivities = activities.reduce(
     (acc, activity) => {
-      const date = new Date(activity.start_time).toDateString()
+      if (!activity.scheduled_start) return acc
+      const date = new Date(activity.scheduled_start).toDateString()
       if (!acc[date]) {
         acc[date] = []
       }
@@ -56,12 +59,20 @@ const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
     {} as Record<string, Activity[]>,
   )
 
+  if (activities.length === 0) {
+    return (
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Typography color="text.secondary">No activities found for this trip.</Typography>
+      </Box>
+    )
+  }
+
   return (
     <Box>
       {Object.entries(groupedActivities).map(([date, dayActivities]) => (
         <Box key={date} sx={{ mb: 4 }}>
           <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
-            {formatDate(dayActivities[0].start_time)}
+            {formatDate(dayActivities[0].scheduled_start)}
           </Typography>
           <Stack spacing={2}>
             {dayActivities.map((activity) => (
@@ -89,14 +100,15 @@ const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
                   }}
                 />
                 <Typography variant="subtitle1" fontWeight="bold">
-                  {activity.title}
+                  {activity.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {formatTime(activity.start_time)} - {formatTime(activity.end_time)}
+                  {formatTime(activity.scheduled_start)}
+                  {activity.scheduled_end && ` - ${formatTime(activity.scheduled_end)}`}
                 </Typography>
-                {activity.location_name && (
+                {(activity.latitude || activity.longitude) && (
                   <Typography variant="body2" color="text.secondary">
-                    📍 {activity.location_name}
+                    📍 Location: {activity.latitude?.toFixed(4)}, {activity.longitude?.toFixed(4)}
                   </Typography>
                 )}
               </Paper>

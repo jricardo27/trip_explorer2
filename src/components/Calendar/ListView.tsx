@@ -6,12 +6,13 @@ import React, { useState, useEffect, useCallback } from "react"
 
 interface Activity {
   id: string
-  title: string
-  start_time: string
-  end_time: string
-  location_name?: string
+  name: string
+  scheduled_start: string
+  scheduled_end: string | null
   activity_type: string
-  is_optional: boolean
+  is_flexible: boolean
+  latitude?: number
+  longitude?: number
 }
 
 interface ListViewProps {
@@ -43,6 +44,14 @@ const ListView: React.FC<ListViewProps> = ({ tripId }) => {
     })
   }
 
+  if (activities.length === 0) {
+    return (
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Typography color="text.secondary">No activities found for this trip.</Typography>
+      </Box>
+    )
+  }
+
   return (
     <Box>
       <List>
@@ -63,21 +72,22 @@ const ListView: React.FC<ListViewProps> = ({ tripId }) => {
               <ListItemText
                 primary={
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="subtitle1">{activity.title}</Typography>
-                    {activity.is_optional && <Chip label="Optional" size="small" variant="outlined" />}
+                    <Typography variant="subtitle1">{activity.name}</Typography>
+                    {activity.is_flexible && <Chip label="Flexible" size="small" variant="outlined" />}
                     <Chip label={activity.activity_type} size="small" color="primary" variant="outlined" />
                   </Box>
                 }
                 secondary={
                   <>
                     <Typography component="span" variant="body2" color="text.secondary">
-                      {formatDateTime(activity.start_time)} - {formatDateTime(activity.end_time)}
+                      {formatDateTime(activity.scheduled_start)}
+                      {activity.scheduled_end && ` - ${formatDateTime(activity.scheduled_end)}`}
                     </Typography>
-                    {activity.location_name && (
+                    {(activity.latitude || activity.longitude) && (
                       <>
                         <br />
                         <Typography component="span" variant="body2" color="text.secondary">
-                          📍 {activity.location_name}
+                          📍 {activity.latitude?.toFixed(4)}, {activity.longitude?.toFixed(4)}
                         </Typography>
                       </>
                     )}
