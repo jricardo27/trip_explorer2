@@ -4,9 +4,9 @@ import React, { useState, useEffect, useCallback } from "react"
 
 interface Activity {
   id: string
-  title: string
-  start_time: string
-  end_time: string
+  name: string
+  scheduled_start: string | null
+  scheduled_end: string | null
 }
 
 interface GanttViewProps {
@@ -32,7 +32,9 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
   // Calculate timeline bounds
   const getTimelineBounds = () => {
     if (activities.length === 0) return { start: new Date(), end: new Date() }
-    const times = activities.flatMap((a) => [new Date(a.start_time), new Date(a.end_time)])
+    const validActivities = activities.filter((a) => a.scheduled_start && a.scheduled_end)
+    if (validActivities.length === 0) return { start: new Date(), end: new Date() }
+    const times = validActivities.flatMap((a) => [new Date(a.scheduled_start!), new Date(a.scheduled_end!)])
     return {
       start: new Date(Math.min(...times.map((t) => t.getTime()))),
       end: new Date(Math.max(...times.map((t) => t.getTime()))),
@@ -43,12 +45,26 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
   const totalDuration = bounds.end.getTime() - bounds.start.getTime()
 
   const getActivityPosition = (activity: Activity) => {
-    const start = new Date(activity.start_time).getTime() - bounds.start.getTime()
-    const duration = new Date(activity.end_time).getTime() - new Date(activity.start_time).getTime()
+    if (!activity.scheduled_start || !activity.scheduled_end) return { left: "0%", width: "0%" }
+    const start = new Date(activity.scheduled_start).getTime() - bounds.start.getTime()
+    const duration = new Date(activity.scheduled_end).getTime() - new Date(activity.scheduled_start).getTime()
     return {
       left: `${(start / totalDuration) * 100}%`,
       width: `${(duration / totalDuration) * 100}%`,
     }
+  }
+
+  const validActivities = activities.filter((a) => a.scheduled_start && a.scheduled_end)
+
+  if (validActivities.length === 0) {
+    return (
+      <Box sx={{ p: 3, textAlign: "center" }}>
+        <Typography color="text.secondary">
+          No activities with scheduled times found. Add start and end times to activities to see them in the Gantt
+          chart.
+        </Typography>
+      </Box>
+    )
   }
 
   return (
@@ -56,7 +72,7 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
       <Typography variant="h6" gutterBottom>
         Gantt Chart
       </Typography>
-      <Box sx={{ position: "relative", minHeight: activities.length * 60 + 40 }}>
+      <Box sx={{ position: "relative", minHeight: validActivities.length * 60 + 40 }}>
         {/* Timeline header */}
         <Box sx={{ display: "flex", mb: 2, px: 2 }}>
           <Typography variant="caption" color="text.secondary">
@@ -69,7 +85,7 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
         </Box>
 
         {/* Activity bars */}
-        {activities.map((activity) => {
+        {validActivities.map((activity) => {
           const position = getActivityPosition(activity)
           return (
             <Box key={activity.id} sx={{ position: "relative", height: 50, mb: 1 }}>
@@ -86,7 +102,7 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
                   whiteSpace: "nowrap",
                 }}
               >
-                {activity.title}
+                {activity.name}
               </Typography>
               <Paper
                 sx={{
@@ -104,7 +120,7 @@ const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
                 }}
               >
                 <Typography variant="caption" sx={{ color: "white", fontSize: "0.7rem" }}>
-                  {new Date(activity.start_time).toLocaleTimeString([], {
+                  {new Date(activity.scheduled_start!).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
