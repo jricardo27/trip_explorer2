@@ -82,6 +82,8 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
     deleteTrip,
     setCurrentTrip,
     reorderItems,
+    updateLocation,
+    updateFeature,
   } = useTripContext()
 
   const [tripFilter, setTripFilter] = useState<"all" | "future" | "past" | "current">("all")
@@ -438,10 +440,26 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         onClose={() => setEditingItem(null)}
         item={editingItem?.item || null}
         type={editingItem?.type || "location"}
-        onSave={(updatedItem) => {
-          // Implement save logic here or pass a handler
-          console.log("Save item:", updatedItem)
-          setEditingItem(null)
+        onSave={async (id, updates) => {
+          if (!editingItem) return
+          setIsLoading(true)
+          try {
+            const dayId = editingItem.item.trip_day_id || ""
+            if (editingItem.type === "location") {
+              await updateLocation(id, dayId, updates as Partial<DayLocation>)
+              showSuccess("Location updated successfully")
+            } else {
+              await updateFeature(id, dayId, updates as Partial<TripFeature>)
+              showSuccess("Feature updated successfully")
+            }
+            setEditingItem(null)
+          } catch (error) {
+            console.error("Error saving item:", error)
+            const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+            showError(`Failed to save changes: ${errorMessage}`)
+          } finally {
+            setIsLoading(false)
+          }
         }}
       />
 
