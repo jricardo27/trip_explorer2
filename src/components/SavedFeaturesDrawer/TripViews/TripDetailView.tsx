@@ -1,3 +1,9 @@
+import DirectionsBikeIcon from "@mui/icons-material/DirectionsBike"
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar"
+import DirectionsTransitIcon from "@mui/icons-material/DirectionsTransit"
+import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk"
+import FlightIcon from "@mui/icons-material/Flight"
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import {
   Box,
   Typography,
@@ -54,11 +60,116 @@ import { exportTripToGeoJSON, exportTripToKML } from "../../TopMenu/exportTrip"
 import { exportTripToExcel } from "../../TopMenu/exportTripToExcel"
 import { exportTripToPDF } from "../../TopMenu/exportTripToPDF"
 import { TripCalendarView } from "../../TripCalendar/TripCalendarView"
+import TripCanvas from "../../TripCanvas/TripCanvas"
 import { TripComparisonModal } from "../../TripComparison/TripComparisonModal"
 import { EditTimeModal } from "../../Trips/EditTimeModal"
 import { EditTransportModal } from "../../Trips/EditTransportModal"
-import { TransportConnector } from "../../Trips/TransportConnector"
 import { TripSummary } from "../../Trips/TripSummary"
+
+const getTransportIcon = (mode: string) => {
+  switch (mode) {
+    case "driving":
+    case "car":
+      return <DirectionsCarIcon fontSize="small" />
+    case "walking":
+    case "walk":
+      return <DirectionsWalkIcon fontSize="small" />
+    case "cycling":
+    case "bike":
+      return <DirectionsBikeIcon fontSize="small" />
+    case "transit":
+    case "train":
+    case "bus":
+    case "ferry":
+      return <DirectionsTransitIcon fontSize="small" />
+    case "flight":
+      return <FlightIcon fontSize="small" />
+    default:
+      return <DirectionsCarIcon fontSize="small" />
+  }
+}
+
+interface TransportConnectorProps {
+  item: DayLocation | TripFeature
+  distance?: number
+  onClick: () => void
+}
+
+const TransportConnector: React.FC<TransportConnectorProps> = ({ item, distance, onClick }) => {
+  const hasTransport = !!item.transport_mode
+  const cost = item.transport_cost
+  const duration = item.travel_time_minutes || item.duration_minutes // Fallback if travel_time not set
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        py: 1,
+        px: 2,
+        ml: 4,
+        borderLeft: "2px dashed #ccc",
+        position: "relative",
+      }}
+    >
+      <Box
+        sx={{
+          position: "absolute",
+          left: -11,
+          top: "50%",
+          marginTop: "-10px",
+          bgcolor: "background.paper",
+        }}
+      >
+        <IconButton
+          size="small"
+          onClick={onClick}
+          sx={{
+            border: "1px solid #e0e0e0",
+            width: 20,
+            height: 20,
+            p: 0,
+          }}
+        >
+          <MoreHorizIcon sx={{ fontSize: 14 }} />
+        </IconButton>
+      </Box>
+
+      {hasTransport ? (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+            "&:hover": { bgcolor: "action.hover", borderRadius: 1 },
+          }}
+          onClick={onClick}
+        >
+          <Box sx={{ color: "text.secondary", mr: 1, display: "flex" }}>
+            {getTransportIcon(item.transport_mode || "")}
+          </Box>
+          <Typography variant="caption" color="text.secondary">
+            {duration ? `${duration} min` : ""}
+            {duration && cost ? " • " : ""}
+            {cost ? `$${cost}` : ""}
+            {distance ? ` • ${distance.toFixed(1)} km` : ""}
+          </Typography>
+        </Box>
+      ) : (
+        <Tooltip title="Add transport">
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            sx={{ cursor: "pointer", fontStyle: "italic" }}
+            onClick={onClick}
+          >
+            Add transport... {distance ? `(${distance.toFixed(1)} km)` : ""}
+          </Typography>
+        </Tooltip>
+      )}
+    </Box>
+  )
+}
 
 interface TripDetailViewProps {
   trip: Trip
@@ -94,9 +205,9 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
   const [copyDialogOpen, setCopyDialogOpen] = useState(false)
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false)
-  const [viewMode, setViewMode] = useState<"list" | "calendar" | "newCalendar">(() => {
+  const [viewMode, setViewMode] = useState<"list" | "calendar" | "newCalendar" | "canvas">(() => {
     const saved = localStorage.getItem("tripDetailViewMode")
-    return (saved as "list" | "calendar" | "newCalendar") || "list"
+    return (saved as "list" | "calendar" | "newCalendar" | "canvas") || "list"
   })
   const [newTripName, setNewTripName] = useState("")
   const [newStartDate, setNewStartDate] = useState("")
@@ -229,6 +340,16 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                 localStorage.setItem("tripDetailViewMode", "newCalendar")
               }}
               color={viewMode === "newCalendar" ? "primary" : "default"}
+              sx={{ borderRadius: 0 }}
+            >
+              <MdViewModule />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Trip Canvas (New Editor)">
+            <IconButton
+              size="small"
+              onClick={() => setViewMode("canvas")}
+              color={viewMode === "canvas" ? "primary" : "default"}
               sx={{ borderRadius: 0 }}
             >
               <MdViewModule />
@@ -371,8 +492,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
         </Button>
       </Box>
 
-      {/* Calendar/List View Conditional Rendering */}
-      {viewMode === "newCalendar" ? (
+      {/* Calendar/List/Canvas View Conditional Rendering */}
+      {viewMode === "canvas" ? (
+        <TripCanvas tripId={trip.id} onBack={() => setViewMode("list")} />
+      ) : viewMode === "newCalendar" ? (
         <CalendarViews tripId={trip.id} />
       ) : viewMode === "calendar" ? (
         <TripCalendarView
@@ -386,7 +509,12 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
               ...(dayFeatures[fromDayId] || []).map((f) => ({ ...f, type: "Feature" as const })),
             ].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
 
-            // Find the item to move
+            const toItems = [
+              ...(dayLocations[toDayId] || []).map((l) => ({ ...l, type: "location" as const })),
+              ...(dayFeatures[toDayId] || []).map((f) => ({ ...f, type: "Feature" as const })),
+            ].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
+
+            // Remove item from source
             const movedItem = fromItems.find((item) => {
               const id = item.type === "location" ? item.id : item.saved_id || item.properties.id
               return id === itemId
@@ -415,12 +543,6 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
               await reorderItems(fromDayId, payload)
               return
             }
-
-            // Different days
-            const toItems = [
-              ...(dayLocations[toDayId] || []).map((l) => ({ ...l, type: "location" as const })),
-              ...(dayFeatures[toDayId] || []).map((f) => ({ ...f, type: "Feature" as const })),
-            ].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
 
             // Remove from source
             const updatedFromItems = fromItems.filter((item) => {
@@ -538,10 +660,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                           const categoryColor = isLocation
                             ? "grey.400" // Locations get a neutral color
                             : getCategoryColor(
-                              (item.properties.type as string) ||
-                              (item.properties.category as string) ||
-                              (item.properties.amenity as string),
-                            )
+                                (item.properties.type as string) ||
+                                  (item.properties.category as string) ||
+                                  (item.properties.amenity as string),
+                              )
 
                           // Determine status color for border
                           let statusColor = categoryColor
@@ -555,10 +677,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                           const thumbnail = !isLocation ? getFeatureThumbnail(item.properties) : null
                           const placeholder = !isLocation
                             ? getCategoryPlaceholder(
-                              (item.properties.type as string) ||
-                              (item.properties.category as string) ||
-                              (item.properties.amenity as string),
-                            )
+                                (item.properties.type as string) ||
+                                  (item.properties.category as string) ||
+                                  (item.properties.amenity as string),
+                              )
                             : null
 
                           // Calculate distance from previous item

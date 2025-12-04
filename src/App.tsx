@@ -23,8 +23,8 @@ import { WesternAustralia } from "./pages/Australia/WesternAustralia"
 import Destinations from "./pages/Destinations/Destinations"
 import { NewZealand } from "./pages/NewZealand/NewZealand"
 import NotFound from "./pages/NotFound/NotFound"
+import { TripDetailPage } from "./pages/TripDetailPage"
 import { lightTheme, darkTheme } from "./theme/theme"
-import { TripDetailWrapper } from "./TripDetailWrapper"
 import { ToastContainer } from "./utils/notifications"
 
 const RedirectHandler = () => {
@@ -240,7 +240,7 @@ const ThemedApp: React.FC<ThemedAppProps> = ({
                         />
                       }
                     />
-                    <Route path="/trips/:tripId" element={<TripDetailWrapper />} />
+                    <Route path="/trips/:tripId" element={<TripDetailPage />} />
 
                     <Route path="*" element={<NotFound />} />
                   </Routes>

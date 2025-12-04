@@ -20,74 +20,43 @@ import React, { useState, useContext, useCallback, useEffect } from "react"
 import { MdPushPin, MdClose, MdDragIndicator } from "react-icons/md"
 
 import SavedFeaturesContext from "../../contexts/SavedFeaturesContext"
-import { useTripContext, DayLocation, TripFeature, Trip } from "../../contexts/TripContext"
+import { useTripContext, Trip } from "../../contexts/TripContext"
 import { showSuccess, showError } from "../../utils/notifications"
 import { AuthModal } from "../Auth/AuthModal"
-import { AddFeatureModal } from "../Trips/AddFeatureModal"
-import { AddLocationModal } from "../Trips/AddLocationModal"
 import { CreateTripModal } from "../Trips/CreateTripModal"
-import { EditItemModal } from "../Trips/EditItemModal"
 
 import { CategoryContextMenu } from "./ContextMenu/CategoryContextMenu"
 import { FeatureContextMenu } from "./ContextMenu/FeatureContextMenu"
-import { FeatureDetailsModal } from "./FeatureDetailsModal"
 import { FeatureDragContext } from "./FeatureList/FeatureDragContext"
 import { FeatureListView } from "./FeatureViews/FeatureListView"
 import { useCategoryManagement } from "./hooks/useCategoryManagement"
 import { useContextMenu } from "./hooks/useContextMenu"
 import { useFeatureManagement } from "./hooks/useFeatureManagement"
 import { useFeatureSelection } from "./hooks/useFeatureSelection"
-import { TripDetailView } from "./TripViews/TripDetailView"
 import { TripListView } from "./TripViews/TripListView"
-import { UserAuthSection } from "./UserAuthSection"
 
 interface SavedFeaturesDrawerProps {
   drawerOpen: boolean
   onClose: () => void
   isPinned: boolean
   onTogglePin: () => void
-  onFlyTo: (lat: number, lng: number) => void
+  onTogglePin: () => void
 }
 
-interface DeleteLocationData {
-  id: string
-  dayId: string
-}
-interface DeleteFeatureData {
-  item: TripFeature
-  dayId: string
-}
-
-const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
-  drawerOpen,
-  onClose,
-  isPinned,
-  onTogglePin,
-  onFlyTo,
-}) => {
-  const { savedFeatures, userId, setUserId, email, logout, setSavedFeatures, removeFeature } =
-    useContext(SavedFeaturesContext)!
+const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({ drawerOpen, onClose, isPinned, onTogglePin }) => {
+  const { savedFeatures, setSavedFeatures, removeFeature } = useContext(SavedFeaturesContext)!
 
   const {
     trips,
     currentTrip,
-    dayFeatures,
-    dayLocations,
-    fetchTripDetails,
-    addLocationToDay,
-    deleteLocation,
-    addFeatureToDay,
-    deleteFeature,
+
     createTrip,
     deleteTrip,
     setCurrentTrip,
-    reorderItems,
-    updateLocation,
-    updateFeature,
   } = useTripContext()
 
   const [tripFilter, setTripFilter] = useState<"all" | "future" | "past" | "current">("all")
-  const [isPlanningMode, setIsPlanningMode] = useState(false)
+
   const [drawerWidth, setDrawerWidth] = useState(() => {
     const saved = localStorage.getItem("drawerWidth")
     return saved ? parseInt(saved) : 500
@@ -154,16 +123,9 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
   // State for modals and interactions
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isCreateTripModalOpen, setIsCreateTripModalOpen] = useState(false)
-  const [selectedDayForLocation, setSelectedDayForLocation] = useState<{ id: string; date: string } | null>(null)
-  const [selectedDayForFeature, setSelectedDayForFeature] = useState<{ id: string; date: string } | null>(null)
-  const [editingItem, setEditingItem] = useState<{
-    item: DayLocation | TripFeature
-    type: "location" | "feature"
-  } | null>(null)
-  const [viewingFeature, setViewingFeature] = useState<TripFeature | null>(null)
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
-    type: "trip" | "location" | "feature" | "logout" | null
-    data: { id: string } | DeleteLocationData | DeleteFeatureData | null
+    type: "trip" | null
+    data: { id: string } | null
   }>({ type: null, data: null })
   const [isLoading, setIsLoading] = useState(false)
 
@@ -206,84 +168,6 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
       } finally {
         setIsLoading(false)
       }
-    }
-  }
-
-  const handleAddFeature = async (feature: unknown) => {
-    if (selectedDayForFeature) {
-      setIsLoading(true)
-      try {
-        await addFeatureToDay(selectedDayForFeature.id, feature, {
-          visited: !isPlanningMode,
-          planned: isPlanningMode,
-        })
-        showSuccess("Feature added to trip day!")
-      } catch (error) {
-        console.error("Failed to add feature:", error)
-        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-        showError(`Failed to add feature to trip day: ${errorMessage}`)
-      } finally {
-        setIsLoading(false)
-        setSelectedDayForFeature(null)
-      }
-    }
-  }
-
-  const handleAddLocation = async (location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => {
-    if (selectedDayForLocation) {
-      setIsLoading(true)
-      try {
-        await addLocationToDay(selectedDayForLocation.id, location)
-        showSuccess("Location added to trip day!")
-      } catch (error) {
-        console.error("Failed to add location:", error)
-        const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-        showError(`Failed to add location to trip day: ${errorMessage}`)
-      } finally {
-        setIsLoading(false)
-        setSelectedDayForLocation(null)
-      }
-    }
-  }
-
-  const handleMoveItem = async (
-    dayId: string,
-    index: number,
-    direction: "up" | "down",
-    items: (DayLocation | TripFeature)[],
-  ) => {
-    if (!items || items.length === 0) return
-
-    const newIndex = direction === "up" ? index - 1 : index + 1
-    if (newIndex < 0 || newIndex >= items.length) return
-
-    setIsLoading(true)
-
-    // Create a new array with the moved item
-    const newItems = [...items]
-    const [movedItem] = newItems.splice(index, 1)
-    newItems.splice(newIndex, 0, movedItem)
-
-    // Prepare the payload for reorderItems
-    const reorderPayload = newItems.map((item, idx) => {
-      const isFeature = "type" in item && item.type === "Feature"
-      return {
-        id: isFeature
-          ? (item as TripFeature).saved_id || (item as TripFeature).properties.id
-          : (item as DayLocation).id,
-        type: isFeature ? "feature" : ("location" as "feature" | "location"),
-        order: idx,
-      }
-    })
-
-    try {
-      await reorderItems(dayId, reorderPayload)
-    } catch (error) {
-      console.error("Error moving item:", error)
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-      showError(`Failed to reorder item: ${errorMessage}`)
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -362,40 +246,16 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
                   setSelectedFeature={setSelectedFeature}
                 />
               </FeatureDragContext>
-            ) : currentTrip ? (
-              <TripDetailView
-                trip={currentTrip}
-                dayLocations={dayLocations}
-                dayFeatures={dayFeatures}
-                onBack={() => setCurrentTrip(null)}
-                isPlanningMode={isPlanningMode}
-                onTogglePlanningMode={() => setIsPlanningMode((prev) => !prev)}
-                onAddLocation={(id, date) => setSelectedDayForLocation({ id, date })}
-                onAddFeature={(id, date) => setSelectedDayForFeature({ id, date })}
-                onEditItem={(item, type) => setEditingItem({ item, type: type === "Feature" ? "feature" : "location" })}
-                onDeleteItem={(item, dayId) => {
-                  if ("type" in item && item.type === "Feature") {
-                    setDeleteConfirmation({
-                      type: "feature",
-                      data: { item: item as TripFeature, dayId },
-                    })
-                  } else {
-                    setDeleteConfirmation({
-                      type: "location",
-                      data: { id: (item as DayLocation).id, dayId },
-                    })
-                  }
-                }}
-                onMoveItem={handleMoveItem}
-                onFlyTo={onFlyTo}
-                onViewFeature={setViewingFeature}
-              />
             ) : (
               <TripListView
                 trips={trips}
                 tripFilter={tripFilter}
                 onTripFilterChange={setTripFilter}
-                onTripSelect={fetchTripDetails}
+                onTripSelect={(id) => {
+                  // Navigate to trip page
+                  window.location.hash = `/trips/${id}`
+                  if (onClose && !isPinned) onClose()
+                }}
                 onTripDelete={handleDeleteTrip}
                 onCreateTrip={() => setIsCreateTripModalOpen(true)}
               />
@@ -404,14 +264,6 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         )}
       </Box>
 
-      <UserAuthSection
-        email={email}
-        userId={userId}
-        setUserId={setUserId}
-        logout={() => setDeleteConfirmation({ type: "logout", data: null })}
-        onLoginClick={() => setIsAuthModalOpen(true)}
-      />
-
       <AuthModal open={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
       <CreateTripModal
@@ -419,51 +271,6 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         onClose={() => setIsCreateTripModalOpen(false)}
         onCreateTrip={handleCreateTrip}
       />
-
-      <AddLocationModal
-        open={!!selectedDayForLocation}
-        onClose={() => setSelectedDayForLocation(null)}
-        onAddLocation={handleAddLocation}
-        dayDate={selectedDayForLocation?.date || ""}
-        isPlanningMode={isPlanningMode}
-      />
-
-      <AddFeatureModal
-        open={!!selectedDayForFeature}
-        onClose={() => setSelectedDayForFeature(null)}
-        onAddFeature={handleAddFeature}
-        dayDate={selectedDayForFeature?.date || ""}
-      />
-
-      <EditItemModal
-        open={!!editingItem}
-        onClose={() => setEditingItem(null)}
-        item={editingItem?.item || null}
-        type={editingItem?.type || "location"}
-        onSave={async (id, updates) => {
-          if (!editingItem) return
-          setIsLoading(true)
-          try {
-            const dayId = editingItem.item.trip_day_id || ""
-            if (editingItem.type === "location") {
-              await updateLocation(id, dayId, updates as Partial<DayLocation>)
-              showSuccess("Location updated successfully")
-            } else {
-              await updateFeature(id, dayId, updates as Partial<TripFeature>)
-              showSuccess("Feature updated successfully")
-            }
-            setEditingItem(null)
-          } catch (error) {
-            console.error("Error saving item:", error)
-            const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-            showError(`Failed to save changes: ${errorMessage}`)
-          } finally {
-            setIsLoading(false)
-          }
-        }}
-      />
-
-      <FeatureDetailsModal feature={viewingFeature} onClose={() => setViewingFeature(null)} open={!!viewingFeature} />
 
       <CategoryContextMenu
         contextMenu={contextMenu}
@@ -488,21 +295,13 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
         <DialogTitle>
           {deleteConfirmation.type === "trip"
             ? "Delete Trip"
-            : deleteConfirmation.type === "location"
-              ? "Delete Location"
-              : deleteConfirmation.type === "feature"
-                ? "Delete Feature"
-                : "Logout"}
+            : "Are you sure you want to delete this trip? This action cannot be undone."}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
             {deleteConfirmation.type === "trip"
               ? "Are you sure you want to delete this trip? This action cannot be undone."
-              : deleteConfirmation.type === "location"
-                ? "Are you sure you want to delete this location from the day?"
-                : deleteConfirmation.type === "feature"
-                  ? "Are you sure you want to delete this feature from the day?"
-                  : "Are you sure you want to logout? Your unsaved local data might be lost."}
+              : ""}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -511,37 +310,6 @@ const SavedFeaturesDrawer: React.FC<SavedFeaturesDrawerProps> = ({
             onClick={() => {
               if (deleteConfirmation.type === "trip") {
                 confirmDeleteTrip()
-              } else if (deleteConfirmation.type === "location") {
-                const { id, dayId } = deleteConfirmation.data as DeleteLocationData
-                setIsLoading(true)
-                deleteLocation(id, dayId)
-                  .then(() => {
-                    setDeleteConfirmation({ type: null, data: null })
-                    showSuccess("Location deleted successfully")
-                  })
-                  .catch((error) => {
-                    console.error("Error deleting location:", error)
-                    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-                    showError(`Failed to delete location: ${errorMessage}`)
-                  })
-                  .finally(() => setIsLoading(false))
-              } else if (deleteConfirmation.type === "feature") {
-                const { item, dayId } = deleteConfirmation.data as DeleteFeatureData
-                setIsLoading(true)
-                deleteFeature(item.saved_id || item.properties.id, dayId)
-                  .then(() => {
-                    setDeleteConfirmation({ type: null, data: null })
-                    showSuccess("Feature deleted successfully")
-                  })
-                  .catch((error) => {
-                    console.error("Error deleting feature:", error)
-                    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-                    showError(`Failed to delete feature: ${errorMessage}`)
-                  })
-                  .finally(() => setIsLoading(false))
-              } else if (deleteConfirmation.type === "logout") {
-                logout()
-                setDeleteConfirmation({ type: null, data: null })
               }
             }}
             color="error"

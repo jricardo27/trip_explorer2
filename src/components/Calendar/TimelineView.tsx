@@ -17,21 +17,9 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import WarningIcon from "@mui/icons-material/Warning"
 import { Box, Typography, Paper, Stack, Tooltip } from "@mui/material"
-import axios from "axios"
-import React, { useState, useEffect, useCallback, useMemo } from "react"
+import React, { useMemo } from "react"
 
-import { useTripContext, Conflict } from "../../contexts/TripContext"
-
-interface Activity {
-  id: string
-  name: string
-  scheduled_start: string
-  scheduled_end: string | null
-  location_coords?: unknown
-  activity_type: string
-  latitude?: number
-  longitude?: number
-}
+import { useTripContext, Conflict, DayLocation, TripFeature } from "../../contexts/TripContext"
 
 interface TimelineViewProps {
   tripId: string
@@ -39,20 +27,35 @@ interface TimelineViewProps {
 
 // Sortable Item Component
 const SortableActivityItem = ({
-  activity,
+  item,
   formatTime,
   conflict,
+  onEdit,
 }: {
-  activity: Activity
+  item: DayLocation | TripFeature
   formatTime: (d: string) => string
   conflict?: Conflict
+  onEdit: (item: DayLocation | TripFeature) => void
 }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: activity.id })
+  const isFeature = "type" in item && item.type === "Feature"
+  const id = isFeature
+    ? (item as TripFeature).saved_id || (item as TripFeature).properties.id
+    : (item as DayLocation).id
+  const name = isFeature
+    ? (item as TripFeature).properties.title || (item as TripFeature).properties.name || "Untitled Feature"
+    : (item as DayLocation).city
+
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   }
+
+  const startTime = item.start_time
+  const endTime = item.end_time
+  const latitude = isFeature ? (item as TripFeature).geometry.coordinates[1] : (item as DayLocation).latitude
+  const longitude = isFeature ? (item as TripFeature).geometry.coordinates[0] : (item as DayLocation).longitude
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
@@ -66,6 +69,7 @@ const SortableActivityItem = ({
           cursor: "grab",
           "&:active": { cursor: "grabbing" },
         }}
+        onClick={() => onEdit(item)}
       >
         <Box
           sx={{
@@ -81,11 +85,11 @@ const SortableActivityItem = ({
           }}
         />
         <Typography variant="subtitle1" fontWeight="bold" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          {activity.name}
+          {name}
           {conflict && (
             <Tooltip
               title={`Conflict with ${
-                conflict.activity1_id === activity.id ? conflict.activity2_name : conflict.activity1_name
+                conflict.activity1_id === id ? conflict.activity2_name : conflict.activity1_name
               }`}
               arrow
             >
@@ -94,12 +98,12 @@ const SortableActivityItem = ({
           )}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {formatTime(activity.scheduled_start)}
-          {activity.scheduled_end && ` - ${formatTime(activity.scheduled_end)}`}
+          {startTime ? formatTime(startTime) : "Unscheduled"}
+          {endTime && ` - ${formatTime(endTime)}`}
         </Typography>
-        {(activity.latitude || activity.longitude) && (
+        {(latitude || longitude) && (
           <Typography variant="body2" color="text.secondary">
-            📍 Location: {activity.latitude?.toFixed(4)}, {activity.longitude?.toFixed(4)}
+            📍 Location: {latitude?.toFixed(4)}, {longitude?.toFixed(4)}
           </Typography>
         )}
       </Paper>
@@ -108,29 +112,13 @@ const SortableActivityItem = ({
 }
 
 const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
-  const [activities, setActivities] = useState<Activity[]>([])
-  const [conflicts, setConflicts] = useState<Conflict[]>([])
+  const { currentTrip, dayLocations, dayFeatures, conflicts, updateLocation, updateFeature, fetchConflicts } =
+    useTripContext()
 
-  const { fetchConflicts } = useTripContext()
-
-  const fetchActivities = useCallback(async () => {
-    try {
-      const response = await axios.get(`/api/trips/${tripId}/activities`)
-      setActivities(response.data)
-    } catch (err) {
-      console.error("Error fetching activities:", err)
-    }
-  }, [tripId])
-
-  const loadConflicts = useCallback(async () => {
-    const data = await fetchConflicts(tripId)
-    setConflicts(data)
+  // Fetch conflicts when component mounts or tripId changes
+  React.useEffect(() => {
+    fetchConflicts(tripId)
   }, [tripId, fetchConflicts])
-
-  useEffect(() => {
-    fetchActivities()
-    loadConflicts()
-  }, [fetchActivities, loadConflicts])
 
   const getConflictForActivity = (activityId: string) => {
     return conflicts.find((c) => c.activity1_id === activityId || c.activity2_id === activityId)
@@ -144,7 +132,9 @@ const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
   )
 
   const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return "Invalid Time"
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   }
 
   const formatDate = (dateStr: string) => {
@@ -155,112 +145,136 @@ const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
     })
   }
 
-  // Group activities by date
-  const groupedActivities = useMemo(() => {
-    return activities.reduce(
-      (acc, activity) => {
-        if (!activity.scheduled_start) return acc
-        const date = new Date(activity.scheduled_start).toDateString()
-        if (!acc[date]) {
-          acc[date] = []
-        }
-        acc[date].push(activity)
-        return acc
-      },
-      {} as Record<string, Activity[]>,
-    )
-  }, [activities])
+  // Group items by day
+  const groupedItems = useMemo(() => {
+    if (!currentTrip?.days) return {}
+
+    const groups: Record<string, (DayLocation | TripFeature)[]> = {}
+
+    currentTrip.days.forEach((day) => {
+      const date = day.date
+      groups[date] = []
+
+      // Add locations for this day
+      const locs = dayLocations[day.id] || []
+      groups[date].push(...locs)
+
+      // Add features for this day
+      const feats = dayFeatures[day.id] || []
+      groups[date].push(...feats)
+
+      // Sort by start time or visit order
+      groups[date].sort((a, b) => {
+        const timeA = a.start_time ? new Date(a.start_time).getTime() : 0
+        const timeB = b.start_time ? new Date(b.start_time).getTime() : 0
+        if (timeA !== timeB) return timeA - timeB
+        return (a.visit_order || 0) - (b.visit_order || 0)
+      })
+    })
+
+    return groups
+  }, [currentTrip, dayLocations, dayFeatures])
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
 
     if (!over || active.id === over.id) return
 
-    // Find the active item and over item
     const activeId = active.id as string
     const overId = over.id as string
 
-    // Find which day group these belong to
-    // Note: This simple implementation assumes dragging within the same day for now
-    // Cross-day dragging would require finding source and destination containers
-    let activeDay: string | undefined
-    let activeActivity: Activity | undefined
+    // Find active item and its day
+    let activeDayDate: string | undefined
+    let activeItem: DayLocation | TripFeature | undefined
 
-    Object.entries(groupedActivities).forEach(([date, items]) => {
-      const found = items.find((a) => a.id === activeId)
+    Object.entries(groupedItems).forEach(([date, items]) => {
+      const found = items.find((item) => {
+        const itemId =
+          "type" in item && item.type === "Feature"
+            ? (item as TripFeature).saved_id || (item as TripFeature).properties.id
+            : (item as DayLocation).id
+        return itemId === activeId
+      })
       if (found) {
-        activeDay = date
-        activeActivity = found
+        activeDayDate = date
+        activeItem = found
       }
     })
 
-    if (!activeDay || !activeActivity) return
+    if (!activeDayDate || !activeItem) return
 
-    const dayActivities = groupedActivities[activeDay]
-    const oldIndex = dayActivities.findIndex((item) => item.id === activeId)
-    const newIndex = dayActivities.findIndex((item) => item.id === overId)
+    const dayItems = groupedItems[activeDayDate]
+    const oldIndex = dayItems.findIndex((item) => {
+      const itemId =
+        "type" in item && item.type === "Feature"
+          ? (item as TripFeature).saved_id || (item as TripFeature).properties.id
+          : (item as DayLocation).id
+      return itemId === activeId
+    })
+    const newIndex = dayItems.findIndex((item) => {
+      const itemId =
+        "type" in item && item.type === "Feature"
+          ? (item as TripFeature).saved_id || (item as TripFeature).properties.id
+          : (item as DayLocation).id
+      return itemId === overId
+    })
 
     if (oldIndex === -1 || newIndex === -1) return
 
-    // Calculate new order locally for optimistic update
-    const newOrder = arrayMove(dayActivities, oldIndex, newIndex)
+    // But we need the array AFTER move to know the new previous item.
+    const newOrder = arrayMove(dayItems, oldIndex, newIndex)
+    // Calculate new time
+    const prevItem = newIndex > 0 ? newOrder[newIndex - 1] : null
 
-    // Calculate new time based on position
-    // If moved to index i, it should start after i-1 (or day start)
-    // and before i+1 (if exists)
+    let newStartTime = new Date(activeDayDate) // Default to day start (00:00)
+    // Set to 9 AM default if no prev item
+    newStartTime.setHours(9, 0, 0, 0)
 
-    const prevActivity = newIndex > 0 ? newOrder[newIndex - 1] : null
-    // const nextActivity = newIndex < newOrder.length - 1 ? newOrder[newIndex + 1] : null
+    if (activeItem.start_time) {
+      // Keep original time components if just reordering? No, drag usually implies rescheduling in timeline.
+      // But if we drag to reorder, we probably want to adjust time.
+    }
 
-    let newStartTime = new Date(activeActivity.scheduled_start)
-    const durationMs = activeActivity.scheduled_end
-      ? new Date(activeActivity.scheduled_end).getTime() - new Date(activeActivity.scheduled_start).getTime()
-      : 60 * 60 * 1000 // Default 1 hour if no end time
+    if (prevItem && prevItem.end_time) {
+      const prevEnd = new Date(prevItem.end_time).getTime()
+      newStartTime = new Date(prevEnd + 15 * 60 * 1000) // +15 mins
+    } else if (prevItem && prevItem.start_time) {
+      const prevStart = new Date(prevItem.start_time).getTime()
+      newStartTime = new Date(prevStart + 60 * 60 * 1000) // +1 hour
+    }
 
-    if (prevActivity && prevActivity.scheduled_end) {
-      // Start 15 mins after previous activity ends
-      const prevEnd = new Date(prevActivity.scheduled_end).getTime()
-      newStartTime = new Date(prevEnd + 15 * 60 * 1000)
-    } else if (prevActivity) {
-      // Start 1 hour after previous activity starts (if no end time)
-      const prevStart = new Date(prevActivity.scheduled_start).getTime()
-      newStartTime = new Date(prevStart + 60 * 60 * 1000)
-    } else {
-      // First item in list - keep same day but set to 09:00 or keep current time if earlier?
-      // For simplicity, let's keep the date but set time to 09:00 if it was later,
-      // or just subtract 1 hour from original?
-      // Let's set to 09:00 of that day
-      newStartTime.setHours(9, 0, 0, 0)
+    // Calculate duration
+    let durationMs = 60 * 60 * 1000 // 1 hour default
+    if (activeItem.start_time && activeItem.end_time) {
+      durationMs = new Date(activeItem.end_time).getTime() - new Date(activeItem.start_time).getTime()
     }
 
     const newEndTime = new Date(newStartTime.getTime() + durationMs)
 
-    // Optimistic update
-    const updatedActivity = {
-      ...activeActivity,
-      scheduled_start: newStartTime.toISOString(),
-      scheduled_end: newEndTime.toISOString(),
-    }
+    // Update item
+    const isFeature = "type" in activeItem && activeItem.type === "Feature"
+    const dayId = activeItem.trip_day_id || "" // Should exist
 
-    const updatedActivities = activities.map((a) => (a.id === activeId ? updatedActivity : a))
-    setActivities(updatedActivities)
-
-    // Backend update
     try {
-      await axios.put(`/api/activities/${activeId}`, {
-        scheduled_start: newStartTime.toISOString(),
-        scheduled_end: newEndTime.toISOString(),
-      })
-      // Refresh to ensure sync
-      fetchActivities()
+      if (isFeature) {
+        await updateFeature(activeId, dayId, {
+          start_time: newStartTime.toISOString(),
+          end_time: newEndTime.toISOString(),
+          visit_order: newIndex, // Update order too
+        })
+      } else {
+        await updateLocation(activeId, dayId, {
+          start_time: newStartTime.toISOString(),
+          end_time: newEndTime.toISOString(),
+          visit_order: newIndex,
+        })
+      }
     } catch (error) {
-      console.error("Failed to update activity time:", error)
-      // Revert on error
-      fetchActivities()
+      console.error("Failed to update item:", error)
     }
   }
 
-  if (activities.length === 0) {
+  if (!currentTrip || !currentTrip.days || currentTrip.days.length === 0) {
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>
         <Typography color="text.secondary">No activities found for this trip.</Typography>
@@ -271,21 +285,35 @@ const TimelineView: React.FC<TimelineViewProps> = ({ tripId }) => {
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <Box>
-        {Object.entries(groupedActivities).map(([date, dayActivities]) => (
+        {Object.entries(groupedItems).map(([date, items]) => (
           <Box key={date} sx={{ mb: 4 }}>
             <Typography variant="h6" sx={{ mb: 2, color: "primary.main" }}>
-              {formatDate(dayActivities[0].scheduled_start)}
+              {formatDate(date)}
             </Typography>
-            <SortableContext items={dayActivities.map((a) => a.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext
+              items={items.map((i) =>
+                "type" in i && i.type === "Feature"
+                  ? (i as TripFeature).saved_id || (i as TripFeature).properties.id
+                  : (i as DayLocation).id,
+              )}
+              strategy={verticalListSortingStrategy}
+            >
               <Stack spacing={2}>
-                {dayActivities.map((activity) => (
-                  <SortableActivityItem
-                    key={activity.id}
-                    activity={activity}
-                    formatTime={formatTime}
-                    conflict={getConflictForActivity(activity.id)}
-                  />
-                ))}
+                {items.map((item) => {
+                  const id =
+                    "type" in item && item.type === "Feature"
+                      ? (item as TripFeature).saved_id || (item as TripFeature).properties.id
+                      : (item as DayLocation).id
+                  return (
+                    <SortableActivityItem
+                      key={id}
+                      item={item}
+                      formatTime={formatTime}
+                      conflict={getConflictForActivity(id)}
+                      onEdit={(item) => console.log("Edit item:", item)}
+                    />
+                  )
+                })}
               </Stack>
             </SortableContext>
           </Box>

@@ -1,11 +1,11 @@
 import { Box, Typography, Slider, Paper } from "@mui/material"
-import axios from "axios"
 import L from "leaflet"
 import icon from "leaflet/dist/images/marker-icon.png"
 import iconShadow from "leaflet/dist/images/marker-shadow.png"
-import React, { useState, useEffect, useCallback, useMemo } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { Marker, Popup, Polyline, useMap } from "react-leaflet"
 
+import { useTripContext } from "../../contexts/TripContext"
 import MapComponent from "../MapComponent/MapComponent"
 
 // Fix Leaflet marker icon issue
@@ -53,22 +53,45 @@ const FitBounds = ({ activities }: { activities: Activity[] }) => {
   return null
 }
 
-const CalendarMapView: React.FC<MapViewProps> = ({ tripId }) => {
-  const [activities, setActivities] = useState<Activity[]>([])
+const CalendarMapView: React.FC<MapViewProps> = () => {
+  const { dayLocations, dayFeatures } = useTripContext()
   const [timeRange, setTimeRange] = useState<number[]>([0, 24])
 
-  const fetchActivities = useCallback(async () => {
-    try {
-      const response = await axios.get(`/api/trips/${tripId}/activities`)
-      setActivities(response.data)
-    } catch (err) {
-      console.error("Error fetching activities:", err)
-    }
-  }, [tripId])
+  const activities = useMemo(() => {
+    const allActivities: Activity[] = []
 
-  useEffect(() => {
-    fetchActivities()
-  }, [fetchActivities])
+    // Process locations
+    Object.values(dayLocations)
+      .flat()
+      .forEach((loc) => {
+        allActivities.push({
+          id: loc.id,
+          name: loc.city, // Or location name if available
+          scheduled_start: loc.start_time || null,
+          scheduled_end: loc.end_time || null,
+          activity_type: "location", // Default type
+          latitude: loc.latitude,
+          longitude: loc.longitude,
+        })
+      })
+
+    // Process features
+    Object.values(dayFeatures)
+      .flat()
+      .forEach((feat) => {
+        allActivities.push({
+          id: feat.saved_id || feat.properties.id,
+          name: feat.properties.title || feat.properties.name || "Untitled",
+          scheduled_start: feat.start_time || null,
+          scheduled_end: feat.end_time || null,
+          activity_type: "feature", // Default type
+          latitude: feat.geometry.coordinates[1],
+          longitude: feat.geometry.coordinates[0],
+        })
+      })
+
+    return allActivities
+  }, [dayLocations, dayFeatures])
 
   const validActivities = useMemo(
     () => activities.filter((a) => a.latitude && a.longitude && a.scheduled_start),

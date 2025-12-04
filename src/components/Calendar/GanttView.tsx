@@ -1,6 +1,5 @@
 import { Box, Typography, Paper, Tooltip } from "@mui/material"
-import axios from "axios"
-import React, { useState, useEffect, useCallback, useMemo } from "react"
+import React, { useEffect, useMemo } from "react"
 
 interface Activity {
   id: string
@@ -15,32 +14,46 @@ interface GanttViewProps {
   tripId: string
 }
 
-import { useTripContext, Conflict } from "../../contexts/TripContext"
+import { useTripContext } from "../../contexts/TripContext"
 
 const GanttView: React.FC<GanttViewProps> = ({ tripId }) => {
-  const [activities, setActivities] = useState<Activity[]>([])
-  const [conflicts, setConflicts] = useState<Conflict[]>([])
+  const { dayLocations, dayFeatures, conflicts, fetchConflicts } = useTripContext()
 
-  const { fetchConflicts } = useTripContext()
+  const activities = useMemo(() => {
+    const allActivities: Activity[] = []
 
-  const fetchActivities = useCallback(async () => {
-    try {
-      const response = await axios.get(`/api/trips/${tripId}/activities`)
-      setActivities(response.data)
-    } catch (err) {
-      console.error("Error fetching activities:", err)
-    }
-  }, [tripId])
+    // Process locations
+    Object.values(dayLocations)
+      .flat()
+      .forEach((loc) => {
+        allActivities.push({
+          id: loc.id,
+          name: loc.city,
+          scheduled_start: loc.start_time || null,
+          scheduled_end: loc.end_time || null,
+          activity_type: "location",
+        })
+      })
 
-  const loadConflicts = useCallback(async () => {
-    const data = await fetchConflicts(tripId)
-    setConflicts(data)
-  }, [tripId, fetchConflicts])
+    // Process features
+    Object.values(dayFeatures)
+      .flat()
+      .forEach((feat) => {
+        allActivities.push({
+          id: feat.saved_id || feat.properties.id,
+          name: feat.properties.title || feat.properties.name || "Untitled",
+          scheduled_start: feat.start_time || null,
+          scheduled_end: feat.end_time || null,
+          activity_type: "feature",
+        })
+      })
+
+    return allActivities
+  }, [dayLocations, dayFeatures])
 
   useEffect(() => {
-    fetchActivities()
-    loadConflicts()
-  }, [fetchActivities, loadConflicts])
+    fetchConflicts(tripId)
+  }, [tripId, fetchConflicts])
 
   const getConflictForActivity = (activityId: string) => {
     return conflicts.find((c) => c.activity1_id === activityId || c.activity2_id === activityId)

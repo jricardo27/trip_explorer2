@@ -5,7 +5,6 @@ import React, { useMemo } from "react"
 
 import { DayLocation, TripDay, TripFeature } from "../../contexts/TripContext"
 
-import { CalendarItem } from "./CalendarItem"
 import { DraggableCalendarItem } from "./DraggableCalendarItem"
 
 interface CalendarDayCellProps {
@@ -24,6 +23,10 @@ interface PositionedItem {
 }
 
 function timeToMinutes(time: string): number {
+  if (time.includes("T")) {
+    const date = new Date(time)
+    return date.getHours() * 60 + date.getMinutes()
+  }
   const [hours, minutes] = time.split(":").map(Number)
   return hours * 60 + minutes
 }
@@ -148,7 +151,10 @@ export const CalendarDayColumn: React.FC<CalendarDayCellProps> = ({ day, items, 
           <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block" }}>
             Unscheduled
           </Typography>
-          <SortableContext items={unscheduledItems.map(i => "city" in i ? i.id : i.saved_id || i.properties.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={unscheduledItems.map((i) => ("city" in i ? i.id : i.saved_id || i.properties.id))}
+            strategy={verticalListSortingStrategy}
+          >
             {unscheduledItems.map((item) => {
               const itemId = "city" in item ? item.id : item.saved_id || item.properties.id
               return (
@@ -210,7 +216,12 @@ export const CalendarDayColumn: React.FC<CalendarDayCellProps> = ({ day, items, 
                 zIndex: 1,
               }}
             >
-              <CalendarItem item={posItem.item} onClick={() => onItemClick(posItem.item)} />
+              <DraggableCalendarItem
+                item={posItem.item}
+                itemId={itemId}
+                dayId={day.id}
+                onClick={() => onItemClick(posItem.item)}
+              />
             </Box>
           )
         })}

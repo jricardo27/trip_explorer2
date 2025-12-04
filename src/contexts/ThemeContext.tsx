@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode } from "react"
+import React, { ReactNode } from "react"
 
 import { ThemeContext } from "./themeContextDefinition"
 
@@ -9,18 +9,9 @@ interface ThemeProviderProps {
 }
 
 export const ThemeModeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [mode, setMode] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem("theme-mode")
-    return (saved as ThemeMode) || "light"
-  })
-
-  useEffect(() => {
-    localStorage.setItem("theme-mode", mode)
-  }, [mode])
-
-  const toggleTheme = () => {
-    setMode((prev) => (prev === "light" ? "dark" : "light"))
-  }
+  // Always force light mode
+  const mode: ThemeMode = "light"
+  const toggleTheme = () => {} // No-op
 
   return <ThemeContext.Provider value={{ mode, toggleTheme }}>{children}</ThemeContext.Provider>
 }

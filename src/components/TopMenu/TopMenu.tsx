@@ -1,9 +1,8 @@
-import { Menu as MenuIcon } from "@mui/icons-material"
+import { AccountCircle, Login, Logout, Sync, Menu as MenuIcon } from "@mui/icons-material"
 import {
   AppBar,
   Box,
   Button,
-  Grid2,
   List,
   ListItem,
   ListItemButton,
@@ -24,6 +23,8 @@ import { useNavigate, Link } from "react-router-dom"
 
 import SavedFeaturesContext from "../../contexts/SavedFeaturesContext"
 import { useTripContext } from "../../contexts/TripContext"
+import { AuthModal } from "../Auth/AuthModal"
+import { GuestSyncModal } from "../Auth/GuestSyncModal"
 import { TravelReportModal } from "../Reports/TravelReportModal"
 import WelcomeModal from "../WelcomeModal/WelcomeModal"
 
@@ -35,7 +36,6 @@ import { importTrip } from "./importTrip"
 import { saveAsBackup } from "./saveAsBackup"
 import { saveAsGeoJson } from "./saveAsGeoJson"
 import { saveAsKml } from "./saveAsKml"
-import { ThemeToggle } from "./ThemeToggle"
 
 interface TopMenuProps {
   onMenuClick: () => void
@@ -63,12 +63,15 @@ const destinations = [
 
 const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
   const location = window.location.pathname
-  const { savedFeatures, setSavedFeatures } = useContext(SavedFeaturesContext)!
+  const { savedFeatures, setSavedFeatures, userId, setUserId, email, logout } = useContext(SavedFeaturesContext)!
   const { createTrip, addLocationToDay, addFeatureToDay, currentTrip, dayLocations, dayFeatures } = useTripContext()
   const navigate = useNavigate()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [accountAnchorEl, setAccountAnchorEl] = useState<null | HTMLElement>(null)
   const [openWelcomeModal, setOpenWelcomeModal] = useState<boolean>(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [guestSyncOpen, setGuestSyncOpen] = useState(false)
   const [importAnchorEl, setImportAnchorEl] = useState<null | HTMLElement>(null)
   const [destinationAnchorEl, setDestinationAnchorEl] = useState<null | HTMLElement>(null)
   const [reportModalOpen, setReportModalOpen] = useState(false) // Added
@@ -127,190 +130,263 @@ const TopMenu: React.FC<TopMenuProps> = ({ onMenuClick }: TopMenuProps) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Toolbar>
-          <Grid2 container spacing={2} sx={{ flexGrow: 1 }}>
-            <Grid2 size={2}>
-              <Tooltip title="Go back to destination selection" aria-label="Go back to destination selection">
-                <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-                  <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                    Trip Explorer
-                  </Typography>
-                </Link>
-              </Tooltip>
-            </Grid2>
-            <Grid2 size={2}>
-              <Tooltip title="Saved Features" aria-label="Saved Features">
-                <Button onClick={onMenuClick} color="inherit" startIcon={<MenuIcon />} />
-              </Tooltip>
-            </Grid2>
-            <Grid2 size={2}>
-              <Tooltip title="Travel Report" aria-label="Travel Report">
-                <Button onClick={() => setReportModalOpen(true)} color="inherit" startIcon={<MdAssessment />} />
-              </Tooltip>
-            </Grid2>
-            <Grid2 size={2}>
-              <Tooltip title="Export" aria-label="Export">
-                <Button
-                  id="fade-button"
-                  aria-controls={exportMenuIsOpen ? "fade-menu" : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={exportMenuIsOpen ? "true" : undefined}
-                  onClick={openExportMenu}
-                  color="inherit"
-                  startIcon={<FaDownload />}
-                />
-              </Tooltip>
-              <Menu
-                id="fade-menu"
-                MenuListProps={{
-                  "aria-labelledby": "fade-button",
-                }}
-                anchorEl={anchorEl}
-                open={exportMenuIsOpen}
-                onClose={closeExportMenu}
-                TransitionComponent={Fade}
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between", gap: 1 }}>
+          {/* Left: Title and Back Link */}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Tooltip title="Go back to destination selection" aria-label="Go back to destination selection">
+              <Link to="/" style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center" }}>
+                <Typography variant="h6" component="div" sx={{ whiteSpace: "nowrap" }}>
+                  Trip Explorer
+                </Typography>
+              </Link>
+            </Tooltip>
+          </Box>
+
+          {/* Right: Actions */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Tooltip title="Saved Features" aria-label="Saved Features">
+              <Button onClick={onMenuClick} color="inherit" sx={{ minWidth: "auto", p: 1 }}>
+                <MenuIcon />
+              </Button>
+            </Tooltip>
+
+            <Tooltip title="Travel Report" aria-label="Travel Report">
+              <Button onClick={() => setReportModalOpen(true)} color="inherit" sx={{ minWidth: "auto", p: 1 }}>
+                <MdAssessment size={24} />
+              </Button>
+            </Tooltip>
+
+            <Tooltip title="Export" aria-label="Export">
+              <Button
+                id="fade-button"
+                aria-controls={exportMenuIsOpen ? "fade-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={exportMenuIsOpen ? "true" : undefined}
+                onClick={openExportMenu}
+                color="inherit"
+                sx={{ minWidth: "auto", p: 1 }}
               >
-                <MenuItem onClick={closeMenuAfterAction(() => saveAsGeoJson(savedFeatures))}>To GeoJson</MenuItem>
-                <MenuItem onClick={closeMenuAfterAction(() => saveAsKml(savedFeatures))}>To KML</MenuItem>
-                <MenuItem onClick={closeMenuAfterAction(() => saveAsBackup(savedFeatures))}>Export backup</MenuItem>
-                {currentTrip && [
-                  <MenuItem key="divider" divider />,
-                  <MenuItem
-                    key="geojson"
-                    onClick={closeMenuAfterAction(() =>
-                      exportTripToGeoJSON({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
-                    )}
-                  >
-                    Export Trip (GeoJSON)
-                  </MenuItem>,
-                  <MenuItem
-                    key="kml"
-                    onClick={closeMenuAfterAction(() =>
-                      exportTripToKML({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
-                    )}
-                  >
-                    Export Trip (KML)
-                  </MenuItem>,
-                  <MenuItem
-                    key="excel"
-                    onClick={closeMenuAfterAction(() =>
-                      exportTripToExcel({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
-                    )}
-                  >
-                    Export Trip (Excel)
-                  </MenuItem>,
-                  <MenuItem
-                    key="pdf"
-                    onClick={closeMenuAfterAction(() => exportTripToPDF(currentTrip, dayLocations, dayFeatures))}
-                  >
-                    Export Trip (PDF)
-                  </MenuItem>,
-                ]}
-                {/* The following MenuItem was part of the instruction snippet but seems misplaced in an "Export" menu.
-                    Keeping it as per instruction, but noting it might be a logical error in the instruction. */}
-                <MenuItem onClick={closeMenuAfterAction(handleImport)}>
-                  <ListItemIcon>
-                    <FaUpload fontSize="small" />
-                  </ListItemIcon>
-                  Import Trip (GeoJSON/KML)
-                </MenuItem>
-              </Menu>
-              <TravelReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false)} />
-            </Grid2>
-            <Grid2 size={2}>
-              <Tooltip title="Import" aria-label="Import">
-                <Button
-                  id="import-button"
-                  aria-controls={importMenuIsOpen ? "import-menu" : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={importMenuIsOpen ? "true" : undefined}
-                  onClick={openImportMenu}
-                  color="inherit"
-                  startIcon={<FaUpload />}
-                />
-              </Tooltip>
-              <Menu id="import-menu" anchorEl={importAnchorEl} open={importMenuIsOpen} onClose={closeImportMenu}>
+                <FaDownload size={20} />
+              </Button>
+            </Tooltip>
+            {/* Export Menu */}
+            <Menu
+              id="fade-menu"
+              MenuListProps={{
+                "aria-labelledby": "fade-button",
+              }}
+              anchorEl={anchorEl}
+              open={exportMenuIsOpen}
+              onClose={closeExportMenu}
+              TransitionComponent={Fade}
+            >
+              <MenuItem onClick={closeMenuAfterAction(() => saveAsGeoJson(savedFeatures))}>To GeoJson</MenuItem>
+              <MenuItem onClick={closeMenuAfterAction(() => saveAsKml(savedFeatures))}>To KML</MenuItem>
+              <MenuItem onClick={closeMenuAfterAction(() => saveAsBackup(savedFeatures))}>Export backup</MenuItem>
+              {currentTrip && [
+                <MenuItem key="divider" divider />,
                 <MenuItem
-                  onClick={closeMenuAfterAction(() => {
-                    importTrip(createTrip, addLocationToDay, addFeatureToDay)
-                  })}
+                  key="geojson"
+                  onClick={closeMenuAfterAction(() =>
+                    exportTripToGeoJSON({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
+                  )}
                 >
-                  Import Trip
-                </MenuItem>
+                  Export Trip (GeoJSON)
+                </MenuItem>,
                 <MenuItem
-                  onClick={closeMenuAfterAction(() => {
-                    importBackup("override", setSavedFeatures)
-                  })}
+                  key="kml"
+                  onClick={closeMenuAfterAction(() =>
+                    exportTripToKML({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
+                  )}
                 >
-                  Override existing POIs
-                </MenuItem>
+                  Export Trip (KML)
+                </MenuItem>,
                 <MenuItem
-                  onClick={closeMenuAfterAction(() => {
-                    importBackup("append", setSavedFeatures)
-                  })}
+                  key="excel"
+                  onClick={closeMenuAfterAction(() =>
+                    exportTripToExcel({ trip: currentTrip, locations: dayLocations, features: dayFeatures }),
+                  )}
                 >
-                  Append categories
-                </MenuItem>
+                  Export Trip (Excel)
+                </MenuItem>,
                 <MenuItem
-                  onClick={closeMenuAfterAction(() => {
-                    importBackup("merge", setSavedFeatures)
-                  })}
+                  key="pdf"
+                  onClick={closeMenuAfterAction(() => exportTripToPDF(currentTrip, dayLocations, dayFeatures))}
                 >
-                  Merge Categories
-                </MenuItem>
-              </Menu>
-            </Grid2>
-            <Grid2 size={2}>
-              <Tooltip title="Destinations" aria-label="Destinations">
-                <Button
-                  id="destination-button"
-                  aria-controls={destinationMenuIsOpen ? "destination-menu" : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={destinationMenuIsOpen ? "true" : undefined}
-                  onClick={openDestinationMenu}
-                  color="inherit"
-                  startIcon={<MdLocationOn />}
-                />
-              </Tooltip>
-              <Menu
-                id="destination-menu"
-                anchorEl={destinationAnchorEl}
-                open={destinationMenuIsOpen}
-                onClose={closeDestinationMenu}
+                  Export Trip (PDF)
+                </MenuItem>,
+              ]}
+              <MenuItem onClick={closeMenuAfterAction(handleImport)}>
+                <ListItemIcon>
+                  <FaUpload fontSize="small" />
+                </ListItemIcon>
+                Import Trip (GeoJSON/KML)
+              </MenuItem>
+            </Menu>
+            <TravelReportModal open={reportModalOpen} onClose={() => setReportModalOpen(false)} />
+
+            <Tooltip title="Import" aria-label="Import">
+              <Button
+                id="import-button"
+                aria-controls={importMenuIsOpen ? "import-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={importMenuIsOpen ? "true" : undefined}
+                onClick={openImportMenu}
+                color="inherit"
+                sx={{ minWidth: "auto", p: 1 }}
               >
-                {destinations.map((region) => (
-                  <Box key={region.label}>
-                    <MenuItem disabled>{region.label}</MenuItem>
-                    <List disablePadding>
-                      {region.children.map((dest) => (
-                        <ListItem key={dest.path} disablePadding>
-                          <ListItemButton
-                            onClick={(event) => handleDestinationChange(event, dest.path)}
-                            sx={{
-                              pl: 4,
-                              bgcolor:
-                                location === dest.path
-                                  ? (theme) => alpha(theme.palette.primary.main, 0.2)
-                                  : "transparent",
-                            }}
-                          >
-                            <ListItemText primary={dest.label} />
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Box>
-                ))}
-              </Menu>
-            </Grid2>
-            <Grid2 size={2}>
-              <Tooltip title="Help" aria-label="Help">
-                <Button onClick={handleOpenWelcomeModal} color="inherit" startIcon={<MdHelpOutline />} />
-              </Tooltip>
-              <ThemeToggle />
-              <WelcomeModal open={openWelcomeModal} onClose={handleCloseWelcomeModal} />
-            </Grid2>
-          </Grid2>
+                <FaUpload size={20} />
+              </Button>
+            </Tooltip>
+            {/* Import Menu */}
+            <Menu id="import-menu" anchorEl={importAnchorEl} open={importMenuIsOpen} onClose={closeImportMenu}>
+              <MenuItem
+                onClick={closeMenuAfterAction(() => {
+                  importTrip(createTrip, addLocationToDay, addFeatureToDay)
+                })}
+              >
+                Import Trip
+              </MenuItem>
+              <MenuItem
+                onClick={closeMenuAfterAction(() => {
+                  importBackup("override", setSavedFeatures)
+                })}
+              >
+                Override existing POIs
+              </MenuItem>
+              <MenuItem
+                onClick={closeMenuAfterAction(() => {
+                  importBackup("append", setSavedFeatures)
+                })}
+              >
+                Append categories
+              </MenuItem>
+              <MenuItem
+                onClick={closeMenuAfterAction(() => {
+                  importBackup("merge", setSavedFeatures)
+                })}
+              >
+                Merge Categories
+              </MenuItem>
+            </Menu>
+
+            <Tooltip title="Destinations" aria-label="Destinations">
+              <Button
+                id="destination-button"
+                aria-controls={destinationMenuIsOpen ? "destination-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={destinationMenuIsOpen ? "true" : undefined}
+                onClick={openDestinationMenu}
+                color="inherit"
+                sx={{ minWidth: "auto", p: 1 }}
+              >
+                <MdLocationOn size={24} />
+              </Button>
+            </Tooltip>
+            {/* Destination Menu */}
+            <Menu
+              id="destination-menu"
+              anchorEl={destinationAnchorEl}
+              open={destinationMenuIsOpen}
+              onClose={closeDestinationMenu}
+            >
+              {destinations.map((region) => (
+                <Box key={region.label}>
+                  <MenuItem disabled>{region.label}</MenuItem>
+                  <List disablePadding>
+                    {region.children.map((dest) => (
+                      <ListItem key={dest.path} disablePadding>
+                        <ListItemButton
+                          onClick={(event) => handleDestinationChange(event, dest.path)}
+                          sx={{
+                            pl: 4,
+                            bgcolor:
+                              location === dest.path
+                                ? (theme) => alpha(theme.palette.primary.main, 0.2)
+                                : "transparent",
+                          }}
+                        >
+                          <ListItemText primary={dest.label} />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              ))}
+            </Menu>
+
+            <Tooltip title="Help" aria-label="Help">
+              <Button onClick={handleOpenWelcomeModal} color="inherit" sx={{ minWidth: "auto", p: 1 }}>
+                <MdHelpOutline size={24} />
+              </Button>
+            </Tooltip>
+            <WelcomeModal open={openWelcomeModal} onClose={handleCloseWelcomeModal} />
+
+            {/* Account Menu */}
+            <Tooltip title="Account" aria-label="Account">
+              <Button
+                onClick={(e) => setAccountAnchorEl(e.currentTarget)}
+                color="inherit"
+                startIcon={<AccountCircle />}
+                sx={{ textTransform: "none" }}
+              >
+                {email ? email.split("@")[0] : "Guest"}
+              </Button>
+            </Tooltip>
+            <Menu anchorEl={accountAnchorEl} open={Boolean(accountAnchorEl)} onClose={() => setAccountAnchorEl(null)}>
+              {email
+                ? [
+                    <MenuItem key="email" disabled>
+                      <Typography variant="body2">{email}</Typography>
+                    </MenuItem>,
+                    <MenuItem
+                      key="logout"
+                      onClick={() => {
+                        logout()
+                        setAccountAnchorEl(null)
+                      }}
+                    >
+                      <ListItemIcon>
+                        <Logout fontSize="small" />
+                      </ListItemIcon>
+                      Logout
+                    </MenuItem>,
+                  ]
+                : [
+                    <MenuItem
+                      key="login"
+                      onClick={() => {
+                        setIsAuthModalOpen(true)
+                        setAccountAnchorEl(null)
+                      }}
+                    >
+                      <ListItemIcon>
+                        <Login fontSize="small" />
+                      </ListItemIcon>
+                      Login / Sign Up
+                    </MenuItem>,
+                    <MenuItem
+                      key="guest-sync"
+                      onClick={() => {
+                        setGuestSyncOpen(true)
+                        setAccountAnchorEl(null)
+                      }}
+                    >
+                      <ListItemIcon>
+                        <Sync fontSize="small" />
+                      </ListItemIcon>
+                      Guest Sync
+                    </MenuItem>,
+                  ]}
+            </Menu>
+            <AuthModal open={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+            <GuestSyncModal
+              open={guestSyncOpen}
+              onClose={() => setGuestSyncOpen(false)}
+              userId={userId}
+              setUserId={setUserId}
+            />
+          </Box>
         </Toolbar>
       </AppBar>
     </Box>

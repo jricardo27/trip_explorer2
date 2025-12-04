@@ -6,6 +6,8 @@ export interface TripDay {
   id: string
   day_index: number
   date: string
+  name?: string
+  notes?: string
 }
 
 export interface AnimationConfig {
@@ -155,6 +157,7 @@ interface TripContextType {
   fetchDayLocations: (dayId: string) => Promise<void>
   addLocationToDay: (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => Promise<void>
   updateLocation: (id: string, dayId: string, updates: Partial<DayLocation>) => Promise<void>
+  updateDay: (dayId: string, updates: Partial<TripDay>) => Promise<void>
   deleteLocation: (locationId: string, dayId: string) => Promise<void>
   addFeatureToDay: (
     dayId: string,
@@ -180,6 +183,7 @@ interface TripContextType {
   updateLocationVisitStatus: (locationId: string, dayId: string, visited: boolean, planned: boolean) => Promise<void>
   updateFeatureVisitStatus: (featureId: string, dayId: string, visited: boolean, planned: boolean) => Promise<void>
   fetchConflicts: (tripId: string) => Promise<Conflict[]>
+  conflicts: Conflict[]
 }
 
 const TripContext = createContext<TripContextType | undefined>(undefined)
@@ -189,6 +193,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentTrip, setCurrentTrip] = useState<Trip | null>(null)
   const [dayFeatures, setDayFeatures] = useState<Record<string, TripFeature[]>>({})
   const [dayLocations, setDayLocations] = useState<Record<string, DayLocation[]>>({})
+  const [conflicts, setConflicts] = useState<Conflict[]>([])
   const [loading, setLoading] = useState(false)
 
   const { userId } = useContext(SavedFeaturesContext)!
@@ -252,102 +257,114 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [API_URL],
   )
 
-  const createTrip = async (name: string, startDate: string, endDate: string): Promise<Trip> => {
-    if (!userId) throw new Error("User ID is required")
-    setLoading(true)
-    try {
-      const response = await fetch(`${API_URL}/api/trips`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, name, start_date: startDate, end_date: endDate }),
-      })
-      if (response.ok) {
-        const createdTrip = await response.json()
-        await fetchTrips()
-        // Fetch full trip details including days
-        const detailsResponse = await fetch(`${API_URL}/api/trips/${createdTrip.id}`)
-        if (detailsResponse.ok) {
-          return await detailsResponse.json()
+  const createTrip = useCallback(
+    async (name: string, startDate: string, endDate: string): Promise<Trip> => {
+      if (!userId) throw new Error("User ID is required")
+      setLoading(true)
+      try {
+        const response = await fetch(`${API_URL}/api/trips`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, name, start_date: startDate, end_date: endDate }),
+        })
+        if (response.ok) {
+          const createdTrip = await response.json()
+          await fetchTrips()
+          // Fetch full trip details including days
+          const detailsResponse = await fetch(`${API_URL}/api/trips/${createdTrip.id}`)
+          if (detailsResponse.ok) {
+            return await detailsResponse.json()
+          }
+          return createdTrip
+        } else {
+          throw new Error("Failed to create trip")
         }
-        return createdTrip
-      } else {
-        throw new Error("Failed to create trip")
+      } catch (error) {
+        console.error(error)
+        throw error
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error(error)
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    [userId, API_URL, fetchTrips],
+  )
 
-  const deleteTrip = async (id: string) => {
-    setLoading(true)
-    try {
-      const response = await fetch(`${API_URL}/api/trips/${id}`, {
-        method: "DELETE",
-      })
-      if (response.ok) {
-        await fetchTrips()
-        if (currentTrip?.id === id) {
-          setCurrentTrip(null)
+  const deleteTrip = useCallback(
+    async (id: string) => {
+      setLoading(true)
+      try {
+        const response = await fetch(`${API_URL}/api/trips/${id}`, {
+          method: "DELETE",
+        })
+        if (response.ok) {
+          await fetchTrips()
+          if (currentTrip?.id === id) {
+            setCurrentTrip(null)
+          }
         }
+      } catch (error) {
+        console.error("Failed to delete trip:", error)
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error("Failed to delete trip:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    [API_URL, fetchTrips, currentTrip],
+  )
 
-  const updateTrip = async (id: string, updates: Partial<Trip>) => {
-    setLoading(true)
-    try {
-      const response = await fetch(`${API_URL}/api/trips/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      })
-      if (response.ok) {
-        const updatedTrip = await response.json()
-        setCurrentTrip((prev) => (prev?.id === id ? { ...prev, ...updatedTrip } : prev))
-        await fetchTrips()
-      }
-    } catch (error) {
-      console.error("Failed to update trip:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const copyTrip = async (tripId: string, newName: string, startDate: string): Promise<Trip> => {
-    if (!userId) throw new Error("User ID is required")
-    setLoading(true)
-    try {
-      const response = await fetch(`${API_URL}/api/trips/${tripId}/copy`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, name: newName, start_date: startDate }),
-      })
-      if (response.ok) {
-        const copiedTrip = await response.json()
-        await fetchTrips()
-        // Fetch full trip details including days
-        const detailsResponse = await fetch(`${API_URL}/api/trips/${copiedTrip.id}`)
-        if (detailsResponse.ok) {
-          return await detailsResponse.json()
+  const updateTrip = useCallback(
+    async (id: string, updates: Partial<Trip>) => {
+      setLoading(true)
+      try {
+        const response = await fetch(`${API_URL}/api/trips/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        })
+        if (response.ok) {
+          const updatedTrip = await response.json()
+          setCurrentTrip((prev) => (prev?.id === id ? { ...prev, ...updatedTrip } : prev))
+          await fetchTrips()
         }
-        return copiedTrip
-      } else {
-        throw new Error("Failed to copy trip")
+      } catch (error) {
+        console.error("Failed to update trip:", error)
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error(error)
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    [API_URL, fetchTrips],
+  )
+
+  const copyTrip = useCallback(
+    async (tripId: string, newName: string, startDate: string): Promise<Trip> => {
+      if (!userId) throw new Error("User ID is required")
+      setLoading(true)
+      try {
+        const response = await fetch(`${API_URL}/api/trips/${tripId}/copy`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, name: newName, start_date: startDate }),
+        })
+        if (response.ok) {
+          const copiedTrip = await response.json()
+          await fetchTrips()
+          // Fetch full trip details including days
+          const detailsResponse = await fetch(`${API_URL}/api/trips/${copiedTrip.id}`)
+          if (detailsResponse.ok) {
+            return await detailsResponse.json()
+          }
+          return copiedTrip
+        } else {
+          throw new Error("Failed to copy trip")
+        }
+      } catch (error) {
+        console.error(error)
+        throw error
+      } finally {
+        setLoading(false)
+      }
+    },
+    [userId, API_URL, fetchTrips],
+  )
 
   const fetchDayFeatures = useCallback(
     async (dayId: string) => {
@@ -364,44 +381,47 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [API_URL],
   )
 
-  const addFeatureToDay = async (
-    dayId: string,
-    feature: unknown,
-    options: {
-      visited?: boolean
-      planned?: boolean
-      duration_minutes?: number
-      travel_time_minutes?: number
-      is_locked?: boolean
-      subtype?: string
-    } = {},
-  ) => {
-    if (!userId) return
-    try {
-      const response = await fetch(`${API_URL}/api/features`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: userId,
-          list_name: "trip_features",
-          feature,
-          trip_day_id: dayId,
-          visited: options.visited !== undefined ? options.visited : true,
-          planned: options.planned !== undefined ? options.planned : false,
-          duration_minutes: options.duration_minutes,
-          travel_time_minutes: options.travel_time_minutes,
-          is_locked: options.is_locked,
-          subtype: options.subtype,
-        }),
-      })
-      if (response.ok) {
-        await fetchDayFeatures(dayId)
+  const addFeatureToDay = useCallback(
+    async (
+      dayId: string,
+      feature: unknown,
+      options: {
+        visited?: boolean
+        planned?: boolean
+        duration_minutes?: number
+        travel_time_minutes?: number
+        is_locked?: boolean
+        subtype?: string
+      } = {},
+    ) => {
+      if (!userId) return
+      try {
+        const response = await fetch(`${API_URL}/api/features`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userId,
+            list_name: "trip_features",
+            feature,
+            trip_day_id: dayId,
+            visited: options.visited !== undefined ? options.visited : true,
+            planned: options.planned !== undefined ? options.planned : false,
+            duration_minutes: options.duration_minutes,
+            travel_time_minutes: options.travel_time_minutes,
+            is_locked: options.is_locked,
+            subtype: options.subtype,
+          }),
+        })
+        if (response.ok) {
+          await fetchDayFeatures(dayId)
+        }
+      } catch (error) {
+        console.error("Failed to add feature to day:", error)
+        throw error
       }
-    } catch (error) {
-      console.error("Failed to add feature to day:", error)
-      throw error
-    }
-  }
+    },
+    [userId, API_URL, fetchDayFeatures],
+  )
 
   const fetchDayLocations = useCallback(
     async (dayId: string) => {
@@ -418,207 +438,280 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [API_URL],
   )
 
-  const addLocationToDay = async (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => {
-    try {
-      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/locations`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(location),
-      })
-      if (response.ok) {
-        await fetchDayLocations(dayId)
+  const addLocationToDay = useCallback(
+    async (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => {
+      try {
+        const response = await fetch(`${API_URL}/api/trip-days/${dayId}/locations`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(location),
+        })
+        if (response.ok) {
+          await fetchDayLocations(dayId)
+        }
+      } catch (error) {
+        console.error("Failed to add location to day:", error)
+        throw error
       }
-    } catch (error) {
-      console.error("Failed to add location to day:", error)
-      throw error
-    }
-  }
+    },
+    [API_URL, fetchDayLocations],
+  )
 
-  const updateLocation = async (id: string, dayId: string, updates: Partial<DayLocation>) => {
-    try {
-      const response = await fetch(`${API_URL}/api/day-locations/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      })
-      if (response.ok) {
-        await fetchDayLocations(dayId)
-      }
-    } catch (error) {
-      console.error("Failed to update location:", error)
-      throw error
-    }
-  }
+  const updateDay = useCallback(
+    async (dayId: string, updates: Partial<TripDay>) => {
+      if (!currentTrip) return
 
-  const deleteLocation = async (locationId: string, dayId: string) => {
-    try {
-      const response = await fetch(`${API_URL}/api/day-locations/${locationId}`, {
-        method: "DELETE",
-      })
-      if (response.ok) {
-        await fetchDayLocations(dayId)
-      }
-    } catch (error) {
-      console.error("Failed to delete location:", error)
-      throw error
-    }
-  }
+      try {
+        const response = await fetch(`${API_URL}/api/trips/${currentTrip.id}/days/${dayId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        })
 
-  const deleteFeature = async (savedId: string, dayId: string) => {
-    try {
-      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features/${savedId}`, {
-        method: "DELETE",
-      })
-      if (response.ok) {
-        await fetchDayFeatures(dayId)
+        if (response.ok) {
+          await fetchTripDetails(currentTrip.id)
+        }
+      } catch (error) {
+        console.error("Error updating day:", error)
       }
-    } catch (error) {
-      console.error("Failed to delete feature:", error)
-      throw error
-    }
-  }
+    },
+    [API_URL, currentTrip, fetchTripDetails],
+  )
 
-  const updateFeature = async (id: string, dayId: string, updates: Partial<TripFeature>) => {
-    try {
-      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      })
-      if (response.ok) {
-        await fetchDayFeatures(dayId)
+  const updateLocation = useCallback(
+    async (id: string, dayId: string, updates: Partial<DayLocation>) => {
+      try {
+        const response = await fetch(`${API_URL}/api/day-locations/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        })
+        if (response.ok) {
+          await fetchDayLocations(dayId)
+        }
+      } catch (error) {
+        console.error("Failed to update location:", error)
+        throw error
       }
-    } catch (error) {
-      console.error("Failed to update feature:", error)
-      throw error
-    }
-  }
+    },
+    [API_URL, fetchDayLocations],
+  )
 
-  const reorderItems = async (dayId: string, items: { id: string; type: "location" | "feature"; order: number }[]) => {
-    try {
-      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/reorder`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
-      })
-      if (response.ok) {
-        // Optimistically update or refetch
-        // Refetching is safer for now
-        await fetchTripDetails(currentTrip!.id)
+  const deleteLocation = useCallback(
+    async (locationId: string, dayId: string) => {
+      try {
+        const response = await fetch(`${API_URL}/api/day-locations/${locationId}`, {
+          method: "DELETE",
+        })
+        if (response.ok) {
+          await fetchDayLocations(dayId)
+        }
+      } catch (error) {
+        console.error("Failed to delete location:", error)
+        throw error
       }
-    } catch (error) {
-      console.error("Failed to reorder items:", error)
-      throw error
-    }
-  }
+    },
+    [API_URL, fetchDayLocations],
+  )
+
+  const deleteFeature = useCallback(
+    async (savedId: string, dayId: string) => {
+      try {
+        const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features/${savedId}`, {
+          method: "DELETE",
+        })
+        if (response.ok) {
+          await fetchDayFeatures(dayId)
+        }
+      } catch (error) {
+        console.error("Failed to delete feature:", error)
+        throw error
+      }
+    },
+    [API_URL, fetchDayFeatures],
+  )
+
+  const updateFeature = useCallback(
+    async (id: string, dayId: string, updates: Partial<TripFeature>) => {
+      try {
+        const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        })
+        if (response.ok) {
+          await fetchDayFeatures(dayId)
+        }
+      } catch (error) {
+        console.error("Failed to update feature:", error)
+        throw error
+      }
+    },
+    [API_URL, fetchDayFeatures],
+  )
+
+  const reorderItems = useCallback(
+    async (dayId: string, items: { id: string; type: "location" | "feature"; order: number }[]) => {
+      try {
+        const response = await fetch(`${API_URL}/api/trip-days/${dayId}/reorder`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items }),
+        })
+        if (response.ok) {
+          // Optimistically update or refetch
+          // Refetching is safer for now
+          await fetchTripDetails(currentTrip!.id)
+        }
+      } catch (error) {
+        console.error("Failed to reorder items:", error)
+        throw error
+      }
+    },
+    [API_URL, currentTrip, fetchTripDetails],
+  )
 
   useEffect(() => {
     fetchTrips()
   }, [fetchTrips])
 
-  const fetchTravelStats = async (year?: number | string): Promise<TravelStats | null> => {
-    if (!userId) return null
-    try {
-      const query = year ? `?user_id=${userId}&year=${year}` : `?user_id=${userId}`
-      const response = await fetch(`${API_URL}/api/reports/travel-stats${query}`)
-      if (response.ok) {
-        return await response.json()
+  const fetchTravelStats = useCallback(
+    async (year?: number | string): Promise<TravelStats | null> => {
+      if (!userId) return null
+      try {
+        const query = year ? `?user_id=${userId}&year=${year}` : `?user_id=${userId}`
+        const response = await fetch(`${API_URL}/api/reports/travel-stats${query}`)
+        if (response.ok) {
+          return await response.json()
+        }
+        return null
+      } catch (error) {
+        console.error("Failed to fetch travel stats:", error)
+        return null
       }
-      return null
-    } catch (error) {
-      console.error("Failed to fetch travel stats:", error)
-      return null
-    }
-  }
-
-  const updateLocationVisitStatus = async (
-    locationId: string,
-    dayId: string,
-    visited: boolean,
-    planned: boolean,
-  ): Promise<void> => {
-    try {
-      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/locations/${locationId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visited, planned }),
-      })
-      if (response.ok) {
-        await fetchDayLocations(dayId)
-      }
-    } catch (error) {
-      console.error("Failed to update location visit status:", error)
-      throw error
-    }
-  }
-
-  const updateFeatureVisitStatus = async (
-    featureId: string,
-    dayId: string,
-    visited: boolean,
-    planned: boolean,
-  ): Promise<void> => {
-    try {
-      const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features/${featureId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visited, planned }),
-      })
-      if (response.ok) {
-        await fetchDayFeatures(dayId)
-      }
-    } catch (error) {
-      console.error("Failed to update feature visit status:", error)
-      throw error
-    }
-  }
-
-  const fetchConflicts = async (tripId: string): Promise<Conflict[]> => {
-    try {
-      const response = await fetch(`${API_URL}/api/trips/${tripId}/activities/conflicts`)
-      if (response.ok) {
-        return await response.json()
-      }
-      return []
-    } catch (error) {
-      console.error("Failed to fetch conflicts:", error)
-      return []
-    }
-  }
-
-  return (
-    <TripContext.Provider
-      value={{
-        trips,
-        currentTrip,
-        dayFeatures,
-        dayLocations,
-        loading,
-        fetchTrips,
-        fetchTripDetails,
-        fetchDayFeatures,
-        fetchDayLocations,
-        addLocationToDay,
-        updateLocation,
-        deleteLocation,
-        addFeatureToDay,
-        updateFeature,
-        deleteFeature,
-        createTrip,
-        deleteTrip,
-        updateTrip,
-        setCurrentTrip,
-        reorderItems,
-        copyTrip,
-        fetchTravelStats,
-        updateLocationVisitStatus,
-        updateFeatureVisitStatus,
-        fetchConflicts,
-      }}
-    >
-      {children}
-    </TripContext.Provider>
+    },
+    [userId, API_URL],
   )
+
+  const updateLocationVisitStatus = useCallback(
+    async (locationId: string, dayId: string, visited: boolean, planned: boolean): Promise<void> => {
+      try {
+        const response = await fetch(`${API_URL}/api/trip-days/${dayId}/locations/${locationId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ visited, planned }),
+        })
+        if (response.ok) {
+          await fetchDayLocations(dayId)
+        }
+      } catch (error) {
+        console.error("Failed to update location visit status:", error)
+        throw error
+      }
+    },
+    [API_URL, fetchDayLocations],
+  )
+
+  const updateFeatureVisitStatus = useCallback(
+    async (featureId: string, dayId: string, visited: boolean, planned: boolean): Promise<void> => {
+      try {
+        const response = await fetch(`${API_URL}/api/trip-days/${dayId}/features/${featureId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ visited, planned }),
+        })
+        if (response.ok) {
+          await fetchDayFeatures(dayId)
+        }
+      } catch (error) {
+        console.error("Failed to update feature visit status:", error)
+        throw error
+      }
+    },
+    [API_URL, fetchDayFeatures],
+  )
+
+  const fetchConflicts = useCallback(
+    async (tripId: string): Promise<Conflict[]> => {
+      try {
+        const response = await fetch(`${API_URL}/api/trips/${tripId}/activities/conflicts`)
+        if (response.ok) {
+          const data = await response.json()
+          setConflicts(data)
+          return data
+        }
+        setConflicts([])
+        return []
+      } catch (error) {
+        console.error("Failed to fetch conflicts:", error)
+        setConflicts([])
+        return []
+      }
+    },
+    [API_URL],
+  )
+
+  const contextValue = React.useMemo(
+    () => ({
+      trips,
+      currentTrip,
+      dayFeatures,
+      dayLocations,
+      loading,
+      fetchTrips,
+      fetchTripDetails,
+      fetchDayFeatures,
+      fetchDayLocations,
+      addLocationToDay,
+      updateLocation,
+      updateDay,
+      deleteLocation,
+      addFeatureToDay,
+      updateFeature,
+      deleteFeature,
+      createTrip,
+      deleteTrip,
+      updateTrip,
+      setCurrentTrip,
+      reorderItems,
+      copyTrip,
+      fetchTravelStats,
+      updateLocationVisitStatus,
+      updateFeatureVisitStatus,
+      fetchConflicts,
+      conflicts,
+    }),
+    [
+      trips,
+      currentTrip,
+      dayFeatures,
+      dayLocations,
+      loading,
+      fetchTrips,
+      fetchTripDetails,
+      fetchDayFeatures,
+      fetchDayLocations,
+      addLocationToDay,
+      updateLocation,
+      updateDay,
+      deleteLocation,
+      addFeatureToDay,
+      updateFeature,
+      deleteFeature,
+      createTrip,
+      deleteTrip,
+      updateTrip,
+      reorderItems,
+      copyTrip,
+      fetchTravelStats,
+      updateLocationVisitStatus,
+      updateFeatureVisitStatus,
+      fetchConflicts,
+      conflicts,
+    ],
+  )
+
+  return <TripContext.Provider value={contextValue}>{children}</TripContext.Provider>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

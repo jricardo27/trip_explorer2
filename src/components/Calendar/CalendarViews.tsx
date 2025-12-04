@@ -1,4 +1,3 @@
-import ListIcon from "@mui/icons-material/List"
 import MapIcon from "@mui/icons-material/Map"
 import ViewTimelineIcon from "@mui/icons-material/ViewTimeline"
 import ViewWeekIcon from "@mui/icons-material/ViewWeek"
@@ -6,7 +5,6 @@ import { Box, Paper, Tabs, Tab } from "@mui/material"
 import React, { useState } from "react"
 
 import GanttView from "./GanttView"
-import ListView from "./ListView"
 import MapView from "./MapView"
 import TimelineView from "./TimelineView"
 
@@ -30,7 +28,6 @@ const CalendarViews: React.FC<CalendarViewsProps> = ({ tripId }) => {
       <Paper sx={{ mb: 2 }}>
         <Tabs value={currentView} onChange={handleViewChange} variant="fullWidth">
           <Tab icon={<ViewTimelineIcon />} label="Timeline" />
-          <Tab icon={<ListIcon />} label="List" />
           <Tab icon={<MapIcon />} label="Map" />
           <Tab icon={<ViewWeekIcon />} label="Gantt" />
         </Tabs>
@@ -38,9 +35,8 @@ const CalendarViews: React.FC<CalendarViewsProps> = ({ tripId }) => {
 
       <Box>
         {currentView === 0 && <TimelineView tripId={tripId} />}
-        {currentView === 1 && <ListView tripId={tripId} />}
-        {currentView === 2 && <MapView tripId={tripId} />}
-        {currentView === 3 && <GanttView tripId={tripId} />}
+        {currentView === 1 && <MapView tripId={tripId} />}
+        {currentView === 2 && <GanttView tripId={tripId} />}
       </Box>
     </Box>
   )
