@@ -558,17 +558,25 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ items }),
         })
-        if (response.ok) {
-          // Optimistically update or refetch
-          // Refetching is safer for now
-          await fetchTripDetails(currentTrip!.id)
+
+        if (!response.ok) {
+          throw new Error(`Failed to reorder items: ${response.statusText}`)
         }
+
+        // Wait a bit to ensure database transaction is fully committed
+        await new Promise(resolve => setTimeout(resolve, 100))
+
+        // Refetch only the affected day's data instead of entire trip
+        await Promise.all([
+          fetchDayLocations(dayId),
+          fetchDayFeatures(dayId)
+        ])
       } catch (error) {
         console.error("Failed to reorder items:", error)
         throw error
       }
     },
-    [API_URL, currentTrip, fetchTripDetails],
+    [API_URL, fetchDayLocations, fetchDayFeatures],
   )
 
   useEffect(() => {
