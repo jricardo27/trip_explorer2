@@ -1072,9 +1072,6 @@ app.put("/api/day-locations/:id", async (req, res) => {
     travel_time_minutes,
     is_locked,
     subtype,
-    // Extract latitude and longitude separately for special handling
-    latitude,
-    longitude,
   } = req.body
 
   try {
