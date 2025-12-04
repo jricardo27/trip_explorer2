@@ -82,7 +82,41 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
         await onItemMoved(itemId, activeItem.type, fromDayId, toDayId, newOrder)
       }
     }
-    // TODO: Handle reordering within the same day
+    // Handle reordering within the same day
+    if (fromDayId === toDayId) {
+      const items = dayItems[fromDayId] || []
+      const activeId = "city" in activeItem.item ? activeItem.item.id : activeItem.item.saved_id || activeItem.item.properties.id
+
+      // Find current index
+      const oldIndex = items.findIndex(item => {
+        const id = "city" in item ? item.id : item.saved_id || item.properties.id
+        return id === activeId
+      })
+
+      if (oldIndex === -1) return
+
+      let newIndex = -1
+
+      // If dropped over a day column (empty space or end of list)
+      if (over.id === fromDayId) {
+        newIndex = items.length - 1
+      } else {
+        // If dropped over another item
+        const overId = over.id as string
+        const overIndex = items.findIndex(item => {
+          const id = "city" in item ? item.id : item.saved_id || item.properties.id
+          return id === overId
+        })
+
+        if (overIndex !== -1) {
+          newIndex = overIndex
+        }
+      }
+
+      if (newIndex !== -1 && newIndex !== oldIndex) {
+        await onItemMoved(activeId, activeItem.type, fromDayId, toDayId, newIndex)
+      }
+    }
 
     setActiveItem(null)
   }

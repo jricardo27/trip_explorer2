@@ -1,10 +1,12 @@
 import { useDroppable } from "@dnd-kit/core"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Box, Paper, Typography } from "@mui/material"
 import React, { useMemo } from "react"
 
 import { DayLocation, TripDay, TripFeature } from "../../contexts/TripContext"
 
 import { CalendarItem } from "./CalendarItem"
+import { DraggableCalendarItem } from "./DraggableCalendarItem"
 
 interface CalendarDayCellProps {
   day: TripDay
@@ -146,10 +148,20 @@ export const CalendarDayColumn: React.FC<CalendarDayCellProps> = ({ day, items, 
           <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block" }}>
             Unscheduled
           </Typography>
-          {unscheduledItems.map((item) => {
-            const itemId = "city" in item ? item.id : item.saved_id || item.properties.id
-            return <CalendarItem key={itemId} item={item} onClick={() => onItemClick(item)} />
-          })}
+          <SortableContext items={unscheduledItems.map(i => "city" in i ? i.id : i.saved_id || i.properties.id)} strategy={verticalListSortingStrategy}>
+            {unscheduledItems.map((item) => {
+              const itemId = "city" in item ? item.id : item.saved_id || item.properties.id
+              return (
+                <DraggableCalendarItem
+                  key={itemId}
+                  item={item}
+                  itemId={itemId}
+                  dayId={day.id}
+                  onClick={() => onItemClick(item)}
+                />
+              )
+            })}
+          </SortableContext>
         </Box>
       )}
 

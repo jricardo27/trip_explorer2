@@ -94,7 +94,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
   const [copyDialogOpen, setCopyDialogOpen] = useState(false)
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false)
-  const [viewMode, setViewMode] = useState<"list" | "calendar" | "newCalendar">("list")
+  const [viewMode, setViewMode] = useState<"list" | "calendar" | "newCalendar">(() => {
+    const saved = localStorage.getItem("tripDetailViewMode")
+    return (saved as "list" | "calendar" | "newCalendar") || "list"
+  })
   const [newTripName, setNewTripName] = useState("")
   const [newStartDate, setNewStartDate] = useState("")
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(null)
@@ -195,7 +198,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
           <Tooltip title="List View">
             <IconButton
               size="small"
-              onClick={() => setViewMode("list")}
+              onClick={() => {
+                setViewMode("list")
+                localStorage.setItem("tripDetailViewMode", "list")
+              }}
               color={viewMode === "list" ? "primary" : "default"}
               sx={{ borderRadius: 0 }}
             >
@@ -205,7 +211,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
           <Tooltip title="Calendar View (Old)">
             <IconButton
               size="small"
-              onClick={() => setViewMode("calendar")}
+              onClick={() => {
+                setViewMode("calendar")
+                localStorage.setItem("tripDetailViewMode", "calendar")
+              }}
               color={viewMode === "calendar" ? "primary" : "default"}
               sx={{ borderRadius: 0 }}
             >
@@ -215,7 +224,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
           <Tooltip title="Calendar Views (New)">
             <IconButton
               size="small"
-              onClick={() => setViewMode("newCalendar")}
+              onClick={() => {
+                setViewMode("newCalendar")
+                localStorage.setItem("tripDetailViewMode", "newCalendar")
+              }}
               color={viewMode === "newCalendar" ? "primary" : "default"}
               sx={{ borderRadius: 0 }}
             >
@@ -367,19 +379,14 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
           trip={trip}
           dayLocations={dayLocations}
           dayFeatures={dayFeatures}
-          onItemMoved={async (itemId, _itemType, fromDayId, toDayId) => {
+          onItemMoved={async (itemId, _itemType, fromDayId, toDayId, newOrder) => {
             // Get items from both days
             const fromItems = [
               ...(dayLocations[fromDayId] || []).map((l) => ({ ...l, type: "location" as const })),
               ...(dayFeatures[fromDayId] || []).map((f) => ({ ...f, type: "Feature" as const })),
             ].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
 
-            const toItems = [
-              ...(dayLocations[toDayId] || []).map((l) => ({ ...l, type: "location" as const })),
-              ...(dayFeatures[toDayId] || []).map((f) => ({ ...f, type: "Feature" as const })),
-            ].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
-
-            // Remove item from source
+            // Find the item to move
             const movedItem = fromItems.find((item) => {
               const id = item.type === "location" ? item.id : item.saved_id || item.properties.id
               return id === itemId
@@ -387,13 +394,44 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
 
             if (!movedItem) return
 
+            // If same day, just reorder
+            if (fromDayId === toDayId) {
+              const updatedItems = fromItems.filter((item) => {
+                const id = item.type === "location" ? item.id : item.saved_id || item.properties.id
+                return id !== itemId
+              })
+
+              // Insert at new position
+              // Ensure newOrder is within bounds
+              const targetIndex = Math.min(Math.max(0, newOrder), updatedItems.length)
+              updatedItems.splice(targetIndex, 0, movedItem)
+
+              const payload = updatedItems.map((item, idx) => ({
+                id: item.type === "location" ? item.id : item.saved_id || item.properties.id,
+                type: item.type === "location" ? ("location" as const) : ("feature" as const),
+                order: idx,
+              }))
+
+              await reorderItems(fromDayId, payload)
+              return
+            }
+
+            // Different days
+            const toItems = [
+              ...(dayLocations[toDayId] || []).map((l) => ({ ...l, type: "location" as const })),
+              ...(dayFeatures[toDayId] || []).map((f) => ({ ...f, type: "Feature" as const })),
+            ].sort((a, b) => (a.visit_order || 0) - (b.visit_order || 0))
+
+            // Remove from source
             const updatedFromItems = fromItems.filter((item) => {
               const id = item.type === "location" ? item.id : item.saved_id || item.properties.id
               return id !== itemId
             })
 
-            // Add item to target
-            const updatedToItems = [...toItems, movedItem]
+            // Add to target at newOrder
+            const updatedToItems = [...toItems]
+            const targetIndex = Math.min(Math.max(0, newOrder), updatedToItems.length)
+            updatedToItems.splice(targetIndex, 0, movedItem)
 
             // Reorder source day
             const fromPayload = updatedFromItems.map((item, idx) => ({
@@ -500,10 +538,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                           const categoryColor = isLocation
                             ? "grey.400" // Locations get a neutral color
                             : getCategoryColor(
-                                (item.properties.type as string) ||
-                                  (item.properties.category as string) ||
-                                  (item.properties.amenity as string),
-                              )
+                              (item.properties.type as string) ||
+                              (item.properties.category as string) ||
+                              (item.properties.amenity as string),
+                            )
 
                           // Determine status color for border
                           let statusColor = categoryColor
@@ -517,10 +555,10 @@ export const TripDetailView: React.FC<TripDetailViewProps> = ({
                           const thumbnail = !isLocation ? getFeatureThumbnail(item.properties) : null
                           const placeholder = !isLocation
                             ? getCategoryPlaceholder(
-                                (item.properties.type as string) ||
-                                  (item.properties.category as string) ||
-                                  (item.properties.amenity as string),
-                              )
+                              (item.properties.type as string) ||
+                              (item.properties.category as string) ||
+                              (item.properties.amenity as string),
+                            )
                             : null
 
                           // Calculate distance from previous item
