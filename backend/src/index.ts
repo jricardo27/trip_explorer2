@@ -675,8 +675,145 @@ app.get("/api/trip-days/:id/features", async (req, res) => {
         visit_order: row.visit_order,
         visited: row.visited,
         planned: row.planned,
+        transport_mode: row.transport_mode,
+        transport_details: row.transport_details,
+        transport_cost: row.transport_cost,
+        duration_minutes: row.duration_minutes,
+        travel_time_minutes: row.travel_time_minutes,
+        start_time: row.start_time,
+        end_time: row.end_time,
       })),
     )
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Update a trip day (name, notes)
+app.put("/api/trips/:tripId/days/:dayId", async (req, res) => {
+  const { tripId, dayId } = req.params
+  const { name, notes } = req.body
+
+  try {
+    const keys = Object.keys(req.body).filter((key) => ["name", "notes"].includes(key))
+
+    if (keys.length === 0) {
+      return res.status(400).json({ error: "No update fields provided" })
+    }
+
+    const values: any[] = []
+    const setClauses: string[] = []
+    let paramIndex = 1
+
+    keys.forEach((key) => {
+      setClauses.push(`${key} = $${paramIndex}`)
+      values.push(req.body[key])
+      paramIndex++
+    })
+
+    values.push(dayId, tripId)
+    const queryText = `
+      UPDATE trip_days 
+      SET ${setClauses.join(", ")}
+      WHERE id = $${paramIndex} AND trip_id = $${paramIndex + 1}
+      RETURNING *
+    `
+
+    const result = await query(queryText, values)
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Trip day not found" })
+    }
+
+    res.json(result.rows[0])
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "Internal server error" })
+  }
+})
+
+// Update a feature in a trip day
+app.put("/api/trip-days/:dayId/features/:id", async (req, res) => {
+  const { dayId, id } = req.params
+  const {
+    transport_mode,
+    transport_details,
+    transport_cost,
+    duration_minutes,
+    travel_time_minutes,
+    start_time,
+    end_time,
+    visited,
+    planned,
+    is_locked,
+    subtype,
+  } = req.body
+
+  try {
+    const keys = Object.keys(req.body).filter((key) =>
+      [
+        "transport_mode",
+        "transport_details",
+        "transport_cost",
+        "duration_minutes",
+        "travel_time_minutes",
+        "start_time",
+        "end_time",
+        "visited",
+        "planned",
+        "is_locked",
+        "subtype",
+      ].includes(key),
+    )
+
+    if (keys.length === 0) {
+      return res.status(400).json({ error: "No update fields provided" })
+    }
+
+    const values: any[] = []
+    const setClauses: string[] = []
+    let paramIndex = 1
+
+    keys.forEach((key) => {
+      setClauses.push(`${key} = $${paramIndex}`)
+      values.push(req.body[key])
+      paramIndex++
+    })
+
+    values.push(id, dayId)
+    const queryText = `
+      UPDATE saved_features
+      SET ${setClauses.join(", ")}
+      WHERE id = $${paramIndex} AND trip_day_id = $${paramIndex + 1}
+      RETURNING *
+    `
+
+    const result = await query(queryText, values)
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Feature not found" })
+    }
+
+    const row = result.rows[0]
+    res.json({
+      ...row.feature,
+      properties: {
+        ...row.feature.properties,
+        trip_day_id: row.trip_day_id,
+      },
+      saved_id: row.id,
+      visit_order: row.visit_order,
+      visited: row.visited,
+      planned: row.planned,
+      transport_mode: row.transport_mode,
+      transport_details: row.transport_details,
+      transport_cost: row.transport_cost,
+      duration_minutes: row.duration_minutes,
+      travel_time_minutes: row.travel_time_minutes,
+      start_time: row.start_time,
+      end_time: row.end_time,
+    })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: "Internal server error" })
@@ -935,58 +1072,81 @@ app.put("/api/day-locations/:id", async (req, res) => {
     travel_time_minutes,
     is_locked,
     subtype,
+    // Extract latitude and longitude separately for special handling
+    latitude,
+    longitude,
   } = req.body
 
   try {
-    const locationCoords = latitude && longitude ? `ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)` : "NULL"
-
-    const result = await query(
-      `UPDATE day_locations
-       SET country = COALESCE($1, country), 
-           country_code = COALESCE($2, country_code), 
-           city = COALESCE($3, city), 
-           town = COALESCE($4, town),
-           location_coords = COALESCE(${locationCoords}, location_coords),
-           visit_order = COALESCE($5, visit_order), 
-           notes = COALESCE($6, notes),
-           transport_mode = COALESCE($7, transport_mode), 
-           transport_details = COALESCE($8, transport_details), 
-           transport_cost = COALESCE($9, transport_cost), 
-           duration_minutes = COALESCE($10, duration_minutes),
-           start_time = COALESCE($11, start_time), 
-           end_time = COALESCE($12, end_time), 
-           animation_config = COALESCE($13, animation_config),
-           visited = COALESCE($14, visited), 
-           planned = COALESCE($15, planned),
-           travel_time_minutes = COALESCE($16, travel_time_minutes), 
-           is_locked = COALESCE($17, is_locked), 
-           subtype = COALESCE($18, subtype)
-       WHERE id = $19
-       RETURNING *,
-         ST_X(location_coords) as longitude,
-         ST_Y(location_coords) as latitude`,
+    const keys = Object.keys(req.body).filter((key) =>
       [
-        country,
-        country_code,
-        city,
-        town,
-        visit_order,
-        notes,
-        transport_mode,
-        transport_details,
-        transport_cost,
-        duration_minutes,
-        start_time,
-        end_time,
-        animation_config || {},
-        visited,
-        planned,
-        travel_time_minutes || null,
-        is_locked || false,
-        subtype || null,
-        id,
-      ],
+        "country",
+        "country_code",
+        "city",
+        "town",
+        "visit_order",
+        "notes",
+        "transport_mode",
+        "transport_details",
+        "transport_cost",
+        "duration_minutes",
+        "start_time",
+        "end_time",
+        "animation_config",
+        "visited",
+        "planned",
+        "travel_time_minutes",
+        "is_locked",
+        "subtype",
+      ].includes(key),
     )
+
+    if (keys.length === 0 && latitude === undefined && longitude === undefined) {
+      return res.status(400).json({ error: "No update fields provided" })
+    }
+
+    const values: any[] = []
+    const setClauses: string[] = []
+    let paramIndex = 1
+
+    keys.forEach((key) => {
+      // Handle specific fields that might need default values if null/undefined
+      let valueToSet = req.body[key];
+      if (key === "animation_config" && valueToSet === undefined) {
+        valueToSet = {};
+      } else if (key === "travel_time_minutes" && valueToSet === undefined) {
+        valueToSet = null;
+      } else if (key === "is_locked" && valueToSet === undefined) {
+        valueToSet = false;
+      } else if (key === "subtype" && valueToSet === undefined) {
+        valueToSet = null;
+      }
+
+      setClauses.push(`${key} = $${paramIndex}`);
+      values.push(valueToSet);
+      paramIndex++;
+    });
+
+    if (latitude !== undefined && longitude !== undefined) {
+      setClauses.push(`location_coords = ST_SetSRID(ST_MakePoint($${paramIndex}, $${paramIndex + 1}), 4326)`)
+      values.push(longitude, latitude)
+      paramIndex += 2
+    } else if (latitude === null || longitude === null) { // Allow setting location_coords to NULL
+      setClauses.push(`location_coords = NULL`);
+    }
+
+
+    values.push(id)
+    const queryText = `
+      UPDATE day_locations
+      SET ${setClauses.join(", ")}
+      WHERE id = $${paramIndex}
+      RETURNING *,
+        ST_X(location_coords) as longitude,
+        ST_Y(location_coords) as latitude
+    `
+
+    const result = await query(queryText, values)
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Location not found" })
