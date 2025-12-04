@@ -37,9 +37,10 @@ interface DaySectionProps {
   features: TripFeature[]
   onEditItem?: (item: DayLocation | TripFeature) => void
   onDeleteItem?: (item: DayLocation | TripFeature, dayId: string) => void
+  onTransportClick?: (item: DayLocation | TripFeature) => void
 }
 
-const DaySection: React.FC<DaySectionProps> = ({ day, locations, features, onEditItem, onDeleteItem }) => {
+const DaySection: React.FC<DaySectionProps> = ({ day, locations, features, onEditItem, onDeleteItem, onTransportClick }) => {
   const { updateDay, updateLocation, updateFeature } = useTripContext()
   const [isEditingName, setIsEditingName] = useState(false)
   const [dayName, setDayName] = useState(day.name || "")
@@ -70,27 +71,24 @@ const DaySection: React.FC<DaySectionProps> = ({ day, locations, features, onEdi
     setIsEditingNotes(false)
   }
 
-  const handleTransportUpdate = async (itemId: string, isLocation: boolean, mode: string) => {
-    if (isLocation) {
-      await updateLocation(itemId, day.id, { transport_mode: mode })
-    } else {
-      await updateFeature(itemId, day.id, { transport_mode: mode })
+  const getTransportIcon = (mode: string) => {
+    switch (mode) {
+      case "car":
+        return <MdDirectionsCar />
+      case "bus":
+        return <MdDirectionsBus />
+      case "walk":
+        return <MdDirectionsWalk />
+      case "bike":
+        return <MdDirectionsBike />
+      case "train":
+        return <MdTrain />
+      case "flight":
+        return <MdFlight />
+      default:
+        return <MdDirectionsCar />
     }
-    setTransportMenuAnchor(null)
-    setActiveTransportItem(null)
   }
-
-  const [transportMenuAnchor, setTransportMenuAnchor] = useState<null | HTMLElement>(null)
-  const [activeTransportItem, setActiveTransportItem] = useState<{ id: string; isLocation: boolean } | null>(null)
-
-  const transportModes = [
-    { mode: "car", icon: <MdDirectionsCar />, label: "Car" },
-    { mode: "bus", icon: <MdDirectionsBus />, label: "Bus" },
-    { mode: "walk", icon: <MdDirectionsWalk />, label: "Walk" },
-    { mode: "bike", icon: <MdDirectionsBike />, label: "Bike" },
-    { mode: "train", icon: <MdTrain />, label: "Train" },
-    { mode: "flight", icon: <MdFlight />, label: "Flight" },
-  ]
 
   const formattedDate = useMemo(() => {
     if (!day.date) return "Invalid Date"
@@ -208,13 +206,10 @@ const DaySection: React.FC<DaySectionProps> = ({ day, locations, features, onEdi
 
                     {item.transport_mode ? (
                       <Chip
-                        icon={transportModes.find((m) => m.mode === item.transport_mode)?.icon}
+                        icon={getTransportIcon(item.transport_mode)}
                         label={item.transport_mode}
                         size="small"
-                        onClick={(e) => {
-                          setTransportMenuAnchor(e.currentTarget)
-                          setActiveTransportItem({ id: itemId, isLocation })
-                        }}
+                        onClick={() => onTransportClick?.(item)}
                         onDelete={async () => {
                           if (isLocation) {
                             await updateLocation(itemId, day.id, {
@@ -232,16 +227,14 @@ const DaySection: React.FC<DaySectionProps> = ({ day, locations, features, onEdi
                           border: 1,
                           borderColor: "divider",
                           textTransform: "capitalize",
+                          cursor: "pointer",
                         }}
                       />
                     ) : (
                       <Button
                         size="small"
                         startIcon={<MdAdd size={14} />}
-                        onClick={(e) => {
-                          setTransportMenuAnchor(e.currentTarget)
-                          setActiveTransportItem({ id: itemId, isLocation })
-                        }}
+                        onClick={() => onTransportClick?.(item)}
                         sx={{
                           zIndex: 1,
                           bgcolor: "background.paper",
@@ -280,26 +273,6 @@ const DaySection: React.FC<DaySectionProps> = ({ day, locations, features, onEdi
           )}
         </Stack>
       </Collapse>
-
-      <Menu
-        anchorEl={transportMenuAnchor}
-        open={Boolean(transportMenuAnchor)}
-        onClose={() => setTransportMenuAnchor(null)}
-      >
-        {transportModes.map(({ mode, icon, label }) => (
-          <MenuItem
-            key={mode}
-            onClick={() =>
-              activeTransportItem && handleTransportUpdate(activeTransportItem.id, activeTransportItem.isLocation, mode)
-            }
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {icon}
-              <Typography variant="body2">{label}</Typography>
-            </Box>
-          </MenuItem>
-        ))}
-      </Menu>
     </Box>
   )
 }

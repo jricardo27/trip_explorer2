@@ -16,6 +16,7 @@ import { MdArrowBack, MdAdd, MdViewList, MdCalendarToday } from "react-icons/md"
 
 import { useTripContext, DayLocation, TripFeature } from "../../contexts/TripContext"
 import { EditTimeModal } from "../Trips/EditTimeModal"
+import { EditTransportModal } from "../Trips/EditTransportModal"
 
 import ActivityCard from "./ActivityCard"
 import CanvasMap from "./CanvasMap"
@@ -43,6 +44,8 @@ const TripCanvas: React.FC<TripCanvasProps> = ({ onBack }) => {
   const [selectedDayId, setSelectedDayId] = useState<string>("") // Reverted to original as the requested change was syntactically incorrect.
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<DayLocation | TripFeature | null>(null)
+  const [transportModalOpen, setTransportModalOpen] = useState(false)
+  const [editingTransportItem, setEditingTransportItem] = useState<DayLocation | TripFeature | null>(null)
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event
@@ -79,6 +82,26 @@ const TripCanvas: React.FC<TripCanvasProps> = ({ onBack }) => {
     } else {
       const featureId = item.saved_id || item.properties.id
       await deleteFeature(featureId, dayId)
+    }
+  }
+
+  const handleTransportClick = (item: DayLocation | TripFeature) => {
+    setEditingTransportItem(item)
+    setTransportModalOpen(true)
+  }
+
+  const handleTransportSave = async (updates: Partial<DayLocation | TripFeature>) => {
+    if (!editingTransportItem) return
+
+    const isLocation = "city" in editingTransportItem
+    const dayId = editingTransportItem.trip_day_id
+    if (!dayId) return
+
+    if (isLocation) {
+      await updateLocation(editingTransportItem.id, dayId, updates)
+    } else {
+      const featureId = editingTransportItem.saved_id || editingTransportItem.properties.id
+      await updateFeature(featureId, dayId, updates)
     }
   }
 
@@ -295,7 +318,8 @@ const TripCanvas: React.FC<TripCanvasProps> = ({ onBack }) => {
               >
                 {currentTrip.days?.map((day) => (
                   <MenuItem key={day.id} value={day.id}>
-                    Day {day.day_index + 1} - {new Date(day.date).toLocaleDateString()}
+                    Day {day.day_index + 1}
+                    {day.name && `: ${day.name}`} - {new Date(day.date).toLocaleDateString()}
                   </MenuItem>
                 ))}
               </TextField>
@@ -329,6 +353,7 @@ const TripCanvas: React.FC<TripCanvasProps> = ({ onBack }) => {
                 dayFeatures={dayFeatures}
                 onEditItem={handleEditItem}
                 onDeleteItem={handleDeleteItem}
+                onTransportClick={handleTransportClick}
               />
             ) : selectedDayId && currentTrip.days?.find((d) => d.id === selectedDayId) ? (
               <DayGridView
@@ -361,6 +386,14 @@ const TripCanvas: React.FC<TripCanvasProps> = ({ onBack }) => {
         onClose={() => setEditModalOpen(false)}
         item={editingItem}
         onSave={handleSaveEdit}
+      />
+
+      {/* Transport Modal */}
+      <EditTransportModal
+        open={transportModalOpen}
+        onClose={() => setTransportModalOpen(false)}
+        item={editingTransportItem}
+        onSave={handleTransportSave}
       />
     </DndContext>
   )

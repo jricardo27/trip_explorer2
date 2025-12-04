@@ -11,9 +11,17 @@ interface ItineraryListProps {
   dayFeatures: Record<string, TripFeature[]>
   onEditItem?: (item: DayLocation | TripFeature) => void
   onDeleteItem?: (item: DayLocation | TripFeature, dayId: string) => void
+  onTransportClick?: (item: DayLocation | TripFeature) => void
 }
 
-const ItineraryList: React.FC<ItineraryListProps> = ({ days, dayLocations, dayFeatures, onEditItem, onDeleteItem }) => {
+const ItineraryList: React.FC<ItineraryListProps> = ({
+  days,
+  dayLocations,
+  dayFeatures,
+  onEditItem,
+  onDeleteItem,
+  onTransportClick,
+}) => {
   return (
     <Box sx={{ p: 3, maxWidth: 800, mx: "auto" }}>
       <Stack spacing={4}>
@@ -25,6 +33,7 @@ const ItineraryList: React.FC<ItineraryListProps> = ({ days, dayLocations, dayFe
             features={dayFeatures[day.id] || []}
             onEditItem={onEditItem}
             onDeleteItem={onDeleteItem}
+            onTransportClick={onTransportClick}
           />
         ))}
       </Stack>
