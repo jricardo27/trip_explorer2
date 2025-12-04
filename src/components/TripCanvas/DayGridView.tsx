@@ -124,11 +124,6 @@ const DayGridView: React.FC<DayGridViewProps> = ({ day, locations, features, onE
 
     return (
       <Paper
-        draggable
-        onDragStart={(e) => {
-          e.dataTransfer.effectAllowed = "move"
-          setDraggedItem(item)
-        }}
         elevation={isDragging ? 4 : 1}
         sx={{
           p: 1,

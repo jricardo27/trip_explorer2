@@ -156,13 +156,8 @@ const TripCanvas: React.FC<TripCanvasProps> = ({ onBack }) => {
 
     // Remove from source if different day
     if (sourceDayId !== targetDayId) {
-      // We don't need to manually remove from source here because reorderItems handles the full list for the day
-      // But we do need to add it to the target list before reordering
-      const itemToAdd = {
-        ...sourceItem,
-        type: "city" in sourceItem ? ("location" as const) : ("feature" as const),
-      }
-      // @ts-expect-error - adding a temporary item for reordering logic
+      // Add the source item to target list for reordering
+      const itemToAdd = "city" in sourceItem ? { ...sourceItem, type: "location" as const } : { ...sourceItem, type: "feature" as const }
       targetItems.push(itemToAdd)
     }
 
@@ -179,19 +174,21 @@ const TripCanvas: React.FC<TripCanvasProps> = ({ onBack }) => {
 
     // If moving within same day
     if (sourceDayId === targetDayId) {
-      if (oldIndex !== -1 && newIndex !== -1) {
+      if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
         const [movedItem] = newItems.splice(oldIndex, 1)
         newItems.splice(newIndex, 0, movedItem)
       }
     } else {
-      // If moving to different day, we already added it to the end.
-      // If we dropped on a specific item, move it there.
-      if (newIndex !== -1) {
-        const movedItem = newItems.pop()! // The one we just added
+      // If moving to different day
+      if (newIndex !== -1 && newItems.length > 0) {
+        // The item we just added should be at the end
+        const movedItem = newItems[newItems.length - 1]
+        // Remove it from the end
+        newItems.pop()
+        // Insert at the target position
         newItems.splice(newIndex, 0, movedItem)
       }
-      // If dropped on the day header, it stays at the end (or beginning?)
-      // For now let's leave it at the end if dropped on header
+      // If dropped on the day header (newIndex === -1), item stays at the end
     }
 
     // Prepare payload for API
