@@ -6,14 +6,14 @@ This documentation is organized numerically for easy navigation. Read in order:
 
 ### Phase 1: Understanding Current State & Planning
 
-1. **[00_current_issues_analysis.md](./00_current_issues_analysis.md)** ⭐ **START HERE**
+1. **[00_current_issues_analysis.md](00_current_issues_analysis.md)** ⭐ **START HERE**
    - Analysis of existing implementation
    - 20 identified issues (critical, medium, low priority)
    - Database design problems
    - API and frontend issues
    - Performance and security concerns
 
-2. **[01_final_implementation_plan.md](./01_final_implementation_plan.md)** ⭐ **THE PLAN**
+2. **[01_final_implementation_plan.md](01_final_implementation_plan.md)** ⭐ **THE PLAN**
    - Complete backend-first implementation plan
    - All database schemas with SQL
    - Currency system with historical rates
@@ -26,13 +26,13 @@ This documentation is organized numerically for easy navigation. Read in order:
 
 ### Phase 2: Requirements & Strategy
 
-3. **[02_requirements.md](./02_requirements.md)**
+3. **[02_requirements.md](02_requirements.md)**
    - Original feature requirements
    - User personas
    - Success metrics
    - Future enhancements
 
-4. **[03_budget_strategy.md](./03_budget_strategy.md)**
+4. **[03_budget_strategy.md](03_budget_strategy.md)**
    - GCP Always Free tier deployment
    - Cost optimization ($0-10/month)
    - Free alternatives to paid APIs
@@ -40,20 +40,20 @@ This documentation is organized numerically for easy navigation. Read in order:
 
 ### Phase 3: Detailed System Design
 
-5. **[04_calendar_redesign.md](./04_calendar_redesign.md)**
+5. **[04_calendar_redesign.md](04_calendar_redesign.md)**
    - Unified activity model
    - 4 calendar view modes (timeline, list, map, gantt)
    - Visual timeline design
    - Comprehensive expense tracking
 
-6. **[05_transport_system.md](./05_transport_system.md)**
+6. **[05_transport_system.md](05_transport_system.md)**
    - Multi-modal transport alternatives
    - Manual entry (no paid APIs)
    - Constraint validation
    - Auto-adjustment of schedules
    - Feasibility checking
 
-7. **[06_architecture.md](./06_architecture.md)**
+7. **[06_architecture.md](06_architecture.md)**
    - System architecture diagrams
    - Data flow visualizations
    - Component hierarchy
@@ -65,8 +65,8 @@ This documentation is organized numerically for easy navigation. Read in order:
 
 ### For Developers
 
-1. Read [00_current_issues_analysis.md](./00_current_issues_analysis.md) to understand what's wrong
-2. Read [01_final_implementation_plan.md](./01_final_implementation_plan.md) to see the solution
+1. Read [00_current_issues_analysis.md](00_current_issues_analysis.md) to understand what's wrong
+2. Read [01_final_implementation_plan.md](01_final_implementation_plan.md) to see the solution
 3. Start with Week 1: Create database migration `012_complete_schema_redesign.sql`
 4. Copy SQL from the plan document
 5. Run migration
@@ -74,15 +74,15 @@ This documentation is organized numerically for easy navigation. Read in order:
 
 ### For Product Managers
 
-1. Read [02_requirements.md](./02_requirements.md) for feature overview
-2. Read [03_budget_strategy.md](./03_budget_strategy.md) for cost constraints
-3. Review [01_final_implementation_plan.md](./01_final_implementation_plan.md) for timeline
+1. Read [02_requirements.md](02_requirements.md) for feature overview
+2. Read [03_budget_strategy.md](03_budget_strategy.md) for cost constraints
+3. Review [01_final_implementation_plan.md](01_final_implementation_plan.md) for timeline
 
 ### For Architects
 
-1. Read [00_current_issues_analysis.md](./00_current_issues_analysis.md) for technical debt
-2. Read [06_architecture.md](./06_architecture.md) for system design
-3. Review [01_final_implementation_plan.md](./01_final_implementation_plan.md) for database schema
+1. Read [00_current_issues_analysis.md](00_current_issues_analysis.md) for technical debt
+2. Read [06_architecture.md](06_architecture.md) for system design
+3. Review [01_final_implementation_plan.md](01_final_implementation_plan.md) for database schema
 
 ---
 
@@ -229,21 +229,21 @@ This documentation is organized numerically for easy navigation. Read in order:
 - ❌ Video storage
 - ❌ Real-time GPS tracking
 
-**See [03_budget_strategy.md](./03_budget_strategy.md) for full list and free alternatives**
+**See [03_budget_strategy.md](03_budget_strategy.md) for full list and free alternatives**
 
 ---
 
 ## 📞 Questions?
 
-- **Current issues?** → [00_current_issues_analysis.md](./00_current_issues_analysis.md)
-- **How to implement?** → [01_final_implementation_plan.md](./01_final_implementation_plan.md)
-- **What features?** → [02_requirements.md](./02_requirements.md)
-- **How much will it cost?** → [03_budget_strategy.md](./03_budget_strategy.md)
-- **How does calendar work?** → [04_calendar_redesign.md](./04_calendar_redesign.md)
-- **How does transport work?** → [05_transport_system.md](./05_transport_system.md)
-- **System architecture?** → [06_architecture.md](./06_architecture.md)
+- **Current issues?** → [00_current_issues_analysis.md](00_current_issues_analysis.md)
+- **How to implement?** → [01_final_implementation_plan.md](01_final_implementation_plan.md)
+- **What features?** → [02_requirements.md](02_requirements.md)
+- **How much will it cost?** → [03_budget_strategy.md](03_budget_strategy.md)
+- **How does calendar work?** → [04_calendar_redesign.md](04_calendar_redesign.md)
+- **How does transport work?** → [05_transport_system.md](05_transport_system.md)
+- **System architecture?** → [06_architecture.md](06_architecture.md)
 
 ---
 
-**Last Updated**: 2025-12-03  
+**Last Updated**: 2025-12-03
 **Version**: 2.0 (Final)

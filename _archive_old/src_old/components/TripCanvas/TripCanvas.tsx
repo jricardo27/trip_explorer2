@@ -97,11 +97,15 @@ const TripCanvas: React.FC<TripCanvasProps> = ({ onBack }) => {
     const dayId = editingTransportItem.trip_day_id
     if (!dayId) return
 
-    if (isLocation) {
-      await updateLocation(editingTransportItem.id, dayId, updates)
-    } else {
-      const featureId = editingTransportItem.saved_id || editingTransportItem.properties.id
-      await updateFeature(featureId, dayId, updates)
+    try {
+      if (isLocation) {
+        await updateLocation(editingTransportItem.id, dayId, updates as Partial<DayLocation>)
+      } else {
+        const featureId = editingTransportItem.saved_id || editingTransportItem.properties.id
+        await updateFeature(featureId, dayId, updates as Partial<TripFeature>)
+      }
+    } catch (error) {
+      console.error("Failed to save transport:", error)
     }
   }
 
@@ -180,7 +184,10 @@ const TripCanvas: React.FC<TripCanvasProps> = ({ onBack }) => {
     // Remove from source if different day
     if (sourceDayId !== targetDayId) {
       // Add the source item to target list for reordering
-      const itemToAdd = "city" in sourceItem ? { ...sourceItem, type: "location" as const } : { ...sourceItem, type: "feature" as const }
+      const itemToAdd =
+        "city" in sourceItem
+          ? { ...sourceItem, type: "location" as const }
+          : { ...sourceItem, type: "feature" as const }
       targetItems.push(itemToAdd)
     }
 

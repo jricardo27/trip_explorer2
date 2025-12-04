@@ -152,7 +152,7 @@ interface TripContextType {
   dayLocations: Record<string, DayLocation[]>
   loading: boolean
   fetchTrips: () => Promise<void>
-  fetchTripDetails: (id: string) => Promise<void>
+  fetchTripDetails: (id: string, background?: boolean) => Promise<void>
   fetchDayFeatures: (dayId: string) => Promise<void>
   fetchDayLocations: (dayId: string) => Promise<void>
   addLocationToDay: (dayId: string, location: Omit<DayLocation, "id" | "trip_day_id" | "created_at">) => Promise<void>
@@ -217,8 +217,8 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [userId, API_URL])
 
   const fetchTripDetails = useCallback(
-    async (id: string) => {
-      setLoading(true)
+    async (id: string, background = false) => {
+      if (!background) setLoading(true)
       try {
         const response = await fetch(`${API_URL}/api/trips/${id}`)
         if (response.ok) {
@@ -251,7 +251,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (error) {
         console.error("Failed to fetch trip details:", error)
       } finally {
-        setLoading(false)
+        if (!background) setLoading(false)
       }
     },
     [API_URL],
@@ -469,7 +469,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
 
         if (response.ok) {
-          await fetchTripDetails(currentTrip.id)
+          await fetchTripDetails(currentTrip.id, true)
         }
       } catch (error) {
         console.error("Error updating day:", error)
@@ -564,13 +564,10 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         // Wait a bit to ensure database transaction is fully committed
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
 
         // Refetch only the affected day's data instead of entire trip
-        await Promise.all([
-          fetchDayLocations(dayId),
-          fetchDayFeatures(dayId)
-        ])
+        await Promise.all([fetchDayLocations(dayId), fetchDayFeatures(dayId)])
       } catch (error) {
         console.error("Failed to reorder items:", error)
         throw error

@@ -1,0 +1,370 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  trips       Trip[]
+  memberships TripMember[]
+
+  @@map("users")
+}
+
+// ============================================
+// TRIPS & DAYS
+// ============================================
+
+model Trip {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  name            String
+  startDate       DateTime @map("start_date") @db.Date
+  endDate         DateTime @map("end_date") @db.Date
+  budget          Decimal? @db.Decimal(10, 2)
+  defaultCurrency String?  @default("AUD") @map("default_currency") @db.Char(3)
+  timezone        String?  @default("Australia/Sydney")
+  isCompleted     Boolean  @default(false) @map("is_completed")
+  isPublic        Boolean  @default(false) @map("is_public")
+
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  days       TripDay[]
+  activities Activity[]
+  members    TripMember[]
+  expenses   Expense[]
+  budgets    Budget[]
+  photos     TripPhoto[]
+  transport  TransportAlternative[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("trips")
+}
+
+model TripDay {
+  id       String   @id @default(uuid())
+  tripId   String   @map("trip_id")
+  dayIndex Int      @map("day_index")
+  date     DateTime @db.Date
+  name     String?
+  notes    String?
+
+  trip       Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  activities Activity[]
+
+  @@unique([tripId, dayIndex])
+  @@map("trip_days")
+}
+
+// ============================================
+// ACTIVITIES
+// ============================================
+
+enum ActivityType {
+  ACCOMMODATION
+  RESTAURANT
+  ATTRACTION
+  TRANSPORT
+  CUSTOM
+}
+
+enum ActivityStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  SKIPPED
+}
+
+model Activity {
+  id              String         @id @default(uuid())
+  tripId          String         @map("trip_id")
+  tripDayId       String?        @map("trip_day_id")
+  activityType    ActivityType   @map("activity_type")
+  activitySubtype String?        @map("activity_subtype")
+  category        String?
+  name            String
+  description     String?
+  notes           String?
+  address         String?
+  city            String?
+  country         String?
+  countryCode     String?        @map("country_code") @db.Char(2)
+  scheduledStart  DateTime?      @map("scheduled_start")
+  scheduledEnd    DateTime?      @map("scheduled_end")
+  actualStart     DateTime?      @map("actual_start")
+  actualEnd       DateTime?      @map("actual_end")
+  durationMinutes Int?           @map("duration_minutes")
+  isAllDay        Boolean        @default(false) @map("is_all_day")
+  isFlexible      Boolean        @default(false) @map("is_flexible")
+  status          ActivityStatus @default(PLANNED)
+  priority        String?        @default("normal")
+
+  bookingReference   String?   @map("booking_reference")
+  bookingUrl         String?   @map("booking_url")
+  confirmationNumber String?   @map("confirmation_number")
+  requiresBooking    Boolean   @default(false) @map("requires_booking")
+  bookingDeadline    DateTime? @map("booking_deadline")
+
+  phone        String? @map("phone")
+  email        String? @map("email")
+  website      String? @map("website")
+  openingHours Json?   @map("opening_hours")
+
+  estimatedCost Decimal? @db.Decimal(10, 2) @map("estimated_cost")
+  actualCost    Decimal? @db.Decimal(10, 2) @map("actual_cost")
+  currency      String?  @default("AUD") @db.Char(3)
+  costCategory  String?  @map("cost_category")
+  isPaid        Boolean  @default(false) @map("is_paid")
+  paymentMethod String?  @map("payment_method")
+
+  useDefaultMembers Boolean @default(true) @map("use_default_members")
+  isGroupActivity   Boolean @default(true) @map("is_group_activity")
+
+  source     String?  @default("manual")
+  externalId String?  @map("external_id")
+  tags       String[]
+
+  trip         Trip                   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripDay      TripDay?               @relation(fields: [tripDayId], references: [id], onDelete: Cascade)
+  participants ActivityParticipant[]
+  expenses     Expense[]
+  photos       TripPhoto[]
+  transportFrom TransportAlternative[] @relation("FromActivity")
+  transportTo   TransportAlternative[] @relation("ToActivity")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("activities")
+}
+
+// ============================================
+// TRANSPORT
+// ============================================
+
+enum TransportMode {
+  DRIVING
+  WALKING
+  CYCLING
+  TRANSIT
+  FLIGHT
+  TRAIN
+  BUS
+  FERRY
+  OTHER
+}
+
+model TransportAlternative {
+  id             String        @id @default(uuid())
+  tripId         String        @map("trip_id")
+  fromActivityId String        @map("from_activity_id")
+  toActivityId   String        @map("to_activity_id")
+  name           String
+  transportMode  TransportMode @map("transport_mode")
+  isSelected     Boolean       @default(false) @map("is_selected")
+
+  durationMinutes Int @map("duration_minutes")
+  bufferMinutes   Int @default(0) @map("buffer_minutes")
+
+  cost          Decimal? @db.Decimal(10, 2)
+  currency      String?  @default("AUD") @db.Char(3)
+  costPerPerson Boolean  @default(true) @map("cost_per_person")
+
+  distanceMeters Int?  @map("distance_meters")
+  waypoints      Json?
+
+  description String?
+  notes       String?
+  pros        String[]
+  cons        String[]
+
+  requiresBooking  Boolean @default(false) @map("requires_booking")
+  bookingUrl       String? @map("booking_url")
+  bookingReference String? @map("booking_reference")
+
+  isFeasible          Boolean @default(true) @map("is_feasible")
+  infeasibilityReason String? @map("infeasibility_reason")
+
+  trip         Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  fromActivity Activity @relation("FromActivity", fields: [fromActivityId], references: [id], onDelete: Cascade)
+  toActivity   Activity @relation("ToActivity", fields: [toActivityId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([fromActivityId, toActivityId, isSelected])
+  @@map("transport_alternatives")
+}
+
+// ============================================
+// MEMBERS & PARTICIPANTS
+// ============================================
+
+enum MemberRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+model TripMember {
+  id        String      @id @default(uuid())
+  tripId    String      @map("trip_id")
+  userId    String?     @map("user_id")
+  name      String
+  email     String?
+  role      MemberRole  @default(VIEWER)
+  avatarUrl String?     @map("avatar_url")
+  color     String?
+
+  trip          Trip                  @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user          User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  participants  ActivityParticipant[]
+  expensesPaid  Expense[]             @relation("PaidBy")
+  expenseSplits ExpenseSplit[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([tripId, userId])
+  @@map("trip_members")
+}
+
+model ActivityParticipant {
+  id         String   @id @default(uuid())
+  activityId String   @map("activity_id")
+  memberId   String   @map("member_id")
+
+  activity  Activity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  member    TripMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([activityId, memberId])
+  @@map("activity_participants")
+}
+
+// ============================================
+// EXPENSES & BUDGETS
+// ============================================
+
+model Expense {
+  id                     String   @id @default(uuid())
+  tripId                 String   @map("trip_id")
+  activityId             String?  @map("activity_id")
+  transportAlternativeId String?  @map("transport_alternative_id")
+  description            String
+  category               String
+  subcategory            String?
+  amount                 Decimal  @db.Decimal(10, 2)
+  currency               String   @default("AUD") @db.Char(3)
+  amountInTripCurrency   Decimal? @db.Decimal(10, 2) @map("amount_in_trip_currency")
+  exchangeRate           Decimal? @db.Decimal(10, 6) @map("exchange_rate")
+  exchangeRateDate       DateTime? @db.Date @map("exchange_rate_date")
+
+  paidById      String?   @map("paid_by_id")
+  paymentMethod String?   @map("payment_method")
+  paymentDate   DateTime? @db.Date @map("payment_date")
+
+  isEstimated  Boolean @default(true) @map("is_estimated")
+  isPaid       Boolean @default(false) @map("is_paid")
+  isRefundable Boolean @default(false) @map("is_refundable")
+
+  receiptUrl    String? @map("receipt_url")
+  receiptNumber String? @map("receipt_number")
+
+  isShared  Boolean @default(false) @map("is_shared")
+  splitType String  @default("equal") @map("split_type")
+
+  tags  String[]
+  notes String?
+
+  trip     Trip        @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  activity Activity?   @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  paidBy   TripMember? @relation("PaidBy", fields: [paidById], references: [id])
+  splits   ExpenseSplit[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("expenses")
+}
+
+model ExpenseSplit {
+  id         String   @id @default(uuid())
+  expenseId  String   @map("expense_id")
+  memberId   String   @map("member_id")
+  amount     Decimal  @db.Decimal(10, 2)
+  percentage Decimal? @db.Decimal(5, 2)
+  isPaid     Boolean  @default(false) @map("is_paid")
+  paidAt     DateTime? @map("paid_at")
+
+  expense Expense    @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  member  TripMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([expenseId, memberId])
+  @@map("expense_splits")
+}
+
+model Budget {
+  id                       String  @id @default(uuid())
+  tripId                   String  @map("trip_id")
+  category                 String
+  amount                   Decimal @db.Decimal(10, 2)
+  currency                 String  @default("AUD") @db.Char(3)
+  spentAmount              Decimal @default(0) @db.Decimal(10, 2) @map("spent_amount")
+  alertThresholdPercentage Int     @default(80) @map("alert_threshold_percentage")
+  alertSent                Boolean @default(false) @map("alert_sent")
+  notes                    String?
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([tripId, category])
+  @@map("budgets")
+}
+
+// ============================================
+// PHOTOS
+// ============================================
+
+model TripPhoto {
+  id            String   @id @default(uuid())
+  tripId        String   @map("trip_id")
+  activityId    String?  @map("activity_id")
+  photoUrl      String   @map("photo_url")
+  thumbnailUrl  String?  @map("thumbnail_url")
+  caption       String?
+  takenAt       DateTime? @map("taken_at")
+  cloudProvider String?  @map("cloud_provider")
+  cloudPhotoId  String?  @map("cloud_photo_id")
+  uploadedById  String?  @map("uploaded_by_id")
+
+  trip     Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  activity Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("trip_photos")
+}

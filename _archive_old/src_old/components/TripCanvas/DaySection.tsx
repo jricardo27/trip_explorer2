@@ -1,15 +1,5 @@
 import { useDroppable } from "@dnd-kit/core"
-import {
-  Box,
-  Typography,
-  Paper,
-  Stack,
-  IconButton,
-  TextField,
-  Collapse,
-  Button,
-  Chip,
-} from "@mui/material"
+import { Box, Typography, Paper, Stack, IconButton, TextField, Collapse, Button, Chip } from "@mui/material"
 import React, { useMemo, useState } from "react"
 import {
   MdEdit,
@@ -38,7 +28,14 @@ interface DaySectionProps {
   onTransportClick?: (item: DayLocation | TripFeature) => void
 }
 
-const DaySection: React.FC<DaySectionProps> = ({ day, locations, features, onEditItem, onDeleteItem, onTransportClick }) => {
+const DaySection: React.FC<DaySectionProps> = ({
+  day,
+  locations,
+  features,
+  onEditItem,
+  onDeleteItem,
+  onTransportClick,
+}) => {
   const { updateDay, updateLocation, updateFeature } = useTripContext()
   const [isEditingName, setIsEditingName] = useState(false)
   const [dayName, setDayName] = useState(day.name || "")

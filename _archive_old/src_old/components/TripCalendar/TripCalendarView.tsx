@@ -84,10 +84,11 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
     } else if (fromDayId === toDayId) {
       // Handle reordering within the same day
       const items = dayItems[fromDayId] || []
-      const activeId = "city" in activeItem.item ? activeItem.item.id : activeItem.item.saved_id || activeItem.item.properties.id
+      const activeId =
+        "city" in activeItem.item ? activeItem.item.id : activeItem.item.saved_id || activeItem.item.properties.id
 
       // Find current index
-      const oldIndex = items.findIndex(item => {
+      const oldIndex = items.findIndex((item) => {
         const id = "city" in item ? item.id : item.saved_id || item.properties.id
         return id === activeId
       })
@@ -105,7 +106,7 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
       } else {
         // If dropped over another item
         const overId = over.id as string
-        const overIndex = items.findIndex(item => {
+        const overIndex = items.findIndex((item) => {
           const id = "city" in item ? item.id : item.saved_id || item.properties.id
           return id === overId
         })
