@@ -81,9 +81,8 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
       if (itemId) {
         await onItemMoved(itemId, activeItem.type, fromDayId, toDayId, newOrder)
       }
-    }
-    // Handle reordering within the same day
-    if (fromDayId === toDayId) {
+    } else if (fromDayId === toDayId) {
+      // Handle reordering within the same day
       const items = dayItems[fromDayId] || []
       const activeId = "city" in activeItem.item ? activeItem.item.id : activeItem.item.saved_id || activeItem.item.properties.id
 
@@ -93,7 +92,10 @@ export const TripCalendarView: React.FC<TripCalendarViewProps> = ({
         return id === activeId
       })
 
-      if (oldIndex === -1) return
+      if (oldIndex === -1) {
+        setActiveItem(null)
+        return
+      }
 
       let newIndex = -1
 
