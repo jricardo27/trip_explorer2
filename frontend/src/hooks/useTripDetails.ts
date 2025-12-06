@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { transportApi } from "../api/client"
 import client from "../api/client"
 import type { Trip, Activity, CreateActivityRequest, UpdateActivityRequest, ApiResponse } from "../types"
 
@@ -55,6 +56,27 @@ export const useTripDetails = (tripId: string) => {
     },
   })
 
+  const createTransportMutation = useMutation({
+    mutationFn: transportApi.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
+  const deleteTransportMutation = useMutation({
+    mutationFn: transportApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
+  const selectTransportMutation = useMutation({
+    mutationFn: transportApi.select,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
   return {
     trip,
     isLoading,
@@ -67,5 +89,8 @@ export const useTripDetails = (tripId: string) => {
     isDeleting: deleteActivityMutation.isPending,
     reorderActivities: reorderActivitiesMutation.mutateAsync,
     isReordering: reorderActivitiesMutation.isPending,
+    createTransport: createTransportMutation.mutateAsync,
+    deleteTransport: deleteTransportMutation.mutateAsync,
+    selectTransport: selectTransportMutation.mutateAsync,
   }
 }

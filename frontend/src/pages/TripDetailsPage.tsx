@@ -13,11 +13,13 @@ import {
 } from "@dnd-kit/core"
 import type { DragEndEvent } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import dayjs from "dayjs"
 
 import { useTripDetails } from "../hooks/useTripDetails"
 import type { Activity } from "../types"
 import ActivityDialog from "../components/ActivityDialog"
 import { SortableActivityCard } from "../components/SortableActivityCard"
+import { TransportSegment } from "../components/Transport/TransportSegment"
 import { useSettingsStore } from "../stores/settingsStore"
 
 const DroppableDay = ({ dayId, children }: { dayId: string; children: React.ReactNode }) => {
@@ -191,6 +193,25 @@ const TripDetailsPage = () => {
       }))
 
       updates = [...sourceUpdates, ...destUpdates]
+
+      // Determine date shift and trigger update for the moved item
+      if (movedItem && (movedItem.scheduledStart || movedItem.scheduledEnd)) {
+        const sourceDate = dayjs(activeDay.date)
+        const destDate = dayjs(overDay.date)
+        const diffMs = destDate.diff(sourceDate)
+
+        const newStart = movedItem.scheduledStart ? dayjs(movedItem.scheduledStart).add(diffMs, 'ms').toISOString() : undefined
+        const newEnd = movedItem.scheduledEnd ? dayjs(movedItem.scheduledEnd).add(diffMs, 'ms').toISOString() : undefined
+
+        // Fire and forget update (or await if critical, but reorder is separate)
+        updateActivity({
+          id: movedItem.id,
+          data: {
+            scheduledStart: newStart,
+            scheduledEnd: newEnd
+          }
+        })
+      }
     }
 
     // Send updates if any
@@ -272,15 +293,41 @@ const TripDetailsPage = () => {
                         Drag items here or add new
                       </Typography>
                     ) : (
-                      day.activities?.map((activity: Activity) => (
-                        <SortableActivityCard
-                          key={activity.id}
-                          activity={activity}
-                          onDelete={handleDeleteActivity}
-                          onEdit={handleEditActivity}
-                          isDeleting={isDeleting}
-                        />
-                      ))
+                      day.activities?.map((activity: Activity, index: number) => {
+                        let nextActivity = day.activities?.[index + 1]
+
+                        // Check for cross-day transport (next activity is first of next day)
+                        if (!nextActivity) {
+                          const currentDayIndex = trip.days?.findIndex(d => d.id === day.id) ?? -1
+                          if (currentDayIndex !== -1 && trip.days && currentDayIndex < trip.days.length - 1) {
+                            const nextDay = trip.days[currentDayIndex + 1]
+                            if (nextDay.activities && nextDay.activities.length > 0) {
+                              nextActivity = nextDay.activities[0]
+                            }
+                          }
+                        }
+
+                        const transportOptions = trip.transport?.filter(t => t.fromActivityId === activity.id && t.toActivityId === nextActivity?.id) || []
+
+                        return (
+                          <div key={activity.id}>
+                            <SortableActivityCard
+                              activity={activity}
+                              onDelete={handleDeleteActivity}
+                              onEdit={handleEditActivity}
+                              isDeleting={isDeleting}
+                            />
+                            {nextActivity && (
+                              <TransportSegment
+                                tripId={trip.id}
+                                fromActivityId={activity.id}
+                                toActivityId={nextActivity.id}
+                                alternatives={transportOptions}
+                              />
+                            )}
+                          </div>
+                        )
+                      })
                     )}
                   </SortableContext>
                 </DroppableDay>

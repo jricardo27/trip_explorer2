@@ -7,6 +7,8 @@ import type {
   UpdateTripRequest,
   CreateActivityRequest,
   UpdateActivityRequest,
+  TransportAlternative,
+  CreateTransportRequest,
 } from "../types"
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
@@ -120,6 +122,33 @@ export const activityApi = {
 
   getConflicts: async (tripId: string): Promise<any[]> => {
     const response = await apiClient.get<ApiResponse<any[]>>(`/trips/${tripId}/activities/conflicts`)
+    return response.data.data
+  },
+}
+
+// Transport API
+export const transportApi = {
+  list: async (tripId: string): Promise<TransportAlternative[]> => {
+    const response = await apiClient.get<ApiResponse<TransportAlternative[]>>(`/transport?tripId=${tripId}`)
+    return response.data.data
+  },
+
+  create: async (data: CreateTransportRequest): Promise<TransportAlternative> => {
+    const response = await apiClient.post<ApiResponse<TransportAlternative>>("/transport", data)
+    return response.data.data
+  },
+
+  update: async (id: string, data: Partial<CreateTransportRequest>): Promise<TransportAlternative> => {
+    const response = await apiClient.put<ApiResponse<TransportAlternative>>(`/transport/${id}`, data)
+    return response.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/transport/${id}`)
+  },
+
+  select: async (id: string): Promise<TransportAlternative> => {
+    const response = await apiClient.put<ApiResponse<TransportAlternative>>(`/transport/${id}/select`, {})
     return response.data.data
   },
 }

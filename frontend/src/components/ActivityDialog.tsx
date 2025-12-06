@@ -70,8 +70,22 @@ const ActivityDialog = ({
         // Reset for create
         setName("")
         setActivityType(ActivityType.ATTRACTION)
-        setScheduledStart(null)
-        setScheduledEnd(null)
+
+        // Pre-set date if tripDayId is provided
+        let defaultStart = null
+        let defaultEnd = null
+
+        if (tripDayId && tripDays) {
+          const day = tripDays.find(d => d.id === tripDayId)
+          if (day) {
+            // Default to 9:00 AM on the selected day
+            defaultStart = dayjs(day.date).hour(9).minute(0).second(0)
+            defaultEnd = defaultStart.add(1, 'hour')
+          }
+        }
+
+        setScheduledStart(defaultStart)
+        setScheduledEnd(defaultEnd)
         setEstimatedCost("")
         setNotes("")
       }

@@ -54,6 +54,7 @@ export interface Trip {
   activities?: Activity[]
   members?: TripMember[]
   budgets?: Budget[]
+  transport?: TransportAlternative[]
   createdAt: string
   updatedAt: string
 }
@@ -209,3 +210,44 @@ export interface UpdateActivityRequest {
   actualCost?: number
   isPaid?: boolean
 }
+
+export interface TransportAlternative {
+  id: string
+  tripId: string
+  fromActivityId: string
+  toActivityId: string
+  name: string
+  transportMode: TransportMode
+  isSelected: boolean
+  durationMinutes: number
+  bufferMinutes: number
+  cost?: number
+  currency?: string
+  costPerPerson: boolean
+  distanceMeters?: number
+  waypoints?: any
+  description?: string
+  notes?: string
+  pros: string[]
+  cons: string[]
+  requiresBooking: boolean
+  bookingUrl?: string
+  bookingReference?: string
+  isFeasible: boolean
+  infeasibilityReason?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateTransportRequest {
+  tripId: string
+  fromActivityId: string
+  toActivityId: string
+  transportMode: TransportMode
+  name?: string
+  durationMinutes: number
+  cost?: number
+  currency?: string
+  description?: string
+}
+

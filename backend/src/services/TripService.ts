@@ -63,6 +63,7 @@ export class TripService {
         },
         members: true,
         budgets: true,
+        transport: true,
       },
     })
 

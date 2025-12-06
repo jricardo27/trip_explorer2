@@ -6,6 +6,7 @@ import { errorHandler } from "./middleware/errorHandler"
 import authRoutes from "./routes/auth"
 import activityRoutes from "./routes/activities"
 import tripRoutes from "./routes/trips"
+import transportRoutes from "./routes/transport"
 
 dotenv.config()
 
@@ -24,6 +25,7 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRoutes)
 app.use("/api/trips", tripRoutes)
 app.use("/api/activities", activityRoutes)
+app.use("/api/transport", transportRoutes)
 
 // Error handling
 app.use(errorHandler)
