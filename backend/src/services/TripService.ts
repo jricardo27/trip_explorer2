@@ -52,9 +52,14 @@ export class TripService {
       include: {
         days: {
           orderBy: { dayIndex: "asc" },
+          include: {
+            activities: {
+              orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
+            },
+          },
         },
         activities: {
-          orderBy: { scheduledStart: "asc" },
+          orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
         },
         members: true,
         budgets: true,

@@ -19,6 +19,16 @@ export class ActivityService {
     estimatedCost?: number
     currency?: string
   }): Promise<Activity> {
+    // Calculate next order index
+    let orderIndex = 0
+    if (data.tripDayId) {
+      const lastActivity = await prisma.activity.findFirst({
+        where: { tripDayId: data.tripDayId },
+        orderBy: { orderIndex: "desc" },
+      })
+      orderIndex = lastActivity ? lastActivity.orderIndex + 1 : 0
+    }
+
     const activity = await prisma.activity.create({
       data: {
         tripId: data.tripId,
@@ -35,6 +45,7 @@ export class ActivityService {
         countryCode: data.countryCode,
         estimatedCost: data.estimatedCost,
         currency: data.currency || "AUD",
+        orderIndex,
       },
     })
 
@@ -45,16 +56,9 @@ export class ActivityService {
     const activity = await prisma.activity.findUnique({
       where: { id },
       include: {
-        participants: {
-          include: {
-            member: true,
-          },
-        },
-        expenses: true,
-        photos: true,
+        tripDay: true,
       },
     })
-
     return activity
   }
 
@@ -84,7 +88,7 @@ export class ActivityService {
 
     const activities = await prisma.activity.findMany({
       where,
-      orderBy: [{ scheduledStart: "asc" }, { createdAt: "asc" }],
+      orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }, { createdAt: "asc" }],
       include: {
         tripDay: true,
       },
@@ -93,29 +97,11 @@ export class ActivityService {
     return activities
   }
 
-  async updateActivity(
-    id: string,
-    data: Partial<{
-      name: string
-      description: string
-      notes: string
-      scheduledStart: Date
-      scheduledEnd: Date
-      actualStart: Date
-      actualEnd: Date
-      durationMinutes: number
-      status: ActivityStatus
-      priority: string
-      estimatedCost: number
-      actualCost: number
-      isPaid: boolean
-    }>,
-  ): Promise<Activity> {
+  async updateActivity(id: string, data: Prisma.ActivityUpdateInput): Promise<Activity> {
     const activity = await prisma.activity.update({
       where: { id },
       data,
     })
-
     return activity
   }
 
@@ -125,27 +111,21 @@ export class ActivityService {
     })
   }
 
-  async reorderActivities(tripDayId: string, activityIds: string[]): Promise<void> {
-    // Update scheduled times based on order
-    const activities = await prisma.activity.findMany({
-      where: {
-        id: { in: activityIds },
-        tripDayId,
-      },
-    })
-
-    // This is a simplified version - in production you'd calculate proper times
-    for (let i = 0; i < activityIds.length; i++) {
-      const activity = activities.find((a) => a.id === activityIds[i])
-      if (activity) {
-        await prisma.activity.update({
-          where: { id: activityIds[i] },
+  async reorderActivities(
+    tripId: string,
+    updates: { activityId: string; orderIndex: number; tripDayId?: string }[],
+  ): Promise<void> {
+    await prisma.$transaction(
+      updates.map((update) =>
+        prisma.activity.update({
+          where: { id: update.activityId, tripId }, // Ensure tripId matches for security
           data: {
-            // Update order or times as needed
+            orderIndex: update.orderIndex,
+            ...(update.tripDayId !== undefined && { tripDayId: update.tripDayId }),
           },
-        })
-      }
-    }
+        }),
+      ),
+    )
   }
 
   async getConflicts(tripId: string): Promise<

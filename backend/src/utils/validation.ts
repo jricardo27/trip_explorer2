@@ -2,7 +2,6 @@ import { z } from "zod"
 
 export const createTripSchema = z
   .object({
-    userId: z.string().uuid(),
     name: z.string().min(1).max(255),
     startDate: z.string(),
     endDate: z.string(),
@@ -32,8 +31,8 @@ export const createActivitySchema = z.object({
   name: z.string().min(1).max(255),
   description: z.string().optional(),
   notes: z.string().optional(),
-  scheduledStart: z.string().optional(),
-  scheduledEnd: z.string().optional(),
+  scheduledStart: z.preprocess((arg) => (arg === "" ? undefined : arg), z.string().datetime().optional()),
+  scheduledEnd: z.preprocess((arg) => (arg === "" ? undefined : arg), z.string().datetime().optional()),
   durationMinutes: z.number().int().positive().optional(),
   city: z.string().optional(),
   country: z.string().optional(),
@@ -46,10 +45,10 @@ export const updateActivitySchema = z.object({
   name: z.string().min(1).max(255).optional(),
   description: z.string().optional(),
   notes: z.string().optional(),
-  scheduledStart: z.string().optional(),
-  scheduledEnd: z.string().optional(),
-  actualStart: z.string().optional(),
-  actualEnd: z.string().optional(),
+  scheduledStart: z.preprocess((arg) => (arg === "" ? undefined : arg), z.string().datetime().optional()),
+  scheduledEnd: z.preprocess((arg) => (arg === "" ? undefined : arg), z.string().datetime().optional()),
+  actualStart: z.preprocess((arg) => (arg === "" ? undefined : arg), z.string().datetime().optional()),
+  actualEnd: z.preprocess((arg) => (arg === "" ? undefined : arg), z.string().datetime().optional()),
   durationMinutes: z.number().int().positive().optional(),
   status: z.enum(["PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "SKIPPED"]).optional(),
   priority: z.string().optional(),

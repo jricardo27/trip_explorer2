@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express"
-import { ZodSchema } from "zod"
+import { ZodSchema, ZodError } from "zod"
 
 export const validate = (schema: ZodSchema) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -7,11 +7,13 @@ export const validate = (schema: ZodSchema) => {
       await schema.parseAsync(req.body)
       next()
     } catch (error: any) {
+      const issues = error.issues || error.errors || []
+      const errorMessage = issues.map((e: any) => e.message).join(", ")
       res.status(400).json({
         error: {
           code: "VALIDATION_ERROR",
-          message: "Invalid request data",
-          details: error.errors,
+          message: errorMessage || "Invalid request data",
+          details: issues,
         },
       })
     }
@@ -20,6 +22,18 @@ export const validate = (schema: ZodSchema) => {
 
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   console.error("Error:", err)
+
+  if (err instanceof ZodError) {
+    const issues = err.issues || err.errors || []
+    const errorMessage = issues.map((e: any) => e.message).join(", ")
+    return res.status(400).json({
+      error: {
+        code: "VALIDATION_ERROR",
+        message: errorMessage || "Invalid request data",
+        details: issues,
+      },
+    })
+  }
 
   if (err.code === "P2002") {
     return res.status(409).json({

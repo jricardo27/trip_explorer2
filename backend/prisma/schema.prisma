@@ -117,6 +117,7 @@ model Activity {
   isFlexible      Boolean        @default(false) @map("is_flexible")
   status          ActivityStatus @default(PLANNED)
   priority        String?        @default("normal")
+  orderIndex      Int            @default(0) @map("order_index")
 
   bookingReference   String?   @map("booking_reference")
   bookingUrl         String?   @map("booking_url")

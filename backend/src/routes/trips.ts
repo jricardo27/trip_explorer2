@@ -3,23 +3,17 @@ import { Router, Request, Response } from "express"
 import { validate } from "../middleware/errorHandler"
 import tripService from "../services/TripService"
 import { createTripSchema, updateTripSchema } from "../utils/validation"
+import { authenticateToken } from "../middleware/auth"
 
 const router = Router()
+
+// Protect all routes
+router.use(authenticateToken)
 
 // GET /api/trips - List all trips for a user
 router.get("/", async (req: Request, res: Response) => {
   try {
-    const userId = req.query.user_id as string
-
-    if (!userId) {
-      return res.status(400).json({
-        error: {
-          code: "MISSING_PARAMETER",
-          message: "user_id is required",
-        },
-      })
-    }
-
+    const userId = (req as any).user.id
     const filters: any = {}
 
     if (req.query.is_completed) {
@@ -51,7 +45,7 @@ router.get("/", async (req: Request, res: Response) => {
 router.post("/", validate(createTripSchema), async (req: Request, res: Response) => {
   try {
     const trip = await tripService.createTrip({
-      userId: req.body.userId,
+      userId: (req as any).user.id,
       name: req.body.name,
       startDate: new Date(req.body.startDate),
       endDate: new Date(req.body.endDate),
@@ -74,18 +68,7 @@ router.post("/", validate(createTripSchema), async (req: Request, res: Response)
 // GET /api/trips/:id - Get trip details
 router.get("/:id", async (req: Request, res: Response) => {
   try {
-    const userId = req.query.user_id as string
-
-    if (!userId) {
-      return res.status(400).json({
-        error: {
-          code: "MISSING_PARAMETER",
-          message: "user_id is required",
-        },
-      })
-    }
-
-    const trip = await tripService.getTripById(req.params.id, userId)
+    const trip = await tripService.getTripById(req.params.id, (req as any).user.id)
 
     if (!trip) {
       return res.status(404).json({
@@ -110,17 +93,6 @@ router.get("/:id", async (req: Request, res: Response) => {
 // PUT /api/trips/:id - Update trip
 router.put("/:id", validate(updateTripSchema), async (req: Request, res: Response) => {
   try {
-    const userId = req.body.userId || (req.query.user_id as string)
-
-    if (!userId) {
-      return res.status(400).json({
-        error: {
-          code: "MISSING_PARAMETER",
-          message: "user_id is required",
-        },
-      })
-    }
-
     const updateData: any = {}
 
     if (req.body.name) updateData.name = req.body.name
@@ -132,7 +104,7 @@ router.put("/:id", validate(updateTripSchema), async (req: Request, res: Respons
     if (req.body.isCompleted !== undefined) updateData.isCompleted = req.body.isCompleted
     if (req.body.isPublic !== undefined) updateData.isPublic = req.body.isPublic
 
-    const trip = await tripService.updateTrip(req.params.id, userId, updateData)
+    const trip = await tripService.updateTrip(req.params.id, (req as any).user.id, updateData)
 
     res.json({ data: trip })
   } catch (error: any) {
@@ -157,18 +129,7 @@ router.put("/:id", validate(updateTripSchema), async (req: Request, res: Respons
 // DELETE /api/trips/:id - Delete trip
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
-    const userId = req.query.user_id as string
-
-    if (!userId) {
-      return res.status(400).json({
-        error: {
-          code: "MISSING_PARAMETER",
-          message: "user_id is required",
-        },
-      })
-    }
-
-    await tripService.deleteTrip(req.params.id, userId)
+    await tripService.deleteTrip(req.params.id, (req as any).user.id)
 
     res.status(204).send()
   } catch (error: any) {
@@ -193,17 +154,6 @@ router.delete("/:id", async (req: Request, res: Response) => {
 // POST /api/trips/:id/copy - Copy trip
 router.post("/:id/copy", async (req: Request, res: Response) => {
   try {
-    const userId = req.body.userId || (req.query.user_id as string)
-
-    if (!userId) {
-      return res.status(400).json({
-        error: {
-          code: "MISSING_PARAMETER",
-          message: "user_id is required",
-        },
-      })
-    }
-
     if (!req.body.name || !req.body.startDate) {
       return res.status(400).json({
         error: {
@@ -213,7 +163,12 @@ router.post("/:id/copy", async (req: Request, res: Response) => {
       })
     }
 
-    const trip = await tripService.copyTrip(req.params.id, userId, req.body.name, new Date(req.body.startDate))
+    const trip = await tripService.copyTrip(
+      req.params.id,
+      (req as any).user.id,
+      req.body.name,
+      new Date(req.body.startDate),
+    )
 
     res.status(201).json({ data: trip })
   } catch (error: any) {

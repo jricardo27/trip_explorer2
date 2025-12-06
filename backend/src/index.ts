@@ -3,6 +3,7 @@ import dotenv from "dotenv"
 import express from "express"
 
 import { errorHandler } from "./middleware/errorHandler"
+import authRoutes from "./routes/auth"
 import activityRoutes from "./routes/activities"
 import tripRoutes from "./routes/trips"
 
@@ -20,12 +21,13 @@ app.get("/health", (req, res) => {
 })
 
 // API routes
+app.use("/api/auth", authRoutes)
 app.use("/api/trips", tripRoutes)
-app.use("/api/trips", activityRoutes)
+app.use("/api/activities", activityRoutes)
 
 // Error handling
 app.use(errorHandler)
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`)
 })

@@ -1,11 +1,11 @@
 services:
   frontend:
-    build: ./
+    build: ./frontend
     container_name: 2025_trip_explorer-frontend
     stdin_open: true
     tty: true
     volumes:
-      - ./:/app
+      - ./frontend:/app
       # One-way volume to use node_modules from inside image
       - node-modules-trip-explorer:/app/node_modules
     ports:
@@ -20,8 +20,7 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
+      context: ./backend
     container_name: 2025_trip_explorer-backend
     volumes:
       - ./backend:/app
@@ -30,10 +29,15 @@ services:
     ports:
       - "3001:3001"
     environment:
+      - NODE_ENV=development
+      - PORT=3001
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=trip_explorer
       - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/trip_explorer?schema=public
+      - JWT_SECRET=dev-secret-key-not-for-production
     networks:
       - 2025_trip_explorer
     depends_on:
@@ -48,7 +52,6 @@ services:
       - POSTGRES_DB=trip_explorer
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./backend/src/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     ports:
       - "5432:5432"
     networks:
