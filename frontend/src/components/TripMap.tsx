@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react"
-import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, LayersControl, GeoJSON } from "react-leaflet"
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, GeoJSON } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
-import { Box, Paper, Typography, IconButton, Select, MenuItem } from "@mui/material"
+import { Box, Paper, Typography, IconButton, Select, MenuItem, Checkbox, ListItemText } from "@mui/material"
 import { PlayArrow, Pause, Stop } from "@mui/icons-material"
 import L from "leaflet"
 import iconValidation from "../utils/iconValidation"
@@ -25,6 +25,8 @@ interface TripMapProps {
   activities?: Activity[]
   selectedActivityId?: string
   animations?: TripAnimation[]
+  days?: Array<{ id: string; name?: string; dayIndex: number }>
+  activeAnimationId?: string
   onMapContextMenu?: (latLng: { lat: number; lng: number }) => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onMarkerContextMenu?: (feature: any) => void
@@ -168,14 +170,16 @@ const AnimationController = ({
   animation,
   isPlaying,
   onPlayPause,
-  onStop,
-  currentStepIndex,
+  onReset,
+  progress,
+  onSeek,
 }: {
   animation: TripAnimation
   isPlaying: boolean
   onPlayPause: () => void
-  onStop: () => void
-  currentStepIndex: number
+  onReset: () => void
+  progress: number
+  onSeek: (value: number) => void
 }) => {
   return (
     <Paper
@@ -185,33 +189,49 @@ const AnimationController = ({
         left: "50%",
         transform: "translateX(-50%)",
         zIndex: 1000,
-        p: 1,
+        p: 2,
+        minWidth: 400,
         display: "flex",
-        alignItems: "center",
+        flexDirection: "column",
         gap: 1,
       }}
     >
-      <Typography variant="body2" sx={{ mr: 1 }}>
-        {animation.name} - Step {currentStepIndex + 1}/{animation.steps.length}
+      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+        {animation.name}
       </Typography>
-      <IconButton size="small" onClick={onPlayPause}>
-        {isPlaying ? <Pause /> : <PlayArrow />}
-      </IconButton>
-      <IconButton size="small" onClick={onStop}>
-        <Stop />
-      </IconButton>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <IconButton size="small" onClick={onPlayPause} color="primary">
+          {isPlaying ? <Pause /> : <PlayArrow />}
+        </IconButton>
+        <IconButton size="small" onClick={onReset}>
+          <Stop />
+        </IconButton>
+        <Box sx={{ flexGrow: 1, mx: 2 }}>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={progress}
+            onChange={(e) => onSeek(Number(e.target.value))}
+            style={{ width: "100%" }}
+          />
+        </Box>
+        <Typography variant="caption">{Math.round(progress)}%</Typography>
+      </Box>
     </Paper>
   )
 }
 
-export default function TripMap({
-  activities,
-  selectedActivityId,
-  animations,
-  onMapContextMenu,
-  onMarkerContextMenu,
-  ...props
-}: TripMapProps) {
+export const TripMap = (props: TripMapProps) => {
+  const {
+    activities,
+    selectedActivityId,
+    animations,
+    days,
+    activeAnimationId: propActiveAnimationId,
+    onMapContextMenu,
+    onMarkerContextMenu,
+  } = props
   const defaultCenter: [number, number] = [-25.2744, 133.7751]
   const [center, setCenter] = useState<[number, number]>(defaultCenter)
   const [zoom, setZoom] = useState(4)
@@ -221,9 +241,40 @@ export default function TripMap({
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null)
   const [pathPositions, setPathPositions] = useState<[number, number][]>([])
+  const [selectedMarkerLayers, setSelectedMarkerLayers] = useState<string[]>([])
+  const [selectedDays, setSelectedDays] = useState<string[]>([])
+  const [showFilters, setShowFilters] = useState(true)
+
+  // Sync activeAnimationId from prop
+  useEffect(() => {
+    if (propActiveAnimationId) {
+      setActiveAnimationId(propActiveAnimationId)
+      setIsPlaying(true)
+    }
+  }, [propActiveAnimationId])
 
   const animationRef = useRef<number | null>(null)
   const mapRef = useRef<L.Map | null>(null)
+
+  // Get unique days from activities with their names
+  const uniqueDays = Array.from(
+    new Map(
+      activities
+        ?.filter((a) => a.tripDayId)
+        .map((a) => {
+          const dayInfo = days?.find((d) => d.id === a.tripDayId)
+          return {
+            id: a.tripDayId!,
+            name: dayInfo?.name || `Day ${(dayInfo?.dayIndex ?? 0) + 1}`,
+          }
+        })
+        .map((day) => [day.id, day]),
+    ).values(),
+  )
+
+  // Filter activities based on selected days
+  const filteredActivities =
+    selectedDays.length > 0 ? activities?.filter((a) => a.tripDayId && selectedDays.includes(a.tripDayId)) : activities
 
   const activeAnimation = animations?.find((a) => a.id === activeAnimationId)
 
@@ -342,40 +393,169 @@ export default function TripMap({
           animation={activeAnimation}
           isPlaying={isPlaying}
           onPlayPause={() => setIsPlaying(!isPlaying)}
-          onStop={() => {
+          onReset={() => {
             setIsPlaying(false)
             setCurrentStepIndex(0)
             setPathPositions([])
           }}
-          currentStepIndex={currentStepIndex}
+          progress={
+            activeAnimation.steps.length > 1
+              ? (currentStepIndex / (activeAnimation.steps.length - 1)) * 100
+              : currentStepIndex === 0 && activeAnimation.steps.length === 1
+                ? 100
+                : 0
+          }
+          onSeek={(value) => {
+            const maxIndex = activeAnimation.steps.length > 0 ? activeAnimation.steps.length - 1 : 0
+            const newIndex = Math.round((value / 100) * maxIndex)
+            setCurrentStepIndex(newIndex)
+          }}
         />
       )}
 
       <MapContainer center={center} zoom={zoom} style={{ height: "100%", width: "100%" }} ref={mapRef}>
-        <LayersControl position="topright">
-          <LayersControl.BaseLayer checked name="OpenStreetMap">
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-          </LayersControl.BaseLayer>
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-          {/* Markers from Manifest */}
-          {Object.entries(MARKER_MANIFEST).map(([region, files]) =>
-            // Type assertion to iterate safely if needed, but here simple map is fine
-            files.map((file) => (
-              <LayersControl.Overlay key={file} name={`${region} - ${file.replace(".json", "").replace("_", " ")}`}>
-                <GeoJSONLayer url={`/markers/${region}/${file}`} onContextMenu={onMarkerContextMenu} />
-              </LayersControl.Overlay>
-            )),
-          )}
-        </LayersControl>
+        {/* Markers from Manifest - Smart filtering based on trip location */}
+        {(() => {
+          // Detect relevant regions based on activity locations
+          const relevantRegions = new Set<string>()
+
+          // Simple state detection based on activity coordinates
+          // This is a basic implementation - could be enhanced with reverse geocoding
+          activities?.forEach((activity) => {
+            if (activity.latitude && activity.longitude) {
+              const lat = activity.latitude
+              const lng = activity.longitude
+
+              // Rough bounding boxes for Australian states
+              if (lng >= 115 && lng <= 129 && lat >= -35 && lat <= -14) relevantRegions.add("westernAustralia")
+              if (lng >= 129 && lng <= 138 && lat >= -26 && lat <= -11) relevantRegions.add("northernTerritory")
+              if (lng >= 138 && lng <= 141 && lat >= -38 && lat <= -26) relevantRegions.add("southAustralia")
+              if (lng >= 141 && lng <= 154 && lat >= -39 && lat <= -28) relevantRegions.add("victoria")
+              if (lng >= 141 && lng <= 154 && lat >= -29 && lat <= -10) relevantRegions.add("queensland")
+              if (lng >= 141 && lng <= 154 && lat >= -38 && lat <= -28) relevantRegions.add("newSouthWales")
+              if (lng >= 144 && lng <= 149 && lat >= -44 && lat <= -40) relevantRegions.add("tasmania")
+              if (lng >= 148 && lng <= 150 && lat >= -36 && lat <= -35)
+                relevantRegions.add("australianCapitalTerritory")
+              if (lng >= 166 && lng <= 179 && lat >= -47 && lat <= -34) relevantRegions.add("newZealand")
+            }
+          })
+
+          // If no activities or no coordinates, show all regions
+          const regionsToShow = relevantRegions.size > 0 ? Array.from(relevantRegions) : Object.keys(MARKER_MANIFEST)
+
+          return (
+            <>
+              {/* Filter Toggle and Content */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 10,
+                  right: 10,
+                  zIndex: 1000,
+                  bgcolor: "white",
+                  borderRadius: 1,
+                  boxShadow: 2,
+                  p: showFilters ? 1.5 : 1,
+                  minWidth: showFilters ? 220 : "auto",
+                  maxWidth: 300,
+                }}
+              >
+                {!showFilters && (
+                  <IconButton size="small" onClick={() => setShowFilters(true)} title="Show filters">
+                    <Typography variant="caption">Filters</Typography>
+                  </IconButton>
+                )}
+                {showFilters && (
+                  <>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                      <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+                        Filters
+                      </Typography>
+                      <IconButton size="small" onClick={() => setShowFilters(false)} title="Hide filters">
+                        <Typography variant="caption">✕</Typography>
+                      </IconButton>
+                    </Box>
+                    <Select
+                      size="small"
+                      multiple
+                      value={selectedDays}
+                      onChange={(e) => setSelectedDays(e.target.value as string[])}
+                      displayEmpty
+                      sx={{ width: "100%", fontSize: "0.875rem", mb: 2 }}
+                      renderValue={(selected) => {
+                        if ((selected || []).length === 0) return "All days"
+                        const selectedNames = uniqueDays
+                          .filter((d) => (selected || []).includes(d.id))
+                          .map((d) => d.name)
+                        return selectedNames.join(", ")
+                      }}
+                    >
+                      {uniqueDays.map((day) => (
+                        <MenuItem key={day.id} value={day.id}>
+                          <Checkbox checked={selectedDays.includes(day.id)} />
+                          <ListItemText primary={day.name} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+
+                    {/* Marker Layers */}
+                    <Typography variant="caption" sx={{ fontWeight: "bold", display: "block", mb: 1 }}>
+                      Map Layers
+                    </Typography>
+                    <Select
+                      size="small"
+                      multiple
+                      value={selectedMarkerLayers}
+                      onChange={(e) => setSelectedMarkerLayers(e.target.value as string[])}
+                      displayEmpty
+                      renderValue={(selected) =>
+                        (selected || []).length === 0 ? "Select layers..." : `${(selected || []).length} layers`
+                      }
+                      sx={{ width: "100%", fontSize: "0.875rem" }}
+                    >
+                      {regionsToShow.map((region) => {
+                        const files = MARKER_MANIFEST[region as keyof typeof MARKER_MANIFEST]
+                        return files.map((file) => {
+                          const layerKey = `${region}/${file}`
+                          const displayName = `${region.replace(/([A-Z])/g, " $1").trim()} - ${file.replace(".json", "").replace(/_/g, " ")}`
+                          return (
+                            <MenuItem key={layerKey} value={layerKey}>
+                              {displayName}
+                            </MenuItem>
+                          )
+                        })
+                      })}
+                    </Select>
+                    {relevantRegions.size > 0 && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
+                        Showing {regionsToShow.length} relevant region(s)
+                      </Typography>
+                    )}
+                  </>
+                )}
+              </Box>
+
+              {/* Render selected marker layers */}
+              {(selectedMarkerLayers || []).map((layerKey: string) => {
+                const [region, file] = layerKey.split("/")
+                return (
+                  <GeoJSONLayer key={layerKey} url={`/markers/${region}/${file}`} onContextMenu={onMarkerContextMenu} />
+                )
+              })}
+            </>
+          )
+        })()}
 
         <MapInteraction center={center} zoom={zoom} onContextMenu={onMapContextMenu} />
         <MapFlyHandler location={props.activeFlyToLocation} />
 
         {!isPlaying &&
-          activities?.map((activity) => {
+          filteredActivities?.map((activity) => {
             if (activity.latitude && activity.longitude) {
               return (
                 <Marker key={activity.id} position={[activity.latitude, activity.longitude]}>

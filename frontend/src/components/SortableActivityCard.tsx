@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Paper, Box, Typography, IconButton } from "@mui/material"
-import { Delete as DeleteIcon, Edit as EditIcon, DragIndicator, NearMe } from "@mui/icons-material"
+import { Paper, Box, Typography, IconButton, Tooltip } from "@mui/material"
+import { Delete as DeleteIcon, Edit as EditIcon, DragIndicator, NearMe, ContentCopy } from "@mui/icons-material"
 import type { Activity } from "../types"
 import { useSettingsStore } from "../stores/settingsStore"
 
@@ -9,6 +9,7 @@ interface SortableActivityCardProps {
   activity: Activity
   onDelete: (id: string) => void
   onEdit: (activity: Activity) => void
+  onCopy?: (activity: Activity) => void
   isDeleting?: boolean
   onFlyTo?: (activity: Activity) => void
 }
@@ -17,6 +18,7 @@ export const SortableActivityCard = ({
   activity,
   onDelete,
   onEdit,
+  onCopy,
   isDeleting,
   onFlyTo,
 }: SortableActivityCardProps) => {
@@ -72,22 +74,27 @@ export const SortableActivityCard = ({
       </Box>
       <Box>
         {activity.latitude && activity.longitude && (
-          <IconButton
-            size="small"
-            onClick={() => onFlyTo && onFlyTo(activity)}
-            sx={{ mr: 0.5 }}
-            color="primary"
-            title="Fly to location"
-          >
-            <NearMe fontSize="small" />
-          </IconButton>
+          <Tooltip title="Fly to location on map">
+            <IconButton size="small" onClick={() => onFlyTo && onFlyTo(activity)} sx={{ mr: 0.5 }} color="primary">
+              <NearMe fontSize="small" />
+            </IconButton>
+          </Tooltip>
         )}
-        <IconButton size="small" onClick={() => onEdit(activity)} sx={{ mr: 0.5 }}>
-          <EditIcon fontSize="small" />
-        </IconButton>
-        <IconButton size="small" color="error" onClick={() => onDelete(activity.id)} disabled={isDeleting}>
-          <DeleteIcon fontSize="small" />
-        </IconButton>
+        <Tooltip title="Copy this activity">
+          <IconButton size="small" onClick={() => onCopy && onCopy(activity)} sx={{ mr: 0.5 }}>
+            <ContentCopy fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Edit activity">
+          <IconButton size="small" onClick={() => onEdit(activity)} sx={{ mr: 0.5 }}>
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete activity">
+          <IconButton size="small" onClick={() => onDelete(activity.id)} disabled={isDeleting} color="error">
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </Box>
     </Paper>
   )

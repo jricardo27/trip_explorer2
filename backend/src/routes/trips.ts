@@ -151,6 +151,36 @@ router.delete("/:id", async (req: Request, res: Response) => {
   }
 })
 
+// PUT /api/trips/:id/days/:dayId - Update trip day
+router.put("/:id/days/:dayId", async (req: Request, res: Response) => {
+  try {
+    const updateData: any = {}
+
+    if (req.body.name) updateData.name = req.body.name
+    if (req.body.notes !== undefined) updateData.notes = req.body.notes
+
+    const day = await tripService.updateDay(req.params.id, req.params.dayId, (req as any).user.id, updateData)
+
+    res.json({ data: day })
+  } catch (error: any) {
+    if (error.message === "Trip not found") {
+      return res.status(404).json({
+        error: {
+          code: "NOT_FOUND",
+          message: "Trip not found",
+        },
+      })
+    }
+
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to update day",
+      },
+    })
+  }
+})
+
 // POST /api/trips/:id/copy - Copy trip
 router.post("/:id/copy", async (req: Request, res: Response) => {
   try {

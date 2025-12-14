@@ -64,6 +64,14 @@ export class TripService {
         members: true,
         budgets: true,
         transport: true,
+        animations: {
+          include: {
+            steps: {
+              orderBy: { orderIndex: "asc" },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        },
       },
     })
 
@@ -142,6 +150,35 @@ export class TripService {
         userId,
       },
     })
+  }
+
+  async updateDay(
+    tripId: string,
+    dayId: string,
+    userId: string,
+    data: Partial<{
+      name: string
+      notes: string
+    }>,
+  ): Promise<any> {
+    // Verify trip belongs to user
+    const trip = await prisma.trip.findFirst({
+      where: { id: tripId, userId },
+    })
+
+    if (!trip) {
+      throw new Error("Trip not found")
+    }
+
+    // Update the day
+    const day = await prisma.tripDay.update({
+      where: {
+        id: dayId,
+      },
+      data,
+    })
+
+    return day
   }
 
   async copyTrip(tripId: string, userId: string, newName: string, newStartDate: Date): Promise<Trip> {

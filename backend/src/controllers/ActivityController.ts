@@ -114,9 +114,24 @@ class ActivityController {
         return res.status(403).json({ error: "Unauthorized" })
       }
 
-      await activityService.deleteActivity(id)
+      await activityService.deleteActivity(id, userId)
       res.status(204).send()
     } catch (error) {
+      next(error)
+    }
+  }
+
+  async copyActivity(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user.id
+      const { id } = req.params
+
+      const copiedActivity = await activityService.copyActivity(id, userId)
+      res.status(201).json(copiedActivity)
+    } catch (error: any) {
+      if (error.message === "Activity not found or unauthorized") {
+        return res.status(404).json({ error: error.message })
+      }
       next(error)
     }
   }

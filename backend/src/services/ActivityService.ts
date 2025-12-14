@@ -109,10 +109,62 @@ export class ActivityService {
     return activity
   }
 
-  async deleteActivity(id: string): Promise<void> {
+  async deleteActivity(id: string, userId: string): Promise<void> {
+    // Verify ownership through trip
+    const activity = await prisma.activity.findUnique({
+      where: { id },
+      include: { trip: true },
+    })
+
+    if (!activity || activity.trip.userId !== userId) {
+      throw new Error("Activity not found or unauthorized")
+    }
+
     await prisma.activity.delete({
       where: { id },
     })
+  }
+
+  async copyActivity(id: string, userId: string): Promise<any> {
+    // Get the original activity
+    const originalActivity = await prisma.activity.findUnique({
+      where: { id },
+      include: {
+        trip: true,
+      },
+    })
+
+    if (!originalActivity || originalActivity.trip.userId !== userId) {
+      throw new Error("Activity not found or unauthorized")
+    }
+
+    // Create a copy with a new ID
+    const copiedActivity = await prisma.activity.create({
+      data: {
+        tripId: originalActivity.tripId,
+        tripDayId: originalActivity.tripDayId,
+        name: `${originalActivity.name} (Copy)`,
+        description: originalActivity.description,
+        activityType: originalActivity.activityType,
+        activitySubtype: originalActivity.activitySubtype,
+        category: originalActivity.category,
+        scheduledStart: originalActivity.scheduledStart,
+        scheduledEnd: originalActivity.scheduledEnd,
+        durationMinutes: originalActivity.durationMinutes,
+        latitude: originalActivity.latitude,
+        longitude: originalActivity.longitude,
+        address: originalActivity.address,
+        city: originalActivity.city,
+        country: originalActivity.country,
+        countryCode: originalActivity.countryCode,
+        estimatedCost: originalActivity.estimatedCost,
+        currency: originalActivity.currency,
+        notes: originalActivity.notes,
+        orderIndex: originalActivity.orderIndex + 1, // Place after original
+      },
+    })
+
+    return copiedActivity
   }
 
   async reorderActivities(

@@ -11,6 +11,7 @@ router.post("/", ActivityController.createActivity)
 router.get("/:id", ActivityController.getActivity)
 router.put("/:id", ActivityController.updateActivity)
 router.delete("/:id", ActivityController.deleteActivity)
+router.post("/:id/copy", ActivityController.copyActivity)
 router.post("/reorder", ActivityController.reorder)
 
 export default router

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogTitle,
@@ -16,14 +16,32 @@ interface AnimationConfigDialogProps {
   open: boolean
   onClose: () => void
   trip: Trip
+  initialData?: { id: string; name: string; description?: string; settings: any; steps: any[] }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmit: (data: { name: string; settings: any; steps: any[] }) => Promise<void>
 }
 
-export default function AnimationConfigDialog({ open, onClose, trip, onSubmit }: AnimationConfigDialogProps) {
+export default function AnimationConfigDialog({
+  open,
+  onClose,
+  trip,
+  initialData,
+  onSubmit,
+}: AnimationConfigDialogProps) {
   const [name, setName] = useState("")
   const [speed, setSpeed] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
+
+  // Initialize form when editing
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name || "")
+      setSpeed(initialData.settings?.speed || 1)
+    } else {
+      setName("")
+      setSpeed(1)
+    }
+  }, [initialData, open])
 
   const handleSubmit = async () => {
     setIsLoading(true)
