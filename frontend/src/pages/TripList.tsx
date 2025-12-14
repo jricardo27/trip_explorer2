@@ -41,13 +41,11 @@ const TripList = () => {
   // 0 = Past, 1 = Current, 2 = Future
   const [tabValue, setTabValue] = useState(2)
 
-
-
   // Determine initial tab based on trips
   useState(() => {
     if (trips) {
       const now = dayjs()
-      const hasCurrent = trips.some(t => dayjs(t.startDate).isBefore(now) && dayjs(t.endDate).isAfter(now))
+      const hasCurrent = trips.some((t) => dayjs(t.startDate).isBefore(now) && dayjs(t.endDate).isAfter(now))
       if (hasCurrent) {
         setTabValue(1)
       } else {
@@ -64,11 +62,14 @@ const TripList = () => {
       const start = dayjs(trip.startDate)
       const end = dayjs(trip.endDate)
 
-      if (tabValue === 0) { // Past
+      if (tabValue === 0) {
+        // Past
         return end.isBefore(now)
-      } else if (tabValue === 1) { // Current
+      } else if (tabValue === 1) {
+        // Current
         return start.isBefore(now) && end.isAfter(now)
-      } else { // Future
+      } else {
+        // Future
         return start.isAfter(now)
       }
     })

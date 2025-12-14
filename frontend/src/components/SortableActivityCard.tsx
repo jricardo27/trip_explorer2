@@ -13,7 +13,13 @@ interface SortableActivityCardProps {
   onFlyTo?: (activity: Activity) => void
 }
 
-export const SortableActivityCard = ({ activity, onDelete, onEdit, isDeleting, onFlyTo }: SortableActivityCardProps) => {
+export const SortableActivityCard = ({
+  activity,
+  onDelete,
+  onEdit,
+  isDeleting,
+  onFlyTo,
+}: SortableActivityCardProps) => {
   const { dateFormat } = useSettingsStore()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: activity.id })
 
@@ -66,7 +72,13 @@ export const SortableActivityCard = ({ activity, onDelete, onEdit, isDeleting, o
       </Box>
       <Box>
         {activity.latitude && activity.longitude && (
-          <IconButton size="small" onClick={() => onFlyTo && onFlyTo(activity)} sx={{ mr: 0.5 }} color="primary" title="Fly to location">
+          <IconButton
+            size="small"
+            onClick={() => onFlyTo && onFlyTo(activity)}
+            sx={{ mr: 0.5 }}
+            color="primary"
+            title="Fly to location"
+          >
             <NearMe fontSize="small" />
           </IconButton>
         )}

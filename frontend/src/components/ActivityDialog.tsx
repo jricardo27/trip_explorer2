@@ -127,15 +127,11 @@ const ActivityDialog = ({
       const activityEnd = dayjs(end)
 
       if (start && (activityStart.isBefore(tripStartDay) || activityStart.isAfter(tripEndDay))) {
-        setError(
-          `Start date must be within trip dates (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`,
-        )
+        setError(`Start date must be within trip dates (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`)
         return false
       }
       if (end && (activityEnd.isBefore(tripStartDay) || activityEnd.isAfter(tripEndDay))) {
-        setError(
-          `End date must be within trip dates (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`,
-        )
+        setError(`End date must be within trip dates (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`)
         return false
       }
     }
@@ -168,7 +164,7 @@ const ActivityDialog = ({
     // Validate that we have a trip day assigned
     if (!finalTripDayId) {
       setError(
-        "Cannot create activity: The selected start date does not match any trip day. Please select a date within the trip period."
+        "Cannot create activity: The selected start date does not match any trip day. Please select a date within the trip period.",
       )
       return
     }

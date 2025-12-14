@@ -36,7 +36,7 @@ const MapFlyHandler = ({ location }: { location?: { lat: number; lng: number } |
   useEffect(() => {
     if (location) {
       map.flyTo([location.lat, location.lng], 14, {
-        duration: 1.5
+        duration: 1.5,
       })
     }
   }, [location, map])
@@ -143,24 +143,21 @@ const GeoJSONLayer = ({ url, onContextMenu }: { url: string; onContextMenu?: (fe
         })
 
         // Bind Popup using React Component
-        layer.bindPopup(() => {
-          const div = document.createElement("div")
-          const root = createRoot(div)
-          const props = feature.properties
-          const title = props.name || props.Name || "Unknown"
+        layer.bindPopup(
+          () => {
+            const div = document.createElement("div")
+            const root = createRoot(div)
+            const props = feature.properties
+            const title = props.name || props.Name || "Unknown"
 
-          // Basic image extraction if available in properties
-          const images = props.images || []
+            // Basic image extraction if available in properties
+            const images = props.images || []
 
-          root.render(
-            <PopupContent
-              title={title}
-              properties={props}
-              images={images}
-            />
-          )
-          return div
-        }, { minWidth: 320 })
+            root.render(<PopupContent title={title} properties={props} images={images} />)
+            return div
+          },
+          { minWidth: 320 },
+        )
       }}
     />
   )

@@ -281,10 +281,24 @@ const TripDetailsPage = () => {
     <Box>
       <Paper
         elevation={0}
-        sx={{ p: 1.5, mb: 1, bgcolor: "#f5f5f5", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2 }}
+        sx={{
+          p: 1.5,
+          mb: 1,
+          bgcolor: "#f5f5f5",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 2,
+        }}
       >
         <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
-          <Button startIcon={<CloseIcon />} onClick={() => navigate("/trips")} color="inherit" size="small" sx={{ minWidth: "auto" }}>
+          <Button
+            startIcon={<CloseIcon />}
+            onClick={() => navigate("/trips")}
+            color="inherit"
+            size="small"
+            sx={{ minWidth: "auto" }}
+          >
             Close
           </Button>
           <Box>
