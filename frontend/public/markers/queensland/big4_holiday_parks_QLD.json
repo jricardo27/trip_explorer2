@@ -1,0 +1,1300 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.big4.com.au",
+    "style": {
+      "layerName": "Big4 Holiday Parks",
+      "color": "magenta"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.67077", "-16.74082"]
+      },
+      "properties": {
+        "id": "890",
+        "name": "NRMA Palm Cove Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/tropical-north/nrma-palm-cove-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/eydjsszx/palmcove_aerial.png",
+            "title": ""
+          }
+        ],
+        "reviews": 9.18,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.469885", "-17.281726"]
+      },
+      "properties": {
+        "id": "452",
+        "name": "NRMA Atherton Tablelands Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/tropical-north/nrma-atherton-tablelands-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/rm0k5toi/pool_aerial.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.1,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.707921", "-16.904155"]
+      },
+      "properties": {
+        "id": "824",
+        "name": "Tasman Holiday Parks - Cairns Cool Waters",
+        "website": "https://www.big4.com.au/caravan-parks/qld/tropical-north/tasman-holiday-parks-cairns-cool-waters",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ojsdlpr4/cool-waters-cedar-cabins-3000px00-1024x682.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.26,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.030259", "-17.544552"]
+      },
+      "properties": {
+        "id": "377",
+        "name": "BIG4 Innisfail Mango Tree Tourist Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/tropical-north/innisfail-mango-tree-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/xs0buk1m/23238jpg.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 0,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["140.829618", "-17.464116"]
+      },
+      "properties": {
+        "id": "866",
+        "name": "Karumba Point Sunset Caravan Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/tropical-north/karumba-point-sunset-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/1iabiyj5/fish5.png",
+            "title": ""
+          }
+        ],
+        "reviews": 8.62,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.093530", "-17.935785"]
+      },
+      "properties": {
+        "id": "145",
+        "name": "BIG4 Tasman Holiday Parks - South Mission Beach",
+        "website": "https://www.big4.com.au/caravan-parks/qld/tropical-north/tasman-holiday-parks-south-mission-beach",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/scifvhfo/thp_southmissionbeach_stock_destination-dsc09514.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.473706", "-16.556061"]
+      },
+      "properties": {
+        "id": "457",
+        "name": "BIG4 Port Douglas Glengarry Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/tropical-north/port-douglas-glengarry-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/rinpkgto/img_8043.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.3,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.39728", "-19.00259"]
+      },
+      "properties": {
+        "id": "887",
+        "name": "Tasman Holiday Parks - Rollingstone",
+        "website": "https://www.big4.com.au/caravan-parks/qld/townsville-surrounds/tasman-holiday-parks-rollingstone",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/cutbwgsj/rollingstone-pool.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.86,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.282315", "-20.062764"]
+      },
+      "properties": {
+        "id": "459",
+        "name": "BIG4 Aussie Outback Oasis Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/townsville-surrounds/aussie-outback-oasis-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/kk5bytjk/sunrise-2.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.52,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.333629", "-18.527753"]
+      },
+      "properties": {
+        "id": "781",
+        "name": "BIG4 Lucinda Wanderers Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/townsville-surrounds/lucinda-wanderers-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/vqulgf1g/l-1162-hdr.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.86,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.791785", "-19.241904"]
+      },
+      "properties": {
+        "id": "729",
+        "name": "BIG4 Tasman Holiday Parks - Rowes Bay",
+        "website": "https://www.big4.com.au/caravan-parks/qld/townsville-surrounds/tasman-holiday-parks-rowes-bay",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/bhbdbybm/thp_rowes_bay_facilities-25.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.7,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.664420", "-19.240590"]
+      },
+      "properties": {
+        "id": "134",
+        "name": "BIG4 Ingenia Holidays Townsville",
+        "website": "https://www.big4.com.au/caravan-parks/qld/townsville-surrounds/ingenia-holidays-townsville",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ka3lnwk4/pool.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.3,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.836830", "-19.319651"]
+      },
+      "properties": {
+        "id": "779",
+        "name": "BIG4 Townsville Gateway Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/townsville-surrounds/townsville-gateway-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/nhrjj4ao/t-344.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.36,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.904011", "-19.374934"]
+      },
+      "properties": {
+        "id": "864",
+        "name": "BIG4 Eco Resort Townsville",
+        "website": "https://www.big4.com.au/caravan-parks/qld/townsville-surrounds/eco-resort-townsville",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/qmdd24kq/walking.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.28,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.72928", "-20.28160"]
+      },
+      "properties": {
+        "id": "884",
+        "name": "Tasman Holiday Parks - Airlie Beach",
+        "website": "https://www.big4.com.au/caravan-parks/qld/whitsunday/tasman-holiday-parks-airlie-beach",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/a3ddngny/aerial.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.86,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.679227", "-20.287144"]
+      },
+      "properties": {
+        "id": "132",
+        "name": "BIG4 Adventure Whitsunday Resort",
+        "website": "https://www.big4.com.au/caravan-parks/qld/whitsunday/adventure-whitsunday-resort",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/4njnfd42/big4-adventure-whitsunday-resort-hero-image.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.32,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.702420", "-20.275520"]
+      },
+      "properties": {
+        "id": "778",
+        "name": "NRMA Airlie Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/whitsunday/nrma-airlie-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/t34fapb1/ab_aerial_park-1200x799-779f864.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.5,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.244315", "-19.985570"]
+      },
+      "properties": {
+        "id": "487",
+        "name": "NRMA Bowen Beachfront Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/whitsunday/nrma-bowen-beachfront-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/qrtazf1w/front-walk.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.96,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.737751", "-20.477502"]
+      },
+      "properties": {
+        "id": "742",
+        "name": "BIG4 Conway Beach Tourist Park Whitsundays",
+        "website": "https://www.big4.com.au/caravan-parks/qld/whitsunday/conway-beach-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/rbil3yx4/conway-beach-7.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.04,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.393211", "-27.934825"]
+      },
+      "properties": {
+        "id": "237",
+        "name": "NRMA Treasure Island Holiday Resort",
+        "website": "https://www.big4.com.au/caravan-parks/qld/gold-coast/nrma-treasure-island-holiday-resort",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/q5pbkhmy/1680x800_website_131_treasureisland.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.76,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.560507", "-27.019382"]
+      },
+      "properties": {
+        "id": "700",
+        "name": "NRMA Lake Somerset Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/sunshine-coast/nrma-lake-somerset-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ckklyxvl/1920x1080_3rdparty_2015_10_11_bwp_somerset_2_5696.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.54,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.045273", "-26.636722"]
+      },
+      "properties": {
+        "id": "695",
+        "name": "Ingenia Holidays Rivershore",
+        "website": "https://www.big4.com.au/caravan-parks/qld/sunshine-coast/ingenia-holidays-rivershore",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/hxuedf4i/ihp_website_rivershore_1700x450.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.38,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.066183", "-26.644284"]
+      },
+      "properties": {
+        "id": "713",
+        "name": "BIG4 Maroochy River",
+        "website": "https://www.big4.com.au/caravan-parks/qld/sunshine-coast/maroochy-river-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/gtwafnw3/beautiful-sunrises.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.2,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.037530", "-26.379570"]
+      },
+      "properties": {
+        "id": "847",
+        "name": "Ingenia Holidays Noosa North",
+        "website": "https://www.big4.com.au/caravan-parks/qld/sunshine-coast/ingenia-holidays-noosa-north",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/yahjsvdv/2019-02-13-12-29-23.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.4,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.015833", "-26.397571"]
+      },
+      "properties": {
+        "id": "353",
+        "name": "Ingenia Holidays Noosa",
+        "website": "https://www.big4.com.au/caravan-parks/qld/sunshine-coast/ingenia-holidays-noosa",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/lfgbxqcb/ihp_website_noosa_1700x450.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.94,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.060154", "-25.900136"]
+      },
+      "properties": {
+        "id": "752",
+        "name": "BIG4 Breeze Holiday Parks - Rainbow Beach",
+        "website": "https://www.big4.com.au/caravan-parks/qld/sunshine-coast/breeze-holiday-parks-rainbow-beach",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/jfgbypeq/1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.16,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.455606", "-24.806655"]
+      },
+      "properties": {
+        "id": "753",
+        "name": "BIG4 Breeze Holiday Parks - Bargara",
+        "website": "https://www.big4.com.au/caravan-parks/qld/bundaberg-coral-isles/breeze-holiday-parks-bargara",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/3rtg1dvb/bargara-images-landscape.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.5,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.316310", "-24.890631"]
+      },
+      "properties": {
+        "id": "155",
+        "name": "Cane Village Holiday Park - Bundaberg",
+        "website": "https://www.big4.com.au/caravan-parks/qld/bundaberg-coral-isles/cane-village-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/qqgebecm/cane-village-mr-009.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.9,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["150.963036", "-24.660624"]
+      },
+      "properties": {
+        "id": "156",
+        "name": "BIG4 Breeze Holiday Parks - Cania Gorge",
+        "website": "https://www.big4.com.au/caravan-parks/qld/bundaberg-coral-isles/breeze-holiday-parks-cania-gorge",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/3pohe4eq/8.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.52,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["150.993587", "-24.723185"]
+      },
+      "properties": {
+        "id": "812",
+        "name": "Cania Gorge Tourist Retreat",
+        "website": "https://www.big4.com.au/caravan-parks/qld/bundaberg-coral-isles/cania-gorge-tourist-retreat",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/5hjfaspd/lake_cania_1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.5,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.037913", "-24.496025"]
+      },
+      "properties": {
+        "id": "852",
+        "name": "BIG4 Rules Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/bundaberg-coral-isles/rules-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/q4pp33hb/rulesbeach-caravanpark-10.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.78,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.567588", "-25.110314"]
+      },
+      "properties": {
+        "id": "734",
+        "name": "NRMA Woodgate Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/bundaberg-coral-isles/nrma-woodgate-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/dhzhx4gu/wb_facility_aerial_03-1200x899-8313029.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.14,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["150.789297", "-23.184369"]
+      },
+      "properties": {
+        "id": "157",
+        "name": "NRMA Capricorn Yeppoon Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/capricorn/nrma-capricorn-yeppoon-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/z2vd1hrj/cy_pool.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.64,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["150.791773", "-23.216811"]
+      },
+      "properties": {
+        "id": "862",
+        "name": "Island View Holiday Park - Yeppoon",
+        "website": "https://www.big4.com.au/caravan-parks/qld/capricorn/island-view-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/elznjxlz/dji_0408.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.74,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.079213", "-23.655543"]
+      },
+      "properties": {
+        "id": "769",
+        "name": "BIG4 Lake Maraboon Holiday Village",
+        "website": "https://www.big4.com.au/caravan-parks/qld/central-qld-highlands/lake-maraboon-holiday-village",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/0f2nmzie/dji_20240331061935_0050_v.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.76,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.85028", "-25.29097"]
+      },
+      "properties": {
+        "id": "888",
+        "name": "Tasman Holiday Parks - Hervey Bay",
+        "website": "https://www.big4.com.au/caravan-parks/qld/fraser-coast-south-burnett/tasman-holiday-parks-hervey-bay",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/sipn4a2f/thp_herveybay_stock_destination-dsc01116.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.18,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.821712", "-25.254879"]
+      },
+      "properties": {
+        "id": "220",
+        "name": "BIG4 Hervey Bay Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/fraser-coast-south-burnett/hervey-bay-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/upzllt0z/img_1698.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.02,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.880540", "-25.285950"]
+      },
+      "properties": {
+        "id": "798",
+        "name": "Ingenia Holidays Hervey Bay",
+        "website": "https://www.big4.com.au/caravan-parks/qld/fraser-coast-south-burnett/ingenia-holidays-hervey-bay",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/3jkd2sdq/ihp_website_hervey-bay_1700x450.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.48,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.869073", "-25.293027"]
+      },
+      "properties": {
+        "id": "826",
+        "name": "Tasman Holiday Parks - Fraser Coast",
+        "website": "https://www.big4.com.au/caravan-parks/qld/fraser-coast-south-burnett/tasman-holiday-parks-fraser-coast",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/tvci54qq/camp-kitchen-5-1536x1022.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.48,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.877228", "-25.286044"]
+      },
+      "properties": {
+        "id": "825",
+        "name": "Tasman Holiday Parks - Torquay Palms",
+        "website": "https://www.big4.com.au/caravan-parks/qld/fraser-coast-south-burnett/tasman-holiday-parks-torquay-palms",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/tn4dkubj/location-location-location-1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.66,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.047983", "-20.924679"]
+      },
+      "properties": {
+        "id": "790",
+        "name": "Cape Hillsborough Nature Tourist Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/mackay/cape-hillsborough-nature-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/kz4f0iwj/687473-19-1200x800-5b2df79.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.58,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.189711", "-21.051210"]
+      },
+      "properties": {
+        "id": "694",
+        "name": "BIG4 Mackay Blacks Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/mackay/mackay-blacks-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/c2vp31ig/powered-sites-resize.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.04,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["151.887927", "-28.723592"]
+      },
+      "properties": {
+        "id": "762",
+        "name": "Country Style Holiday Park - Stanthorpe",
+        "website": "https://www.big4.com.au/caravan-parks/qld/toowoomba-golden-west/country-style-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/2g3gtkzu/spit.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.6,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["151.936144", "-27.586886"]
+      },
+      "properties": {
+        "id": "307",
+        "name": "BIG4 Toowoomba Garden City Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/toowoomba-golden-west/toowoomba-garden-city-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/wyvdmpuw/bunya_mountains_np_16-634.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.06,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["151.948261", "-27.588018"]
+      },
+      "properties": {
+        "id": "875",
+        "name": "Toowoomba Motor Village",
+        "website": "https://www.big4.com.au/caravan-parks/qld/toowoomba-golden-west/toowoomba-motor-village",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/fjnhxnql/toowoomba-motor-village-1200x482.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.22,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.019805", "-28.228865"]
+      },
+      "properties": {
+        "id": "737",
+        "name": "BIG4 Freedom Lifestyle Holiday Park Warwick",
+        "website": "https://www.big4.com.au/caravan-parks/qld/toowoomba-golden-west/warwick-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/2sebic0s/big4-pool-and-park.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.96,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.098230", "-17.783360"]
+      },
+      "properties": {
+        "id": "856",
+        "name": "BIG4 Kurrimine Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/tropical-north/kurrimine-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/krwl2na1/fafivfxa.jpeg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.12,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.271054", "-25.070939"]
+      },
+      "properties": {
+        "id": "766",
+        "name": "BIG4 Breeze Holiday Parks - Carnarvon Gorge",
+        "website": "https://www.big4.com.au/caravan-parks/qld/central-qld-highlands/breeze-holiday-parks-carnarvon-gorge",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/30yfbscr/breeze-carnarvon-park-early-morning.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.02,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.753981", "-20.277418"]
+      },
+      "properties": {
+        "id": "728",
+        "name": "BIG4 Whitsundays Tropical Eco Resort",
+        "website": "https://www.big4.com.au/caravan-parks/qld/whitsunday/whitsundays-tropical-eco-resort",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ul2m5g1w/tropical-gardens-1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.2,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.140366", "-27.076835"]
+      },
+      "properties": {
+        "id": "723",
+        "name": "BIG4 Sandstone Point Holiday Resort",
+        "website": "https://www.big4.com.au/caravan-parks/qld/greater-brisbane/sandstone-point-holiday-resort",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/bxwhzmlu/axis-productions-au-474-of-586.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.76,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.315931", "-27.900138"]
+      },
+      "properties": {
+        "id": "555",
+        "name": "BIG4 Gold Coast Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/gold-coast/gold-coast-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/4sxbsihk/gcwp-624-1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.5,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.126421", "-26.804963"]
+      },
+      "properties": {
+        "id": "548",
+        "name": "BIG4 Caloundra Waterfront",
+        "website": "https://www.big4.com.au/caravan-parks/qld/sunshine-coast/caloundra-waterfront-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/gpbdz1tl/web-xpool-b.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.46,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["152.965370", "-26.795340"]
+      },
+      "properties": {
+        "id": "797",
+        "name": "Landsborough Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/sunshine-coast/landsborough-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/pdglhni2/ihp_website_landsborough_1700x450.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.64,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.20201", "-27.06783"]
+      },
+      "properties": {
+        "id": "896",
+        "name": "Bribie Island Caravan Park",
+        "website": "https://www.big4.com.au/caravan-parks/qld/greater-brisbane/bribie-island-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/sr2jtsqc/aerial.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.88,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["153.044760", "-26.353260"]
+      },
+      "properties": {
+        "id": "770",
+        "name": "BIG4 Noosa North Shore",
+        "website": "https://www.big4.com.au/caravan-parks/qld/sunshine-coast/noosa-north-shore-retreat",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/bp5fgb1o/exterior.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.2,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.743960", "-16.967920"]
+      },
+      "properties": {
+        "id": "154",
+        "name": "BIG4 Ingenia Holidays Cairns Coconut Resort",
+        "website": "https://www.big4.com.au/caravan-parks/qld/tropical-north/ingenia-holidays-cairns-coconut",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/zgrk2tib/_dsc6067cabinchange_1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.04,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

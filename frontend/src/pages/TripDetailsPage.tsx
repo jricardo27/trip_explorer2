@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { Box, CircularProgress, Typography, Alert, Paper, Grid, Button, IconButton } from "@mui/material"
-import { Add as AddIcon } from "@mui/icons-material"
+import { Add as AddIcon, Close as CloseIcon } from "@mui/icons-material"
 import {
   DndContext,
   closestCorners,
@@ -18,8 +18,10 @@ import dayjs from "dayjs"
 import { useTripDetails } from "../hooks/useTripDetails"
 import type { Activity } from "../types"
 import ActivityDialog from "../components/ActivityDialog"
+import AnimationConfigDialog from "../components/AnimationConfigDialog"
 import { SortableActivityCard } from "../components/SortableActivityCard"
 import { TransportSegment } from "../components/Transport/TransportSegment"
+import TripMap from "../components/TripMap"
 import { useSettingsStore } from "../stores/settingsStore"
 
 const DroppableDay = ({ dayId, children }: { dayId: string; children: React.ReactNode }) => {
@@ -45,6 +47,7 @@ const DroppableDay = ({ dayId, children }: { dayId: string; children: React.Reac
 
 const TripDetailsPage = () => {
   const { tripId } = useParams<{ tripId: string }>()
+  const navigate = useNavigate()
   const { dateFormat } = useSettingsStore()
   const {
     trip,
@@ -57,10 +60,12 @@ const TripDetailsPage = () => {
     deleteActivity,
     isDeleting,
     reorderActivities,
+    createAnimation,
   } = useTripDetails(tripId!)
 
   // Dialog State
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [animationDialogOpen, setAnimationDialogOpen] = useState(false)
   const [selectedDayId, setSelectedDayId] = useState<string | undefined>(undefined)
   const [editingActivity, setEditingActivity] = useState<Activity | undefined>(undefined)
 
@@ -91,6 +96,7 @@ const TripDetailsPage = () => {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmitActivity = async (data: any) => {
     if (data.id) {
       await updateActivity({ id: data.id, data })
@@ -98,11 +104,41 @@ const TripDetailsPage = () => {
       await createActivity({
         ...data,
         tripId: tripId!, // Ensure tripId is passed
-        tripDayId: selectedDayId, // Ensure dayId is passed if selected
+        // Only override tripDayId if it wasn't already set by the dialog's smart assignment
+        tripDayId: data.tripDayId || selectedDayId,
       })
     }
     setDialogOpen(false)
     setEditingActivity(undefined)
+  }
+
+  const handleMapContextMenu = (latLng: { lat: number; lng: number }) => {
+    setEditingActivity({
+      latitude: latLng.lat,
+      longitude: latLng.lng,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any) // Use cast to populate partial data for creation
+    setDialogOpen(true)
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleMarkerContextMenu = (feature: any) => {
+    const properties = feature.properties
+    setEditingActivity({
+      name: properties.name || properties.title || properties.label || "New Activity",
+      latitude: feature.geometry.coordinates[1],
+      longitude: feature.geometry.coordinates[0],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
+    setDialogOpen(true)
+  }
+
+  // Fly To Handler
+  const [flyToLocation, setFlyToLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const handleFlyTo = (activity: Activity) => {
+    if (activity.latitude && activity.longitude) {
+      setFlyToLocation({ lat: activity.latitude, lng: activity.longitude })
+    }
   }
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -200,16 +236,20 @@ const TripDetailsPage = () => {
         const destDate = dayjs(overDay.date)
         const diffMs = destDate.diff(sourceDate)
 
-        const newStart = movedItem.scheduledStart ? dayjs(movedItem.scheduledStart).add(diffMs, 'ms').toISOString() : undefined
-        const newEnd = movedItem.scheduledEnd ? dayjs(movedItem.scheduledEnd).add(diffMs, 'ms').toISOString() : undefined
+        const newStart = movedItem.scheduledStart
+          ? dayjs(movedItem.scheduledStart).add(diffMs, "ms").toISOString()
+          : undefined
+        const newEnd = movedItem.scheduledEnd
+          ? dayjs(movedItem.scheduledEnd).add(diffMs, "ms").toISOString()
+          : undefined
 
         // Fire and forget update (or await if critical, but reorder is separate)
         updateActivity({
           id: movedItem.id,
           data: {
             scheduledStart: newStart,
-            scheduledEnd: newEnd
-          }
+            scheduledEnd: newEnd,
+          },
         })
       }
     }
@@ -231,6 +271,7 @@ const TripDetailsPage = () => {
   if (error || !trip) {
     return (
       <Alert severity="error" sx={{ mt: 2 }}>
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         Failed to load trip: {(error as any)?.message || "Unknown error"}
       </Alert>
     )
@@ -240,31 +281,55 @@ const TripDetailsPage = () => {
     <Box>
       <Paper
         elevation={0}
-        sx={{ p: 3, mb: 3, bgcolor: "#f5f5f5", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+        sx={{ p: 1.5, mb: 1, bgcolor: "#f5f5f5", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 2 }}
       >
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            {trip.name}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            {new Date(trip.startDate).toLocaleDateString(dateFormat)} -{" "}
-            {new Date(trip.endDate).toLocaleDateString(dateFormat)}
-          </Typography>
-          {trip.budget && (
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              Budget: {trip.defaultCurrency} {trip.budget}
-            </Typography>
-          )}
+        <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
+          <Button startIcon={<CloseIcon />} onClick={() => navigate("/trips")} color="inherit" size="small" sx={{ minWidth: "auto" }}>
+            Close
+          </Button>
+          <Box>
+            <Box display="flex" alignItems="baseline" gap={2}>
+              <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                {trip.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {new Date(trip.startDate).toLocaleDateString(dateFormat)} -{" "}
+                {new Date(trip.endDate).toLocaleDateString(dateFormat)}
+              </Typography>
+            </Box>
+            {trip.budget && (
+              <Typography variant="caption" color="text.secondary">
+                Budget: {trip.defaultCurrency} {trip.budget}
+              </Typography>
+            )}
+          </Box>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleAddActivity()}>
-          Add Activity
-        </Button>
+
+        <Box display="flex" gap={1}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleAddActivity()} size="small">
+            Add Activity
+          </Button>
+          <Button variant="outlined" onClick={() => setAnimationDialogOpen(true)} size="small">
+            Animation
+          </Button>
+        </Box>
       </Paper>
+
+      {trip && (
+        <TripMap
+          activities={trip.activities}
+          selectedActivityId={editingActivity?.id}
+          animations={trip.animations}
+          onMapContextMenu={handleMapContextMenu}
+          onMarkerContextMenu={handleMarkerContextMenu}
+          activeFlyToLocation={flyToLocation}
+        />
+      )}
 
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
         <Grid container spacing={2}>
           {trip.days?.map((day) => (
-            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={day.id}>
+            <Grid key={day.id} size={{ xs: 12, md: 6, lg: 4 }}>
               <Paper sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                   <Box>
@@ -298,7 +363,7 @@ const TripDetailsPage = () => {
 
                         // Check for cross-day transport (next activity is first of next day)
                         if (!nextActivity) {
-                          const currentDayIndex = trip.days?.findIndex(d => d.id === day.id) ?? -1
+                          const currentDayIndex = trip.days?.findIndex((d) => d.id === day.id) ?? -1
                           if (currentDayIndex !== -1 && trip.days && currentDayIndex < trip.days.length - 1) {
                             const nextDay = trip.days[currentDayIndex + 1]
                             if (nextDay.activities && nextDay.activities.length > 0) {
@@ -307,7 +372,10 @@ const TripDetailsPage = () => {
                           }
                         }
 
-                        const transportOptions = trip.transport?.filter(t => t.fromActivityId === activity.id && t.toActivityId === nextActivity?.id) || []
+                        const transportOptions =
+                          trip.transport?.filter(
+                            (t) => t.fromActivityId === activity.id && t.toActivityId === nextActivity?.id,
+                          ) || []
 
                         return (
                           <div key={activity.id}>
@@ -316,6 +384,7 @@ const TripDetailsPage = () => {
                               onDelete={handleDeleteActivity}
                               onEdit={handleEditActivity}
                               isDeleting={isDeleting}
+                              onFlyTo={handleFlyTo}
                             />
                             {nextActivity && (
                               <TransportSegment
@@ -349,6 +418,15 @@ const TripDetailsPage = () => {
           tripStartDate={trip.startDate}
           tripEndDate={trip.endDate}
           tripDays={trip.days}
+        />
+      )}
+
+      {trip && (
+        <AnimationConfigDialog
+          open={animationDialogOpen}
+          onClose={() => setAnimationDialogOpen(false)}
+          trip={trip}
+          onSubmit={createAnimation}
         />
       )}
     </Box>

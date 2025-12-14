@@ -120,7 +120,9 @@ export const activityApi = {
     await apiClient.delete(`/trips/${tripId}/activities/${activityId}`)
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getConflicts: async (tripId: string): Promise<any[]> => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await apiClient.get<ApiResponse<any[]>>(`/trips/${tripId}/activities/conflicts`)
     return response.data.data
   },

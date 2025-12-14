@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { Paper, Box, Typography, IconButton } from "@mui/material"
-import { Delete as DeleteIcon, Edit as EditIcon, DragIndicator } from "@mui/icons-material"
+import { Delete as DeleteIcon, Edit as EditIcon, DragIndicator, NearMe } from "@mui/icons-material"
 import type { Activity } from "../types"
 import { useSettingsStore } from "../stores/settingsStore"
 
@@ -10,9 +10,10 @@ interface SortableActivityCardProps {
   onDelete: (id: string) => void
   onEdit: (activity: Activity) => void
   isDeleting?: boolean
+  onFlyTo?: (activity: Activity) => void
 }
 
-export const SortableActivityCard = ({ activity, onDelete, onEdit, isDeleting }: SortableActivityCardProps) => {
+export const SortableActivityCard = ({ activity, onDelete, onEdit, isDeleting, onFlyTo }: SortableActivityCardProps) => {
   const { dateFormat } = useSettingsStore()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: activity.id })
 
@@ -64,6 +65,11 @@ export const SortableActivityCard = ({ activity, onDelete, onEdit, isDeleting }:
         </Typography>
       </Box>
       <Box>
+        {activity.latitude && activity.longitude && (
+          <IconButton size="small" onClick={() => onFlyTo && onFlyTo(activity)} sx={{ mr: 0.5 }} color="primary" title="Fly to location">
+            <NearMe fontSize="small" />
+          </IconButton>
+        )}
         <IconButton size="small" onClick={() => onEdit(activity)} sx={{ mr: 0.5 }}>
           <EditIcon fontSize="small" />
         </IconButton>

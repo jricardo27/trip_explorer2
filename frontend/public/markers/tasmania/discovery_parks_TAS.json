@@ -1,0 +1,212 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.discoveryholidayparks.com.au",
+    "style": {
+      "layerName": "Discovery Parks",
+      "color": "red"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [146.375, -41.17190170288086]
+      },
+      "properties": {
+        "id": "TDEV",
+        "name": "Devonport - Discovery Parks",
+        "area": "North West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/TDEV",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a33d656a-3e3c-4c38-b97f-ffd114474a8c/25098_over_view_of_devonport_discovery_park_jpg_copy.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8e4efd5c-d258-488a-8ebc-b4c61f8eaecb/14743_cabin-5-103.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/797ae724-f344-4b0e-9033-78d2a5b5cd33/14742_dp-732.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1a1e1807-6232-41f6-ac07-3ff1f1ac8c15/25099_discovery_park_devonport_playgound_hdr20200210_1130100.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e4ef58db-f876-4e19-8658-60397a195cab/14740_s1688-885-pano.png",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [147.07127380371094, -41.502872467041016]
+      },
+      "properties": {
+        "id": "TLAU",
+        "name": "Hadspen - Discovery Parks",
+        "area": "Launceston and North",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/TLAU",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f90615a0-b967-4e4f-b7c3-d49015f3dc60/17335_hadspen_aerials_007.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4b132668-071e-409a-b6f9-88a1ec7f6e07/17339_had-1146.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4c9dd022-67c8-47ae-93bf-cdf479aab006/17336_hadspen_playgrnd_004.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8695be5c-b051-4783-bcf8-1d219cc89340/14738_s1691-117-hdr.png",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [145.93783569335938, -41.58018112182617]
+      },
+      "properties": {
+        "id": "TCRA",
+        "name": "Cradle Mountain - Discovery Parks",
+        "area": "North West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/TCRA",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/018c0f59-dd04-4119-9ecf-b336f9152aef/14730_s1690-750.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/12f99142-0408-4589-b48e-ff761ac4bb91/14729_cm-695-2.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e891a96d-50cf-4fc5-a40b-a7634f390f54/17348_cradle_recept-entry_004.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d2c17c17-834f-4d5c-b4e6-9c7c7a5c47fa/14732_s1690-379.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8cbdac9e-128b-4a5e-807e-f16bf67c63a3/17345_cm-475-hdr.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/02844423-ff29-4838-9109-e55fb202c6a1/14731_cm-516-hdr.png",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [147.33689880371094, -42.8135986328125]
+      },
+      "properties": {
+        "id": "THOB",
+        "name": "Hobart - Discovery Parks",
+        "area": "Hobart and South",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/THOB",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/bf363529-522b-4ef9-bc7a-6a45bd75c339/14240_hob-1470-pano.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/57edee43-a4b4-45af-90f5-5ee1948ff969/14239_hob-345-hdr.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/aa622e48-c2e8-48aa-b69d-7988bf86790e/14241_cabin-33-657.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ff849c91-4c39-4427-b4f3-bb793b7595f9/17733_s1689-814.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ca8ae213-9f17-46c0-8682-6c275812579f/14242_hob-265.png",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [147.3971710205078, -42.855838775634766]
+      },
+      "properties": {
+        "id": "TMOR",
+        "name": "Mornington Hobart - Discovery Parks",
+        "area": "Hobart and South",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/TMOR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/14b31fc9-d5e4-4416-a9c8-d4d2a3b6cdbc/17740_mornington_aerial_001.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d7e8d199-5c34-4669-a7ba-27bfed56df2b/17742_mornington_bbq_006.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/96777e8f-8af7-4417-9ce9-3a2afa759843/17739_mornington_play_grdn_010.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9edd65b7-538a-4dc2-a2a7-8e71d28bba6c/17741_mornington_gen_008.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/69f35383-32af-4529-b2aa-b6a0b70a384f/5671_park_landing_heros_mornington.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

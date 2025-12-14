@@ -1,0 +1,1622 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.big4.com.au",
+    "style": {
+      "layerName": "Big4 Holiday Parks",
+      "color": "magenta"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["147.637777", "-37.824608"]
+      },
+      "properties": {
+        "id": "759",
+        "name": "NRMA Bairnsdale Riverside Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/nrma-bairnsdale-riverside-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/vmwh0lwd/bdale-1-park_aerial-no_people-nil-cold-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.82,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.620650", "-38.671668"]
+      },
+      "properties": {
+        "id": "796",
+        "name": "Ingenia Holidays Cape Paterson",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/ingenia-holidays-cape-paterson",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/aqseq325/aerial1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.8,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.740916", "-38.634354"]
+      },
+      "properties": {
+        "id": "834",
+        "name": "Ingenia Holidays Inverloch Foreshore",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/ingenia-holidays-inverloch-foreshore",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/051fezej/017_open2view_id810939-the_espalande_inverloch_2.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.06,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.001203", "-37.875605"]
+      },
+      "properties": {
+        "id": "250",
+        "name": "BIG4 Whiters Holiday Village - Lakes Entrance",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/whiters-holiday-village",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/fnvjr4vg/carts1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.94,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.013711", "-37.873959"]
+      },
+      "properties": {
+        "id": "794",
+        "name": "NRMA Eastern Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/nrma-eastern-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/4xghht5u/aerial.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.7,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.451668", "-38.697885"]
+      },
+      "properties": {
+        "id": "846",
+        "name": "Long Jetty Caravan Park - Port Welshpool",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/long-jetty-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/vf3pkefw/long-jetty-1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.34,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.266634", "-38.811617"]
+      },
+      "properties": {
+        "id": "840",
+        "name": "BIG4 Wilsons Prom Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/wilsons-prom-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/i3bfemkw/346066394_1719569108502859_2226313361113480038_n.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.82,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.579422", "-38.600222"]
+      },
+      "properties": {
+        "id": "844",
+        "name": "Wonthaggi Park Lane Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/wonthaggi-park-lane-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/akybgh5f/snapinstaapp_436278195_1003976587753295_5304727439929123684_n_1080.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.56,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.872000", "-37.571995"]
+      },
+      "properties": {
+        "id": "140",
+        "name": "NRMA Ballarat Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/goldfields/nrma-ballarat-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/uzgfu1ki/blrt-1-pool-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.32,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.956830", "-37.572170"]
+      },
+      "properties": {
+        "id": "772",
+        "name": "Kryal Castle Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/goldfields/kryal-castle-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/0vvfmwdt/archery-adventure-section-photo-1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 6.58,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.313510", "-36.726740"]
+      },
+      "properties": {
+        "id": "137",
+        "name": "BIG4 Tasman Holiday Parks - Bendigo",
+        "website": "https://www.big4.com.au/caravan-parks/vic/goldfields/tasman-holiday-parks-bendigo",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/4rlbjiam/bdas-1-playground-kids-playing-nil-male.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.24,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.127700", "-36.732587"]
+      },
+      "properties": {
+        "id": "561",
+        "name": "BIG4 Bendigo Marong",
+        "website": "https://www.big4.com.au/caravan-parks/vic/goldfields/big4-bendigo-marong-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/clbhgs25/bm22-2484.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.54,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.213300", "-37.055000"]
+      },
+      "properties": {
+        "id": "536",
+        "name": "BIG4 Castlemaine Gardens Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/goldfields/castlemaine-gardens-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/bhmoowca/big4_container_dawn-2-cropped_1.jpeg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.88,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.181417", "-38.409224"]
+      },
+      "properties": {
+        "id": "358",
+        "name": "BIG4 Anglesea Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/anglesea-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/xjbb1ef0/ang-2-pool-no_people-nil-nil-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.34,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.565144", "-38.237906"]
+      },
+      "properties": {
+        "id": "523",
+        "name": "BIG4 Bellarine Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/bellarine-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/f1hn2xs4/bel-4-playground-kids-playing-warm-mixed_group.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.3,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.116675", "-38.235695"]
+      },
+      "properties": {
+        "id": "854",
+        "name": "Lakes and Craters Holiday Park - Camperdown",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/lakes-and-craters-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/gceoaqdq/jmp0071-820x520.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.94,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.512838", "-38.829162"]
+      },
+      "properties": {
+        "id": "855",
+        "name": "Bimbi Park - Cape Otway",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/bimbi-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/jjlpqyb0/koala.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.32,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.341454", "-38.159352"]
+      },
+      "properties": {
+        "id": "819",
+        "name": "Tasman Holiday Parks - Geelong",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/tasman-holiday-parks-geelong",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/1bbpldm1/447261017.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.995520", "-38.618101"]
+      },
+      "properties": {
+        "id": "699",
+        "name": "NRMA Port Campbell Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/nrma-port-campbell-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/5heb2sxi/ptcmbl-1-beach-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.5,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.230613", "-38.374585"]
+      },
+      "properties": {
+        "id": "136",
+        "name": "BIG4 Port Fairy Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/port-fairy-anchorage-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/pqhi2hnm/ptf-1-beach-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.48,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["141.606921", "-38.337948"]
+      },
+      "properties": {
+        "id": "701",
+        "name": "NRMA Portland Bay Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/nrma-portland-bay-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/3jshuhdr/ptld-1-park_aerial-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.1,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["141.705066", "-38.257459"]
+      },
+      "properties": {
+        "id": "789",
+        "name": "BIG4 Narrawong Island Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/narrawong-island-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/1axlkf3v/narrawong-holiday-park-drone-images04.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.3,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.569662", "-38.399896"]
+      },
+      "properties": {
+        "id": "553",
+        "name": "NRMA Warrnambool Riverside Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/nrma-warrnambool-riverside-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/wrypxg2i/wr-1-sunset-no_people-nil-night-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.46,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.490858", "-38.384731"]
+      },
+      "properties": {
+        "id": "717",
+        "name": "BIG4 Tasman Holiday Parks - Warrnambool",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/tasman-holiday-parks-warrnambool",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/lyop4i2c/apostles.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.28,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.890218", "-38.635063"]
+      },
+      "properties": {
+        "id": "382",
+        "name": "BIG4 Wye River Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/wye-river-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/4inifcfo/1ep-40-greatest-camping-11.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.130700", "-37.030501"]
+      },
+      "properties": {
+        "id": "698",
+        "name": "BIG4 Seymour Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/daylesford-macedon-ranges/seymour-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/bwgltgip/sey-1-outdoors-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.66,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.210000", "-38.038000"]
+      },
+      "properties": {
+        "id": "241",
+        "name": "BIG4 Dandenong Tourist Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/greater-melbourne/dandenong-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/pbmbcrlm/dan-1-park_-cabins-no_people-nil-night-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.22,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.985016", "-37.722847"]
+      },
+      "properties": {
+        "id": "204",
+        "name": "BIG4 Melbourne Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/greater-melbourne/melbourne-big4-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/og3fxyzs/mel-1-park_aerial-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.58,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.177520", "-37.750220"]
+      },
+      "properties": {
+        "id": "876",
+        "name": "Crystal Brook Tourist Park - Melbourne",
+        "website": "https://www.big4.com.au/caravan-parks/vic/greater-melbourne/crystal-brook-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/4wnhh5wa/powered-site.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.98,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.141360", "-38.174253"]
+      },
+      "properties": {
+        "id": "177",
+        "name": "BIG4 Mornington Peninsula Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/mornington-peninsula/mornington-peninsula-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ncujbaep/mpen-1-beach-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.76,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.357300", "-38.516886"]
+      },
+      "properties": {
+        "id": "395",
+        "name": "BIG4 Ingenia Holidays Phillip Island",
+        "website": "https://www.big4.com.au/caravan-parks/vic/phillip-island/ingenia-holidays-phillip-island",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/gkijzn5p/ihp_website_phillip-island_1700x450.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.14,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.227328", "-38.451246"]
+      },
+      "properties": {
+        "id": "792",
+        "name": "NRMA Phillip Island Beachfront Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/phillip-island/nrma-phillip-island-beachfront-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ayzbzxjo/725x420_visit_victoria-phillip-island.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.62,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.261039", "-38.486075"]
+      },
+      "properties": {
+        "id": "843",
+        "name": "Phillip Island Park Lane Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/phillip-island/phillip-island-park-lane-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/rxhj51j1/plpi-caravanpark-6.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.64,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.538685", "-37.128748"]
+      },
+      "properties": {
+        "id": "804",
+        "name": "Breeze Holiday Parks - Grampians",
+        "website": "https://www.big4.com.au/caravan-parks/vic/grampians/breeze-holiday-parks-grampians",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/zhhl3555/129822.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.12,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.524944", "-37.127584"]
+      },
+      "properties": {
+        "id": "216",
+        "name": "NRMA Halls Gap Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/grampians/nrma-halls-gap-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/x1bbph04/nhalls-1-mountain-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.78,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.518485", "-37.141177"]
+      },
+      "properties": {
+        "id": "749",
+        "name": "Breeze Holiday Parks - Halls Gap",
+        "website": "https://www.big4.com.au/caravan-parks/vic/grampians/breeze-holiday-parks-halls-gap",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/dqrjjvgy/bhalls-1-facilities-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.3,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.743320", "-36.116320"]
+      },
+      "properties": {
+        "id": "786",
+        "name": "NRMA Echuca Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/nrma-echuca-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/k1zj2d1n/couple-walking.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.66,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.710743", "-37.317819"]
+      },
+      "properties": {
+        "id": "255",
+        "name": "BIG4 Taggerty Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/victorias-high-country/taggerty-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/f4qpv4o5/taggerty23-294.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.06,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.347364", "-36.329442"]
+      },
+      "properties": {
+        "id": "211",
+        "name": "BIG4 Wangaratta North Cedars Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/victorias-high-country/wangaratta-north-cedars-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/g2gcvmqr/z-old-park-photo.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.18,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.451591", "-35.942905"]
+      },
+      "properties": {
+        "id": "842",
+        "name": "Torrumbarry Weir Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/torrumbarry-weir-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/t1jjifex/dji_0216.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.94,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.135355", "-35.642302"]
+      },
+      "properties": {
+        "id": "871",
+        "name": "Koondrook Glamping Retreat",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/koondrook-glamping-retreat",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/j4pdrx1b/20240112-20240112-dji_0820.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.62,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.136498", "-34.208192"]
+      },
+      "properties": {
+        "id": "206",
+        "name": "BIG4 Mildura Getaway Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/mildura-getaway-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ox3ffufb/pool-photo-2.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.6,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.186810", "-34.297383"]
+      },
+      "properties": {
+        "id": "860",
+        "name": "BIG4 Red Cliffs",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/red-cliffs",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/tp2j4cby/redcliffs24-395.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.44,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["142.124443", "-34.175803"]
+      },
+      "properties": {
+        "id": "181",
+        "name": "NRMA Mildura Riverside Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/nrma-mildura-riverside-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/o11corv5/1154x922_0008_dji_0065.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.36,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.447135", "-36.393439"]
+      },
+      "properties": {
+        "id": "841",
+        "name": "Shepparton Holiday Park and Village",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/shepparton-holiday-park-and-village",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/c52cn03c/19467643_1227669267362762_1861731397029495552_o.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.56,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.563499", "-35.339800"]
+      },
+      "properties": {
+        "id": "544",
+        "name": "BIG4 Riverside Swan Hill",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/riverside-swanhill-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/m0kho13u/070861-dsc_0436.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.7,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.964960", "-36.728130"]
+      },
+      "properties": {
+        "id": "777",
+        "name": "NRMA Bright Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/victorias-high-country/nrma-bright-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/p3zdzmkt/bri_inventory_unpowered_site_01-1200x800-5b2df79_1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.1,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.869866", "-37.251349"]
+      },
+      "properties": {
+        "id": "750",
+        "name": "BIG4 Breeze Holiday Parks - Eildon",
+        "website": "https://www.big4.com.au/caravan-parks/vic/victorias-high-country/breeze-holiday-parks-eildon",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/oknbnipb/eildon-riverside-scenic-0001.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.22,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.457320", "-36.055230"]
+      },
+      "properties": {
+        "id": "873",
+        "name": "BIG4 Rutherglen Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/victorias-high-country/rutherglen-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/eeld2jel/img_3913.jpeg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.36,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.623900", "-38.271598"]
+      },
+      "properties": {
+        "id": "147",
+        "name": "BIG4 Ingenia Holidays Queenscliff Beacon",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/ingenia-holidays-queenscliff-beacon",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/bqfkk2np/big4-beacon-resort-gas-firepit.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.86,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.536142", "-35.819470"]
+      },
+      "properties": {
+        "id": "784",
+        "name": "Ingenia Holidays Murray Bend",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/ingenia-holidays-murray-bend",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ibzntkth/murray-view-6-deck.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.12,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.316708", "-38.327547"]
+      },
+      "properties": {
+        "id": "799",
+        "name": "BIG4 Ingenia Holidays Torquay",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/ingenia-holidays-torquay",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/qm0l33gu/ihp_website_torquay_1700x450.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.4,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.965194", "-36.725625"]
+      },
+      "properties": {
+        "id": "135",
+        "name": "BIG4 Tasman Holiday Parks - Bright",
+        "website": "https://www.big4.com.au/caravan-parks/vic/victorias-high-country/tasman-holiday-parks-bright",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/p2ale5xu/thp_bright_dogs.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.06,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.347036", "-36.770023"]
+      },
+      "properties": {
+        "id": "686",
+        "name": "BIG4 Bendigo Park Lane Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/goldfields/big4-bendigo-park-lane-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/050hsarm/ben-684-copy.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.84,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.890833", "-36.680070"]
+      },
+      "properties": {
+        "id": "221",
+        "name": "BIG4 Porepunkah Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/victorias-high-country/porepunkah-mill-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/1okfzov2/por-5-outdoors-group-physical_activity-warm-mixed_group.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.2,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.856672", "-36.109842"]
+      },
+      "properties": {
+        "id": "150",
+        "name": "Borderland Wodonga Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/borderland-wodonga",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/rkcjpiic/big4-borderland-wodonga.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.44,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["147.997137", "-37.878315"]
+      },
+      "properties": {
+        "id": "246",
+        "name": "Waters Edge Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/waters-edge-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/vcflrtzq/lakes-entrance.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 6.24,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.782669", "-37.540044"]
+      },
+      "properties": {
+        "id": "130",
+        "name": "BIG4 Ballarat Windmill Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/goldfields/ballarat-windmill-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/suxds3dq/ballarat-windmill-528.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.551617", "-35.324154"]
+      },
+      "properties": {
+        "id": "454",
+        "name": "BIG4 Swan Hill",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/swan-hill-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/5lcc4mnz/swanhill24-2221.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.74,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.740482", "-38.633544"]
+      },
+      "properties": {
+        "id": "464",
+        "name": "BIG4 Ingenia Holidays Inverloch",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/ingenia-holidays-inverloch",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/iptnzbjq/ihp_website_inverloch_1700x450.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.8,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.914044", "-35.737226"]
+      },
+      "properties": {
+        "id": "782",
+        "name": "BIG4 Kerang Riverfront Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/kerang-riverfront-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ingcjb0e/kerang24-518.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.12,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.546000", "-37.682600"]
+      },
+      "properties": {
+        "id": "406",
+        "name": "BIG4 Yarra Valley Park Lane Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/yarra-valley-dandenong-ranges/yarra-valley-park-lane-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/rytci1p4/dsc02180-sm.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.92,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.390183", "-36.424690"]
+      },
+      "properties": {
+        "id": "490",
+        "name": "BIG4 Shepparton Park Lane Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/shepparton-park-lane-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/j3npvo3v/sh-392-hdr.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.18,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.385758", "-35.856055"]
+      },
+      "properties": {
+        "id": "901",
+        "name": "Murray River Hideaway Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/murray/murray-river-hideaway-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/mu4hcim4/431733635_1800766470387320_557173833471947701_n.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 10,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.97074", "-36.73071"]
+      },
+      "properties": {
+        "id": "885",
+        "name": "Tasman Holiday Parks - South Bright",
+        "website": "https://www.big4.com.au/caravan-parks/vic/victorias-high-country/tasman-holiday-parks-south-bright",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ytmhjw4z/thp_south-bright_facilities-14.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.32,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.478513", "-38.215285"]
+      },
+      "properties": {
+        "id": "687",
+        "name": "BIG4 Traralgon Park Lane Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/gippsland/big4-traralgon-park-lane-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/dokhsuqw/highropesandminigolf-19.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.46,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.106889", "-38.457610"]
+      },
+      "properties": {
+        "id": "746",
+        "name": "BIG4 Aireys Inlet",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/aireys-inlet-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/d2lb3gkd/ai-286.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.44,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["144.139264", "-37.358213"]
+      },
+      "properties": {
+        "id": "853",
+        "name": "Daylesford Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/daylesford-macedon-ranges/daylesford-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/yebjeany/19-pine-villa-1200px-10.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.6,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["143.676217", "-38.740411"]
+      },
+      "properties": {
+        "id": "539",
+        "name": "BIG4 Apollo Bay Pisces Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/vic/great-ocean-road/apollo-bay-pisces",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/rcedy1ot/apollobay-2610.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.46,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.414067", "-36.762576"]
+      },
+      "properties": {
+        "id": "870",
+        "name": "Valley View Caravan Park - King Valley",
+        "website": "https://www.big4.com.au/caravan-parks/vic/victorias-high-country/valley-view-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/s5cn014a/powered-sites-6.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.64,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

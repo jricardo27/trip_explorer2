@@ -1,0 +1,854 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://wikicamps.com.au/",
+    "style": {
+      "layerName": "Accommodation in ACT",
+      "icon": "md/MdHotel",
+      "color": "blue"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.106387", "-35.256709"]
+      },
+      "properties": {
+        "id": 43634,
+        "name": "Alivio Tourist Park Canberra",
+        "type": "Accommodation",
+        "operatorName": "Alivio Tourist Park Canberra",
+        "GroupName": "Caravan Parks & Camping",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-primary-677e06e2-b611-4ca0-85f6-d14d27c6fc21.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraf.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberrag.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberrac.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberra-std-0ac73927-3b76-4370-90ac-b19c4a911806.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-094f180f-f04b-41fb-918e-1111bbc73d3a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-2e6a61e2-e5ce-4da9-8133-5f6f1f145278.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-c16e93fa-01db-4584-a314-f6664be75616.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-6dbb83a9-540b-4bfe-8b41-26f5ba0487f2.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-83d1bc5e-7a63-42f0-a107-f66dc248c40c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-ea2c6930-0d56-436b-81e6-77434ed82bde.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-2a2dfd27-af96-486d-a08b-f66eb160b89a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-f0b1ca56-0bfe-49e2-a156-249e90a30712.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-1ada3e62-1819-419d-9511-a7f99fa0c953.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-a3481f64-de64-4a5f-87e2-8f108cf9b2aa.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-d9189062-9a4c-4d96-a1aa-52bbb6b970d1.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-d2b6cfc4-90f1-430b-8748-0159346f0e6a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-bb4e09d0-7fed-4b4e-80c1-cbd77b026d6c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-c72b751f-a10b-49b7-9705-5c3d5449dcbd.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-03ed217e-9831-4ad5-9ca1-b87718820a8b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-a4c12194-8756-4d33-bc41-f02f4fbc6489.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-8345cb1f-f270-4251-9715-a2d120426d2f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-7d8b3f10-de30-4898-a073-914e2b2ac3ee.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-7df65d93-bcaa-4ccb-a1e8-bc8da49be25f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-5ca5a7cd-ec6e-489f-9dfa-370cfc7cbf08.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-4f7f2a15-de5e-45d9-a0d0-d3c785325124.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-1351e768-945c-41d2-ae19-ae62d893a17a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-5b78a4cb-e55c-46c0-b324-c0d951edecd0.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-a310843c-960c-41be-8707-c1067b8ed846.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-d1d889ed-4222-42ea-b115-653287af0899.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-5fc37565-b667-4044-8e8d-a69c56ed65d2.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-505cf266-ff08-419c-a2a2-b638a8bb4a92.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-89eff103-793a-4e02-a437-59536f61d0ab.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/canberraalivio-std-c12083a9-cffc-4010-b66c-fc982de4a681.jpg"
+        ],
+        "CheckInTime": "1400",
+        "CheckOutTime": "1000",
+        "description": "Alivio Tourist Park Canberra is more than just accommodation - it&rsquo;s a self contained holiday village, offering a variety of accommodation styles to suit all budgets and personal requirements. On site ...",
+        "email": "reservations@aliviogroup.com.au",
+        "address": "20 Kunzea Street, O\u2019Connor ACT 2602",
+        "town": "Canberra",
+        "state": "ACT",
+        "tarif": {
+          "min": "39",
+          "max": "550"
+        },
+        "website": "aliviogroup.com.au",
+        "hours": "Reception hours: 7am to 10.30pm. Check in after 10.30pm by arrangement only",
+        "pointofdifference": "Set in bushland and located only 4km from the city centre and most major attractions and sporting venues, Alivio Tourist Park Canberra is an ideal location to base your stay whilst visiting the Nation..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["0", "0"]
+      },
+      "properties": {
+        "id": 80125,
+        "name": "Leumeah Lodge",
+        "type": "Accommodation",
+        "operatorName": "Leumeah Lodge",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/528388a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/528388-std-2467d20c-a8f0-48d3-895a-e1d690de6e9f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/528388-std-267f935c-01ee-4c45-9738-d33ca62ab894.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/528388-std-65a3a154-9b6c-4344-89d0-0942887f382a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/528388-std-16f745c4-234b-4ef0-a140-e3c9623888ff.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/528388-std-520548f7-2acf-43f8-b562-55daa64818f9.jpg"
+        ],
+        "CheckInTime": "14:00",
+        "CheckOutTime": "10:00",
+        "description": "Leumeah Lodge is one of Canberra&#039;s newest accommodation properties, located in the bustling precinct of Gold Creek, just off the Barton Highway. There are a range of room types and rates to suit the b...",
+        "email": "leumeah.lodge@ymca.org.au",
+        "address": "48 O'hanlon Place Nicholls ACT",
+        "town": "Nicholls",
+        "state": "ACT",
+        "tarif": {
+          "min": "125",
+          "max": "200"
+        },
+        "website": "www.leumeahlodge.com.au",
+        "hours": "Monday - Friday 9am - 5pm  Saturday & Sunday - Various Hours, please confirm directly",
+        "pointofdifference": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.134836", "-35.282623"]
+      },
+      "properties": {
+        "id": 32889,
+        "name": "Crowne Plaza Canberra",
+        "type": "Accommodation",
+        "operatorName": "Crowne Plaza Canberra",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-primary-eee502b3-b33a-47a9-b030-9d77c8b34a0b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marlandd.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marlande.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-be56fad8-a2a6-46e3-a9d6-f8d7b63825b9.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-7217eb71-0de3-4346-b4cd-ac5eb45af9f2.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-a16fec8f-9fc5-453c-838b-1e5425df285f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-fe6642a8-b65d-4bdc-803f-608719fa7ec1.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-248f049e-65d3-411e-bda3-dc9cba694367.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-cc90f6d9-7d99-4abd-ad7b-78a3a70c68c6.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-b78812b8-acbd-4b7e-aa45-8d783f1707a0.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-8908de25-6b6b-40b8-85fa-308bc0d71025.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-837ae151-d902-4846-b877-35e37d5b087b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-301bf211-ad8d-4214-af7b-876c1bfac21f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-70d1f45e-d72d-4a12-8d62-5afefacc5978.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-548359fc-39ff-495b-8ca6-84f5e15431a4.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-dea6ae9a-4e6f-4b80-aa92-7684a1a65160.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-589c8a3b-9813-458c-887f-e3973eb0ada4.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-95a0b813-4011-4984-8c33-f2e82d6902e1.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-04c8e91f-75b4-494f-842d-20dad94dfd79.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-a2c8a331-e675-41d1-8643-dddc07142f73.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-e14cb50d-c6cc-49c3-b63c-2dfa66410380.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-bf09027c-6b09-4f3e-8d20-9d780990544c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-6bb63497-4581-4253-b452-55bfe4ef89d9.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-12661bd9-a7e8-4aa7-a29c-ce7f009467cf.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-09ef1e31-824d-4e79-b9e2-92a403be3818.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-345fafa1-16d5-43d7-a352-ee6ed5ab4aa0.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-a3282a41-2b7a-420f-bd52-177c690c5672.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-91b05c74-3d42-49e9-bbda-00a70aa1e429.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-024c4c6f-c720-491b-8c6a-72f421e42a52.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-8db2b916-89ae-4a84-9c5b-10bc6ebbdfe3.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-ec8be905-cb68-4cac-8e32-8ec1d7fd9bcd.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/marland-std-30b1d13a-8356-4457-8954-8fdb4ff6f189.jpg"
+        ],
+        "CheckInTime": "15:00",
+        "CheckOutTime": "11:00",
+        "description": "Our central CBD location is only a 2 minute walk from the National Convention Centre and close to the city&#039;s major shopping centre and lively bars and restaurants. Parliament House is 3km from Crowne ...",
+        "email": "reservations.cbrbs@ihg.com",
+        "address": "1 Binara Street, Canberra ACT 2601, Australia",
+        "town": "Canberra City",
+        "state": "ACT",
+        "tarif": {
+          "min": "175",
+          "max": "400"
+        },
+        "website": "www.crowneplazacanberra.com.au",
+        "hours": "24 Hours",
+        "pointofdifference": "Stay at the Crowne Plaza Canberra hotel overlooking Glebe Park for personalised service in the heart of Canberra."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.145436", "-35.2494366"]
+      },
+      "properties": {
+        "id": 96526,
+        "name": "Canberra Parklands Central Apartment Hotel",
+        "type": "Accommodation",
+        "operatorName": "Canberra Parklands Central Apartment Hotel",
+        "GroupName": "Studio/Apartments",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/626270-primary-3f9b6123-1e5f-4ad8-bfdd-2a62d5697666.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/626270-std-00be9769-d082-4c74-b856-4e319dfde67a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/626270-std-5a26f51e-5926-4b7f-a5e1-346907fb6b54.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/626270-std-183d7a0b-2ba5-4257-a9ac-d4df5dfef45f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/626270-std-6255147c-1971-4d93-868c-9676fa6ceac7.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/626270-std-ed77ce04-f1d2-4325-b7b6-3e23d006eb88.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/626270-std-94b827b6-9f52-468c-b075-d7b843282fd7.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/626270-std-7cfd7821-851d-4cac-928e-a451fe867f2d.jpg"
+        ],
+        "CheckInTime": "N/A",
+        "CheckOutTime": "N/A",
+        "description": "Canberra Parklands Central offers premium accommodation in Canberra CBD, perfectly positioned just minutes from the city centre. Our central location puts you steps away from over 40 restaurants and b...",
+        "email": "reservations@canberraparklandscentral.com.au",
+        "address": "6 Hawdon Place, Dickson ACT 2602, Australia",
+        "town": "Dickson",
+        "state": "ACT",
+        "tarif": {
+          "min": 0,
+          "max": 0
+        },
+        "website": "www.canberraparklandscentral.com.au",
+        "hours": "7AM-8:30PM",
+        "pointofdifference": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["151.2074731", "-33.8793252"]
+      },
+      "properties": {
+        "id": 144085,
+        "name": "Merry Heart CBR",
+        "type": "Tours",
+        "operatorName": "Merry Heart CBR",
+        "GroupName": "Tours",
+        "isBookable": true,
+        "images": [],
+        "CheckInTime": "N/A",
+        "CheckOutTime": "N/A",
+        "description": "Merry Heart CBR provides innovative public and private Canberra winery tour experiences and custom itineraries, each offering excellent value-for-money for budget to luxury tours, ranging from six to ...",
+        "email": "reception@merryheartcbr.com.au",
+        "address": "65 Northbourne Ave, Canberra, ACT, 2600, Australia",
+        "town": "Canberra",
+        "state": "ACT",
+        "tarif": {
+          "min": 0,
+          "max": 0
+        },
+        "website": "https://merryheartcbr.com.au/",
+        "hours": "",
+        "pointofdifference": "Relax. Unwind. Be Merry! Enjoy exploring wineries from local Canberra, Lake George and Murrumbateman wineries on a pet-friendly Canberra wineries tour.",
+        "style": {
+          "icon": "md/MdOutlineTour"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.128012", "-35.315587"]
+      },
+      "properties": {
+        "id": 44581,
+        "name": "Forrest Hotel and Apartments",
+        "type": "Accommodation",
+        "operatorName": "Forrest Hotel and Apartments",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/953433a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/953433c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/953433d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/953433b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/953433e.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/953433f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/953433g.jpg"
+        ],
+        "CheckInTime": "14:00",
+        "CheckOutTime": "10:00",
+        "description": "We offer both motel and apartment style accommodation.",
+        "email": "Reservations@forresthotel.com",
+        "address": "30 National Crt, FORREST",
+        "town": "Forrest",
+        "state": "ACT",
+        "tarif": {
+          "min": "99",
+          "max": "300"
+        },
+        "website": "www.forresthotel.com",
+        "hours": "7am - 10pm Monday to Friday.  7.30am - 10pm Saturday and Sunday.",
+        "pointofdifference": "Affordable accommodation in a great location, situated next to the Parliamentary Triangle and close to many major National Attractions. Just a 10 minute walk to Manuka&#039;s cosmopolitan, boutique shoppin..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.1376103", "-35.2513387"]
+      },
+      "properties": {
+        "id": 44604,
+        "name": "Quality Hotel Dickson",
+        "type": "Accommodation",
+        "operatorName": "Quality Hotel Dickson",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/474744-primary-416e966c-f84a-47d4-93c1-c69ac5e3a315.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/474744b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/474744-std-a1eeb49d-569f-4718-add7-566c7a7cd623.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/474744-std-8af0ea0c-3f3a-49d1-bbc8-31768292f689.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/474744-std-539fdc1d-c4ca-4082-a612-734f894a430c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/474744-std-cd0fa9d1-65be-4fdb-b3c6-456f8106254d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/474744-std-6cfd96f8-81bf-4c06-acda-0e39f3af8c8a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/474744-std-6a7b3117-5333-45af-aa3c-087b32848e2d.jpg"
+        ],
+        "CheckInTime": "1400",
+        "CheckOutTime": "1000",
+        "description": "Quality Hotel Dickson features 76 rooms, superbly appointed with tea and coffee facilities, 55inch flat screen TV, air conditioning, broadband wireless internet, 24 hour reception, free underground ca...",
+        "email": "dicksonreservations@thetradies.com.au",
+        "address": "Corner of Cape and Badham Street, Dickson ACT 2602, Australia",
+        "town": "Dickson",
+        "state": "ACT",
+        "tarif": {
+          "min": "158",
+          "max": "410"
+        },
+        "website": "http://www.thetradies.com.au/CMSOnline/portal.aspx",
+        "hours": "24 hours a day 7 days a week",
+        "pointofdifference": "Quality Hotel Dickson is proudly owned and operated by The Tradies Group. Ideally situated in the heart of Canberra&rsquo;s cosmopolitan dining precinct and only minutes from all the iconic attractions of o..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.1259406", "-35.2982601"]
+      },
+      "properties": {
+        "id": 44587,
+        "name": "Hyatt Hotel Canberra",
+        "type": "Accommodation",
+        "operatorName": "Hyatt Hotel Canberra",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/701234a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/701234d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/701234f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/701234c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/701234b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/701234g.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/701234e.jpg"
+        ],
+        "CheckInTime": "15:00",
+        "CheckOutTime": "11:00",
+        "description": "All guests of Hyatt Hotel Canberra enjoy luxurious accommodation with complimentary WiFi internet and access to the Clubhouse Fitness Centre including pool, spa and sauna. Hyatt Hotel Canberra boasts ...",
+        "email": "web.pacific@hyatt.com",
+        "address": "Commonwealth Ave, YARRALUMLA ACT 2600, Australia",
+        "town": "Yarralumla",
+        "state": "ACT",
+        "tarif": {
+          "min": "280",
+          "max": "695"
+        },
+        "website": "www.hyatt.com",
+        "hours": "24 hours a day, 7 days a week",
+        "pointofdifference": "Canberra&#039;s finest five star hotel, Hyatt Hotel Canberra - A Park Hyatt Hotel, is conveniently located a short stroll to the city centre, Parliament House, National Gallery of Australia, National Portr..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.13996869511", "-35.318039913137"]
+      },
+      "properties": {
+        "id": 44603,
+        "name": "Pinnacle Apartments",
+        "type": "Accommodation",
+        "operatorName": "Pinnacle Apartments",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/pinnacleapartments-primary-f3235799-e9fd-4cd5-a9ed-6d25f761e49b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/pinnacleapartments-std-48b3c085-2e1e-48d2-bde2-bf2760267362.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/pinnacleapartments-std-f6470f52-6d47-45aa-b332-66f2d6637751.jpg"
+        ],
+        "CheckInTime": "14.00",
+        "CheckOutTime": "10.00",
+        "description": "N/A",
+        "email": "reservations@pinnacleapartments.com.au",
+        "address": "11 Ovens Street, Kingston ACT 2604, Australia",
+        "town": "Kingston",
+        "state": "ACT",
+        "tarif": {
+          "min": "200",
+          "max": "560"
+        },
+        "website": "www.pinnacleapartments.com.au",
+        "hours": "",
+        "pointofdifference": "Doma Hotels is delighted to offer you the Pinnacle Apartments.  Canberra&#039;s only two, three and four bedroom fully serviced self contained apartments, found nestled in a tree-lined Kingston street."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.9572568", "-35.1713092"]
+      },
+      "properties": {
+        "id": 141514,
+        "name": "Helicopter Corp. Pty Ltd",
+        "type": "Tours",
+        "operatorName": "Helicopter Corp. Pty Ltd",
+        "GroupName": "Tours",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/99369-primary-d2258900-19ee-4a37-9a1d-4e7e506cff16.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/99369-std-34451d59-0a83-4411-be54-e9a567d6ae49.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/99369-std-7d6a062e-f852-4978-ad12-6f09ca5d1c0d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/99369-std-7dc80e44-24cc-487f-b34c-387bf74165a7.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/99369-std-20f0837b-64a4-4ee1-8332-81a6472f0106.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/99369-std-9328049f-4ca3-4898-8c6c-744f9ea9e43c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/99369-std-c8a689ad-6ae1-4915-9784-19b8bf0422b1.jpg"
+        ],
+        "CheckInTime": "N/A",
+        "CheckOutTime": "N/A",
+        "description": "We are a family operated and professional helicopter charter business and flight school. We conduct various scenic flights in the Canberra region and offer flight training services.",
+        "email": "info@helicoptercorp.com.au",
+        "address": "154 Woodgrove Close, Wallaroo NSW 2618, Australia",
+        "town": "Duffy",
+        "state": "ACT",
+        "tarif": {
+          "min": 0,
+          "max": 0
+        },
+        "website": "www.helicoptercorp.com.au",
+        "hours": "09:00am - 17:00pm",
+        "pointofdifference": "We offer scenic flights over the foothills of the Brindabella Mountains and the Murrumbidgee River as well as Canberra City, Lake Burley Griffin, Parliamentary Triangle and the National Monuments.",
+        "style": {
+          "icon": "md/MdOutlineTour"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["151.9736035", "-26.8350243"]
+      },
+      "properties": {
+        "id": 146774,
+        "name": "Yarraman Caravan Park and Cabins",
+        "type": "Accommodation",
+        "operatorName": "Yarraman Caravan Park and Cabins",
+        "GroupName": "Caravan, Camping and Holiday Parks",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/yarraman-primary-9b64dd8c-9c94-46c2-960a-b8cb9d4daed4.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/yarraman-std-14bf97ab-b186-47d4-9341-ff6f1c4c8e3c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/yarraman-std-b35c93c2-0696-49b5-bee2-a5ee6cf70f0a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/yarraman-std-38a316e1-900b-4084-b430-46577d3d976a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/yarraman-std-c2565e7e-157b-4a93-bb2d-a34b4902395a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/yarraman-std-41c7ff67-c5cb-480f-b90d-1d2a1f23fa94.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/yarraman-std-1574bb3b-e79b-422b-829b-47da154f6d08.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/yarraman-std-1bfa8e9b-289a-4c9d-a86c-207be26367d6.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/yarraman-std-ae60c91e-949d-4e01-85e5-9aa2f4f939a8.jpg"
+        ],
+        "CheckInTime": "N/A",
+        "CheckOutTime": "N/A",
+        "description": "Yarraman Caravan Park &amp; Cabins has something for everyone, whether you&rsquo;re camping under the stars, caravanning, or enjoying the comfort of a cosy cabin. All our cabins and sites are pet-friendly, ensu...",
+        "email": "bookings@yarramancp.com.au",
+        "address": "12121 D'Aguilar Hway, Yarraman, Qld, 4614, Australia",
+        "town": "Yarraman",
+        "state": "ACT",
+        "tarif": {
+          "min": 0,
+          "max": 0
+        },
+        "website": "www.yarramancp.com.au",
+        "hours": "9am to 6pm Daily",
+        "pointofdifference": "Nestled beside the tranquil Yarraman State Forest, Yarraman Caravan Park &amp; Cabins offers pet-friendly accommodation and a warm welcome to those seeking an authentic taste of country life. Start your d..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.13679771522", "-35.318371440232"]
+      },
+      "properties": {
+        "id": 44593,
+        "name": "Manuka Park Apartments",
+        "type": "Accommodation",
+        "operatorName": "Manuka Park Apartments",
+        "GroupName": "Studio/Apartments",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/390000a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/390000b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/390000c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/390000d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/390000e.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/390000f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/390000g.jpg"
+        ],
+        "CheckInTime": "1400",
+        "CheckOutTime": "1030",
+        "description": "Enjoy resort-style living in our executive appointed one and two bedroom apartments. Manuka Park Serviced Apartments is close to Canberra&#039;s major attractions, Manuka Oval, boutique shopping, restauran...",
+        "email": "Reservations@manukapark.com.au",
+        "address": "Cnr Manuka Circle and Oxley Street, MANUKA ACT 2604",
+        "town": "Manuka",
+        "state": "ACT",
+        "tarif": {
+          "min": "185",
+          "max": "280"
+        },
+        "website": "www.manukapark.com.au",
+        "hours": "Mon - Thurs 8am - 7.30pm,   Fri 7.30am - 7.30pm,   Sat Sun P/Hol 8.30am - 12.30pm  (Manager contactable after hours)",
+        "pointofdifference": "Manuka Park Serviced Apartments have all recently been refurbished to an executive level. Each apartment has a fully equipped kitchen, bathroom and laundry. We are located only a few minutes walk from..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.0452592", "-35.2425215"]
+      },
+      "properties": {
+        "id": 44558,
+        "name": "Belconnen Way Hotel and Serviced Apartments",
+        "type": "Accommodation",
+        "operatorName": "Belconnen Way Hotel and Serviced Apartments",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/542222a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/542222b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/542222c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/542222d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/542222e.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/542222f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/542222g.jpg"
+        ],
+        "CheckInTime": "14:00",
+        "CheckOutTime": "10:00",
+        "description": "We offer guests a large communal lounge area and guest laundry. <br>We have wireless broadband available FREE to our guests in the reception and lounge area.<br>We are within walking distance to Hawker Sh...",
+        "email": "info@belconnenhotel.com",
+        "address": "77 - 79 Belconnen Way,  HAWKER, ACT 2614 Australia",
+        "town": "Hawker",
+        "state": "ACT",
+        "tarif": {
+          "min": "99",
+          "max": "550"
+        },
+        "website": "www.belconnenhotel.com/",
+        "hours": "Check-in from 12 noon, check-out 10am, reception open until 2am most nights",
+        "pointofdifference": "Situated northwest of CBD in the quiet leafy suburb of Hawker close to shops &amp; facilities. Our complex comprises three levels with elevator to all and undercover off street parking &amp; we are attached t..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.13712471842", "-35.319477623495"]
+      },
+      "properties": {
+        "id": 60195,
+        "name": "East Hotel and Apartments",
+        "type": "Accommodation",
+        "operatorName": "East Hotel and Apartments",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/956925a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/956925b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/956925d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/956925e.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/956925f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/956925g.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/956925c.jpg"
+        ],
+        "CheckInTime": "1500",
+        "CheckOutTime": "1200",
+        "description": "EAST will be the ultimate location for your visit to the Australia&rsquo;s capital. At EAST you will experience all the services you would expect from a premium hotel, whilst feeling completely at home in t...",
+        "email": "stay@easthotel.com.au",
+        "address": "69 Canberra Avenue, Kingston, ACT, 2604, Australia",
+        "town": "Kingston",
+        "state": "ACT",
+        "tarif": {
+          "min": "200",
+          "max": "500"
+        },
+        "website": "www.easthotel.com.au",
+        "hours": "24 Hour Reception",
+        "pointofdifference": "East Hotel is Canberra&rsquo;s newest 4.5 star hotel. <br><br>Situated between the vibrant hubs of Kingston and Manuka, EAST will be the ultimate location for your visit to the Australia&rsquo;s capital. At EAST you ..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.0709086", "-35.2409558"]
+      },
+      "properties": {
+        "id": 145649,
+        "name": "Mercure Canberra Belconnen",
+        "type": "Accommodation",
+        "operatorName": "Mercure Canberra Belconnen",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [],
+        "CheckInTime": "N/A",
+        "CheckOutTime": "N/A",
+        "description": "Mercure Canberra Belconnen features 125 superior accommodation rooms ideal for both business and leisure travelers. These stylish modern rooms include plush beds, relaxed workstations, Smart TVs, Chro...",
+        "email": "Hb390@accor.com",
+        "address": "59 Cameron Avenue, Belconnen ACT 2617, Australia",
+        "town": "Belconnen",
+        "state": "ACT",
+        "tarif": {
+          "min": 0,
+          "max": 0
+        },
+        "website": "http://mercurebelconnen.com.au/",
+        "hours": "24 Hours",
+        "pointofdifference": ""
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.1329247", "-35.3120799"]
+      },
+      "properties": {
+        "id": 44586,
+        "name": "Hotel Realm",
+        "type": "Accommodation",
+        "operatorName": "Hotel Realm",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/631888a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/631888b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/631888c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/631888-std-236eda5f-ea6b-46a4-bcbb-9a1e222796ef.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/631888-std-2133f979-2a5f-431f-a25e-120cb77bb421.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/631888-std-938e9e1b-cd1a-4438-b7c0-ef5e9dc05576.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/631888-std-ad3610a7-54ca-4e2f-90e9-c8c200835738.jpg"
+        ],
+        "CheckInTime": "14:00",
+        "CheckOutTime": "11:00",
+        "description": "At Hotel Realm you will find yourself surrounded by the nation&rsquo;s cultural icons including the National Gallery of Australia, National Library of Australia and Old Parliament House. Lake Burley Griffin...",
+        "email": "reservations@domahotels.com.au",
+        "address": "18 National Circuit, BARTON",
+        "town": "Barton",
+        "state": "ACT",
+        "tarif": {
+          "min": "195",
+          "max": "495"
+        },
+        "website": "www.hotelrealm.com.au/",
+        "hours": "",
+        "pointofdifference": "Located at the footsteps of Parliament House in Canberra, Hotel Realm is part of a truly mixed-used precinct within the Parliamentary Triangle. Hotel Realm offers 163 hotel and suite style accommodati..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.1240027", "-35.2848497"]
+      },
+      "properties": {
+        "id": 44577,
+        "name": "Peppers Gallery Hotel",
+        "type": "Accommodation",
+        "operatorName": "Peppers Gallery Hotel",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/752222a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/752222b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/752222c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/752222d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/752222e.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/752222f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/752222g.jpg"
+        ],
+        "CheckInTime": "15:00",
+        "CheckOutTime": "11:00",
+        "description": "Winner of the Deluxe Accommodation Award at the Canberra and Capital Region Tourism Awards 2012, this spectacular 80 room boutique art house hotel is positioned by Lake Burley Griffin at the intersect...",
+        "email": "gallery@peppers.com.au",
+        "address": "15 Edinburgh Avenue, CANBERRA CITY",
+        "town": "Canberra City",
+        "state": "ACT",
+        "tarif": {
+          "min": "180",
+          "max": "600"
+        },
+        "website": "http://www.peppers.com.au/gallery/",
+        "hours": "",
+        "pointofdifference": "Designer boutique hotel housed in a 1920&#039;s heritage listed building."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.061273", "-35.4174117"]
+      },
+      "properties": {
+        "id": 44573,
+        "name": "Alpha Canberra Hotel and Apartments",
+        "type": "Accommodation",
+        "operatorName": "Alpha Canberra Hotel and Apartments",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/933666a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/933666b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/933666c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/933666e.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/933666f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/933666g.jpg"
+        ],
+        "CheckInTime": "1400",
+        "CheckOutTime": "1000",
+        "description": "Alpha Canberra Hotel and Apartments is Tuggeranong&#039;s premier accommodation provider and is ideally located in the Tuggeranong Valley just 20 minutes drive south of Canberra City (with all of its attra...",
+        "email": "res.tug@alphahotels.com.au",
+        "address": "46 Rowland Rees Crescent, GREENWAY",
+        "town": "Greenway",
+        "state": "ACT",
+        "tarif": {
+          "min": "120",
+          "max": "500"
+        },
+        "website": "www.alphahotelcanberra.com.au",
+        "hours": "7am to 7pm Monday to Friday",
+        "pointofdifference": "Set against the backdrop of the Brindabella ranges,with kangaroos galore, and within walking distance of the South Point shopping centre, local sporting facilities, public transport and the Tuggeranon..."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.130554", "-35.274761"]
+      },
+      "properties": {
+        "id": 71327,
+        "name": "Avenue Hotel Canberra",
+        "type": "Accommodation",
+        "operatorName": "Avenue Hotel Canberra",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/469500a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/469500b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/469500c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/469500d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/469500e.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/469500f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/469500g.jpg"
+        ],
+        "CheckInTime": "1400",
+        "CheckOutTime": "1000",
+        "description": "Avenue Hotel Canberra is Canberra&#039;s newest 5 star hotel and will set new trends in style and elegance in the Nations Capital. From the moment you arrive you&rsquo;ll experience the difference. Avenue combin...",
+        "email": "reservations@avenuehotel.com.au",
+        "address": "80 Northbourne Avenue, Canberra City ACT 2612, Australia",
+        "town": "Canberra",
+        "state": "ACT",
+        "tarif": {
+          "min": "180",
+          "max": "1095"
+        },
+        "website": "avenuehotel.com.au",
+        "hours": "24 Hours",
+        "pointofdifference": "Avenue Hotel Canberra is one of Canberras brand new luxury hotel. Located in the heart of the city the Avenue is perfectly positioned on Northbourne Avenue."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["149.19423933167", "-35.234297812917"]
+      },
+      "properties": {
+        "id": 146528,
+        "name": "Treetops Adventure Canberra",
+        "type": "Tours",
+        "operatorName": "Treetops Adventure Canberra",
+        "GroupName": "Tours",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/10treetopsadventurecanberra-primary-4ab09adc-9250-4ae0-acd4-e87f412d6509.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/10treetopsadventurecanberra-std-01caf276-1f8b-4063-94bd-a357198b3464.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/10treetopsadventurecanberra-std-b727c937-2952-439e-81df-c0410d4e0a1b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/10treetopsadventurecanberra-std-b17a40aa-eff4-4929-b7bb-e48a27c656f1.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/10treetopsadventurecanberra-std-fd0c29c7-b15d-483d-9add-9eb229930307.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/10treetopsadventurecanberra-std-db7915f4-c725-49cd-9056-469326c1c95b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/bookaus/10treetopsadventurecanberra-std-88668dd5-d672-47e4-9399-f38bf79a65d4.jpg"
+        ],
+        "CheckInTime": "N/A",
+        "CheckOutTime": "N/A",
+        "description": "Australia&rsquo;s #1 Treetops and Ziplining Adventure Group.Our 15 parks around Australia feature exciting and challenging obstacle courses high up in the tree canopy, that will have all the family swinging...",
+        "email": "canberra@treetopsadventure.com.au",
+        "address": "Lime Kiln Rd, Majura, ACT, 2609, Australia",
+        "town": "Majura",
+        "state": "ACT",
+        "tarif": {
+          "min": 0,
+          "max": 0
+        },
+        "website": "www.treetopsadventure.com.au/",
+        "hours": "",
+        "pointofdifference": "",
+        "style": {
+          "icon": "md/MdOutlineTour"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["0", "0"]
+      },
+      "properties": {
+        "id": 44592,
+        "name": "Mantra on Northbourne",
+        "type": "Accommodation",
+        "operatorName": "Mantra on Northbourne",
+        "GroupName": "Hotels / Motels / Resorts",
+        "isBookable": true,
+        "images": [
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/432500a.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/432500c.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/432500d.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/432500e.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/432500b.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/432500f.jpg",
+          "https://images.bookeasy.com.au/website/thumbs/1200_900_crop/canberra/432500g.jpg"
+        ],
+        "CheckInTime": "14:00",
+        "CheckOutTime": "10:00",
+        "description": "Located in the city, the Mantra on Northbourne is within walking distance to shopping, dining and nightlife. Relax and unwind in our indoor heated pool, sauna and gymnasium or take advantage of our 24...",
+        "email": "northbourne.rec@mantra.com.au",
+        "address": "84 Northbourne Ave, BRADDON ACT 2612, Australia",
+        "town": "Braddon",
+        "state": "ACT",
+        "tarif": {
+          "min": "159",
+          "max": "757"
+        },
+        "website": "www.mantra.com.au/",
+        "hours": "24 Hours",
+        "pointofdifference": "Combining luxury with convenience, this property is the ideal base for business and leisure travellers. Guests have a choice of 175 air-conditioned hotel rooms, one or two bedroom apartments, all full..."
+      }
+    }
+  ]
+}

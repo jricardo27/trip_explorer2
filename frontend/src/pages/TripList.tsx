@@ -18,7 +18,11 @@ import {
   CircularProgress,
   Alert,
   InputAdornment,
+  Tabs,
+  Tab,
 } from "@mui/material"
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import dayjs from "dayjs"
 import { Add as AddIcon, CalendarToday, FlightTakeoff, AttachMoney } from "@mui/icons-material"
 import { useTrips, useCreateTrip } from "../hooks/useTrips"
 
@@ -29,11 +33,46 @@ const TripList = () => {
   const [open, setOpen] = useState(false)
 
   // Form state
+  const [currency] = useState("AUD") // Default currency
   const [name, setName] = useState("")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [budget, setBudget] = useState("")
-  const [currency] = useState("USD") // Removed setCurrency as it was unused for now
+  // 0 = Past, 1 = Current, 2 = Future
+  const [tabValue, setTabValue] = useState(2)
+
+
+
+  // Determine initial tab based on trips
+  useState(() => {
+    if (trips) {
+      const now = dayjs()
+      const hasCurrent = trips.some(t => dayjs(t.startDate).isBefore(now) && dayjs(t.endDate).isAfter(now))
+      if (hasCurrent) {
+        setTabValue(1)
+      } else {
+        // Default to Future (2) if no current, or whatever logic. User asked: if no current, show future.
+        setTabValue(2)
+      }
+    }
+  })
+
+  const getVisibleTrips = () => {
+    if (!trips) return []
+    const now = dayjs()
+    return trips.filter((trip) => {
+      const start = dayjs(trip.startDate)
+      const end = dayjs(trip.endDate)
+
+      if (tabValue === 0) { // Past
+        return end.isBefore(now)
+      } else if (tabValue === 1) { // Current
+        return start.isBefore(now) && end.isAfter(now)
+      } else { // Future
+        return start.isAfter(now)
+      }
+    })
+  }
 
   const handleCreateTrip = async () => {
     if (name && startDate && endDate) {
@@ -81,8 +120,16 @@ const TripList = () => {
         </Typography>
       </Box>
 
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+        <Tabs value={tabValue} onChange={(_e, val) => setTabValue(val)} aria-label="trip tabs">
+          <Tab label="Past" />
+          <Tab label="Current" />
+          <Tab label="Future" />
+        </Tabs>
+      </Box>
+
       <Grid container spacing={3}>
-        {trips?.map((trip) => (
+        {getVisibleTrips()?.map((trip) => (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={trip.id}>
             <Card
               sx={{ height: "100%", display: "flex", flexDirection: "column", cursor: "pointer" }}
@@ -95,7 +142,7 @@ const TripList = () => {
                 <Box display="flex" alignItems="center" color="text.secondary" mb={1}>
                   <CalendarToday fontSize="small" sx={{ mr: 1 }} />
                   <Typography variant="body2">
-                    {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
+                    {dayjs(trip.startDate).format("LL")} - {dayjs(trip.endDate).format("LL")}
                   </Typography>
                 </Box>
                 <Box display="flex" alignItems="center" color="text.secondary" mb={2}>
@@ -106,16 +153,16 @@ const TripList = () => {
                 </Box>
                 <Chip
                   label={
-                    new Date(trip.startDate) > new Date()
+                    dayjs(trip.startDate).isAfter(dayjs())
                       ? "Upcoming"
-                      : new Date(trip.endDate) < new Date()
+                      : dayjs(trip.endDate).isBefore(dayjs())
                         ? "Past"
                         : "Ongoing"
                   }
                   color={
-                    new Date(trip.startDate) > new Date()
+                    dayjs(trip.startDate).isAfter(dayjs())
                       ? "primary"
-                      : new Date(trip.endDate) < new Date()
+                      : dayjs(trip.endDate).isBefore(dayjs())
                         ? "default"
                         : "success"
                   }
@@ -154,7 +201,13 @@ const TripList = () => {
         color="primary"
         aria-label="add"
         sx={{ position: "fixed", bottom: 16, right: 16 }}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setName("")
+          setStartDate("")
+          setEndDate("")
+          setBudget("")
+          setOpen(true)
+        }}
       >
         <AddIcon />
       </Fab>
@@ -164,21 +217,26 @@ const TripList = () => {
         <DialogContent>
           <Box pt={1} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <TextField autoFocus label="Trip Name" fullWidth value={name} onChange={(e) => setName(e.target.value)} />
-            <TextField
+            <DatePicker
               label="Start Date"
-              type="date"
-              fullWidth
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
+              value={startDate ? dayjs(startDate) : null}
+              onChange={(newValue) => {
+                const isoDate = newValue ? newValue.format("YYYY-MM-DD") : ""
+                setStartDate(isoDate)
+                // Auto-set End Date if empty or if Start Date is after current End Date
+                if (isoDate) {
+                  if (!endDate || dayjs(isoDate).isAfter(dayjs(endDate))) {
+                    setEndDate(isoDate)
+                  }
+                }
+              }}
+              slotProps={{ textField: { fullWidth: true } }}
             />
-            <TextField
+            <DatePicker
               label="End Date"
-              type="date"
-              fullWidth
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
+              value={endDate ? dayjs(endDate) : null}
+              onChange={(newValue) => setEndDate(newValue ? newValue.format("YYYY-MM-DD") : "")}
+              slotProps={{ textField: { fullWidth: true } }}
             />
             <TextField
               label="Budget (Optional)"

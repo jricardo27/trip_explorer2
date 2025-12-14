@@ -1,0 +1,66 @@
+export const MARKER_MANIFEST = {
+  australianCapitalTerritory: [
+    "accommodation_ACT.json",
+    "accommodation_campermate.json",
+    "toiletmap_aus_2025_ACT.json",
+  ],
+  newSouthWales: [
+    "accommodation_NSW.json",
+    "accommodation_campermate.json",
+    "big4_holiday_parks_NSW.json",
+    "discovery_parks_NSW.json",
+    "toiletmap_aus_2025_NSW.json",
+  ],
+  newZealand: ["accommodation_campermate.json"],
+  northernTerritory: [
+    "accommodation_NT.json",
+    "accommodation_campermate.json",
+    "big4_holiday_parks_NT.json",
+    "discovery_parks_NT.json",
+    "toiletmap_aus_2025_NT.json",
+  ],
+  queensland: [
+    "accommodation_QLD.json",
+    "accommodation_campermate.json",
+    "big4_holiday_parks_QLD.json",
+    "discovery_parks_QLD.json",
+    "toiletmap_aus_2025_QLD.json",
+  ],
+  southAustralia: [
+    "accommodation_SA.json",
+    "accommodation_campermate.json",
+    "big4_holiday_parks_SA.json",
+    "discovery_parks_SA.json",
+    "toiletmap_aus_2025_SA.json",
+  ],
+  tasmania: [
+    "accommodation_TAS.json",
+    "accommodation_campermate.json",
+    "big4_holiday_parks_TAS.json",
+    "discovery_parks_TAS.json",
+    "toiletmap_aus_2025_TAS.json",
+  ],
+  victoria: [
+    "accommodation_VIC.json",
+    "accommodation_campermate.json",
+    "big4_holiday_parks_VIC.json",
+    "discovery_parks_VIC.json",
+    "toiletmap_aus_2025_VIC.json",
+  ],
+  westernAustralia: [
+    "accommodation_WA.json",
+    "accommodation_campermate.json",
+    "big4_holiday_parks_WA.json",
+    "discovery_parks_WA.json",
+    "gas_stations_bp.json",
+    "gas_stations_fuelwatch.json",
+    "gas_stations_openstreetmap.json",
+    "national_parks_simplified.json",
+    "places.json",
+    "toiletmap_aus_2025_WA.json",
+    "western_australia_tourism.json",
+    "western_australia_visitor_centre.json",
+  ],
+} as const
+
+export type Region = keyof typeof MARKER_MANIFEST

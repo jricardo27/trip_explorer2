@@ -24,7 +24,7 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
   console.error("Error:", err)
 
   if (err instanceof ZodError) {
-    const issues = err.issues || err.errors || []
+    const issues = err.issues || []
     const errorMessage = issues.map((e: any) => e.message).join(", ")
     return res.status(400).json({
       error: {

@@ -31,8 +31,8 @@ const SettingsPage = () => {
         <Typography variant="h4" gutterBottom>
           Settings
         </Typography>
-        <Grid container spacing={3} mt={1}>
-          <Grid item xs={12} md={6}>
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <FormControl fullWidth>
               <InputLabel>Date Format (Region)</InputLabel>
               <Select value={dateFormat} label="Date Format (Region)" onChange={(e) => setDateFormat(e.target.value)}>
@@ -44,7 +44,7 @@ const SettingsPage = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <FormControl fullWidth>
               <InputLabel>Default Currency</InputLabel>
               <Select value={currency} label="Default Currency" onChange={(e) => setCurrency(e.target.value)}>

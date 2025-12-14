@@ -1,0 +1,644 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.discoveryholidayparks.com.au",
+    "style": {
+      "layerName": "Discovery Parks",
+      "color": "red"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [152.8725128173828, -25.28738594055176]
+      },
+      "properties": {
+        "id": "QFRA",
+        "name": "Fraser Street, Hervey Bay - Discovery Parks",
+        "area": "Fraser Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QFRA",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/6cb322cf-8688-4a71-a7dd-5e3e5415a176/FRASER-STREET_Other_006.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a384c300-4e5f-4201-9f95-963285c84dfe/FRASER-STREET_Other_014.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8adb8156-43b4-451d-a70f-4fa4e0fe4fa8/21652_hero_jumping_pillow.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/72c152be-f239-4ee3-8e83-5463e2a7c796/FRASER-STREET_Lifestyle_008.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/07db35ac-64e1-4af6-b50c-0a5207d2c42a/FRASER-STREET_Other_016.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [150.51678466796875, -24.40738868713379]
+      },
+      "properties": {
+        "id": "QBIL",
+        "name": "Biloela - Discovery Parks",
+        "area": "Outback Queensland",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QBIL",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0eede07c-d1d1-4f66-84d6-51b799cf3114/14171_biloela_camp_and_caravan_camp_site_04.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ce9bd89d-1d73-4c24-b434-6f1862345e65/BILOELA_BBQarea_A.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/898860a7-d591-41ac-9d9a-5af87b0ecf61/BILOELA_Pool_B.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/26318919-c58b-4b82-a949-5a6054371626/BILOELA_Other_002.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/cacfa6d2-7883-4f27-ade9-105fe66c94e1/BILOELA_Other_003.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": "",
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.155029296875, -23.511131286621097]
+      },
+      "properties": {
+        "id": "QEME",
+        "name": "Emerald - Discovery Parks",
+        "area": "Central Highlands",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QEME",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/99d63fb2-ed9e-4b76-a9fa-ba38304dadbe/3423_emerald_facilities_outdoor_dining_dusk_hdr.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0fa90598-4baa-45d7-ac6d-1beae4ffc489/5455_emerald.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/05fc1d92-99ce-4d72-ad05-e2c5baa02af7/Emerald-park-with-DHP-sign_1.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0df451c5-6df7-4b31-80ed-3186db9fe845/Emerald-twilight-verandah.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 3,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.8755645751953, -23.57484436035156]
+      },
+      "properties": {
+        "id": "QBLA",
+        "name": "Blackwater - Discovery Parks",
+        "area": "Capricorn",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QBLA",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1422dbed-47a0-4c2a-b949-77cd00e3aff5/4087_blackwaterhero.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/fcacbbb8-eb05-49fd-8185-5a75a00c21c3/9628_davys_photos_114.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1970d97f-1a40-47a4-9d11-f8c5ee5b1b09/5446_blackwater.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ea2f0ec9-ef29-41e5-a467-a05862c3b0f5/BLACKWATER_BBQarea_A.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/095887f7-ec12-4a04-885c-669ff2d268a4/BLACKWATER_FoodHall_C.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": "",
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [151.380859375, -23.95602226257324]
+      },
+      "properties": {
+        "id": "QTAN",
+        "name": "Tannum Sands - Discovery Parks",
+        "area": "Gladstone",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QTAN",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b40cb5c6-dcba-4882-9e28-f0e75cc2a3b0/S1671-153.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c139ca36-6f91-4442-8b09-cf1c651c28ee/TS-341.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8de934ae-383b-414b-9a60-9617727fdfb5/TANNUM-SANDS_Other_002.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/35166080-3d13-42ed-9db1-0fc533a753a7/TANNUM-SANDS_Lifestyle_029.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a2bec98e-7ff7-464b-b922-3ca69152941b/TANNUM-SANDS_Lifestyle_026.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [150.52151489257812, -23.344987869262695]
+      },
+      "properties": {
+        "id": "QROC",
+        "name": "Rockhampton - Discovery Parks",
+        "area": "Capricorn",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QROC",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7ef701a0-0fca-46c3-bafa-6fecbe011eb4/ROCKHAMPTON_Other_009-(1).jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/6b77ae4a-f57c-49b2-a57d-30c282bfa5a7/ROCKHAMPTON_Lifestyle_015.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2bd72ad1-b921-41b9-ba49-a0843b79fee0/ROCKHAMPTON_Pool_B.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9d52b432-44ad-4f8e-a512-5b041300b9ea/ROCKHAMPTON_RecreationRoom_A.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8eb66fb6-6891-40ea-b48c-55cd6e6ef46b/Discovery-Parks-Rockhamption-Cabins-Exterior.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [150.78578186035156, -23.203838348388672]
+      },
+      "properties": {
+        "id": "QCOO",
+        "name": "Coolwaters, Yeppoon - Discovery Parks",
+        "area": "Capricorn",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QCOO",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f87d5f79-08e9-4f08-beba-766a6d4bf964/COOLWATERS-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/711fe904-8aea-44a1-8476-970ef9af4912/17762_096_open2view_id552624-cool_waters_discovery_park.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/6764c2b8-b703-4d26-bdde-92b4c5bab9c5/Tennis-court-discovery-park-coolwaters-yeppoon.JPG",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/caf7bd55-82ec-42fd-bf29-f93bd948c7aa/COOLWATERS-Cabin.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7336367e-b8f2-4463-ab33-3b8f7f0e85a4/COOLWATERS-Karts.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.20689392089844, -21.11273956298828]
+      },
+      "properties": {
+        "id": "QMAC",
+        "name": "Mackay - Discovery Parks",
+        "area": "Mackay",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QMAC",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d6bde2ad-7be2-4c16-8ce8-6cadce58015e/MACKAY_Other_007.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/89637f0a-395f-453f-b584-12ea404c2d6d/MACKAY_Lifestyle_012.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0956a3e9-3584-4d17-b81e-56fc6930237c/MACKAY_Lifestyle_002.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8a45c5b2-3750-4f7a-908c-08f2077a054d/MACKAY_Lifestyle_049.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3c17ac4f-cc65-4441-bc30-ec9644d99bdb/MACKAY_Lifestyle_023.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.73890686035156, -20.28311538696289]
+      },
+      "properties": {
+        "id": "QAIR",
+        "name": "Airlie Beach - Discovery Parks",
+        "area": "Whitsundays",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QAIR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/270c2d9b-7e0d-4bcb-8568-5e233661f8ae/AIRLIE-BEACH_Other_001.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/18eff503-94a2-43ad-8078-fc03178d33d2/AIRLIE-BEACH_Other_013.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/16f41232-7e83-4364-822e-1a5c9fcff9ac/Airlie-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4063347a-a31c-4f87-89d3-879c5c77dd82/Airlie-Cabin.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/38f1e158-abbd-4ff0-b11d-56f43beb9337/AIRLIE-BEACH_Lifestyle_012.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [140.5259552001953, -20.70708274841309]
+      },
+      "properties": {
+        "id": "QCLO",
+        "name": "Cloncurry - Discovery Parks",
+        "area": "Outback Queensland",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QCLO",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f2073454-dcbe-4277-ae3f-d4cf2479ceea/18303_039_open2view_id570672-cloncurry_holiday_caravan_park.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b17259fe-8752-46bf-bf5d-9d99195cd832/18306_026_open2view_id570672-cloncurry_holiday_caravan_park.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/71d2e666-f109-4197-a985-32e4b5082a6f/18305_028_open2view_id570672-cloncurry_holiday_caravan_park.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7542565f-a805-45e2-bc58-4b2fb9fc9c02/18302_021_open2view_id570672-cloncurry_holiday_caravan_park.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/19e11401-9b51-430e-8234-7e3679e063e4/18304_019_open2view_id570672-cloncurry_holiday_caravan_park.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.51681518554688, -20.72394371032715]
+      },
+      "properties": {
+        "id": "QARG",
+        "name": "Argylla - Discovery Parks",
+        "area": "Outback Queensland",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QARG",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e4f4d3c5-086d-42bd-8b3e-416aa91dfa44/ARGYLLA_Other_001.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/50526965-07c6-426d-925f-aedd5f19a703/18292_argylla-camp-and-caravan-powered-site-2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1c8cb682-c4bb-4e06-81c2-1ffc5016f142/18384_024_open2view_id570671-argylla_holiday_park.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9ce33d32-df1d-4426-85ac-e846d5d22b4a/ARGYLLA_Pool_A.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/00c95966-2ea9-46c6-bfe8-33b5ecf807d1/ARGYLLA_CampKitchen_B.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.49522399902344, -20.708215713500977]
+      },
+      "properties": {
+        "id": "QISA",
+        "name": "Mount Isa - Discovery Parks",
+        "area": "Outback Queensland",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QISA",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7fec2caf-501b-44b2-b6a0-45036697b1b5/discovery-parks-mount-isa-cabin.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4c145d43-7c2f-41fb-aa63-882664a54353/discovery-parks-mount-isa-camp-kitchen_1.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/bd96961d-51e3-4fdc-bcab-23c530e53637/discovery-parks-mount-isa-pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/563da605-d734-4ca9-8f45-754cb896fa3e/5672_park_landing_heros_mtisa.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ffbcd5f6-bb64-458b-8040-0f4107b1c3dc/8482_mount_isa_local_sights_1_lowres.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": "",
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [147.41473388671875, -19.575157165527344]
+      },
+      "properties": {
+        "id": "QAYR",
+        "name": "Ayr - Discovery Parks",
+        "area": "Townsville",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QAYR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/852eee3f-9d02-4520-b000-47953d7fc5b3/85242423_2816057695122225_3487544887807574016_n.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ee0e3a1f-6301-4579-9f5c-79d4804844ca/AYR_Other_002.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3cae773c-2fb1-44d2-8a4a-0721a57cc41c/AYR_BounceZone_B.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e260384e-20be-4028-bd52-f16b0c55910f/AYR_CampKitchen_A.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2c46248e-8493-4666-b54e-564bff7bb2ef/AYR_Lifestyle_002.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [146.8121337890625, -19.31743621826172]
+      },
+      "properties": {
+        "id": "QTOW",
+        "name": "Townsville - Discovery Parks",
+        "area": "Townsville",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QTOW",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/80893aa4-9efd-47f6-9692-13ef3bfd71a7/TOWNSVILLE_Lifestyle_015.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8a57f1af-f335-4fe7-a30e-3565d31585cf/14377_cabins.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/91c1055e-fcc4-4966-b319-bdfb531a42db/14985_007_open2view_id522882-6_university_drive_wulguru.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a8eb027d-d3f3-4ae0-bceb-34dd48f9ab76/14379_waterpark.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3f8e248b-0080-4597-b54a-56c511b19d40/19540_006_open2view_id522882-6_university_drive_wulguru.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.56971740722656, -18.20219612121582]
+      },
+      "properties": {
+        "id": "QUND",
+        "name": "Discovery Resorts - Undara - Discovery Parks",
+        "area": "Tropical North",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QUND",
+        "images": [
+          {
+            "src": "https://gdayparks.com.au/getmedia/a568fd31-dc05-43df-9a59-36181d56dc66/Discovery-Resorts-Undara-Header-Image-Railway-Carriage.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/00dccdaf-749d-4092-aff8-6b800a66ce49/Discovery-Resorts-Undara-Header-Image-Archway-Explorer.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d50d7e0a-6a15-4781-a1b3-f9c0417ef325/Discovery-Resorts-Undara-Header-Image-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9455cbb9-8917-4edc-a002-3bfefe9593ec/Discovery-Resorts-Undara-Header-Image-Archway.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b16acf4a-878a-4758-8d85-b801f78d944d/Discovery-Resorts-Undara-Header-Image-Van-Sites.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.3202362060547, -18.14479637145996]
+      },
+      "properties": {
+        "id": "QSUR",
+        "name": "Mount Surprise - Discovery Parks",
+        "area": "Tropical North",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/QSUR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/09cbf356-0863-4511-9612-a5a8ce81d9b2/Discovery-Parks-Mount-Surprise-Header-Image-Aerial-View.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f3c156dc-8f0e-49d2-b774-2c9dcb4e7fa3/Discovery-Parks-Mount-Surprise-Mini-Golf-Course-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d3c9d207-de6f-44d0-b1a3-43b372ada15c/Discovery-Parks-Mount-Surprise-Header-Image-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b340f275-1b15-4363-9c34-4378e919f11c/Discovery-Parks-Mount-Surprise-Header-Image-Savannahlander-Train.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 3.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

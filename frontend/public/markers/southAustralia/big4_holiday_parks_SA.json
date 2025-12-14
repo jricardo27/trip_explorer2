@@ -1,0 +1,472 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.big4.com.au",
+    "style": {
+      "layerName": "Big4 Holiday Parks",
+      "color": "magenta"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["140.763063", "-34.179178"]
+      },
+      "properties": {
+        "id": "470",
+        "name": "BIG4 Renmark Riverfront Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/riverland/renmark-riverfront-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/tmihnjd4/renmark24-862.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.06,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["140.609921", "-34.286539"]
+      },
+      "properties": {
+        "id": "848",
+        "name": "Berri Riverside Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/riverland/berri-riverside-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/hhedlf5r/brhp-websized-205.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.68,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["139.982269", "-34.174996"]
+      },
+      "properties": {
+        "id": "733",
+        "name": "Echo Holiday Parks - Waikerie",
+        "website": "https://www.big4.com.au/caravan-parks/sa/riverland/waikerie-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/mdbnzfat/wai-1-outdoors-nuclear_family-physical_activity-warm-mixed_group.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.52,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["138.308517", "-35.446641"]
+      },
+      "properties": {
+        "id": "771",
+        "name": "BIG4 Normanville Jetty Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/fleurieu-peninsula/normanville-jetty-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/4vndbjbn/322604437_935657004479267_6099401215130878453_n.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.68,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["138.689070", "-35.530808"]
+      },
+      "properties": {
+        "id": "356",
+        "name": "BIG4 Port Elliot Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/fleurieu-peninsula/big4-port-elliot-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/4znhvoq4/pe_overview-copy.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.66,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["138.612056", "-35.559703"]
+      },
+      "properties": {
+        "id": "787",
+        "name": "NRMA Victor Harbor Beachfront Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/fleurieu-peninsula/nrma-victor-harbor-beachfront-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/zamjfssg/vh_0011_210618_nrma_victorharbour_destination_0872-1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.74,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["139.001624", "-34.468641"]
+      },
+      "properties": {
+        "id": "716",
+        "name": "BIG4 Barossa Tourist Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/barossa/barossa-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/4fmfengy/screenshot-2023-09-13-154343.png",
+            "title": ""
+          }
+        ],
+        "reviews": 9.02,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["133.678363", "-32.124564"]
+      },
+      "properties": {
+        "id": "364",
+        "name": "BIG4 Ceduna Tourist Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/eyre-peninsula/ceduna-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/mvsdbwjb/ced-1-local_area-no_people-nil-night-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.54,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["134.883513", "-33.636527"]
+      },
+      "properties": {
+        "id": "850",
+        "name": "Elliston Caravan Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/eyre-peninsula/elliston-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/podhgxxw/jetty.png",
+            "title": ""
+          }
+        ],
+        "reviews": 8.56,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["134.758512", "-29.022270"]
+      },
+      "properties": {
+        "id": "558",
+        "name": "BIG4 Stuart Range Outback Resort",
+        "website": "https://www.big4.com.au/caravan-parks/sa/flinders-ranges-outback/stuart-range-outback-resort",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/zzfnonwp/lifestyle0924-164.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.62,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["140.770065", "-37.845329"]
+      },
+      "properties": {
+        "id": "372",
+        "name": "BIG4 Blue Lake Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/limestone-coast/blue-lake-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/uf4ev4z2/blue-1-park_aerial-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.82,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["140.742627", "-36.952534"]
+      },
+      "properties": {
+        "id": "210",
+        "name": "BIG4 Echo Holiday Parks - Naracoorte",
+        "website": "https://www.big4.com.au/caravan-parks/sa/limestone-coast/naracoorte-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/o4gn1vo5/nara-1-camp-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.68,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["139.507070", "-35.312846"]
+      },
+      "properties": {
+        "id": "726",
+        "name": "BIG4 The Bend Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/murraylands/the-bend-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/e4xk5xmj/bend-1-park_aerial-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.54,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["138.561972", "-35.017033"]
+      },
+      "properties": {
+        "id": "201",
+        "name": "BIG4 Marion Holiday Park - Adelaide",
+        "website": "https://www.big4.com.au/caravan-parks/sa/greater-adelaide/marion-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/jnmdsoxd/marion-1-pool-kids-playing-warm-mixed_group.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.66,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["138.613900", "-35.361670"]
+      },
+      "properties": {
+        "id": "773",
+        "name": "BIG4 Mount Compass Caravan Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/fleurieu-peninsula/mount-compass-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/jvxffgkr/dsc07323.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.22,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["140.550902", "-34.452352"]
+      },
+      "properties": {
+        "id": "199",
+        "name": "BIG4 Loxton Riverfront Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/riverland/loxton-riverfront-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/a53k3cuc/loxton-898.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.18,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["138.472018", "-35.246865"]
+      },
+      "properties": {
+        "id": "547",
+        "name": "BIG4 Port Willunga Tourist Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/fleurieu-peninsula/port-willunga-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/bvmaadgh/ptwillunga-1032.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.4,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["137.547657", "-34.079698"]
+      },
+      "properties": {
+        "id": "705",
+        "name": "BIG4 Port Hughes Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/yorke-peninsula/port-hughes-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/zrunfy2a/hugh-1-caravans-seniors-sitting-warm-mixed_pair.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.06,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["139.317644", "-34.908376"]
+      },
+      "properties": {
+        "id": "751",
+        "name": "BIG4 Mannum Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/murraylands/mannum-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/1hybpmpv/man-1-facilities-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.58,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["138.128678", "-35.605210"]
+      },
+      "properties": {
+        "id": "740",
+        "name": "BIG4 Cape Jervis Accommodation & Caravan Park",
+        "website": "https://www.big4.com.au/caravan-parks/sa/fleurieu-peninsula/cape-jervis-accommodation-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/xo4luwah/jer-5-park_aerial-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.14,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

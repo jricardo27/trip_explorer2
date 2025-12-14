@@ -1,0 +1,610 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.big4.com.au",
+    "style": {
+      "layerName": "Big4 Holiday Parks",
+      "color": "magenta"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["116.136653", "-33.972563"]
+      },
+      "properties": {
+        "id": "882",
+        "name": "BIG4 Bridgetown",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/big4-bridgetown",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/vjtbmufy/bridgetown-8467.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.38,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["117.941500", "-34.999590"]
+      },
+      "properties": {
+        "id": "568",
+        "name": "BIG4 Emu Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/emu-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/rilbaqk4/big4-emu-beach-drone-park-ocean-views-looking-towards-middleton-beach-3000px-may-2023.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.02,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["117.915423", "-35.022476"]
+      },
+      "properties": {
+        "id": "205",
+        "name": "BIG4 Middleton Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/middleton-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/w1zaulye/middleton-beach-jetty.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.2,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.850887", "-34.420539"]
+      },
+      "properties": {
+        "id": "757",
+        "name": "RAC Karri Valley Resort",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/rac-karri-valley-resort",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/0gwlssxw/rac-kvr-november-117.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.92,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.697678", "-33.311315"]
+      },
+      "properties": {
+        "id": "861",
+        "name": "BIG4 Bunbury Riverside Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/bunbury-riverside-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/q3acp5wm/looking-north.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.18,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.307926", "-33.656317"]
+      },
+      "properties": {
+        "id": "146",
+        "name": "BIG4 Breeze Holiday Parks - Busselton",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/breeze-holiday-parks-busselton",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/lmfh5idy/beachlands-drone-3_1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.48,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.296410", "-33.657140"]
+      },
+      "properties": {
+        "id": "849",
+        "name": "Mandalay Holiday Resort - Busselton",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/mandalay-holiday-resort",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/gp5hcpjs/mandalay-october-2021-134.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.28,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["117.326010", "-35.021300"]
+      },
+      "properties": {
+        "id": "509",
+        "name": "BIG4 Denmark Ocean Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/denmark-ocean-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/n5qdsc4x/15844896_1133062596742918_3177837312993072414_o.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.22,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.990910", "-32.366318"]
+      },
+      "properties": {
+        "id": "747",
+        "name": "Tasman Holiday Parks - Serpentine Falls",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/tasman-holiday-parks-serpentine-falls",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ns4czbao/pool.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.74,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.025701", "-33.639785"]
+      },
+      "properties": {
+        "id": "837",
+        "name": "Tasman Holiday Parks - Yallingup Beach ",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/tasman-holiday-parks-yallingup-beach",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/y2fmbdfi/instances_5712585013ea26897ecd7338a90bc631_5f324bff1341d.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.3,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.032562", "-33.646675"]
+      },
+      "properties": {
+        "id": "838",
+        "name": "Tasman Holiday Parks - Yallingup Caves",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/tasman-holiday-parks-yallingup-caves",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/gxeozyg0/dog-harvey-cropped-van-982x1024.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.66,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.066940", "-30.497902"]
+      },
+      "properties": {
+        "id": "724",
+        "name": "RAC Cervantes Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/coral-coast/rac-cervantes-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/fnjjc2t0/aerial-cervantes.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.62,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["114.130581", "-21.937431"]
+      },
+      "properties": {
+        "id": "475",
+        "name": "RAC Exmouth Cape Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/coral-coast/rac-exmouth-cape-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/iggjoz10/rac_exmouth-oct2020-50.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.66,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.378577", "-31.102911"]
+      },
+      "properties": {
+        "id": "492",
+        "name": "BIG4 Tasman Holiday Parks - Ledge Point",
+        "website": "https://www.big4.com.au/caravan-parks/wa/coral-coast/tasman-holiday-parks-ledge-point",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/cxhlnz5i/big4-ledge-point.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.94,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["113.717532", "-25.793991"]
+      },
+      "properties": {
+        "id": "725",
+        "name": "RAC Monkey Mia Dolphin Resort",
+        "website": "https://www.big4.com.au/caravan-parks/wa/coral-coast/rac-monkey-mia-dolphin-resort",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/db0fp5xv/monkey-mia.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.86,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["116.011726", "-31.876304"]
+      },
+      "properties": {
+        "id": "736",
+        "name": "BIG4 Perth Midland Tourist Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/greater-perth/perth-midland-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/e2dnqc13/card1-original.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.48,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [" 121.914730", "-33.836147"]
+      },
+      "properties": {
+        "id": "891",
+        "name": "Bathers Paradise Caravan Park - Esperance",
+        "website": "https://www.big4.com.au/caravan-parks/wa/golden-outback/bathers-paradise-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/p5afsljs/thumbnail_luckyplusbay.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.26,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["121.902379", "-33.846101"]
+      },
+      "properties": {
+        "id": "758",
+        "name": "RAC Esperance Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/golden-outback/rac-esperance-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/alyb2sqh/00000020-2.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.22,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["128.742879", "-15.783130"]
+      },
+      "properties": {
+        "id": "851",
+        "name": "Lily Lagoon Resort - Kununurra",
+        "website": "https://www.big4.com.au/caravan-parks/wa/north-west-wa/lily-lagoon-resort",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/cnxdn1px/aerial1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.28,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["119.738388", "-23.348761"]
+      },
+      "properties": {
+        "id": "874",
+        "name": "Yurlu Caravan Park - Newman",
+        "website": "https://www.big4.com.au/caravan-parks/wa/north-west-wa/yurlu-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/20kipl52/yurlu-caravan-park-19.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.24,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["121.778346", "-32.190159"]
+      },
+      "properties": {
+        "id": "739",
+        "name": "Acclaim Gateway Tourist Park - Norseman",
+        "website": "https://www.big4.com.au/caravan-parks/wa/golden-outback/acclaim-gateway-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/kkkfofxe/sunset.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.5,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["114.923089", "-29.270528"]
+      },
+      "properties": {
+        "id": "370",
+        "name": "BIG4 Dongara Denison Beach Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/coral-coast/dongara-denison-beach-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/oitnd1zm/077138-irwin-river-dongara-credit-tourism-western-australia.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.46,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["121.453976", "-30.765217"]
+      },
+      "properties": {
+        "id": "738",
+        "name": "BIG4 Acclaim Prospector Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/golden-outback/acclaim-prospector-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/rlydpt4y/pool-larger-image.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["113.700290", "-24.862336"]
+      },
+      "properties": {
+        "id": "294",
+        "name": "Plantation Caravan Park - Carnarvon",
+        "website": "https://www.big4.com.au/caravan-parks/wa/coral-coast/plantation-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ztld5opw/20220909_172100.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 6.84,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.248250", "-33.661610"]
+      },
+      "properties": {
+        "id": "474",
+        "name": "RAC Busselton Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/south-west/rac-busselton-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/5szd5kxm/abbey-jetty.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.56,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["115.941500", "-31.928829"]
+      },
+      "properties": {
+        "id": "857",
+        "name": "Perth Central Caravan Park",
+        "website": "https://www.big4.com.au/caravan-parks/wa/greater-perth/perth-central-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/qzklhof4/poweredsite2.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.2,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

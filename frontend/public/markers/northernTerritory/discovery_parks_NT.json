@@ -1,0 +1,212 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.discoveryholidayparks.com.au",
+    "style": {
+      "layerName": "Discovery Parks",
+      "color": "red"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [133.8700714111328, -23.733861923217773]
+      },
+      "properties": {
+        "id": "CALI",
+        "name": "Alice Springs - Discovery Parks",
+        "area": "Alice Springs",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/CALI",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9bd5fc5d-a22c-43aa-8562-3c8991a4aba3/Discovery-Parks-Alice-Springs-Front-Gates-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0a9dd69e-599f-4d45-bde0-f0a1b5f770c3/Discovery-Parks-Alice-Springs-Cabins-Aerial.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3c4421bb-35d7-4146-92e2-f419c864b8b0/Discovery-Parks-Alice-Springs-Swimming-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7a03f6e8-2597-421c-b6f7-703c45c4866b/Discovery-Parks-Alice-Springs-Aerial-View.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/cd7826b4-faea-4cb5-b3cc-6ae6dc39bcab/Discovery-Parks-Alice-Springs-Waterpark-Header-Image.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [132.67294311523438, -23.68581199645996]
+      },
+      "properties": {
+        "id": "CGLE",
+        "name": "Discovery Resorts - Glen Helen - Discovery Parks",
+        "area": "MacDonnell",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/CGLE",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1c30cfd7-17a4-442f-a26c-7665dec37fc0/GLEN-HELEN_Lifestyle_021.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3516e37f-db23-4bb5-a895-7db0be485efc/GLEN-HELEN_Pool_A.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9baf9732-b9be-46b7-930b-34477dceb136/GLEN-HELEN_Lifestyle_028-(2).jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/76e2beae-192e-4f56-9321-582c52f0ba50/GLEN-HELEN_Lifestyle_009.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/392d071e-1bd5-4ff6-996f-ed59b03f643c/GLEN-HELEN_Lifestyle_005.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": "",
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [131.5120849609375, -24.25031089782715]
+      },
+      "properties": {
+        "id": "CKIN",
+        "name": "Discovery Resorts - Kings Canyon - Discovery Parks",
+        "area": "Lasseter",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/CKIN",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/6bbebf37-4eb4-4511-af3d-f4fa5c790469/Header-Images-(1).png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5028292a-d553-4f6b-8867-430062a4c9c9/Header-Images-(2).png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b76ef324-4a42-4d36-a111-cfeeff59bf3d/Header-Images-(4).png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b1582346-749f-43f7-a8c4-991681366c2f/Header-Images-(7)_1.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3949f33d-7d48-4904-86d8-d91c9d97060b/Header-Images-(6).png",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [132.2954864501953, -14.431013107299805]
+      },
+      "properties": {
+        "id": "CKAT",
+        "name": "Katherine - Discovery Parks",
+        "area": "Katherine Daly",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/CKAT",
+        "images": [
+          {
+            "src": "https://gdayparks.com.au/getmedia/8743b8c5-9cd7-4fb5-850f-fbfad3a5d1f5/Katherine-landing-page-1.png",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/262be0a2-b332-4173-b93e-3c772635b7b3/Katherine-landing-page-2.png",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/ebd9f809-50dd-4518-9d5f-29b2b29ad4e8/Katherine-landing-page-3.png",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/9d435411-7fa1-46fd-8e7f-169a0a04af7e/Katherine-landing-page-4.png",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/4ce397a2-4313-4b63-8c24-32f61edc11ff/Katherine-landing-page-5.png",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [130.9010467529297, -12.42701816558838]
+      },
+      "properties": {
+        "id": "CDAR",
+        "name": "Darwin - Discovery Parks",
+        "area": "Darwin",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/CDAR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/bcdc38c0-84c5-4db7-b120-873e31a78b33/DARWIN_Pool2_B.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8917651e-8b31-4f04-889d-284f9f821bf4/DiscoveryJan2021-18.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1ba6e0b2-1dfe-4244-b3c5-30d37cb88cd5/DARWIN_Other_007.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3b77f34b-aa81-42ed-8d54-dbe03967751b/DARWIN_Lifestyle_046.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4b433272-81f0-4fb5-b41c-ba5710f95d31/DARWIN_CampKitchen_North_A.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

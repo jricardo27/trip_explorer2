@@ -1,0 +1,150 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.big4.com.au",
+    "style": {
+      "layerName": "Big4 Holiday Parks",
+      "color": "magenta"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["133.867462", "-23.733843"]
+      },
+      "properties": {
+        "id": "869",
+        "name": "G'day Mate Tourist Park - Alice Springs",
+        "website": "https://www.big4.com.au/caravan-parks/nt/alice-springs-surrounds/gday-mate-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/zltc0wzf/lhp-gdaymatetouristpark-8549.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.76,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["130.916030", "-12.436310"]
+      },
+      "properties": {
+        "id": "763",
+        "name": "BIG4 Hidden Valley Holiday Park - Darwin",
+        "website": "https://www.big4.com.au/caravan-parks/nt/darwin-surrounds/hidden-valley-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/kksl1hhh/hiddenvalley6.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.78,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["131.033635", "-12.495556"]
+      },
+      "properties": {
+        "id": "300",
+        "name": "BIG4 Howard Springs Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/nt/darwin-surrounds/howard-springs-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/f50mhonl/howard-springs-big_rig-sites.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.88,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["134.241241", "-22.968183"]
+      },
+      "properties": {
+        "id": "872",
+        "name": "Gemtree Caravan Park - Anmatjere",
+        "website": "https://www.big4.com.au/caravan-parks/nt/alice-springs-surrounds/gemtree-roadhouse-and-caravan-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/s13nqfop/sites_6.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.64,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["131.651200", "-12.906510"]
+      },
+      "properties": {
+        "id": "774",
+        "name": "Mary River Wilderness Retreat",
+        "website": "https://www.big4.com.au/caravan-parks/nt/darwin-surrounds/mary-river-wilderness-retreat",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ksxe3iwk/breeze_-687.png",
+            "title": ""
+          }
+        ],
+        "reviews": 7.72,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["132.234800", "-14.491320"]
+      },
+      "properties": {
+        "id": "765",
+        "name": "BIG4 Breeze Holiday Parks - Katherine",
+        "website": "https://www.big4.com.au/caravan-parks/nt/katherine-surrounds/breeze-holiday-parks-katherine",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/pfklm5py/breeze_-298.png",
+            "title": ""
+          }
+        ],
+        "reviews": 8.64,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

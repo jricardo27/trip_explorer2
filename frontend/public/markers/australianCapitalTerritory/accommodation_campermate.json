@@ -1,0 +1,925 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://campermate.com/",
+    "style": {
+      "layerName": "Accommodation (Campermate)",
+      "icon": "md/MdHotel",
+      "color": "blueviolet"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.131, -35.29]
+      },
+      "properties": {
+        "id": "917b5a67-b86c-4b22-bc6f-ab133d7d4aeb",
+        "name": "Canberra and Region Visitors Centre",
+        "description": "# Canberra and Region Visitors Centre\r\nThe Canberra and Region Visitors Centre sits within the Regatta Point precinct, boasting one of Canberra\u2019s best views. Look out over Lake Burley Griffin towards a range of iconic national attractions including Parliament House, the National Gallery of Australia, the National Library of Australia and Questacon. Purchase local and regional wines, beer, spirits and schnapps. Pick up designer merchandise, jewellery and souvenirs from local and regional suppliers including: Jasper+Myrtle, Gundaroo Puzzler, Gatbi, Zilpah Tart, Lindner and more. Choose from a range of maps and books, and kids\u2019 treats and toys. You can also find the entire range of CBR merchandise boasting quality made hoodies, shirts and beanies, stationery, reusable coffee cups and more. Chat to the friendly staff and volunteers. They\u2019re a wealth of local knowledge, offering valuable insights to help you get the most from your stay. Whether it\u2019s a last-minute accommodation deal or tips about cool new cafes. Wanting to experience scenic Lake Burley Griffin on two wheels? Hire bikes are available from the Canberra and Region Visitors Centre for two and four hour hire, as well as all day options. Canberra's official and fully accredited tourism information centre is operated by VisitCanberra for the benefit of tourists and locals. Limited free parking available, along with designated free parking for caravans, camper trailers, coaches and RVs",
+        "fees": "",
+        "bookable": true,
+        "images": [
+          "https://photos.geozone.co.nz/photos/00b835e377cad76438827faba5d8a903.jpg",
+          "https://photos.geozone.co.nz/photos/cf06cc652b74f01eeaf227c8c37b8e59.jpg",
+          "https://photos.geozone.co.nz/photos/51992ac3a2522c1dd74118be3f04e90c.jpg",
+          "https://photos.geozone.co.nz/photos/caa76c725b001efcbdd8029bf68b16ec.jpg",
+          "https://photos.geozone.co.nz/photos/07add7a1a3b1584f66890ace4a3db87a.jpg",
+          "https://photos.geozone.co.nz/photos/f6e1967b2a0dc26bed493fe8f0da45e3.jpg",
+          "https://photos.geozone.co.nz/photos/d18e9be9aad675d493286a905b36d581.jpg",
+          "https://photos.geozone.co.nz/photos/df82d8f200070624d7247461fa962ef1.jpg",
+          "https://photos.geozone.co.nz/photos/4fc01ab584f332aa9f405d4d8c689400.jpg"
+        ],
+        "category": "Explore Visitor Centre",
+        "subCategory": [
+          "Wheelchair Accessible",
+          "Wifi",
+          "Activities & Attractions",
+          "Large Vehicle Access",
+          "Museum",
+          "Flush Toilet",
+          "Phone Charging Station",
+          "Caf\u00e9"
+        ],
+        "parent_category": "Other",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 6.1,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "md/MdFestival",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.165, -35.1868]
+      },
+      "properties": {
+        "id": "8d248cb9-785c-43a0-a6f3-e4f2ecd3bc83",
+        "name": "Mulligans Flat Woodland Sanctuary",
+        "description": "Visit Mulligans Flat Woodland Sanctuary to embark on a 2.5 hour twilight walk in nature on Canberra's doorstep. \n\nJoin nature guides as you wander amongst the biological preserve to learn about the sanctuary that protects many native and endangered species from their predators.\n\nHighlights:\n\n- Twilight walking tour with nature guides\n- Learn about the local ecology\n- Spot nocturnal and endangered animals\n- Relaxing evening bushwalk in grassy woodlands\n- Discover how animals are reintroduced to the wild\n- Uncover the historical connections of the landscape",
+        "fees": "From $65",
+        "bookable": true,
+        "images": [
+          "https://photos.geozone.co.nz/photos/a7d4b6d4-f28b-4bc0-8c74-87579f0a0ed3.jpeg",
+          "https://photos.geozone.co.nz/photos/b90681d9-2b07-4074-bb89-f3148c25bef3.jpeg",
+          "https://photos.geozone.co.nz/photos/24d36201-8496-4186-8c4d-1990ffaabe85.jpeg",
+          "https://photos.geozone.co.nz/photos/6c540f768e4808f63af29c5b463db407.jpg",
+          "https://photos.geozone.co.nz/photos/03c99c78b15febab32860a48315eb56d.jpg",
+          "https://photos.geozone.co.nz/photos/7d135eeb00eeadfe7446d1fc866019a7.jpg"
+        ],
+        "category": "Tourist Attractions",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 5.8,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "bs/BsImage",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.183, -35.3155]
+      },
+      "properties": {
+        "id": "d8306494-9448-4316-80b7-8a4fc9c773df",
+        "name": "Canberra Hot Air Balloon Flight",
+        "description": "This early morning Canberra hot air balloon ride offers a tranquil experience with amazing scenery over the blend of historical and modern architecture and abundant greenery that give Australia's capital city its charm. \n\nEmbark on a flight that lasts around one hour and see the city and its surrounds from a vantage point few others get to experience; a hot air ballooning ride offers a sense of serenity that's hard to match and even harder to forget!\n\nHighlights: \n\n- Up to 1 hour balloon flight\n- Famously clear Canberra skies\n- Champagne celebration at the Hyatt Hotel\n- Receive a commemorative flight certificate\n- Optional buffet breakfast (payable on the day)\n- Reach heights of 2000 feet or more",
+        "fees": "From $430",
+        "bookable": true,
+        "images": [
+          "https://photos.geozone.co.nz/photos/e8e538d7e9db4bfc6d223f7627e991da.jpg",
+          "https://photos.geozone.co.nz/photos/ab4f93053ecba2f85189a333296f533f.jpg",
+          "https://photos.geozone.co.nz/photos/905a8a1d088e7816f9314d375c68e1c8.jpg"
+        ],
+        "category": "Scenic Flights",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 5.8,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "gi/GiHelicopter",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.163, -35.3339]
+      },
+      "properties": {
+        "id": "e02c99ab-5edb-4a9c-9595-c2ebfcd5bcdf",
+        "name": "Southside Village",
+        "description": "Southside Village holiday park is conveniently located in Symonston, just a short 10 minute drive from the Canberra city centre\nLandscaped gardens and native Australian bush, our affordable accommodation choices include self contained furnished cabins, powered and unpowered caravan and camping sites.\n\nWe are a pet friendly caravan park, cabins and campsites subject to management approval",
+        "fees": "From $45",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/3f2c3c5a-0341-4ae2-ac2a-34904ccd0dc4-original.jpeg",
+          "https://photos.geozone.co.nz/photos/4142a68b-159f-4010-9139-ad81e939b01a-original.jpeg",
+          "https://photos.geozone.co.nz/photos/8462c571-f920-4490-8e29-e57565f76d92-original.jpeg",
+          "https://photos.geozone.co.nz/photos/625d80d0-10d0-45fd-9869-c411e3206647-original.jpeg"
+        ],
+        "category": "Paid Campground",
+        "subCategory": ["Kitchen", "Non self-contained vehicles", "Laundry", "Powered Sites", "Unpowered Sites"],
+        "parent_category": "Accommodation",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 5,
+        "thumbs_down": 5,
+        "thumbs_up": 4,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.107, -35.2575]
+      },
+      "properties": {
+        "id": "dfa5d64c-0c3e-41fb-af23-d43a7ba6d0ff",
+        "name": "Alivio Tourist Park Canberra",
+        "description": "Nestled in a quiet bushland setting less than 5 minutes from the heart of the city, we are your perfect home away from home when visiting Canberra. \r\n\r\nFeaturing a huge choice of modern and spacious villas, cabins and motel rooms, a great caf\u00e9, bar, pool and spa, leisure facilities and friendly helpful staff, all just a few minutes drive from the National Capital's biggest attractions.\r\n",
+        "fees": "From $37",
+        "bookable": true,
+        "images": [
+          "https://photos.geozone.co.nz/photos/caee3f28dac0d5505e2e45f8dd289ea9.jpg",
+          "https://photos.geozone.co.nz/photos/638a9d5c591882877a95f21645b12eed.jpg",
+          "https://photos.geozone.co.nz/photos/e7f31f2b862f3a456dbb76ffc26de880.jpg",
+          "https://photos.geozone.co.nz/photos/b09bdb9024dc2ea41363c6f57f5a42ed.jpg",
+          "https://photos.geozone.co.nz/photos/2411b2c5b8099d60a6618cdfa57f38ae.jpg",
+          "https://photos.geozone.co.nz/photos/0388b4dae81c3cf0ff45da70cac8e312.jpg",
+          "https://photos.geozone.co.nz/photos/c0c473fb4bb9f17e1316f54688bef2d0.jpg",
+          "https://photos.geozone.co.nz/photos/e596df481d3e9376469ef219c3a0e3ac.jpg",
+          "https://photos.geozone.co.nz/photos/ababd309c3edcca3faead31add6d39cd.jpg",
+          "https://photos.geozone.co.nz/photos/fa0ae3107db21facfa17706c1f6786e2.jpg",
+          "https://photos.geozone.co.nz/photos/004b19605763e961e68511b4d67cb4ff.jpg",
+          "https://photos.geozone.co.nz/photos/d6f893e58489dd41f4109161915d3768.jpg"
+        ],
+        "category": "Paid Campground",
+        "subCategory": ["Non self-contained vehicles", "Wifi", "Allows Same Day Bookings", "Powered Sites"],
+        "parent_category": "Accommodation",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 3.6,
+        "thumbs_down": 0,
+        "thumbs_up": 4,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.194, -35.2342]
+      },
+      "properties": {
+        "id": "d425bb01-0c2f-11ef-9fc6-3231da123284",
+        "name": "Treetops Adventure Canberra",
+        "description": "Treetops Adventure Canberra ACT\n\nGet ready for the ultimate outdoor adventure in the heart of Majura Pines! Nestled  just a short drive from Canberra\u2019s CBD, the once-working pine plantation is branching out to be the home of our next treetops playground for all ages.\n\nBoasting over 90 aerial obstacles and 16 ziplines, suspended between 1-15 metres above the ground, our Canberra park has a course for everyone aged 3 years and up to enjoy.",
+        "fees": "From $32",
+        "bookable": true,
+        "images": [
+          "https://photos.geozone.co.nz/photos/2ed1fbd3-47d5-4b7f-b41a-b83a9d0dfbd5.jpeg",
+          "https://photos.geozone.co.nz/photos/1c64e339-c5a9-4a7d-b3ef-deaf88c47568.jpeg",
+          "https://photos.geozone.co.nz/photos/53b0ae12-d486-4324-adf1-33ff786976b3.jpeg",
+          "https://photos.geozone.co.nz/photos/8825cc89-88e8-4e59-b71d-5a410fbd1885.jpeg"
+        ],
+        "category": "Tourist Attractions",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Majura",
+        "state": "ACT",
+        "score": 3.5,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "bs/BsImage",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.121, -35.2929]
+      },
+      "properties": {
+        "id": "25056188-0c90-40fa-982c-589bbf5f649e",
+        "name": "National Museum of Australia ",
+        "description": "Discover where Australia\u2019s stories come alive at the National Museum of Australia.\n\nLocated on the shores of Lake Burley Griffin, the Museum\u2019s stunning architecture offers visitors an extraordinary place to explore the rich and diverse stories of Australia and its people.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/f573dc59e3515b31c6b05f226c2cb300.jpg",
+          "https://photos.geozone.co.nz/photos/771e8741dae2b257691ffedb1557762d.jpg",
+          "https://photos.geozone.co.nz/photos/7d409de54e748cdfd0464fcc2393d16a.jpg",
+          "https://photos.geozone.co.nz/photos/b5fcfb44a7c128c619a2210777e2a587.jpg",
+          "https://photos.geozone.co.nz/photos/b8d6eed488d378e85204f3e7dc4aa273.jpg",
+          "https://photos.geozone.co.nz/photos/cfe05d3ad0a9b03758522bad33bc2303.jpg",
+          "https://photos.geozone.co.nz/photos/c95f0bdd8d64102785fdd480774b48aa.jpg",
+          "https://photos.geozone.co.nz/photos/d79b27ff387b3054958ef10729bd5acd.jpg"
+        ],
+        "category": "Culture",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 3,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "fa/FaTheaterMasks",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.949, -35.3249]
+      },
+      "properties": {
+        "id": "d7f3ffa8-e75a-4aac-bbcb-9d9e3b79fbb1",
+        "name": "Cotter Campground",
+        "description": "The Cotter Campground is the most highly serviced Bushland Camping Area in the ACT. Enjoy grassed areas suitable for tents, grassed and gravelled areas suitable for Campervans/Caravans. Facilities block includes: Hot showers and flush toilets, sinks for dishwashing and laundering. There are several shared sheltered free Electric/Gas BBQ\u2019s, plus wood fire BBQ\u2019s places. Bring your own wood or purchase from Rangers on site. \r\n\r\nPlease no collecting wood as this is an offence. No Bookings as there is no designated sites. \r\n\r\nNo pets allowed.",
+        "fees": "Fees - $15 adult, $12 seniors, $10 concession/student, children 14 & under Free. Cash only, no EFTPOS. A bag of wood = $12.00",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/c2057cf0ff4b5210a2a07f6c06aa0265.jpg",
+          "https://photos.geozone.co.nz/photos/e25513489ed63400d998261801eacf05.jpg",
+          "https://photos.geozone.co.nz/photos/7ec58f96da9da266abd2c22fb4f19f4b.jpg",
+          "https://photos.geozone.co.nz/photos/a4a7c87895e9b4bf0a15f751bc349309.jpg",
+          "https://photos.geozone.co.nz/photos/b69eb155611aa150d74b1abe107d8bdf.jpg",
+          "https://photos.geozone.co.nz/photos/b69eb155611aa150d74b1abe106e74aa.jpg",
+          "https://photos.geozone.co.nz/photos/b69eb155611aa150d74b1abe1072fe31.jpg",
+          "https://photos.geozone.co.nz/photos/a4e1c1f96c023640fbd68ef8dac02e1c.jpg"
+        ],
+        "category": "Paid Campground",
+        "subCategory": ["Unpowered Sites", "Flush Toilet", "Hot Shower", "Non self-contained vehicles"],
+        "parent_category": "Accommodation",
+        "town": "ACT - South West",
+        "state": "ACT",
+        "score": 2.45,
+        "thumbs_down": 1,
+        "thumbs_up": 14,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.147, -35.2313]
+      },
+      "properties": {
+        "id": "523ac1f2-9c80-4ef0-b88b-7999d325402d",
+        "name": "Exhibition Park in Canberra Camping Facilities",
+        "description": "Exhibition Park in Canberra (EPIC) is a Territory owned multi-purpose events facility, located at the gateway to the Nation\u2019s Capital.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/5d850fc4-398e-4d39-963d-da00625cf9cb.png",
+          "https://photos.geozone.co.nz/photos/9361dbf9-7375-43f1-9f0e-1e3954952450.png"
+        ],
+        "category": "Paid Campground",
+        "subCategory": ["Powered Sites", "Unpowered Sites", "Non self-contained vehicles", "Laundry"],
+        "parent_category": "Accommodation",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 2.2,
+        "thumbs_down": 1,
+        "thumbs_up": 20,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.155, -35.2267]
+      },
+      "properties": {
+        "id": "8691d7fe-eb7c-4ae9-b6f0-e86170475751",
+        "name": "Canberra Park Tourist Park",
+        "description": "Canberra Park is the largest and newest group accommodation property in the Canberra region. Canberra Park has been designed to specifically meet the needs of groups travelling to Canberra.",
+        "fees": "From $50 per night",
+        "bookable": false,
+        "images": ["https://photos.geozone.co.nz/photos/7f54302165927f9caa077b4871bb3c3d.jpg"],
+        "category": "Paid Campground",
+        "subCategory": [
+          "Cold Shower",
+          "Hot Shower",
+          "Laundry",
+          "Kitchen",
+          "Pets Welcome by arrangement",
+          "Self-contained vehicles only",
+          "Disabled Parking",
+          "Wifi",
+          "Powered Sites"
+        ],
+        "parent_category": "Accommodation",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 1.7,
+        "thumbs_down": 0,
+        "thumbs_up": 1,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.129, -35.282]
+      },
+      "properties": {
+        "id": "bd475ed8-0fb5-4bd1-aff4-c007245873cb",
+        "name": "Canberra Centenary Trail",
+        "description": "The Canberra Centenary Trail is a 145-kilometre self-guided, non-motorised loop trail for walkers and touring cyclists. It showcases urban and rural Canberra, as well as iconic sites and hidden treasures. \n\nThe trail is designed to be accessible for as many walkers and cyclists as possible. It follows management trails, walking tracks and shared paths. It is designed for low intensity use by all walkers and cyclists of moderate ability, with less than a 10% gradient overall.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/a42427160d0fa5fd225aa506e4c5475a.jpg",
+          "https://photos.geozone.co.nz/photos/bfd412e6f68cd18f77a47f66a643869c.jpg"
+        ],
+        "category": "Walking & Hiking",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 1.7,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "md/MdOutlineHiking",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.929, -35.4381]
+      },
+      "properties": {
+        "id": "03392871-d0b5-4106-985b-64613a4e418a",
+        "name": "Nil Desperandum",
+        "description": "Nestled in a tranquil, natural bush setting beneath the Tidbinbilla Range, Nil Desperandum maintains its heritage charm and offers visitors a feeling of remoteness just a short drive away from the centre of Canberra. \n\nThe historic European pis\u00e9 house provides a beautiful, rustic wilderness experience. Access to Nil Desperandum is by 4WD or AWD vehicles ONLY. Alternatively, a marked walking trail will lead you to historic cottage (12km return).",
+        "fees": "",
+        "bookable": false,
+        "images": ["https://photos.geozone.co.nz/photos/dc3ace2d23ce7033b580c2bb6512279c.jpg"],
+        "category": "Paid Campground",
+        "subCategory": ["Kitchen", "Non self-contained vehicles", "Unpowered Sites"],
+        "parent_category": "Accommodation",
+        "town": "ACT - South West",
+        "state": "ACT",
+        "score": 1.7,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.055, -35.5921]
+      },
+      "properties": {
+        "id": "d5b64138-7d05-4afc-ae32-7c277872c349",
+        "name": "Namadgi National Park",
+        "description": "A variety of campgrounds and bush camping are available in this 106,000ha national Park. \n\nHoneysuckle Campground has access to the historic Honeysuckle Tracking Station site. A walking track connects to Booroomba Rocks/Orroral Ridge.",
+        "fees": "",
+        "bookable": false,
+        "images": ["https://photos.geozone.co.nz/photos/dc3ace2d23ce7033b580c2bb6511a1fb.jpg"],
+        "category": "Paid Campground",
+        "subCategory": ["Non self-contained vehicles", "Unpowered Sites"],
+        "parent_category": "Accommodation",
+        "town": "Namadgi",
+        "state": "ACT",
+        "score": 1.7,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.873, -35.3057]
+      },
+      "properties": {
+        "id": "f773b336-a3de-4632-b4cd-39e0642c69b2",
+        "name": "Blue Range Hut",
+        "description": "Blue Range Hut is available to hire for functions and overnight stays. The hut interior is sparse with only an open fireplace and picnic table. Access pit toilets and wood fired and gas barbeques outside. The area around Blue Range Hut is a popular place to picnic, horse ride, cycle and camp.",
+        "fees": "Pricing: $8.00 to $55.40",
+        "bookable": false,
+        "images": ["https://photos.geozone.co.nz/photos/16be22cb-4545-4b3b-908a-a8cbe5821803.jpeg"],
+        "category": "Paid Campground",
+        "subCategory": ["Non self-contained vehicles", "Unpowered Sites"],
+        "parent_category": "Accommodation",
+        "town": "ACT - South West",
+        "state": "ACT",
+        "score": 1.7,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.149, -35.2273]
+      },
+      "properties": {
+        "id": "81e78699-14b8-4508-b189-147f06a0be0f",
+        "name": "EPIC Camp Ground",
+        "description": "Powered & unpowered grass sites with toilets, showers, laundry & dump point located in the Canberra Showgrounds.",
+        "fees": "",
+        "bookable": false,
+        "images": ["https://photos.geozone.co.nz/photos/a465fa90-371c-4062-ad4c-494984f920e8.webp"],
+        "category": "Paid Campground",
+        "subCategory": [
+          "Hot Shower",
+          "Powered Sites",
+          "Unpowered Sites",
+          "Dump Station",
+          "Non self-contained vehicles",
+          "Laundry"
+        ],
+        "parent_category": "Accommodation",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 1.6,
+        "thumbs_down": 0,
+        "thumbs_up": 1,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.941, -35.4797]
+      },
+      "properties": {
+        "id": "9027dc48-febd-4c8a-8534-af09e372528a",
+        "name": "Woods Reserve",
+        "description": "Situated on the banks of Gibraltar Creek, Woods Reserve Recreation Area provides camping for tents and campervans. Facilities include hot showers, toilets, Gass BBQs, picnic shelter and tables, and wood fire pits. You will need to bring your own firewood. Campsite runs on a first in basis. Paymnets can be made at the box onsite, through the ranger or at the Namadgi Visitor's Centre.",
+        "fees": "AUD $12 per person per night Under 15's are free",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/94c9d36865dfd461423f7b2f44e95e32.jpg",
+          "https://photos.geozone.co.nz/photos/a53d599b0e9214d6458215ee458845e0.jpg",
+          "https://photos.geozone.co.nz/photos/b7e71bf46a5990a466f498f75189ccb5.jpg",
+          "https://photos.geozone.co.nz/photos/dc3ace2d23ce7033b580c2bb6597668a.jpg",
+          "https://photos.geozone.co.nz/photos/dc3ace2d23ce7033b580c2bb652ed967.jpg"
+        ],
+        "category": "Paid Campground",
+        "subCategory": [
+          "Unpowered Sites",
+          "Flush Toilet",
+          "Hot Shower",
+          "Non self-contained vehicles",
+          "Pets Welcome by arrangement"
+        ],
+        "parent_category": "Accommodation",
+        "town": "ACT - South West",
+        "state": "ACT",
+        "score": 1.55,
+        "thumbs_down": 0,
+        "thumbs_up": 10,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.942, -35.4404]
+      },
+      "properties": {
+        "id": "59e38d79-be3b-4723-aac3-beeffe2911d6",
+        "name": "Tidbinbilla Nature Reserve",
+        "description": "Tidbinbilla Nature Reserve is a 54.5 square kilometre protected area, on the fringe of Namadgi National Park, approximately 40 kilometres from the centre of Canberra, Australia. The reserve is managed by the ACT Parks and Conservation Service, and was established in 1971.\n\nTidbinbilla Nature Reserve is home to a wide variety of Australian wildlife, including kangaroos, wallabies, koalas, platypus, lyrebirds, emus, and other birds, reptiles, and mammals. The reserve also contains a variety of plant life, including eucalypt forests, woodlands, grasslands, and wetlands.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/c8da05dd37ce63d45359d53eb78c97cb.jpg",
+          "https://photos.geozone.co.nz/photos/e73119959053383bc4b633e57f3a906b.jpg",
+          "https://photos.geozone.co.nz/photos/81c5ec0c6596a7f40721485c5c560d53.jpg",
+          "https://photos.geozone.co.nz/photos/d2530fd82d3b2689c944bd8d7cdf8382.jpg",
+          "https://photos.geozone.co.nz/photos/79eb0ec3f342f1d68471ece186c36563.jpg",
+          "https://photos.geozone.co.nz/photos/bc5c90e53ebcb74b3ea999a23fe342a2.jpg",
+          "https://photos.geozone.co.nz/photos/fabd4c4b3faaddc1e10bd69e9b997341.jpg"
+        ],
+        "category": "Walking & Hiking",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "ACT - South West",
+        "state": "ACT",
+        "score": 1.4,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "md/MdOutlineHiking",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.144, -35.3132]
+      },
+      "properties": {
+        "id": "cd9c7b7b-28c1-4949-a01c-1cff2e4a4c66",
+        "name": "Canberra Glassworks",
+        "description": "See the beauty and versatility of glass in a new light at the Canberra Glassworks, housed in the historic Kingston Power House. Take a self-guided tour and discover some of Canberra's heritage at this contemporary glass centre, the only one of its kind in Australia.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/e2a92b59e85681ce54c681c1f15a13fc.jpg",
+          "https://photos.geozone.co.nz/photos/e5050b48491a90962eede816ae0a6ff2.jpg",
+          "https://photos.geozone.co.nz/photos/7fb71b5660247361cee80ffd6e829594.jpg",
+          "https://photos.geozone.co.nz/photos/9552dfad284f26c8db99f207b003dd6e.jpg",
+          "https://photos.geozone.co.nz/photos/813cb6863337991e4b1bc8506593a061.jpg",
+          "https://photos.geozone.co.nz/photos/af34765fec9f3a245746d32f070a3825.jpg",
+          "https://photos.geozone.co.nz/photos/8c102f2b08b642bbfb93ec77ce61347a.jpg",
+          "https://photos.geozone.co.nz/photos/8597e630195c52eefec30e119deeb2fa.jpg"
+        ],
+        "category": "Tourist Attractions",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 1.4,
+        "thumbs_down": 0,
+        "thumbs_up": 1,
+        "style": {
+          "icon": "bs/BsImage",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.097, -35.2747]
+      },
+      "properties": {
+        "id": "15a292b6-e618-49d8-8756-f99784669100",
+        "name": "Black Mountain Nature Reserve",
+        "description": "Black Mountain Nature Reserve is a 434-hectare protected area on the northern side of Lake Burley Griffin. Black Mountain, a prominent hill 812 metres above sea level topped by a 195-metre tower, dominates the reserve. The reserve has many walking tracks, with views overlooking the bush capital.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/be392dfca2d455035d2860a9cb7cad0f.jpg",
+          "https://photos.geozone.co.nz/photos/d6d9b44073e93f90f062d43c723e953b.jpg"
+        ],
+        "category": "Walking & Hiking",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 1.4,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "md/MdOutlineHiking",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.191, -35.2102]
+      },
+      "properties": {
+        "id": "af9bd214-4088-4ffe-8f2f-2a6844bfb31d",
+        "name": "Hughie Edwards VC Rest Area",
+        "description": "Spacious drive-through rest area with basic, well- kept facilities. It is adjacent to the highway and there is not much shade or privacy. The site is also frequented by trucks.",
+        "fees": "Free",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/e89518b01bcda4ed596327423fcbd24e.jpg",
+          "https://photos.geozone.co.nz/photos/b2291ff6056fb82892c629bd7386f151.jpg"
+        ],
+        "category": "Free Campgrounds",
+        "subCategory": ["Unpowered Sites", "Non self-contained vehicles", "Pets Welcome by arrangement"],
+        "parent_category": "Accommodation",
+        "town": "Majura",
+        "state": "ACT",
+        "score": 1.35,
+        "thumbs_down": 5,
+        "thumbs_up": 16,
+        "style": {
+          "icon": "fa/FaCampground",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.124, -35.3083]
+      },
+      "properties": {
+        "id": "b1fc480b-a841-4d1e-807b-c8b83beecf89",
+        "name": "Parliament House",
+        "description": "See democracy in action at Australia's iconic Parliament House high on Capital Hill. During Question Time see the country\u2019s elected politicians make the big decisions on behalf of the nation. Take a guided tour, view historic documents and see an impressive collection of Australian art.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/324a483f09ce7024d7ca73f50d20ab63.jpg",
+          "https://photos.geozone.co.nz/photos/9bbd93ffb3a76cfc29129798e82be4cf.jpg",
+          "https://photos.geozone.co.nz/photos/d95d3842ec381212b9c68906b538387e.jpg"
+        ],
+        "category": "Culture",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 1.3,
+        "thumbs_down": 0,
+        "thumbs_up": 3,
+        "style": {
+          "icon": "fa/FaTheaterMasks",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.159, -35.2703]
+      },
+      "properties": {
+        "id": "213b406f-8b44-461d-82a7-fcc0a050c939",
+        "name": "Mount Ainslie Lookout",
+        "description": "Mount Ainslie Lookout is one of Canberra's most popular tourist attractions, offering stunning panoramic views of the city and surrounding area. Located just a short drive from the city center, the lookout is easily accessible by car, bus, or bike. There is also a walking trail that leads to the top, for those who prefer to take a more scenic route. \nOnce you reach the summit, you'll be rewarded with breathtaking views of Lake Burley Griffin, the Australian War Memorial, Parliament House, and many other iconic landmarks. You can also see the Brindabella Mountains to the west and the Australian Alps to the south.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/de075e5a2c54715dbf139cfddeb40db7.jpg",
+          "https://photos.geozone.co.nz/photos/86233be41b5be0811b6e401929144946.jpg"
+        ],
+        "category": "Scenic Spots",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Majura",
+        "state": "ACT",
+        "score": 1.3,
+        "thumbs_down": 0,
+        "thumbs_up": 5,
+        "style": {
+          "icon": "bs/BsBrightnessAltHigh",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.877, -35.2895]
+      },
+      "properties": {
+        "id": "b84e8357-944e-421d-99bc-23e33d0d4593",
+        "name": "Blue Range Recreation Area",
+        "description": "Blue Range Recreation Area located in Uriarra Forest is suitable for tent camping or you can book the Blue Range Hut that sleeps 6 people. Facilities include toilets, BBQ, picnic tables and wood fireplace. You will need to bring firewood. Bookings are essential and can be done over the pone.",
+        "fees": "AUD $8.20 per person per night. $58.50 per night for 6 ppl (Hut)",
+        "bookable": false,
+        "images": ["https://photos.geozone.co.nz/photos/a54ee846-5266-4b0b-9edc-e79055328ccc.jpeg"],
+        "category": "Paid Campground",
+        "subCategory": [
+          "Flush Toilet",
+          "Non self-contained vehicles",
+          "Pets Welcome by arrangement",
+          "Unpowered Sites"
+        ],
+        "parent_category": "Accommodation",
+        "town": "ACT - South West",
+        "state": "ACT",
+        "score": 1.3,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.976, -35.5833]
+      },
+      "properties": {
+        "id": "2e91120c-8650-4c87-a93b-32c49985b8c2",
+        "name": "Honeysuckle Campground",
+        "description": "Honeysuckle campground is near the Australian Alps walking track,\u00a0Booroomba Rocks and the historic Honeysuckle Tracking station.\u00a0Facilities include fireplace, BBQ, toilets and\u00a0covered shelter with seats. You will need to bring firewood and water. Bookings are essential and may be made online.",
+        "fees": "AUD $8 per adult",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/b69eb155611aa150d74b1abe107d183c.jpg",
+          "https://photos.geozone.co.nz/photos/b69eb155611aa150d74b1abe107d1451.jpg"
+        ],
+        "category": "Paid Campground",
+        "subCategory": ["Flush Toilet", "Non self-contained vehicles", "Unpowered Sites"],
+        "parent_category": "Accommodation",
+        "town": "Namadgi",
+        "state": "ACT",
+        "score": 1.3,
+        "thumbs_down": 0,
+        "thumbs_up": 3,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.117, -35.2995]
+      },
+      "properties": {
+        "id": "e8fb38a6-0b54-4f73-a6f4-e89dc145285f",
+        "name": "Lake Burley Griffin",
+        "description": "The masterful centrepiece of Canberra, the large and lovely Lake Burley Griffin is an ideal water playground, whether you're into rowing, sailing, kayaking, stand-up paddle boarding or fishing. Cyclists and walkers are well catered for along the 40km shoreline, and nothing beats a picnic in its numerous parks and gardens.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/8f8ad20bfa8b28082a15c1bcfd86f692.jpg",
+          "https://photos.geozone.co.nz/photos/ab46946ddb27dd0d0a1ccba7f31925ce.jpg",
+          "https://photos.geozone.co.nz/photos/935a1e18927a498a826cfe41bfd531c9.jpg",
+          "https://photos.geozone.co.nz/photos/ba52f30df9786994af092983dd688cf0.jpg"
+        ],
+        "category": "Scenic Spots",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 1.1,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "bs/BsBrightnessAltHigh",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.164, -35.3167]
+      },
+      "properties": {
+        "id": "35ecef78-b1bb-406f-bd60-a0025f1775ec",
+        "name": "Jerrabomberra Wetlands",
+        "description": "The filling of Lake Burley Griffin in 1964 led to an artificially high water table on the Molonglo River floodplain. Jerrabomberra Wetlands was the result. This waterbird wonderland now hosts a diverse panorama of plant and animal life, including over 170 different bird species.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/aef141cfaf9707898d40cbf03c0830c7.jpg",
+          "https://photos.geozone.co.nz/photos/f261874d1508b911ff4490fda4d7349a.jpg"
+        ],
+        "category": "Scenic Spots",
+        "subCategory": [],
+        "parent_category": "Activities",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 1.1,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "bs/BsBrightnessAltHigh",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.156, -35.3472]
+      },
+      "properties": {
+        "id": "d8572252-e551-44fa-b869-bd9e05ab37b5",
+        "name": "Sundown Villas",
+        "description": "The Sundown Villas is a unique \"apartment\" style motel centrally located on the south side of the National Capital.\r\n\r\nOnly minutes away from all major attractions you can relax and enjoy the tranquil surroundings after a hectic schedule of work or sightseeing.\r\n\r\nOur friendly staff will do the upmost to make your stay enjoyable and comfortable. They can advise you about our many tourist attractions available. Should you require conference facilities whilst in Canberra, this is also available on site at the Sundown Motel Resort.",
+        "fees": "",
+        "bookable": false,
+        "images": [
+          "https://photos.geozone.co.nz/photos/e7abf950033ce965d8ff41be82aaec28.jpg",
+          "https://photos.geozone.co.nz/photos/a5430db2a2ad78222ea1b677e9d2dba0.jpg",
+          "https://photos.geozone.co.nz/photos/8c031565b25682eb0f521217562ad606.jpg"
+        ],
+        "category": "Paid Campground",
+        "subCategory": ["Non self-contained vehicles", "Laundry", "Kitchen", "Wifi", "Cold Shower"],
+        "parent_category": "Accommodation",
+        "town": "Canberra",
+        "state": "ACT",
+        "score": 1,
+        "thumbs_down": 2,
+        "thumbs_up": 1,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.072, -35.6669]
+      },
+      "properties": {
+        "id": "b366e964-739f-48d9-9259-4457582c6544",
+        "name": "Caloola Farm",
+        "description": "Caloola Farm is a beautiful events venue, with accommodation and camp sites set in Tharwa near Canberra.",
+        "fees": "",
+        "bookable": false,
+        "images": ["https://photos.geozone.co.nz/photos/34cfde9b-add2-4bac-8b5b-9e233c3951c6.jpeg"],
+        "category": "Paid Campground",
+        "subCategory": ["Flush Toilet", "Hot Shower", "Non self-contained vehicles", "Unpowered Sites"],
+        "parent_category": "Accommodation",
+        "town": "Namadgi",
+        "state": "ACT",
+        "score": 0,
+        "thumbs_down": 0,
+        "thumbs_up": 0,
+        "style": {
+          "icon": "bs/BsHouseExclamation",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

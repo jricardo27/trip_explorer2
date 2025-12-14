@@ -1,0 +1,380 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.discoveryholidayparks.com.au",
+    "style": {
+      "layerName": "Discovery Parks",
+      "color": "red"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [146.9076385498047, -36.69701385498047]
+      },
+      "properties": {
+        "id": "VBUF",
+        "name": "Mount Buffalo - Discovery Parks",
+        "area": "High Country",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/VBUF",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/64997550-0d84-4a7f-b354-329153c21e4a/discovery-parks-mount-buffalo-hero-image-1.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3aaeed6f-6fce-47b3-850a-bba06861e44c/discovery-parks-mount-buffalo-hero-image-2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/283fc0c6-497f-41a1-823e-ef1d4fb615fd/discovery-parks-mount-buffalo-hero-image-3.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ae200204-409e-473f-ae7f-764824bc8b62/discovery-parks-mount-buffalo-hero-image-4.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d2c861a1-718e-402f-bcf3-6ed764ef349f/discovery-parks-mount-buffalo-hero-image-5.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3e2b30f8-22d0-4bb9-9477-756da3c044f6/discovery-parks-mount-buffalo-hero-image-6.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8c134832-9e87-4a52-961b-60b52982d874/discovery-parks-mount-buffalo-hero-image-7.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a6efa8b1-8dd5-4d27-9339-508c74891022/discovery-parks-mount-buffalo-hero-image-8.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [147.03311157226562, -36.773799896240234]
+      },
+      "properties": {
+        "id": "VBRT",
+        "name": "Bright - Discovery Parks",
+        "area": "High Country",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/VBRT",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b2154ae4-996c-4716-a7ea-8f9cd581d8e9/BRF-2034-Pano.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0b307683-ab9e-404c-9ece-1713cad4bb7a/BRF-460-Pano.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/84dda423-0ff0-4a2b-8d0e-b1357335c78a/Hero-Tennis-Court.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e5a415b4-1bc9-4063-8a7b-39edabcf7484/110536183.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [145.1263885498047, -36.79111099243164]
+      },
+      "properties": {
+        "id": "VNAG",
+        "name": "Nagambie Lakes - Discovery Parks",
+        "area": "Goulburn",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/VNAG",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/cc74ccd9-752d-44f2-aaef-20e68c94671c/Discovery-Parks-Nagambie-Lakes-banner.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/55d51ee6-b5fc-4ff7-bdbe-580f6b975a1a/NAGAMBIE-LAKES_4.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/83bb4971-c66b-40ee-b8a9-de366bedaed4/NAGAMBIE-LAKES_5.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e9eaf4a2-366a-4e65-b80f-ace698840651/Discovery-Parks-Nagambie-Lakes-Homepage-deck.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a59d6903-045d-4886-b3a2-113b7819c86c/Discovery-Parks-Nagamie-Lakes-Powered-Lakeview-River-Gum-Island-e.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.8636932373047, -37.78563690185547]
+      },
+      "properties": {
+        "id": "VMEL",
+        "name": "Melbourne - Discovery Parks",
+        "area": "Melbourne",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/VMEL",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0cb9e917-f3bc-43d3-8356-a8095aa25682/20720_melbourne_lifestyle_032.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/6162428f-5861-4316-9f16-8e2a5edb9ed6/7734_img_3740.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2534c5f8-60b6-4f1b-886c-7efeecbfaebb/5923_agm-1194.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b170774c-0086-4aa8-a9bc-19a75219ee83/20722_melbourne_playground_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/15a64d3c-3350-4838-8124-c65ec76a52e6/20721_melbourne_pool_a.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [147.01226806640625, -36.14126205444336]
+      },
+      "properties": {
+        "id": "VHUM",
+        "name": "Lake Hume, Victoria - Discovery Parks",
+        "area": "Murray East",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/VHUM",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ca66966c-e2e7-459a-b9ec-c0f7c576be1f/14245_dji_0012.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4e3849a2-4db5-4812-96a6-3efe7474e38b/21577_lake_hume_lifestyle_011.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/de889e0f-562d-4b22-8291-0bf13102d9cd/21578_lake_hume_other_032.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ed907f7c-ada5-490c-9c1b-b74a12879243/21579_lake_hume_playground_a.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b5a5888f-505a-4af0-aee4-458772b327d4/21576_lake_hume_pool_a.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.337646484375, -38.16716003417969]
+      },
+      "properties": {
+        "id": "VGEE",
+        "name": "Geelong - Discovery Parks",
+        "area": "Geelong and Bellarine",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/VGEE",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1137175a-5bac-4db5-bb48-f33c92de3007/23033_geelong_deluxe_studio_access_s2_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1c0982b1-ec22-46ed-b28a-3e1816a29ad9/20425_geelong_pool_q_003.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f77f3e07-7782-436c-a2f6-c2b5ceafad0b/21334_geelong_lifestyle_007.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e5791cc1-c6d6-448b-9d33-6a0f982a1713/GEELONG_BBQ_Area_A.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.7924346923828, -36.12382507324219]
+      },
+      "properties": {
+        "id": "VECH",
+        "name": "Echuca - Discovery Parks",
+        "area": "Central Murray",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/VECH",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c3dcfcf6-13d4-485d-adef-634455b53a0a/21442_echuca_bouncezone_c.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/fc423e4a-f4f4-40e4-9e92-1cc3d246d298/21439_echuca_pool2_c.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4b471f76-c048-4f3d-a198-41491a78fd15/21443_echuca_lifestyle_009.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/78368d30-73cf-4d00-b270-5c5368a9e675/21444_echuca_other_011.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/bde59661-9ed1-4d7a-9dd6-acd1b9c670fb/photo-72.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [142.47479248046875, -38.39508819580078]
+      },
+      "properties": {
+        "id": "VWAR",
+        "name": "Warrnambool - Discovery Parks",
+        "area": "Great Ocean Road",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/VWAR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/939cf307-6aaa-4294-a7e5-5619950c0f54/23036_s1655-568.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9dd65d3d-079c-4a72-8478-4f7148808e11/20901_warnambool_lstyle_041.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5322a9b2-9ce5-40dc-b1d8-73a0faccb2ad/14754_wb-121.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/332658c9-d3fd-4034-8861-993361f734a7/20899_warrnambool_movieroom_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8a0d2850-02cc-4cf0-9d6c-b4f65add56fb/14756_wb-1354.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a176870c-b19f-4763-bfe7-fff72f7dc771/20900_warnambool_lstyle_003.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [142.1699676513672, -34.181034088134766]
+      },
+      "properties": {
+        "id": "NMIL",
+        "name": "Mildura, Buronga Riverside - Discovery Parks",
+        "area": "Mallee",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NMIL",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c5562f8e-f4e7-431c-b1f7-e9b95deea073/discovery-parks-mildura-caravan-site.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e4f91552-d4a3-46f4-8322-b5113500dc4a/discovery-parks-mildura-pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b13e717f-f520-47b3-be3c-cd3e09043f2b/discovery-parks-mildura-cabin-drone.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d92c5d5a-1388-4ddc-a240-b696b504d56b/discovery-parks-mildura-bbq.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3afcc8cc-8db5-4e57-9efa-b0cd3ad3ecb8/discovery-parks-mildura-deluxe-2BR-waterfront-cabin-S4-deck.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": "",
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

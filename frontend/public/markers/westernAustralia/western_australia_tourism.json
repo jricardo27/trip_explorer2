@@ -1,0 +1,540 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.westernaustralia.com/",
+    "style": {
+      "layerName": "Western Australia website",
+      "color": "teal"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.86104879999992, -31.9525739]
+      },
+      "properties": {
+        "id": "56b266c5d5f1565045da9dd7",
+        "name": "Perth",
+        "description": "Perth edges the Indian Ocean \u2013 with 19 pale, sandy beaches - framed around enormous Kings Park and carved by the s-bends of the Swan River. Western Australia\u2019s capital is a dynamic city that balances its natural beauty with a lively after-dark scene. Perth is safe, friendly, clean and easy to get around, whether you\u2019re taking public transport, self-driving or jumping in a taxi or Uber. Most people fly in \u2013 the airport is only a 20-minute drive from the city centre - while some will cross the Nullarbor Plain, an epic desert journey along Australia\u2019s base, achievable on wheels ...",
+        "url": "https://www.westernaustralia.com/en/places/perth/56b266c5d5f1565045da9dd7",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/b07e6c254b793d3da16f1f2b7f206f35.jpeg?rect=521,0,2263,1273&rot=360",
+            "title": "Perth City Skyline"
+          }
+        ],
+        "town": "Perth",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.0739807605744, -33.949037248405155]
+      },
+      "properties": {
+        "id": "56b266c62880253d74c4eee9",
+        "name": "Margaret River",
+        "description": "Few of the world\u2019s wine regions bear such a striking combination of treasures. Tall tree forests tower over clusters of vibrantly coloured wildflowers. Fragrant scrub edges a coastline of pale sandy beaches, rounded boulders and glass-clear ocean. Inland, vines frame cellar doors, barrels of wine and some of Western Australia\u2019s best dining experiences. At the heart of it all, is Margaret River town. The Margaret River region\u2019s main airport is at Busselton, which is a 45-minute drive from Margaret River town. Sitting about three-and-a-half hours\u2019 drive south from Perth, the town itself has a small, ...",
+        "url": "https://www.westernaustralia.com/en/places/margaret-river/56b266c62880253d74c4eee9",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/3a2f03c8ddd2331b78983e0cfd34e7cb.jpeg?rect=0,187,2000,1125&rot=360",
+            "title": "Vasse Felix, Margaret River"
+          }
+        ],
+        "town": "Margaret River",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.12930721815565, -21.93507152352366]
+      },
+      "properties": {
+        "id": "56b266b92880253d74c4edcc",
+        "name": "Exmouth",
+        "description": "Brimming with adventure, the welcoming coastal town of Exmouth is your base to discover some of the most spectacular scenery on the planet. Jump into the ocean and swim with beautiful aquatic creatures, big and small. Or head to the surrounding coastline, as rugged as it is dramatic, for even more opportunities to get among nature. A 13-hour drive or two-hour flight from Perth, Exmouth is the gateway to the World Heritage-listed Ningaloo Marine Park, the world\u2019s largest fringing reef. Glimpse kaleidoscopic fish darting between the coral from a glass-bottom boat, or snorkel in the crystal-clear ...",
+        "url": "https://www.westernaustralia.com/en/places/exmouth/56b266b92880253d74c4edcc",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/2720da8a563dd2c5149bd4aec512d40c.jpeg?rect=0,254,3508,1973&rot=360",
+            "title": "Exmouth"
+          }
+        ],
+        "town": "Exmouth",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.84580430000004, -20.73535]
+      },
+      "properties": {
+        "id": "56b266c3d5f1565045da9dac",
+        "name": "Karratha",
+        "description": "Awe and ore can be found in equal measure in Karratha. Known for its iron ore operations, this is the gateway to the marine-life rich Dampier Archipelago, the world's most prolific prehistoric rock engraving site, Karijini's four billion year old adventure playground and Millstream's Chichester National Park. It's also one of the few locations where you can witness the Staircase to the Moon. Karratha is a two hour flight or a 16 hour road trip from Perth, and a three hour drive south of Port Hedland. From here, you can join one of many guided tours, or begin your own ...",
+        "url": "https://www.westernaustralia.com/en/places/karratha/56b266c3d5f1565045da9dac",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/c7bde92dc35f0baf2d2c46a77666ab13.jpeg?rect=4,0,2731,1536&rot=360",
+            "title": "Cleaverville"
+          }
+        ],
+        "town": "Karratha",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [117.88442719238289, -35.0272540144812]
+      },
+      "properties": {
+        "id": "56b266bb2cbcbe7073ae06bd",
+        "name": "Albany",
+        "description": "The cool climate haven of Albany perches on a placid harbour edged by a National Park. A rugged coastline of sculpted rocks, peaceful sandy beaches and nature trails through fragrant bush awaits those with a sense of adventure, while fans of local wineries, small wine bars and historic buildings will enjoy slow walks around town. It takes just over four-and-a-half hours to drive to Albany from Perth, or you can fly there directly in one hour. Coach lines also service Albany. If you want to walk to Albany from Perth, you can \u2013 a 1000 kilometre bush walking trail called ...",
+        "url": "https://www.westernaustralia.com/en/places/albany/56b266bb2cbcbe7073ae06bd",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/1156ff5b8c22429ab1223bf9c38e3d6b.jpeg?rect=154,0,2516,1415&rot=360",
+            "title": "The Gap, Albany"
+          }
+        ],
+        "town": "Albany",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.7417129430054, -32.53407975497306]
+      },
+      "properties": {
+        "id": "56b266c6d5f1565045da9dec",
+        "name": "Mandurah",
+        "description": "Explore the award-winning charm of Mandurah, recently crowned Australia's Top Tourism Town for 2023. Just a 55-minute drive from Perth, Mandurah seamlessly combines a laid-back lifestyle with a holiday vibe, offering a plethora of attractions and experiences. Known for its unique features like Thomas Dambo's enchanting Giants of Mandurah and WA's largest Christmas Lights display with captivating Christmas Lights Cruises, Mandurah is a haven for those seeking a coastal escape. The town boasts one of Australia's healthiest dolphin populations, adding a touch of marine magic to its waters. Hop on ...",
+        "url": "https://www.westernaustralia.com/en/places/mandurah/56b266c6d5f1565045da9dec",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/5d41f124646121c199b94314661665ce.jpeg?rect=0,191,2048,1152&rot=360",
+            "title": "City of Mandurah"
+          }
+        ],
+        "town": "Mandurah",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [122.23585200000002, -17.9614336]
+      },
+      "properties": {
+        "id": "56b266bcd5f1565045da9d18",
+        "name": "Broome",
+        "description": "Welcome to Broome, where old and modern worlds collide, and the ocean meets the outback in picture-perfect style. It\u2019s a place that captivates visitors with its spectacular natural landscapes and fascinating pearl-diving history. Explore the western gateway to the Kimberley wilderness as you traverse turquoise waters and red ochre rock, take a camel ride against a tangerine sunset, and uncover ancient dinosaur footprints along the way. A two-and-a-half-hour flight north from Perth, the relaxed town of Broome has attracted people from around the globe for centuries, thanks to the stunning pearls ...",
+        "url": "https://www.westernaustralia.com/en/places/broome/56b266bcd5f1565045da9d18",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/4fadad02aa0ebfc88910d3f7665dbffa.jpeg?rect=0,215,2311,1300&rot=360",
+            "title": "Broome"
+          }
+        ],
+        "town": "Broome",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [121.45704469999998, -30.7519667]
+      },
+      "properties": {
+        "id": "56b267a97b935fbe730e6e20",
+        "name": "Kalgoorlie",
+        "description": "If places could talk, Kalgoorlie would have some interesting stories to tell. Explore Australia\u2019s largest outback town to uncover its fascinating past and present, from the region\u2019s gold rush era to the modern-day Super Pit mine. A visit to the whimsical outdoor art gallery set against the spectacular backdrop of Lake Ballard is a hauntingly beautiful way to round out your trip. Explore Western Australia\u2019s Golden Outback from the dynamic modern mining hub of Kalgoorlie. From Perth, choose your mode of transport: it\u2019s a 6. 5-hour drive along the Great Eastern Highway, a one-hour flight or a seven-hour ...",
+        "url": "https://www.westernaustralia.com/en/places/kalgoorlie/56b267a97b935fbe730e6e20",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/87e3765e9de55fa758ad628315fcefec.jpeg?rect=0,188,1799,1012&rot=360",
+            "title": ""
+          }
+        ],
+        "town": "Kalgoorlie",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [121.89022228537216, -33.86018056238752]
+      },
+      "properties": {
+        "id": "56b266ba2880253d74c4ede2",
+        "name": "Esperance",
+        "description": "Esperance \u2013 your portal to an iconic Australian holiday. Lay down a towel on the whitest sand you may ever experience and watch kangaroos laze on the shore at Lucky Bay, or charter a course among the untouched islands of the Recherche Archipelago. It\u2019s a beachside beauty spot, where coastal parks await discovery and relaxation is the order of the day. Prepare for an outdoor adventure surrounded by stunning seascapes. A one-and-a-half-hour flight or an eight-hour drive south from Perth, Esperance instantly dazzles visitors with its pristine sandy stretches and turquoise waters. Head to Lucky Bay ...",
+        "url": "https://www.westernaustralia.com/en/places/esperance/56b266ba2880253d74c4ede2",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/467eb6fcbbb7d9e69ec9d5b178da9296.jpeg?rect=0,762,1689,950&rot=360",
+            "title": "Twilight Cove, along the Great Ocean Drive"
+          }
+        ],
+        "town": "Esperance",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.71994216794428, -25.793724362464197]
+      },
+      "properties": {
+        "id": "56b266c17b935fbe730e5e3f",
+        "name": "Monkey Mia",
+        "description": "Wild dolphins have been visiting the shoreline at Monkey Mia virtually every day for over 40 years, making this spot in the Shark Bay World Heritage Area one of the best and most reliable places for dolphin interaction in the world. A 30-minute drive from Denham will bring you to Monkey Mia for a magical face-to-bottlenose encounter with these gentle creatures. Denham is a two-hour flight from Perth or a day's drive or perhaps join an extended guided tour. The story of the Monkey Mia dolphins begins in the early 1960s, when wild dolphins started making a regular appearance in ...",
+        "url": "https://www.westernaustralia.com/en/places/monkey-mia/56b266c17b935fbe730e5e3f",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/82bc64466b1614515ca6d565d7753dfc.jpeg?rect=0,151,2450,1378&rot=360",
+            "title": "Monkey Mia"
+          }
+        ],
+        "town": "Monkey Mia",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.54004409999992, -31.9969253]
+      },
+      "properties": {
+        "id": "56b266c1d5f1565045da9d82",
+        "name": "Rottnest Island",
+        "description": "Home to the happiest animals on earth - quokkas \u2013 Rottnest Island / Wadjemup is a holiday haven of pristine beaches, aquamarine bays, bike tracks and walking trails. The best part? The car-free, conservation-minded Class A reserve is only a 30-minute ferry ride from Fremantle in our capital city, Perth and an unforgettable adventure for every visitor. Whadjuk Noongar people are the original Custodians of Wadjemup, and the island holds a rich and complex history for Aboriginal people across WA. Join an immersive Aboriginal tour or visit the Wadjemup Museum and connect to the historical, cultural ...",
+        "url": "https://www.westernaustralia.com/en/places/rottnest-island/56b266c1d5f1565045da9d82",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/717a70223bdd5a7c20d1d634f99bd11b.jpeg?rect=0,94,1801,1013&rot=360",
+            "title": ""
+          }
+        ],
+        "town": "Rottnest Island",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.34507347153315, -33.65208922364687]
+      },
+      "properties": {
+        "id": "56b266c37b935fbe730e5e73",
+        "name": "Busselton",
+        "description": "Busselton has a foreshore that will stop you in your tracks and have you entertained for hours. You\u2019ll be dazzled by the ivory sand and the translucent turquoise ocean lapping at its edges. Then, a 1. 8-kilometre-long, heritage-listed jetty will draw your eyes out to sea where, from May to December, tens of thousands of whales pass by on their annual migration. And that\u2019s only the beginning. The drive to Busselton from Perth takes roughly 2. 5 hours. Or, you could fly, with the Busselton Margaret River Airport sitting 6. 5 kilometres from the town centre, equipped for everything from ...",
+        "url": "https://www.westernaustralia.com/en/places/busselton/56b266c37b935fbe730e5e73",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/f3f59572345ac4154a39f561e2018c63.jpeg?rect=213,0,2731,1536&rot=360",
+            "title": "Busselton Jetty"
+          }
+        ],
+        "town": "Busselton",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.745869, -32.053128]
+      },
+      "properties": {
+        "id": "56b266c1d5f1565045da9d6d",
+        "name": "Fremantle",
+        "description": "Fremantle / Walyalup has a way of drawing you in and making you want to stay forever. Its charm is found in narrow streets lined with historic buildings, a port bobbing with fishing boats, one-off shops, unconventional breweries and quirky buskers. It can be reached from central Perth via a 25-minute train ride, or half hour drive along Stirling Highway. Freo, as the locals call it, has a history as colourful as its buzzing markets. In days gone by, convicts, bushrangers, prison escapees and sailors frequented the postcode and since 1897, hundreds of tiny stalls run by artists, makers and ...",
+        "url": "https://www.westernaustralia.com/en/places/fremantle/56b266c1d5f1565045da9d6d",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/a62c5a6c342a27a4f3f71edab8fff856.jpeg?rect=0,676,3933,2212&rot=360",
+            "title": "Fremantle International Street Arts Festival"
+          }
+        ],
+        "town": "Fremantle",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.97195221860623, -31.897508908548836]
+      },
+      "properties": {
+        "id": "56b267fe7b935fbe730e74bb",
+        "name": "Swan Valley",
+        "description": "Western Australia's oldest wine region is a patchwork of grapevines and galleries, cellar doors, breweries and produce stalls, all within easy reach of Perth. Taste more than 180 years of winemaking and choose from 150 attractions on a gentle, 32-kilometre loop drive around the region. The Swan Valley is a 30-minute drive from Perth city centre. Many tours will take you there and back. You can do guided tasting tours via river cruise, kayak, limousine, private car, bus and even horse-drawn wagon \u2013 or, go on a self-led adventure. The region hosts a hotbed of artisanal makers. Forget the shiny ...",
+        "url": "https://www.westernaustralia.com/en/places/swan-valley/56b267fe7b935fbe730e74bb",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/9b6a627a51015aa5ea6d03fda77f3c1d.jpeg?rect=2,0,2665,1499&rot=360",
+            "title": "Mandoon Estate & Homestead Brewery, Swan Valley"
+          }
+        ],
+        "town": "Guildford",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.10733795614168, -33.61532703038971]
+      },
+      "properties": {
+        "id": "56b267b92880253d74c4fe54",
+        "name": "Dunsborough",
+        "description": "There are few places where the West Australian bush meets the beach, and lucky Dunsborough bears most of them. In a region of breathtaking bays, Dunsborough\u2019s stand out, each one a dreamy combination of crystalline turquoise water, granite boulder stacks and leafy canopies. Dunsborough is a relaxed yet refined coastal town that\u2019s just under three hour\u2019s drive from Perth. The nearest airport is at Busselton, a 30-minute drive away. There are also daily coach services. Travel bible Lonely Planet singled out Dunsborough\u2019s beaches when it named the Margaret River region the number one destination ...",
+        "url": "https://www.westernaustralia.com/en/places/dunsborough/56b267b92880253d74c4fe54",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/34527c4f21b6617267780e4be9c1d438.jpeg?rect=0,180,2366,1331&rot=360",
+            "title": "Dunsborough"
+          }
+        ],
+        "town": "Dunsborough",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.63927220000004, -33.3270129]
+      },
+      "properties": {
+        "id": "56b266c32cbcbe7073ae076a",
+        "name": "Bunbury",
+        "description": "The cosmopolitan city of Bunbury is renowned for its wild but friendly bottlenose dolphins which you can meet at the shoreline or out in the bay aboard a dolphin watching and swimming tour. It's also the setting of many maritime legends and the northern gateway to Australia's South West - one of the most biodiverse regions on Earth, where world-class wine, pristine beaches and forests of timber giants can all be enjoyed in a single day. Hitting the Kwinana Freeway and Forrest Highway south of Perth, you'll be beside the blue waters of Koombana Bay in under two hours. Regular ...",
+        "url": "https://www.westernaustralia.com/en/places/bunbury/56b266c32cbcbe7073ae076a",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/c16c3a5b55e6ef3520006211df45ddee.jpeg?rect=0,150,1600,900&rot=360",
+            "title": ""
+          }
+        ],
+        "town": "Bunbury",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.686523, -25.799891]
+      },
+      "properties": {
+        "id": "56b268c2aeeeaaf773cfb669",
+        "name": "Shark Bay",
+        "description": "A paradise for nature lovers and adventure seekers, this beautiful slice of West Australian wilderness promises one unforgettable experience after another \u2013 and almost year-round sunshine. Walk into the warm blue-green waters of Monkey Mia to encounter friendly wild dolphins before uncovering the off-shore and on-land wonders of the Shark Bay World Heritage area. Leave the city energy of Perth behind and enter the vivid and varied landscape of Shark Bay \u2013 it\u2019s a two-hour flight or an eight-hour drive from the capital city to Denham, an ideal base from which to explore the area. Get a sense of ...",
+        "url": "https://www.westernaustralia.com/en/places/shark-bay/56b268c2aeeeaaf773cfb669",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/2d0d62aa44a641269f1bdc240be47fd6.jpeg?rect=0,94,1801,1013&rot=360",
+            "title": ""
+          }
+        ],
+        "town": "Shark Bay",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.78515283436889, -28.717416852201236]
+      },
+      "properties": {
+        "id": "56b268c22cbcbe7073ae26c9",
+        "name": "Abrolhos Islands",
+        "description": "Escape to the remote Abrolhos Islands, home to a unique marine environment that mesmerises all who visit. An unforgettable underwater world awaits: dive into the coral-fringed waters, snorkel alongside curious sea lions and discover the Batavia, an atmospheric shipwreck site. Or immerse yourself in an adventure of natural wonders, from wildlife spotting to first-class fishing in the Indian Ocean. Situated 60 kilometres off the Western Australian coast, the spectacular Abrolhos Islands can be reached in a variety of ways. Cross the water by charter boat, fishing tour or ecotour from Geraldton or ...",
+        "url": "https://www.westernaustralia.com/en/places/abrolhos-islands/56b268c22cbcbe7073ae26c9",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/Original__9840000_WATC_110907_sfiusse.jpg?rect=0,267,2848,1602",
+            "title": "Abrolhos Islands."
+          }
+        ],
+        "town": "Abrolhos Islands",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.83738849999996, -31.9577214]
+      },
+      "properties": {
+        "id": "56b267a42880253d74c4fca7",
+        "name": "Kings Park",
+        "description": "Kings Park and Botanic Garden is the green heart of the city, covering 400. 6 hectares and located adjacent to the Swan River, approximately 1. 5 kilometres from the Central Business District of Perth. With its remarkable expanses of unique bushland, tranquil parkland and botanic garden, the Park is the most popular visitor destination in Western Australia. Kings Park and Botanic Garden has extensive city and river views with panorama to the Darling Range. The magnificently sited State War Memorial is also one of several scenic vantage points. Kings Park and Botanic Garden showcases an outstanding ...",
+        "url": "https://www.westernaustralia.com/en/places/kings-park/56b267a42880253d74c4fca7",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/bc543ce59ca19ebdf47ebc88fd088d13.jpeg?rect=0,217,2309,1299&rot=360",
+            "title": "Kings Park and Botanical Garden"
+          }
+        ],
+        "town": "Kings Park",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [114.6056643265198, -28.775752748889616]
+      },
+      "properties": {
+        "id": "56b266c07b935fbe730e5e17",
+        "name": "Geraldton",
+        "description": "Soak up Geraldton\u2019s stunning seascapes, and enjoy exhilarating outdoor adventures amid the beauty of the remote Abrolhos Islands. Proudly displaying its rich maritime and Aboriginal heritage at every turn, Geraldton is a lively coastal city inviting adventure seekers, fishing fanatics and food lovers alike to explore its myriad attractions. From kitesurfing to snorkelling, you can create an activity-packed itinerary in Geraldton, a five-hour drive or a one-hour flight north from Perth. Kick-start your explorations by boarding a diving or snorkelling charter to the Abrolhos Islands, or enjoy an ...",
+        "url": "https://www.westernaustralia.com/en/places/geraldton/56b266c07b935fbe730e5e17",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/a30b331bc638271f22db828e299ffbb2.jpeg?rect=161,0,2510,1412&rot=360",
+            "title": "Point Moore Lighthouse, Geraldton"
+          }
+        ],
+        "town": "Geraldton",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.73437749444577, -32.27287572811518]
+      },
+      "properties": {
+        "id": "56b266c1aeeeaaf773cf961f",
+        "name": "Rockingham",
+        "description": "Rockingham's catch-cry is 'where the coast comes to life', and it certainly lives up to this claim. The pristine islands and reefs of the Shoalwater Islands Marine Park offer an incredible array of marine encounters, from penguins, dolphins and sea lions to dive wrecks and snorkel trails. And beyond, the beautiful beaches and clear blue sea are playgrounds for fishing, surfing and sailing. An easy 40-minute drive or train-and-bus ride south of Perth brings you to the seaside town of Rockingham, where you'll find opportunities for adventure and relaxation in equal measure. With pods of dolphins ...",
+        "url": "https://www.westernaustralia.com/en/places/rockingham/56b266c1aeeeaaf773cf961f",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/581166339e13932d0a0b60871df77a02.jpeg?rect=0,253,3860,2171&rot=360",
+            "title": ""
+          }
+        ],
+        "town": "Rockingham",
+        "style": {
+          "icon": "md/MdLocationCity",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.86104879999992, -31.9525739]
+      },
+      "properties": {
+        "id": "5a139cd6666130926c57cab7",
+        "name": "Pinnacles and Cervantes",
+        "description": "A highlights reel of evocative landscapes, enchanting wildlife and exhilarating adventure awaits in the stunning 200-kilometre drive from Perth to the Pinnacles. Time your trip with wildflower season (July to October) to witness the scenery whizz past in a kaleidoscope of colour. From Perth, Yanchep National Park is your first stop. Wildlife abounds, so don\u2019t forget to look up - you might spot koalas dozing among the gum trees. Keep an eye out for Western Grey kangaroos as you hike the walking trails, or take a guided tour of Crystal Cave. This is the place to experience the Aboriginal Noongar ...",
+        "url": "https://www.westernaustralia.com/en/itinerary/pinnacles-and-cervantes/5a139cd6666130926c57cab7",
+        "images": [
+          {
+            "src": "https://assets.atdw-online.com.au/images/3c41b616446d2381bb62c9aa7b6cd7f9.jpeg?rect=0,0,2449,1378&rot=360",
+            "title": "The Pinnacles, Nambung National Park, Cervantes"
+          }
+        ],
+        "town": "Perth",
+        "style": {
+          "icon": "gi/GiJourney",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

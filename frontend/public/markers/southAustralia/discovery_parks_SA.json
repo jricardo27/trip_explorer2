@@ -1,0 +1,600 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.discoveryholidayparks.com.au",
+    "style": {
+      "layerName": "Discovery Parks",
+      "color": "red"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.78334045410156, -37.16402053833008]
+      },
+      "properties": {
+        "id": "SROB",
+        "name": "Robe - Discovery Parks",
+        "area": "Limestone Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SROB",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0499168e-5442-48c4-8f74-54d07c70bb09/21836_org_6cddd0abab869471_1570502175000_resized_1.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b42c69eb-9856-4f67-9d0e-f3df179ff4af/13642_img_9115.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/55e81b7e-7a52-4b93-8be2-01294f648c66/24797_robe_naturesplayground_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ad165daf-588e-421f-8322-77e06c729f3b/24798_robe_pool_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/90ecaf1f-eb48-4021-8c49-bc4b3f9f69a3/24796_robe_lifestyle_040.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [140.45361328125, -34.2510986328125]
+      },
+      "properties": {
+        "id": "SBON",
+        "name": "Lake Bonney - Discovery Parks",
+        "area": "Riverland",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SBON",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ddbbd15a-6e46-417c-9292-94c7b42bd982/23031_lake_bonney_other_010.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3fb2348d-be81-4374-8c7e-3269607938ff/25339_lake_bonney_pool1_a.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1c38bc79-bdd0-497c-bc13-44e55f6c881d/20804_20191126_124434.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/63075e50-338d-41ca-af5f-ea2c29f5c5c3/25340_lake_bonney_splashzone_g.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [138.77285766601562, -35.496726989746094]
+      },
+      "properties": {
+        "id": "SGOO",
+        "name": "Goolwa - Discovery Parks",
+        "area": "Fleurieu Peninsula",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SGOO",
+        "images": [
+          {
+            "src": "https://gdayparks.com.au/getmedia/1fcfa727-3954-40c3-887c-d0c0c9bc9bfb/Discovery-Parks-Goolwa-homepage-aerial-Sep-2024.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/61a6ef13-1207-47b3-924a-e63626316532/Discovery-Parks-Goolwa-homepage2.JPG",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/da9b3bc6-fe61-44e0-8ccd-e0babf095234/Discovery-Parks-Goolwa-homepage3.JPG",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/d6992fdf-f4c1-4103-b94d-3bca64c8c826/Discovery-Parks-Goolwa-homepage4.JPG",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/c7250146-5b8a-460a-8d56-607f7b32891d/Discovery-Parks-Goolwa-homepage5.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [138.79995727539062, -35.0218391418457]
+      },
+      "properties": {
+        "id": "SHAH",
+        "name": "Hahndorf - Discovery Parks",
+        "area": "Adelaide Hills",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SHAH",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/63253d8b-30b2-4235-8667-4f9aa18384a0/Discovery-Parks-Hahndorf-Deluxe-Cabin-Drone-A.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ba777c78-2317-4e5e-86ef-d31d896a1168/Discovery-Parks-Hahndorf-Deluxe-Cabin-Drone-B.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/61eeaefa-d43b-4e21-ae99-6647c73d7024/Site-15.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5709f17e-0396-4bac-b34a-9ba4b2c3cdf9/Family-Pool-25.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4c2361b9-ae9f-4623-8750-5e2fa9dfc436/Family-Jumping-Cushion-09.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3608e000-bd9f-4a06-a4f0-8c0cd3158b0a/Discovery-Parks-Hahndor-Pump-Track.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [138.95004272460938, -34.53023147583008]
+      },
+      "properties": {
+        "id": "SBAR",
+        "name": "Barossa Valley - Discovery Parks",
+        "area": "Barossa Valley",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SBAR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c6f77988-9fe5-4df7-b357-8e206e11854b/15201_discovery_tanunda_180720_573.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a89aef84-1c52-44ae-bb02-44f4746eb03d/discovery-parks-bbq-area.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d1bd36d8-566f-47f3-b555-25bdb82152df/22598_barossa_pool_a.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7bab2927-f38b-45d7-a30c-02c29da181fa/discovery-parks-barossa-valley.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3b5dcc5c-94e2-427f-9d0b-173ee5ef547d/BAROSSA_Deluxe_Safari_Tent_S2_A.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [138.50535583496094, -34.94786071777344]
+      },
+      "properties": {
+        "id": "SWES",
+        "name": "Discovery Parks - West Beach Parks - Discovery Parks",
+        "area": "Adelaide",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SWES",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c82089c5-7011-4388-9ee3-59cdd75255f6/discovery-parks-west-beach-parks-playground.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9e842ce5-25b7-462d-9494-fd5cfb783c27/Discovery-Parks-West-Beach-Parks-Hero-Image-Family-BBQ.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/74e46810-9c95-4511-9775-311b3e2a8da5/Discovery-Parks-West-Beach-Parks-Hero-Image-Family-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c02a373b-db48-4f7a-bbd3-57b4c1d91ffc/Discovery-Parks-West-Beach-Parks-Hero-Image-Grey-Nomads-outside-van.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2a09ac7c-4287-4c78-a12b-d081d31865b1/Discovery-Parks-West-Beach-Parks-Hero-Image-Parents-Eco-Tent.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [138.47874450683594, -34.852691650390625]
+      },
+      "properties": {
+        "id": "SADE",
+        "name": "Adelaide Beachfront - Discovery Parks",
+        "area": "Adelaide",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SADE",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a47b4695-5d26-41ab-adbd-61f35357caf8/23331_abf_other_006_copy.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8edb26e3-886d-4bfb-933e-08341f9db7d9/23334_abf_campkitchen_a.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/395ac803-c38d-4532-9541-fa231acdc5b0/23330_abf_pool_d.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2fcf6aac-ad32-4aaf-8697-f2576fdaed4d/23335_abf_lifestyle_004_copy.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3af379bb-2650-407d-a9d9-5904a0e32ac2/23333_abf_lifestyle_032.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [138.62059020996094, -33.8643684387207]
+      },
+      "properties": {
+        "id": "SCLA",
+        "name": "Clare - Discovery Parks",
+        "area": "Clare Valley",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SCLA",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/badeb301-ea00-45c8-aee6-ceb6e4fd2224/22489_clare_other_003.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0e15f93e-8644-4ee9-9250-1e51cb47b999/22485_clare_bbqarea1_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/082e074c-ed85-466f-b84a-9a03a5d692af/22484_clare_lifestyle_001.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a75b13ae-c9c3-4fdd-9324-68d63981a47c/22488_clare_lifestyle_016.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [136.80804443359375, -35.96062469482422]
+      },
+      "properties": {
+        "id": "SKAN",
+        "name": "Kangaroo Island - Discovery Parks",
+        "area": "Kangaroo Island",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SKAN",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c4399486-5111-44ed-8e5b-8c80b5439faf/Discovery-Parks-Kangaroo-Island-Aerial-View.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7e40105e-8de7-4894-97be-a501381f1848/Discovery-Parks-Kangaroo-Island-Wildlife-Kangaroo-and-Joey.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/aef35ecd-208d-44b4-ab3a-e7b07515c4dc/Discovery-Parks-Kangaroo-Island-Cabins.JPG",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e77fd14d-008c-40b9-824a-6d5de072e146/Discovery-Parks-Kangaroo-Island-BBQ-Area.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [137.5784912109375, -33.04072189331055]
+      },
+      "properties": {
+        "id": "SWHY",
+        "name": "Whyalla Foreshore - Discovery Parks",
+        "area": "Eyre Peninsula",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SWHY",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2a48497d-cab5-464b-87f9-7ebb0558ea3c/24893_whyalla_other_010.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8b471393-5753-4961-8731-0f8c81eb88f9/24894_whyalla_bouncezone_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8ad25fb0-9fce-4d0f-845c-872bdabd556b/24895_whyalla_minigolf_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3fdc7303-a869-41a7-942f-6319456120a8/WHYALLA_Powered_Site3_A.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/941bf107-8324-47e7-ba18-e66375cfd823/WHYALLA_Deluxe_2B_Cabin_S5_D.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [137.754638671875, -32.48078536987305]
+      },
+      "properties": {
+        "id": "SAUG",
+        "name": "Port Augusta - Discovery Parks",
+        "area": "Flinders Ranges and Outback",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SAUG",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1ac525df-363e-4c28-ba75-a41dcab0362f/23213_ptaugusta_other_002.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/07dba620-ca65-48a3-bde2-71f92c466d70/23214_ptaugusta_campkitchen_f.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e3bed1ca-3f18-416f-b460-e3c2e365b3f0/23215_ptaugusta_playground_a.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/02c98ef7-1ee3-4c5a-ba68-cf6b8966c30b/23212_ptaugusta_gymnasium_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/93af3e7e-1b67-4d65-b676-56dc9e99c57f/23211_ptaugusta_pool_a.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [138.6002960205078, -31.529539108276367]
+      },
+      "properties": {
+        "id": "SWPR",
+        "name": "Discovery Resorts - Wilpena Pound - Discovery Parks",
+        "area": "Flinders Ranges and Outback",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SWPR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f20ae3af-6f12-4c27-bdc5-efcb59fad18b/discovery-resorts-wilpena-pound-groups-home-page-tile.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8d85ed83-ba96-4b97-95a6-b12996ac13e1/discovery-resorts-wilpena-pound-scenery.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/812c7ea0-a962-416b-bfd3-5475e18d9f81/discovery-resorts-wilpena-pound-safari-tent-view.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/9d863436-309a-423a-a1cf-dbcae836639c/wilpena-pound-pool.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [135.47206115722656, -34.62375259399414]
+      },
+      "properties": {
+        "id": "SCOF",
+        "name": "Coffin Bay - Discovery Parks",
+        "area": "Eyre Peninsula",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SCOF",
+        "images": [
+          {
+            "src": "https://gdayparks.com.au/getmedia/0ed176b0-270c-4dfa-acdb-5f936e1d27ee/Coffin-Bay-hero-image-915x515.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5f3f1656-17df-4405-a85d-73f987754667/25191_001_open2view_id523234-coffin_bay_caravan_park.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/92223f52-c959-4f7f-8d07-9de4818620d5/25200_020_open2view_id523234-coffin_bay_caravan_park.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/87ccc8a2-60a5-4bd4-b41b-3b770f8dfc39/ext_park_345_1_1575328317.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [136.8926239013672, -30.566286087036133]
+      },
+      "properties": {
+        "id": "SROX",
+        "name": "Roxby Downs - Discovery Parks",
+        "area": "Flinders Ranges and Outback",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SROX",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/fbdd55be-398f-42e5-af96-925b2cf89219/5936_mg_park_grounds_08_resized.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/724c0d41-4adb-43fa-b6b2-75c81e8c88ca/24989_roxby_downs_bbqarea1_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7b780a5b-f74d-4e79-936b-8702f7f27736/24990_roxby_downs_campkitchen_a.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a770d45a-61b7-4e35-b93b-a1e43426bbd4/24991_roxby_downs_bbqarea2_a.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3b878030-e0cd-496e-97fe-1c4fcc48ac32/5937_mg_overnightpowsite_01.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [134.19802856445312, -32.7957763671875]
+      },
+      "properties": {
+        "id": "SSTR",
+        "name": "Streaky Bay Foreshore - Discovery Parks",
+        "area": "Eyre Peninsula",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/SSTR",
+        "images": [
+          {
+            "src": "https://gdayparks.com.au/getmedia/f4f18a25-e767-4707-bcee-bb04283d4cbd/Streaky-Bay-hero-image1.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/9ff591d5-eba4-48f7-9862-7e87980c6eb5/Streaky-Bay-hero-image2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4291f291-9d2c-41bf-a3aa-4037bc683cab/24918_streaky_bay_other_010.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0bae2a1b-d784-4523-9a6a-f2b65e63690f/24916_streaky_bay_bouncezone_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b4bd68cc-6e5a-462f-be22-2c16f71d78fb/24914_streaky_bay_playground_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7824259c-5447-4a61-ae96-801f87e56b90/24917_streaky_bay_other_033.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

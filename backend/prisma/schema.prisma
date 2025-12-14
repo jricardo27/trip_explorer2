@@ -52,6 +52,7 @@ model Trip {
   budgets    Budget[]
   photos     TripPhoto[]
   transport  TransportAlternative[]
+  animations TripAnimation[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -108,6 +109,8 @@ model Activity {
   city            String?
   country         String?
   countryCode     String?        @map("country_code") @db.Char(2)
+  latitude        Float?
+  longitude       Float?
   scheduledStart  DateTime?      @map("scheduled_start")
   scheduledEnd    DateTime?      @map("scheduled_end")
   actualStart     DateTime?      @map("actual_start")
@@ -151,6 +154,7 @@ model Activity {
   photos       TripPhoto[]
   transportFrom TransportAlternative[] @relation("FromActivity")
   transportTo   TransportAlternative[] @relation("ToActivity")
+  animationSteps TripAnimationStep[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -367,4 +371,50 @@ model TripPhoto {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("trip_photos")
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+
+model TripAnimation {
+  id              String   @id @default(uuid())
+  tripId          String   @map("trip_id")
+  name            String
+  description     String?
+  
+  // Animation settings
+  settings        Json     @default("{}") // Store generic settings like speed, loop, etc.
+  
+  steps           TripAnimationStep[]
+  
+  trip            Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("trip_animations")
+}
+
+model TripAnimationStep {
+  id              String   @id @default(uuid())
+  animationId     String   @map("animation_id")
+  activityId      String?  @map("activity_id") // Optional: could be a step simply moving to a location, but usually tied to activity
+  
+  orderIndex      Int      @map("order_index")
+  
+  // Per-step overrides/settings
+  isVisible       Boolean  @default(true) @map("is_visible")
+  customLabel     String?  @map("custom_label")
+  zoomLevel       Int?     @map("zoom_level")
+  
+  // For steps that are transitions between activities
+  transportMode   String?  @map("transport_mode")
+  
+  settings        Json     @default("{}") // Extra settings like "skip zoom in", "hide name" etc.
+
+  animation       TripAnimation @relation(fields: [animationId], references: [id], onDelete: Cascade)
+  activity        Activity?     @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@map("trip_animation_steps")
 }

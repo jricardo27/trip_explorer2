@@ -53,6 +53,8 @@ const ActivityDialog = ({
   const [scheduledStart, setScheduledStart] = useState<dayjs.Dayjs | null>(null)
   const [scheduledEnd, setScheduledEnd] = useState<dayjs.Dayjs | null>(null)
   const [estimatedCost, setEstimatedCost] = useState("")
+  const [latitude, setLatitude] = useState("")
+  const [longitude, setLongitude] = useState("")
   const [notes, setNotes] = useState("")
   const [error, setError] = useState<string | null>(null)
 
@@ -65,6 +67,8 @@ const ActivityDialog = ({
         setScheduledStart(activity.scheduledStart ? dayjs(activity.scheduledStart) : null)
         setScheduledEnd(activity.scheduledEnd ? dayjs(activity.scheduledEnd) : null)
         setEstimatedCost(activity.estimatedCost?.toString() || "")
+        setLatitude(activity.latitude?.toString() || "")
+        setLongitude(activity.longitude?.toString() || "")
         setNotes(activity.notes || "")
       } else {
         // Reset for create
@@ -76,17 +80,23 @@ const ActivityDialog = ({
         let defaultEnd = null
 
         if (tripDayId && tripDays) {
-          const day = tripDays.find(d => d.id === tripDayId)
+          const day = tripDays.find((d) => d.id === tripDayId)
           if (day) {
             // Default to 9:00 AM on the selected day
             defaultStart = dayjs(day.date).hour(9).minute(0).second(0)
-            defaultEnd = defaultStart.add(1, 'hour')
+            defaultEnd = defaultStart.add(1, "hour")
           }
+        } else if (tripStartDate) {
+          // Default to 9:00 AM on the trip start date
+          defaultStart = dayjs(tripStartDate).hour(9).minute(0).second(0)
+          defaultEnd = defaultStart.add(1, "hour")
         }
 
         setScheduledStart(defaultStart)
         setScheduledEnd(defaultEnd)
         setEstimatedCost("")
+        setLatitude("")
+        setLongitude("")
         setNotes("")
       }
     }
@@ -107,20 +117,24 @@ const ActivityDialog = ({
     }
 
     if (tripStart && tripEnd) {
-      // Check boundaries
-      // We allow slight buffer or just strict comparison. Strict for now.
-      // Adjust tripEnd to end of day? Usually tripEndDate is Date only (bad assumption? No, schema says DateTime).
-      // Usually trip dates are just YYYY-MM-DD treated as 00:00 or similar.
-      // Let's assume strict usage.
-      if (start && (start < tripStart || start > tripEnd)) {
+      // Use dayjs for boundary checks to ignore time components and handling timezones correctly
+      // We want to ensure the activity starts on or after the trip start DAY,
+      // and ends on or before the trip end DAY.
+      const tripStartDay = dayjs(tripStart).startOf("day")
+      const tripEndDay = dayjs(tripEnd).endOf("day")
+
+      const activityStart = dayjs(start)
+      const activityEnd = dayjs(end)
+
+      if (start && (activityStart.isBefore(tripStartDay) || activityStart.isAfter(tripEndDay))) {
         setError(
-          `Start date must be within trip dates (${new Date(tripStart).toLocaleDateString()} - ${new Date(tripEnd).toLocaleDateString()})`,
+          `Start date must be within trip dates (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`,
         )
         return false
       }
-      if (end && (end < tripStart || end > tripEnd)) {
+      if (end && (activityEnd.isBefore(tripStartDay) || activityEnd.isAfter(tripEndDay))) {
         setError(
-          `End date must be within trip dates (${new Date(tripStart).toLocaleDateString()} - ${new Date(tripEnd).toLocaleDateString()})`,
+          `End date must be within trip dates (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`,
         )
         return false
       }
@@ -136,19 +150,27 @@ const ActivityDialog = ({
 
     // Smart Day Assignment
     let finalTripDayId = activity?.tripDayId || tripDayId
+
     if (scheduledStart && tripDays) {
-      const startDate = scheduledStart.toDate()
+      const startDayjs = dayjs(scheduledStart)
       const matchingDay = tripDays.find((day) => {
-        const dayDate = new Date(day.date)
-        return (
-          dayDate.getDate() === startDate.getDate() &&
-          dayDate.getMonth() === startDate.getMonth() &&
-          dayDate.getFullYear() === startDate.getFullYear()
-        )
+        // parsing day.date with dayjs ensures consistent handling
+        // using format('YYYY-MM-DD') avoids timezone issues during comparison
+        const dayFormatted = dayjs(day.date).format("YYYY-MM-DD")
+        const startFormatted = startDayjs.format("YYYY-MM-DD")
+        return dayFormatted === startFormatted
       })
       if (matchingDay) {
         finalTripDayId = matchingDay.id
       }
+    }
+
+    // Validate that we have a trip day assigned
+    if (!finalTripDayId) {
+      setError(
+        "Cannot create activity: The selected start date does not match any trip day. Please select a date within the trip period."
+      )
+      return
     }
 
     try {
@@ -161,8 +183,11 @@ const ActivityDialog = ({
         scheduledStart: scheduledStart ? scheduledStart.toISOString() : undefined,
         scheduledEnd: scheduledEnd ? scheduledEnd.toISOString() : undefined,
         estimatedCost: estimatedCost ? parseFloat(estimatedCost) : undefined,
+        latitude: latitude ? parseFloat(latitude) : undefined,
+        longitude: longitude ? parseFloat(longitude) : undefined,
         notes,
       })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Failed to save activity:", err)
       const errorMessage =
@@ -172,7 +197,7 @@ const ActivityDialog = ({
   }
 
   return (
-    <Dialog open={open} onClose={handleClose as any} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
         <DialogTitle>{activity ? "Edit Activity" : "Add Activity"}</DialogTitle>
         <DialogContent>
@@ -212,7 +237,10 @@ const ActivityDialog = ({
                 <DateTimePicker
                   label="Start Time"
                   value={scheduledStart}
-                  onChange={(newValue) => setScheduledStart(newValue)}
+                  minDate={tripStartDate ? dayjs(tripStartDate) : undefined}
+                  maxDate={tripEndDate ? dayjs(tripEndDate) : undefined}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  onChange={(newValue: any) => setScheduledStart(newValue)}
                   slotProps={{ textField: { fullWidth: true } }}
                 />
               </Grid>
@@ -220,8 +248,14 @@ const ActivityDialog = ({
                 <DateTimePicker
                   label="End Time"
                   value={scheduledEnd}
-                  onChange={(newValue) => setScheduledEnd(newValue)}
-                  slotProps={{ textField: { fullWidth: true } }}
+                  minDate={tripStartDate ? dayjs(tripStartDate) : undefined}
+                  maxDate={tripEndDate ? dayjs(tripEndDate) : undefined}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  onChange={(newValue: any) => {
+                    if (newValue) {
+                      setScheduledEnd(newValue)
+                    }
+                  }}
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
@@ -232,6 +266,26 @@ const ActivityDialog = ({
                   value={estimatedCost}
                   onChange={(e) => setEstimatedCost(e.target.value)}
                   InputProps={{ startAdornment: "$" }}
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  fullWidth
+                  label="Latitude"
+                  type="number"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  inputProps={{ step: "any" }}
+                />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  fullWidth
+                  label="Longitude"
+                  type="number"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  inputProps={{ step: "any" }}
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>

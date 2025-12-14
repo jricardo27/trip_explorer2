@@ -23,6 +23,7 @@ const SignupPage = () => {
       const { token, user } = response.data
       setAuth(token, user)
       navigate("/")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const errorData = err.response?.data?.error
       setError(typeof errorData === "string" ? errorData : errorData?.message || "Failed to sign up")

@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth"
 import activityRoutes from "./routes/activities"
 import tripRoutes from "./routes/trips"
 import transportRoutes from "./routes/transport"
+import animationRoutes from "./routes/animations"
 
 dotenv.config()
 
@@ -26,6 +27,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/trips", tripRoutes)
 app.use("/api/activities", activityRoutes)
 app.use("/api/transport", transportRoutes)
+app.use("/api/animations", animationRoutes)
 
 // Error handling
 app.use(errorHandler)

@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "style": {
+      "layerName": "Places"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "f1c1e48e-8b13-4e01-95ad-769486710086",
+        "name": "Perth",
+        "style": {
+          "icon": "fa/FaCity",
+          "iconColor": "green"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.86151599884035, -31.952180444648622]
+      }
+    }
+  ]
+}

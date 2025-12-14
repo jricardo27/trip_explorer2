@@ -10,16 +10,23 @@ class ActivityController {
       const userId = (req as any).user.id
       const activityData = req.body
 
-      // Validate using Zod (assuming schema exists, or do basic check)
-      // const validatedData = createActivitySchema.parse(activityData)
+      // Validate using Zod
+      const validatedData = createActivitySchema.parse(activityData)
 
       // Check trip ownership
-      const trip = await tripService.getTripById(activityData.tripId, userId)
+      const trip = await tripService.getTripById(validatedData.tripId, userId)
       if (!trip) {
         return res.status(403).json({ error: "Unauthorized or Trip not found" })
       }
 
-      const activity = await activityService.createActivity(activityData)
+      // Transform date strings to Date objects for service
+      const serviceData = {
+        ...validatedData,
+        scheduledStart: validatedData.scheduledStart ? new Date(validatedData.scheduledStart) : undefined,
+        scheduledEnd: validatedData.scheduledEnd ? new Date(validatedData.scheduledEnd) : undefined,
+      }
+
+      const activity = await activityService.createActivity(serviceData)
       res.status(201).json(activity)
     } catch (error) {
       next(error)

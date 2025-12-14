@@ -75,7 +75,7 @@ export default function Layout() {
           </div>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Container maxWidth={false} sx={{ mt: 4 }}>
         <Outlet />
       </Container>
     </Box>

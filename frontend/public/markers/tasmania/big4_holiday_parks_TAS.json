@@ -1,0 +1,265 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.big4.com.au",
+    "style": {
+      "layerName": "Big4 Holiday Parks",
+      "color": "magenta"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.294472", "-40.763237"]
+      },
+      "properties": {
+        "id": "845",
+        "name": "BIG4 Tassie Getaway Parks Stanley",
+        "website": "https://www.big4.com.au/caravan-parks/tas/devonport-cradle-mountain-great-western-tiers/stanley-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/1kjfmnzk/stanley-the-nut.png",
+            "title": ""
+          }
+        ],
+        "reviews": 8.76,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.181486", "-41.154550"]
+      },
+      "properties": {
+        "id": "242",
+        "name": "BIG4 Tassie Getaway Parks Ulverstone",
+        "website": "https://www.big4.com.au/caravan-parks/tas/devonport-cradle-mountain-great-western-tiers/ulverstone-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/lgbn10gc/ulverstone-163.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.18,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.285063", "-42.122579"]
+      },
+      "properties": {
+        "id": "187",
+        "name": "BIG4 Iluka on Freycinet Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/tas/freycinet-east-coast/iluka-on-freycinet-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/obsjjx5s/cbi-637-hdr_1.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.48,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["147.493300", "-42.830500"]
+      },
+      "properties": {
+        "id": "535",
+        "name": "BIG4 Hobart Airport Tourist Park",
+        "website": "https://www.big4.com.au/caravan-parks/tas/hobart-surrounds/hobart-airport-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/0pwkndew/064324-101649-3.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.14,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["147.141500", "-41.456405"]
+      },
+      "properties": {
+        "id": "567",
+        "name": "BIG4 Launceston Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/tas/launceston-north-tamar-valley/launceston-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/yxbpipvr/la-535.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.94,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.811949", "-41.083436"]
+      },
+      "properties": {
+        "id": "707",
+        "name": "BIG4 Low Head Tourist Park",
+        "website": "https://www.big4.com.au/caravan-parks/tas/launceston-north-tamar-valley/low-head-tourist-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/0ptpo51k/low-1-park_aerial-no_people-nil-warm-nil.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.34,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["146.780956", "-41.092645"]
+      },
+      "properties": {
+        "id": "329",
+        "name": "BIG4 Kelso Sands Holiday and Native Wildlife Park",
+        "website": "https://www.big4.com.au/caravan-parks/tas/launceston-north-tamar-valley/kelso-sands-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/iqefhv2e/kel-773.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.76,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.253560", "-41.333213"]
+      },
+      "properties": {
+        "id": "469",
+        "name": "BIG4 Tassie Getaway Parks St Helens",
+        "website": "https://www.big4.com.au/caravan-parks/tas/st-helens-north-east/st-helens-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/w0qafgnw/bay_of_fires-15-wikicommons.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.54,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["148.265527", "-41.339606"]
+      },
+      "properties": {
+        "id": "827",
+        "name": "Tasman Holiday Parks - St Helens",
+        "website": "https://www.big4.com.au/caravan-parks/tas/st-helens-north-east/tasman-holiday-parks-st-helens",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/pw3ft0t2/drone-small-e1634002858238.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 9.06,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["145.320076", "-42.152232"]
+      },
+      "properties": {
+        "id": "708",
+        "name": "BIG4 Strahan Holiday Retreat",
+        "website": "https://www.big4.com.au/caravan-parks/tas/strahan-the-west-coast/strahan-holiday-retreat",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/1xjp3urz/sr-2274.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 7.86,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": ["147.855700", "-43.130552"]
+      },
+      "properties": {
+        "id": "571",
+        "name": "NRMA Port Arthur Holiday Park",
+        "website": "https://www.big4.com.au/caravan-parks/tas/tasman-peninsula-the-south-east/nrma-port-arthur-holiday-park",
+        "images": [
+          {
+            "src": "https://assets.big4.com.au/media/ppglk3on/s1905-434-tessellatedpavement.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 8.94,
+        "style": {
+          "icon": "custom/Big4Icon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

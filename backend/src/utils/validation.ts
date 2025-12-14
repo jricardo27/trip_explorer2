@@ -26,7 +26,7 @@ export const updateTripSchema = z.object({
 
 export const createActivitySchema = z.object({
   tripId: z.string().uuid(),
-  tripDayId: z.string().uuid().optional(),
+  tripDayId: z.string().uuid(), // Required - activities must be assigned to a trip day
   activityType: z.enum(["ACCOMMODATION", "RESTAURANT", "ATTRACTION", "TRANSPORT", "CUSTOM"]),
   name: z.string().min(1).max(255),
   description: z.string().optional(),
@@ -34,6 +34,8 @@ export const createActivitySchema = z.object({
   scheduledStart: z.preprocess((arg) => (arg === "" ? undefined : arg), z.string().datetime().optional()),
   scheduledEnd: z.preprocess((arg) => (arg === "" ? undefined : arg), z.string().datetime().optional()),
   durationMinutes: z.number().int().positive().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   city: z.string().optional(),
   country: z.string().optional(),
   countryCode: z.string().length(2).optional(),

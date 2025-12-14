@@ -1,0 +1,748 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.discoveryholidayparks.com.au",
+    "style": {
+      "layerName": "Discovery Parks",
+      "color": "red"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [121.4887924194336, -30.791751861572266]
+      },
+      "properties": {
+        "id": "WBOU",
+        "name": "Boulder - Discovery Parks",
+        "area": "Golden Outback",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WBOU",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d45966bc-3495-48aa-b483-d9c3507f70b8/13268_park_grounds.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/461d2718-2d48-4702-9037-5de71a781e0f/13266_camp_kitchen.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c59f91d7-b675-4cb5-a623-53b0cad96d62/13267_dining_hall2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9e5269ce-95f1-47c5-b736-ca3a57642987/13019_boulder_facilities_pool_1.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d43c0487-1662-4a41-b1e8-f55140a42abc/13270_van2.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [121.4697723388672, -30.781888961791992]
+      },
+      "properties": {
+        "id": "WKAL",
+        "name": "Kalgoorlie Goldfields - Discovery Parks",
+        "area": "Golden Outback",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WKAL",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0ca36281-5178-4aaa-affb-cd389e35ad70/Discovery-Parks-Kalgoorlie-Header-Image-Cabins.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2fad283e-1533-4c31-a234-af88a11c883a/Discovery-Parks-Kalgoorlie-Header-Image-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1650e27f-18dc-400e-bedd-33ee0a0aa130/Discovery-Parks-Kalgoorlie-Header-Image-Aerial.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/215dd87a-eaca-45ac-883d-b5a60347d51e/Discovery-Parks-Kalgoorlie-Header-Image-BBQ-Area.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/bd42956c-32d9-4298-82a1-a27cde4ecdd6/Discovery-Parks-Kalgoorlie-Header-Image-Camp-Sites.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.6457290649414, -33.37461853027344]
+      },
+      "properties": {
+        "id": "WBUN",
+        "name": "Bunbury Village - Discovery Parks",
+        "area": "South West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WBUN",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0d81d973-3db8-43cd-b5ed-d587b49d0361/4795_viv1892.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/381630b1-8926-4503-b027-279788d6f4c9/14476_176_v1_current.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b9df85e0-41fd-4bcb-9ad5-f16bc699e131/14483_201_v1_current.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/83bb2071-534e-496f-a953-dd86bc35008d/14479_183_v1_current_2.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8b6f50e5-4151-43f5-98ac-623ef96ce235/14474_171_v1_current.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ac1ce3b5-49c6-41cc-aec8-adb849ebd5a7/4794_viv1853.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.64505004882812, -33.32086181640625]
+      },
+      "properties": {
+        "id": "WKOO",
+        "name": "Bunbury Foreshore - Discovery Parks",
+        "area": "South West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WKOO",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/95fd77fa-2144-4747-a130-d28c3ee8e258/Discovery-Parks-Bunbury-Foreshore-Header-Image-Park-View.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4c643668-0a15-4ffb-94a1-725fc6c45e2c/Discovery-Parks-Bunbury-Foreshore-Header-Image-BBQ-Area.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ee7d1e85-6c61-490e-a54d-0f0434e49679/Discovery-Parks-Bunbury-Foreshore-Header-Image-Bouncing-Pillow.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/faadb547-6e91-42e0-91fa-dc60cbc68991/Discovery-Parks-Bunbury-Foreshore-Header-Image-Camp-KItchen.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/19e11931-49b9-42ad-98f8-cc8e5532c7c6/Discovery-Parks-Bunbury-Foreshore-Header-Image-Pool.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.99776458740234, -31.991907119750977]
+      },
+      "properties": {
+        "id": "WPER",
+        "name": "Perth Airport - Discovery Parks",
+        "area": "Greater Perth",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WPER",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/36d0205b-8d00-40be-b984-e4774ff92249/Discovery-Parks-Perth-Airport-Header-Image-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/fb7dd372-a39d-436b-90a8-13cb7f521abd/Discovery-Parks-Perth-Airport-Header-Image-BBQ-Area.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/312d1a61-9db5-4fca-803e-34d0b6f7a6c2/Discovery-Parks-Perth-Airport-Header-Image-Games-Room.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c4f62c43-c4be-4663-ba4a-246004531a6f/Discovery-Parks-Perth-Airport-Header-Image-Gym.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/487aa2bf-e64f-4c04-a8b1-8e5dac69b751/Discovery-Parks-Perth-Airport-Header-Image-Playground.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.2729034423828, -33.658329010009766]
+      },
+      "properties": {
+        "id": "WBUS",
+        "name": "Busselton - Discovery Parks",
+        "area": "South West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WBUS",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/538ca71d-4f72-493b-95c9-65c80bb17769/Discovery-Parks-Busselton-Header-Image-BBQ-Area.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b40dcb6e-f482-406c-927e-66b80ce42fc3/discovery-parks-busselton-greenery.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ed4e6713-cd00-461f-a514-b308a1bbbf88/Discovery-Parks-Busselton-Header-Image-Beach.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/28647a35-aacb-464e-9054-9d51eecb4b54/Discovery-Parks-Busselton-Header-Image-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/05a153c4-7266-4f22-8309-ddb6fa6df1bd/Discovery-Parks-Busselton-Header-Image-Playground.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.96444702148438, -31.876949310302734]
+      },
+      "properties": {
+        "id": "WPVY",
+        "name": "Swan Valley - Discovery Parks",
+        "area": "Greater Perth",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WPVY",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a37d68ca-f53a-465a-a7b0-f7c5e015945e/Discovery-Parks-Swan-Valley-Header-Image-Playground.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5fdf2b18-938a-4626-a1ce-0682d28ae52b/Discovery-Parks-Swan-Valley-Header-Image-Recreation-Room.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1b06868b-eaea-4169-b3b1-2bf847832f2a/Discovery-Parks-Swan-Valley-Header-Image-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d820938c-3157-4553-a8e0-2357b97571b2/Discovery-Parks-Swan-Valley-Header-Image-Camp-Kitchen.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/50aab0df-f747-4d55-bd65-1fb8b8049c45/Discovery-Parks-Swan-Valley-Header-Image-BBQ-Area.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.1226577758789, -33.81096649169922]
+      },
+      "properties": {
+        "id": "WMRG",
+        "name": "Margaret River - Discovery Parks",
+        "area": "South West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WMRG",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/881d28bd-b5a9-4589-8ca3-b3bd73dc54f1/discovery-parks-margaret-river-bouncing-pillow-playground.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/216ded58-870e-442c-8ad9-bc65e12e34e3/discovery-parks-margaret-river-aerial-cabins.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ff4a9e2e-4ae7-4fc7-9823-5f4a817097f9/discovery-parks-margaret-river-cabins.jpeg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/75ff9497-6570-4011-a70b-e19228d58638/discovery-parks-margaret-river-animal-farm-cows.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/38c6a660-9025-48ca-9db3-b2ff6644d502/discovery-parks-margaret-river-scenery.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.76653289794922, -32.12883377075195]
+      },
+      "properties": {
+        "id": "WWOO",
+        "name": "Woodman Point - Discovery Parks",
+        "area": "Greater Perth",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WWOO",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/28f294d2-7d14-4315-aae3-5b44a5082973/Discovery-Parks-Woodman-Point-Header-Image-Aerial-DHP.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e6efa9cc-3f49-4b03-8b49-df78da4fd6eb/Discovery-Parks-Woodman-Point-Header-Image-Playground.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5c799b91-1323-4a9a-a554-e9885446fa75/Discovery-Parks-Woodman-Point-Header-Image-BBQ-Area.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/60e0ff1c-d375-44f8-ac93-a83ceea60e16/Discovery-Parks-Woodman-Point-Header-Image-Jumping-Pillow.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a9ca130c-bf10-4770-b151-058bab2c74db/Discovery-Parks-Woodman-Point-Header-Image-Games-Room.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/462ed330-ef6c-40ab-9eb4-20bac16d2cb2/Discovery-Parks-Woodman-Point-Header-Image-Pool-Gday.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.76397705078124, -32.11566162109375]
+      },
+      "properties": {
+        "id": "WCOO",
+        "name": "Coogee Beach - Discovery Parks",
+        "area": "Greater Perth",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WCOO",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/27549a40-315d-4bd8-899a-b801aca44dc0/Discovery-Parks-Coogee-Beach-Header-Image-Aerial.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f72a61d3-7936-4e19-a2c3-4ff37066d8fc/Discovery-Parks-Coogee-Beach-Header-Image-Caravan.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.5368423461914, -31.99156188964844]
+      },
+      "properties": {
+        "id": "WROT",
+        "name": "Discovery Resorts - Rottnest Island - Discovery Parks",
+        "area": "Greater Perth",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WROT",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a5a5759a-4465-4be4-b8ba-3c926200d818/discovery-resorts-rottnest-island-deluxe-tent-header-image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a777329f-75fe-4ff0-90ee-62fae1a096ef/discovery-parks-rottnest-island-header-image-resort-style-pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e2bb7d75-c911-4894-8cdf-0502b7c4f2bf/discovery-parks-rottnest-island-header-image-tents-at-night.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0ef15ebd-a8c7-4031-9756-27ae4e4d1812/discovery-parks-rottnest-island-header-image-oceanview-tent.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/30e8952a-9727-4cab-afb8-ea20f053e916/discovery-parks-rottnest-island-header-image-lighthouse-aerial-view.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [128.7398681640625, -16.113033294677734]
+      },
+      "properties": {
+        "id": "WARG",
+        "name": "Discovery Resorts - Lake Argyle - Discovery Parks",
+        "area": "North West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WARG",
+        "images": [
+          {
+            "src": "https://gdayparks.com.au/getmedia/9ea53df1-fae4-422c-922a-78644c7446d8/Discovery-Parks-Lake-Argyle-Tile.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/04204a95-0107-4b3f-bcbc-cfcc52ddd8b3/Lake-Argyle-Infinity-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/239e9940-928d-4269-9158-9b9b0f7109c8/discovery-resorts-lake-argyle-header-image-kimberley-durack-boat.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/accd1273-dccd-4fda-be5d-23d6fd27dd46/discovery-resorts-lake-argyle-header-image-couple-camping.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/258d9229-3605-49c5-9ee0-a7577891bc33/discovery-resorts-lake-argyle-header-image-couple-in-infinity-pool.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [128.72091674804688, -15.791479110717772]
+      },
+      "properties": {
+        "id": "WKUN",
+        "name": "Lake Kununurra - Discovery Parks",
+        "area": "North West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WKUN",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9064fda8-bfa1-483b-81ee-2bc7c563d355/LAKE-KUNUNURRA_Other_040.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9c7148ce-2e30-4c71-8927-351e57ebcadc/LAKE-KUNUNURRA_Pool_C.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/558f8f16-a108-4512-8e42-b6e977598c29/LAKE-KUNUNURRA_LifeStyle_007.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a7245e40-a6e5-46d1-aa64-c6cb3689a7bd/LAKE-KUNUNURRA_LifeStyle_060.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8ab622f5-cd62-4022-a9cc-d575034670d5/LAKE-KUNUNURRA_Playground_B.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [122.23370361328124, -17.96963882446289]
+      },
+      "properties": {
+        "id": "WBRO",
+        "name": "Broome - Discovery Parks",
+        "area": "North West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WBRO",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/90aa6759-c065-4d37-8d3f-abbde8585a8d/Discovery-Parks-Broome-Cabins-Pool-Aerial-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/90b148db-2881-4eb2-a33c-1e78fefafbf5/Discovery-Parks-Broome-Pool-Fun-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/cbb0cb7a-aa1e-40d2-8a31-6520dce6a65e/Discovery-Parks-Broome-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a7179118-878f-4693-9931-3b0f470b7150/Discovery-Parks-Broome-Deluxe-Cabin-View-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/bb22a6c7-7755-4f1c-a2aa-a5cd6398a274/Discovery-Parks-Broome-Waterfront-Sites-Aerial-Header-Image.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [118.63887786865234, -20.30941390991211]
+      },
+      "properties": {
+        "id": "WHED",
+        "name": "Port Hedland - Discovery Parks",
+        "area": "North West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WHED",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/55984437-4465-4719-ae72-0334c653f60a/discovery-parks-port-hedland-hero-image-lifestyle.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ec9c3e26-18e6-4461-b4ef-ee784e925889/discovery-parks-port-hedland-hero-image-BBQ-area.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/72abd144-28f5-445b-9074-22e01cd56f8d/discovery-parks-port-hedland-hero-image-camp-kitchen.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/364741c5-5ba7-49b3-9e0b-f6d4e7726d61/discovery-parks-port-hedland-hero-image-games-room.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/92a58cd5-d23c-431c-8ee4-0ce99d8be7c2/discovery-parks-port-hedland-hero-image-playground.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d2cc6ad9-1cb4-4b5e-9434-5fab9f2d64c3/discovery-parks-port-hedland-hero-image-pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1631dbf5-7751-42f4-9429-76022a58c453/discovery-parks-port-hedland-park-aerial.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [113.69632720947266, -24.864572525024418]
+      },
+      "properties": {
+        "id": "WCAR",
+        "name": "Carnarvon - Discovery Parks",
+        "area": "Coral Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WCAR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/30b58425-5175-439d-80c1-580156557284/Discovery-Parks-Carnarvon-Header-Image-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/6e32f63f-983a-42ae-a0d0-89698b7faee3/Discovery-Parks-Carnarvon-Header-Image-Exterior.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/351ed1cf-c8b6-4777-85bb-447869ac4b29/Discovery-Parks-Carnarvon-Header-Image-Jumping-Pillow.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/32f9f2f5-d2e8-49d4-8afb-93f4f25a71ff/Discovery-Parks-Carnarvon-Header-Image-Cabins.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f2b5df53-1977-412a-a572-1754cdac3de7/Discovery-Parks-Carnarvon-Header-Image-Playground.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.8222885131836, -20.756149291992188]
+      },
+      "properties": {
+        "id": "WKAR",
+        "name": "Pilbara, Karratha - Discovery Parks",
+        "area": "North West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WKAR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/cd8be3a1-08a6-49bd-b34c-c4736ff29949/Discovery-Parks-Pilbara-Karratha-hero-image-pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5b5588db-cbd5-4e22-b4b5-435e680e78d0/Discovery-Parks-Pilbara-Karratha-hero-image-camp-kitchen2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/68a6482f-e331-4eff-a074-31492036a91b/Discovery-Parks-Pilbara-Karratha-hero-image-camp-kitchen.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/16942dfd-e2c2-468d-8968-6afa704e8fd5/Discovery-Parks-Pilbara-Karratha-hero-image-adult-lounge.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/08115388-2d5b-4438-a615-0efd60af1eab/Discovery-Parks-Pilbara-Karratha-hero-image-amenities.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/75d05255-6983-4221-8feb-92c9ce01c6c9/Discovery-Parks-Pilbara-Karratha-hero-image-playground.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 3.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [115.12918853759766, -21.64823341369629]
+      },
+      "properties": {
+        "id": "WONS",
+        "name": "Onslow - Discovery Parks",
+        "area": "North West",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/WONS",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ec1fe2ed-4a26-4673-975d-27e92f77efe5/Discovery-Parks-Onslow-Accomm-Block.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8a257f3f-e213-4fd1-bd8b-b88a2738606a/Discovery-Parks-Onslow-BBQ-Area.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/63273f01-e4e9-4ead-b904-f98921e20550/Discovery-Parks-Onslow-Camp-Kitchen.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3cc4b042-a48f-46a7-9e8c-3082dac97739/Discovery-Parks-Onslow-Dining-Hall.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/96620bd7-a40a-4986-995f-73dd64738bc6/Discovery-Parks-Onslow-Gym.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/62d880f0-016c-43a8-84ad-ce474ac9fb1f/Discovery-Parks-Onslow-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/51a22a5a-a933-4eeb-98d1-fa96f67b0e73/Discovery-Parks-Onslow-Rec-Room.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 3.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}

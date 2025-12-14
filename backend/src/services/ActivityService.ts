@@ -5,7 +5,7 @@ import prisma from "../utils/prisma"
 export class ActivityService {
   async createActivity(data: {
     tripId: string
-    tripDayId?: string
+    tripDayId: string // Now required
     activityType: ActivityType
     name: string
     description?: string
@@ -13,6 +13,8 @@ export class ActivityService {
     scheduledStart?: Date
     scheduledEnd?: Date
     durationMinutes?: number
+    latitude?: number
+    longitude?: number
     city?: string
     country?: string
     countryCode?: string
@@ -40,6 +42,8 @@ export class ActivityService {
         scheduledStart: data.scheduledStart,
         scheduledEnd: data.scheduledEnd,
         durationMinutes: data.durationMinutes,
+        latitude: data.latitude,
+        longitude: data.longitude,
         city: data.city,
         country: data.country,
         countryCode: data.countryCode,

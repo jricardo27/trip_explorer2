@@ -1,42 +1,68 @@
 // Generated from Prisma schema - keep in sync with backend
-export enum ActivityType {
-  ACCOMMODATION = "ACCOMMODATION",
-  RESTAURANT = "RESTAURANT",
-  ATTRACTION = "ATTRACTION",
-  TRANSPORT = "TRANSPORT",
-  CUSTOM = "CUSTOM",
-}
 
-export enum ActivityStatus {
-  PLANNED = "PLANNED",
-  IN_PROGRESS = "IN_PROGRESS",
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
-  SKIPPED = "SKIPPED",
-}
+export const TransportMode = {
+  FLIGHT: "FLIGHT",
+  TRAIN: "TRAIN",
+  BUS: "BUS",
+  CAR: "CAR",
+  WALK: "WALK",
+  BOAT: "BOAT",
+  OTHER: "OTHER", // Make sure this matches backend if needed, or remove if not present in schema enum normally
+  // Aliases or additional modes used in code
+  DRIVING: "DRIVING",
+  WALKING: "WALKING",
+  CYCLING: "CYCLING",
+  TRANSIT: "TRANSIT",
+  FERRY: "FERRY",
+} as const
 
-export enum TransportMode {
-  DRIVING = "DRIVING",
-  WALKING = "WALKING",
-  CYCLING = "CYCLING",
-  TRANSIT = "TRANSIT",
-  FLIGHT = "FLIGHT",
-  TRAIN = "TRAIN",
-  BUS = "BUS",
-  FERRY = "FERRY",
-  OTHER = "OTHER",
-}
+export type TransportMode = (typeof TransportMode)[keyof typeof TransportMode]
 
-export enum MemberRole {
-  OWNER = "OWNER",
-  EDITOR = "EDITOR",
-  VIEWER = "VIEWER",
+export const ActivityType = {
+  ACCOMMODATION: "ACCOMMODATION",
+  RESTAURANT: "RESTAURANT", // Was DINING
+  ATTRACTION: "ATTRACTION",
+  TRANSPORT: "TRANSPORT",
+  CUSTOM: "CUSTOM", // Was OTHER
+} as const
+
+export type ActivityType = (typeof ActivityType)[keyof typeof ActivityType]
+
+export const ActivityStatus = {
+  PLANNED: "PLANNED",
+  BOOKED: "BOOKED",
+  CONFIRMED: "CONFIRMED",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED",
+} as const
+export type ActivityStatus = (typeof ActivityStatus)[keyof typeof ActivityStatus]
+
+export const MemberRole = {
+  OWNER: "OWNER",
+  EDITOR: "EDITOR",
+  VIEWER: "VIEWER",
+} as const
+
+export type MemberRole = (typeof MemberRole)[keyof typeof MemberRole]
+
+export interface TransportSegment {
+  id: string
+  activityId: string
+  mode: TransportMode
+  departureTime?: string
+  arrivalTime?: string
+  carrier?: string
+  icon?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  details?: any
 }
 
 export interface User {
   id: string
   email: string
+  name?: string
   createdAt: string
+  updatedAt: string
 }
 
 export interface Trip {
@@ -55,8 +81,35 @@ export interface Trip {
   members?: TripMember[]
   budgets?: Budget[]
   transport?: TransportAlternative[]
+  animations?: TripAnimation[]
   createdAt: string
   updatedAt: string
+}
+
+export interface TripAnimation {
+  id: string
+  tripId: string
+  name: string
+  description?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  settings: any
+  steps: TripAnimationStep[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TripAnimationStep {
+  id: string
+  animationId: string
+  activityId?: string
+  orderIndex: number
+  isVisible: boolean
+  customLabel?: string
+  zoomLevel?: number
+  transportMode?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  settings: any
+  activity?: Activity
 }
 
 export interface TripDay {
@@ -83,6 +136,8 @@ export interface Activity {
   city?: string
   country?: string
   countryCode?: string
+  latitude?: number
+  longitude?: number
   scheduledStart?: string
   scheduledEnd?: string
   actualStart?: string
@@ -101,6 +156,7 @@ export interface Activity {
   phone?: string
   email?: string
   website?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   openingHours?: any
   estimatedCost?: number
   actualCost?: number
@@ -153,6 +209,7 @@ export interface ApiError {
   error: {
     code: string
     message: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     details?: any
   }
 }
@@ -225,6 +282,7 @@ export interface TransportAlternative {
   currency?: string
   costPerPerson: boolean
   distanceMeters?: number
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   waypoints?: any
   description?: string
   notes?: string
@@ -250,4 +308,3 @@ export interface CreateTransportRequest {
   currency?: string
   description?: string
 }
-

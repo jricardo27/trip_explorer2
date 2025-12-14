@@ -1,0 +1,828 @@
+{
+  "type": "FeatureCollection",
+  "properties": {
+    "source": "https://www.discoveryholidayparks.com.au",
+    "style": {
+      "layerName": "Discovery Parks",
+      "color": "red"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [147.03646850585938, -36.10369491577149]
+      },
+      "properties": {
+        "id": "NHUM",
+        "name": "Lake Hume, New South Wales",
+        "area": "The Murray",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NHUM",
+        "images": [
+          {
+            "src": "https://gdayparks.com.au/getmedia/ddc9b754-2064-49d6-891e-89bebe61cb5b/ALake-Hume-NSW-Header.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f337f242-df61-474c-bf9c-3be8b92b11af/Lake-Hume-NSW-Header-(1).jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/52c71477-0f0c-4ff1-8890-5ee8a9ea0122/Lake-Hume-NSW-Header-(2).jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3fe019c3-0436-40c0-b0c7-299f2b9c81c8/Lake-Hume-NSW-Header-(3).jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/66545e7f-09e0-4255-994f-94e9d7bb93ca/Lake-Hume-NSW-Header-(4).jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/112e3dee-9f68-4516-9930-26afa1717146/Lake-Hume-NSW-Header-(5).jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.7950897216797, -36.111236572265625]
+      },
+      "properties": {
+        "id": "NMWA",
+        "name": "Moama Waters",
+        "area": "The Murray",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NMWA",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1bf3aa8d-99d6-4f26-9d4b-273b329196aa/discovery-parks-moama-waters-cabins.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d272b9cf-514b-4efc-a9b5-bddc436f9136/discovery-parks-moama-waters-aerial-view.JPG",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f088fe24-5916-41ae-ad70-9641516e01d7/pdiscovery-parks-moama-waters-playground-bouncing-pillow.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/48935101-40c9-4bb6-b81e-7c3306491c8f/discovery-parks-moama-waters-waterpark-swimming-pool.JPG",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b81de946-ad66-437e-95f5-01270d3c7b15/discovery-parks-moama-waters-pump-track.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.7950897216797, -36.110939025878906]
+      },
+      "properties": {
+        "id": "NHOR",
+        "name": "Horseshoe Lagoon",
+        "area": "Murray",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NHOR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/88ec1023-d685-49f2-9fd0-ac1bc991097b/17447_untitled_33_of_34.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3081505e-e5b5-4b60-94ee-2cd259a864d1/17450_img_2020.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4464cae6-e9ed-4c90-98ee-2f61a61c71e2/17449_untitled_25_of_34.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b499ffad-bb06-443c-8d7c-25804d720897/17451_untitled_27_of_34.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1905ceee-f059-4941-98c2-91f5630443d5/17448_untitled_20_of_34.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": "",
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.77626037597656, -36.11752700805664]
+      },
+      "properties": {
+        "id": "NMOE",
+        "name": "Maidens Inn, Moama",
+        "area": "The Murray",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NMOE",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/336616c0-bbd2-49b6-b1b9-0211242606a8/Maidens-Inn-Deluxe-2BR-Riverfront-Cabin-S6-hero-image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1f059f3a-f0cc-46a3-a6c9-2b0a7178459b/Maidens-Inn-Moama-hero-image2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/da67de6b-2de8-4db4-88f3-71e68c9f72ac/Maidens-Inn-Moama-hero-image3.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/6c99c0e1-0437-4a77-b932-34b1b5b0d8ab/Maidens-Inn-Moama-hero-image4.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d431d940-c8b5-42d0-ab15-2b6605607d90/Maidens-Inn-Moama-hero-image5.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/07407bd5-7413-44f0-8e27-347b5ad946be/9260_img_0817.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4a12a4fb-a16e-4aa5-8c4e-5f30d39a54f3/22398_maidens_inn_lifestyle_003.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [144.73045349121094, -36.106204986572266]
+      },
+      "properties": {
+        "id": "NMOW",
+        "name": "Moama West",
+        "area": "The Murray",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NMOW",
+        "images": [
+          {
+            "src": "https://gdayparks.com.au/getmedia/485de98a-48c2-4c4e-8462-aa663dd0d386/23026_moama_west_standard_3b_semidisable_holidayunit_s7_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f8cef7ea-61f1-4c5b-9ae0-73def195b0e3/21389_maoma_west_bouncezone_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f705e403-3906-43b7-af1e-732ad1021fa1/21390_moama_west_lifestyle_001.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/192ef8c2-a417-4fb5-adc9-fd82c84b6c18/21388_moama_west_other_006.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.59571838378906, -36.41080856323242]
+      },
+      "properties": {
+        "id": "NJIN",
+        "name": "Jindabyne",
+        "area": "Snowy Mountains",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NJIN",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e325f62b-6da3-4f7f-8587-32074ab56ae3/Discovery-Parks-Jindabyne-park-hero-image1.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f6de4875-970f-4c40-bd50-8bc4c196ece6/Discovery-Parks-Jindabyne-park-hero-image2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b6eb4c89-6125-49d7-8e5e-c582b0f9143c/Discovery-Parks-Jindabyne-park-hero-image3.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/974300ac-0f54-44f6-bf18-a0e0742f012c/Discovery-Parks-Jindabyne-park-hero-image4.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/7e8c2509-b00a-47ac-8a7a-106cb9305fa1/Discovery-Parks-Jindabyne-park-hero-image5.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.87359619140625, -37.09785461425781]
+      },
+      "properties": {
+        "id": "NEDN",
+        "name": "Eden",
+        "area": "South Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NEDN",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/bab6d3fa-ed40-4af4-9a3f-fad0cb39e2d9/19714_eden_lsamb_021.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/fab25a72-7d03-4426-9590-6d41d89fb817/Eden-Water-Park.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/31a2f8e0-d030-48f4-9e03-b239222b9279/19715_eden_lsamb_014.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e14ff02d-36e6-4d15-befe-d576ab1c951c/19717_eden_playground_a.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/dbae56bd-f6e6-4da6-9f5a-af45faaef610/19716_eden_pool_b.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [149.90658569335938, -36.940399169921875]
+      },
+      "properties": {
+        "id": "NPAM",
+        "name": "Pambula Beach",
+        "area": "South Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NPAM",
+        "images": [
+          {
+            "src": "https://gdayparks.com.au/getmedia/54d4f1a4-8b00-4b3c-90b9-a811fc1ca061/Pambula-Beach-aerial.png",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/4c1a469c-19ed-46af-8cbf-7e148a5167f4/Pambula-Beach-aerial-beach.png",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/4838647f-a05b-4135-8216-a629f6a3c616/Pambula-Beach-waterpark.png",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/3d64d62d-297c-4c2e-9d80-d6dffc48b7b2/Pambula-Beach-cabin.png",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/35309408-31c2-462f-9cb4-98733a81144f/Pambula-Beach-family.png",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [150.14056396484375, -36.2469482421875]
+      },
+      "properties": {
+        "id": "NNRM",
+        "name": "Narooma Beach",
+        "area": "South Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NNRM",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e23013a7-b4e8-4d83-a9e3-a76670303e55/Discovery-Parks-Narooma-Beach-Cabin-Balcony.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/19e557ed-98a4-4101-9376-3f5e7639e3f5/Discovery-Parks-Narooma-Beach-Family-Beach-Day.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/44ba50d4-750c-45de-a4aa-307a79804f42/Discovery-Parks-Narooma-Swimming-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/90114991-96a4-4b94-902e-36c808123ea3/Discovery-Parks-Narooma-Beach-Family-On-Beach.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/9836be60-b1f9-4399-8122-8d6fae3ef5a7/narooma-beach-playground.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c2b27765-3873-4dcc-b640-c8dc4f512214/Discovery-Parks-Narooma-Beach-Pump-Track.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [150.4395294189453, -35.38869094848633]
+      },
+      "properties": {
+        "id": "NULD",
+        "name": "Burrill Lake, Ulladulla",
+        "area": "South Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NULD",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/fad98e1d-1baf-416c-8abd-2c58886b319c/Discovery-Parks-Burrill-Lake-Ulladulla-Pool.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e8a54b14-20a1-41ec-81b6-649b30c4f108/discovery-parks-burrill-lake-ulladulla-kayak-hire-lake.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d5f949de-b1bc-471b-8587-e7d869becaa5/Discovery-Parks-Burrill-Lake-Ulladulla-Mini-Golf.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3b926e87-d8d7-47e7-8987-3552e1b463c6/Discovery-Parks-Burrill-Lake-Ulladulla-Playground.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ade78372-753a-40b5-a143-8439c1e9d6d7/Discovery-Parks-Burrill-Lake-Ulladulla-Fishing.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/581163c7-fdf2-410a-8580-c4d82e626cad/Discovery-Parks-Burrill-Lake-Ulladulla-Lake.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [150.8092041015625, -34.76925277709961]
+      },
+      "properties": {
+        "id": "NGER",
+        "name": "Gerroa",
+        "area": "South Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NGER",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2a8b1030-702b-4b0d-b0b9-a16cbd7d76e2/Gerroa-hero-banner-image1.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/49e3eea0-4729-4a63-b754-f167adbfc2ca/Gerroa-hero-banner-image2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e035c894-64b6-41b8-a443-c70dcb6a4ec0/Gerroa-hero-banner-image3.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9a84490b-7458-4b9b-8fb7-441f49a4a905/Gerroa-hero-banner-image4.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/dbcf1c60-6f3c-4a97-9a89-91c5621cf736/Gerroa-hero-banner-image5.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [151.14337158203125, -33.78950881958008]
+      },
+      "properties": {
+        "id": "NLAC",
+        "name": "Lane Cove",
+        "area": "Sydney",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NLAC",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/24db3daf-940c-4c25-a570-f19a27bbbe94/LANE-COVE_Other_001.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/fe5ee1c6-7256-4ee6-ab28-c6414b01bf1a/LANE-COVE_Lifestyle_025.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1fd7e981-b8ed-4fa7-8821-101af0b11c09/LANE-COVE_PlayGround_A2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5c64f506-8085-4318-ad05-e12cc836d4a9/LANE-COVE_Pool_A.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/867e4ef5-0d9c-413e-a812-abb4754bd5c1/Discovery-Parks-Lane-Cove-Superior-Safari-Tent-Exterior.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [148.58758544921875, -32.25761032104492]
+      },
+      "properties": {
+        "id": "NDUB",
+        "name": "Dubbo",
+        "area": "Central",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NDUB",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ea041cbe-8037-44e2-8875-ca53789d939c/DUBBO_1.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/385c2682-41a0-4646-b740-c172066cf854/DUBBO_2.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c3ea9e90-d370-49ea-8477-0d37eaf572ba/DUBBO_3.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ad1b028d-8c38-480d-93be-93e0335a613e/DUBBO_4.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b7e2035d-d6e5-4339-9069-871c00d4ee95/DUBBO_5.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [152.4702606201172, -32.099674224853516]
+      },
+      "properties": {
+        "id": "NFOR",
+        "name": "Forster",
+        "area": "North Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NFOR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f68760f7-06cf-42c9-be36-92364c68857c/Discovery-Parks-Forster-Pool-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/30ff648e-a466-4f42-b2db-e5bf48f28c63/19830_forster_lsamb_050.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c7e00cb1-5fe2-47b4-8bd9-e2cd5cda546e/19827_forster_lsamb_072.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/d29beb50-fbc7-4ddb-ae4a-f337ab7dd61c/19829_forster_lsamb_063.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/20fe8ed1-a58d-4de8-9586-453d1259c4e4/19781_forster_delux_2b_cabinnew_s4_a.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/b30230dd-529a-4064-8d3f-033e0c6184c1/Discovery-Parks-Forster-Boardwalk-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2bfb5578-b9ba-43b8-924e-2ab13f9e9cf7/Discovery-Parks-Forster-Waterpark-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5cb01dcb-b505-46c1-ac94-08285d59d1fe/Discovery-Parks-Forster-Fishing-Header-Image.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e68d412f-dae3-4796-8243-96fb8d3820dc/Discovery-Parks-Forster-Waterslide-Header-Image.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [152.72039794921875, -31.856849670410156]
+      },
+      "properties": {
+        "id": "NHAR",
+        "name": "Harrington Beach",
+        "area": "North Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NHAR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4d78c119-c81e-4543-a8aa-603d644aa95b/23025_harrington_lsamb_058.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5a196212-115c-4c33-9882-1498e43a962f/20178_harrington_lsamb_036.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/a6f1f6a9-504d-40de-959d-05c07c96783b/20180_harrington_lsamb_033.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c29ef06c-0713-4a4c-a406-f405975493d8/20179_harrington_pool_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/05b6a1ca-3cd3-406a-b561-81c177035c76/20176_harrington_lsamb_046.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://gdayparks.com.au/getmedia/fd8d5936-1702-40aa-aa29-06ddb9822202/harrington-beach-cover-photo-night-shot.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [153.18795776367188, -30.167089462280273]
+      },
+      "properties": {
+        "id": "NEME",
+        "name": "Emerald Beach",
+        "area": "North Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NEME",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0d173d66-09fa-4a96-becb-bfbf9fd08b42/23024_emerald_lsamb_093.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8ea4ec9a-ab4a-4aad-b700-93ec9a7e5720/20170_emerald_lsamb_080.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ba5e5baf-0f10-4341-a485-a45aa3156b7c/21029_emerald_beach.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/4e28b396-9b80-4ebd-b743-1244ca658308/20167_emerald_lsamb_046.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/253065ab-7b7c-4c16-a6b5-eae82480b792/20168_emerald_lsamb_072.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/aa738cd9-f83e-4042-8239-cb6a95ac3564/20166_emerald_lsamb_075.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1ffc5e00-7e87-4d6c-ac76-4c9ef0dfab53/Emerald-Beach-Camp-Kitchen.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e1a1b63b-dee8-453f-84b0-1322633b50e9/Emerald-Beach-Bali-Huts.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/6a68fd48-6b89-4151-a609-6c4418725881/Emerald-Beach-Tiny-Tots-Room.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/f0366d89-0b12-4730-a105-0525d5cc1ec7/Emerald-Beach-Playground.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [153.06228637695312, -28.86173439025879]
+      },
+      "properties": {
+        "id": "NCAS",
+        "name": "Casino",
+        "area": "North Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NCAS",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/ff76e066-607a-42b9-9d28-dd8045c45c75/8028_84du3079.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/42572c67-498b-4785-b714-182aaeae8ddc/8027_banner.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/0ad0b39c-048b-4ee9-a1ac-edbc06ae8972/19574_casino_bbqarea_a_copy.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [153.58570861816406, -28.868749618530273]
+      },
+      "properties": {
+        "id": "NBAL",
+        "name": "Ballina",
+        "area": "North Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NBAL",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/5582c17f-4118-426e-b22d-f30bbfd621b8/23022_ballina_delux_2b_waterfrontcabin_s7_b.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/6105bb47-bd42-4595-8298-46b3d052a3b1/20412_ballina_lsamb_037.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/df05534f-4d85-4dd2-b4ed-f7ba82e5b388/14154_bl-1196.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/1b2f95e3-4f0a-4cf8-82e0-c33f15150bd5/20411_ballina_lsamb_027.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/c459fc18-5b21-4555-84bb-5eee99567591/20410_ballina_lsamb_019.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/e0f94d8c-17a8-4592-a550-9afa73b84c97/20409_ballina_lsamb_001.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4.5,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [153.59439086914062, -28.635610580444336]
+      },
+      "properties": {
+        "id": "NBYR",
+        "name": "Byron Bay",
+        "area": "North Coast",
+        "website": "https://www.discoveryholidayparks.com.au/parks/permalink/NBYR",
+        "images": [
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/2d9dfb65-d3d0-4d87-bb14-9e5b62faeeaf/20136_byron_lsamb_071.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/8bc842e4-7c65-4344-8d18-c8d1af02886b/14187_bbd-2502.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/fd6c13df-e7ed-45fb-b8e0-1ce71449f9a1/14186_mg_5473.png",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/3de1ec08-9121-41e5-a61e-40e3c30bd8af/discovery-parks-byron-bay-family-fun.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9e0e1623-6b32-45da-91e8-4ceeab87cb11/dsicovery-parks-byron-bay-couple.jpg",
+            "title": ""
+          },
+          {
+            "src": "https://prod-stratweb-gdaygroup.imgix.net/getmedia/9b0f51eb-8a5e-421d-aaf1-0b3e72b81056/discovery-parks-byron-bay-ebikes.jpg",
+            "title": ""
+          }
+        ],
+        "reviews": 4,
+        "style": {
+          "icon": "custom/DiscoveryParksIcon",
+          "innerIconColor": "black"
+        }
+      }
+    }
+  ]
+}
