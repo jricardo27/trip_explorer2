@@ -157,6 +157,58 @@ class ActivityController {
       next(error)
     }
   }
+
+  async addParticipant(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user.id
+      const { id } = req.params // activityId
+      const { memberId } = req.body
+
+      if (!memberId) {
+        return res.status(400).json({ error: "memberId is required" })
+      }
+
+      const activity = await activityService.getActivityById(id)
+      if (!activity) {
+        return res.status(404).json({ error: "Activity not found" })
+      }
+
+      const trip = await tripService.getTripById(activity.tripId, userId)
+      if (!trip) {
+        return res.status(403).json({ error: "Unauthorized" })
+      }
+
+      const participant = await activityService.addParticipant(id, memberId)
+      res.status(201).json(participant)
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        return res.status(409).json({ error: "Member is already a participant" })
+      }
+      next(error)
+    }
+  }
+
+  async removeParticipant(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user.id
+      const { id, memberId } = req.params
+
+      const activity = await activityService.getActivityById(id)
+      if (!activity) {
+        return res.status(404).json({ error: "Activity not found" })
+      }
+
+      const trip = await tripService.getTripById(activity.tripId, userId)
+      if (!trip) {
+        return res.status(403).json({ error: "Unauthorized" })
+      }
+
+      await activityService.removeParticipant(id, memberId)
+      res.status(204).send()
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 export default new ActivityController()

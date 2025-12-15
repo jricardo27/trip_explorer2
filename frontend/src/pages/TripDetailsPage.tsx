@@ -17,6 +17,9 @@ import dayjs from "dayjs"
 
 import { useTripDetails } from "../hooks/useTripDetails"
 import type { Activity, TripAnimation } from "../types"
+import { TripMembersDialog } from "../components/TripMembersDialog"
+import { ExpensesDialog } from "../components/ExpensesDialog"
+import { PersonAdd, AttachMoney } from "@mui/icons-material"
 import ActivityDialog from "../components/ActivityDialog"
 import AnimationConfigDialog from "../components/AnimationConfigDialog"
 import { SortableActivityCard } from "../components/SortableActivityCard"
@@ -71,6 +74,8 @@ const TripDetailsPage = () => {
   // Dialog State
   const [dialogOpen, setDialogOpen] = useState(false)
   const [animationDialogOpen, setAnimationDialogOpen] = useState(false)
+  const [membersDialogOpen, setMembersDialogOpen] = useState(false)
+  const [expensesDialogOpen, setExpensesDialogOpen] = useState(false)
   const [selectedDayId, setSelectedDayId] = useState<string | undefined>(undefined)
   const [editingActivity, setEditingActivity] = useState<Activity | undefined>(undefined)
   const [editingAnimation, setEditingAnimation] = useState<TripAnimation | undefined>(undefined)
@@ -397,6 +402,32 @@ const TripDetailsPage = () => {
             )}
           </Box>
         </Box>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button variant="outlined" size="small" startIcon={<PersonAdd />} onClick={() => setMembersDialogOpen(true)}>
+            Members
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<AttachMoney />}
+            onClick={() => setExpensesDialogOpen(true)}
+          >
+            Expenses
+          </Button>
+          {!trip.isCompleted && (
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={() => {
+                setEditingActivity(undefined)
+                setDialogOpen(true)
+              }}
+            >
+              Add Activity
+            </Button>
+          )}
+        </Box>
 
         <Box display="flex" gap={1}>
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleAddActivity()} size="small">
@@ -639,8 +670,29 @@ const TripDetailsPage = () => {
             setEditingAnimation(undefined)
           }}
           trip={trip}
-          initialData={editingAnimation}
+          initialData={
+            editingAnimation
+              ? {
+                  ...editingAnimation,
+                  steps: editingAnimation.steps.map((s) => ({
+                    ...s,
+                    activityId: s.activityId || "", // Ensure activityId is string
+                  })),
+                }
+              : undefined
+          }
           onSubmit={createAnimation}
+        />
+      )}
+
+      {trip && <TripMembersDialog open={membersDialogOpen} onClose={() => setMembersDialogOpen(false)} trip={trip} />}
+
+      {trip && (
+        <ExpensesDialog
+          open={expensesDialogOpen}
+          onClose={() => setExpensesDialogOpen(false)}
+          tripId={trip.id}
+          currency={trip.defaultCurrency || "AUD"}
         />
       )}
     </Box>

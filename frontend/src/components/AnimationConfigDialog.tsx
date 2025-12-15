@@ -12,13 +12,32 @@ import {
 } from "@mui/material"
 import type { Trip } from "../types"
 
+type AnimationSettings = {
+  speed: number
+}
+
+type AnimationStep = {
+  activityId: string
+  orderIndex: number
+  isVisible: boolean
+  zoomLevel?: number
+  transportMode?: string
+}
+
+interface AnimationConfig {
+  id?: string
+  name: string
+  description?: string
+  settings: AnimationSettings
+  steps: AnimationStep[]
+}
+
 interface AnimationConfigDialogProps {
   open: boolean
   onClose: () => void
   trip: Trip
-  initialData?: { id: string; name: string; description?: string; settings: any; steps: any[] }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSubmit: (data: { name: string; settings: any; steps: any[] }) => Promise<void>
+  initialData?: AnimationConfig
+  onSubmit: (data: AnimationConfig) => Promise<void>
 }
 
 export default function AnimationConfigDialog({

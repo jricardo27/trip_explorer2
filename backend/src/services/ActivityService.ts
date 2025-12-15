@@ -20,6 +20,7 @@ export class ActivityService {
     countryCode?: string
     estimatedCost?: number
     currency?: string
+    participantIds?: string[]
   }): Promise<Activity> {
     // Calculate next order index
     let orderIndex = 0
@@ -50,6 +51,19 @@ export class ActivityService {
         estimatedCost: data.estimatedCost,
         currency: data.currency || "AUD",
         orderIndex,
+        participants: data.participantIds
+          ? {
+              create: data.participantIds.map((memberId) => ({ memberId })),
+            }
+          : undefined,
+      },
+      include: {
+        tripDay: true,
+        participants: {
+          include: {
+            member: true,
+          },
+        },
       },
     })
 
@@ -61,6 +75,11 @@ export class ActivityService {
       where: { id },
       include: {
         tripDay: true,
+        participants: {
+          include: {
+            member: true,
+          },
+        },
       },
     })
     return activity
@@ -95,6 +114,11 @@ export class ActivityService {
       orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }, { createdAt: "asc" }],
       include: {
         tripDay: true,
+        participants: {
+          include: {
+            member: true,
+          },
+        },
       },
     })
 
@@ -225,6 +249,54 @@ export class ActivityService {
     }
 
     return conflicts
+  }
+
+  async addParticipant(activityId: string, memberId: string) {
+    // Check if both exist
+    const activity = await prisma.activity.findUnique({ where: { id: activityId } })
+    const member = await prisma.tripMember.findUnique({ where: { id: memberId } })
+
+    if (!activity || !member) {
+      throw new Error("Activity or Member not found")
+    }
+
+    if (activity.tripId !== member.tripId) {
+      throw new Error("Activity and Member must belong to the same trip")
+    }
+
+    return prisma.activityParticipant.create({
+      data: {
+        activityId,
+        memberId,
+      },
+      include: {
+        member: true,
+      },
+    })
+  }
+
+  async removeParticipant(activityId: string, memberId: string) {
+    const participant = await prisma.activityParticipant.findUnique({
+      where: {
+        activityId_memberId: {
+          activityId,
+          memberId,
+        },
+      },
+    })
+
+    if (!participant) {
+      return // Already removed or didn't exist
+    }
+
+    await prisma.activityParticipant.delete({
+      where: {
+        activityId_memberId: {
+          activityId,
+          memberId,
+        },
+      },
+    })
   }
 }
 

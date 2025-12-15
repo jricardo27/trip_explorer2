@@ -98,6 +98,18 @@ export interface TripAnimation {
   updatedAt: string
 }
 
+export interface TripMember {
+  id: string
+  tripId: string
+  userId?: string
+  name: string
+  email?: string
+  role: MemberRole
+  avatarUrl?: string
+  color?: string
+  createdAt: string
+}
+
 export interface TripAnimationStep {
   id: string
   animationId: string
@@ -148,6 +160,7 @@ export interface Activity {
   status: ActivityStatus
   priority?: string
   orderIndex?: number
+  participants?: ActivityParticipant[]
   bookingReference?: string
   bookingUrl?: string
   confirmationNumber?: string
@@ -172,6 +185,14 @@ export interface Activity {
   tripDay?: TripDay
   createdAt: string
   updatedAt: string
+}
+
+export interface ActivityParticipant {
+  id: string
+  activityId: string
+  memberId: string
+  member: TripMember
+  createdAt: string
 }
 
 export interface TripMember {
@@ -250,6 +271,7 @@ export interface CreateActivityRequest {
   countryCode?: string
   estimatedCost?: number
   currency?: string
+  participantIds?: string[]
 }
 
 export interface UpdateActivityRequest {
@@ -266,6 +288,7 @@ export interface UpdateActivityRequest {
   estimatedCost?: number
   actualCost?: number
   isPaid?: boolean
+  participantIds?: string[]
 }
 
 export interface TransportAlternative {

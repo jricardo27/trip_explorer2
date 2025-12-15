@@ -13,16 +13,27 @@ import {
   FormControl,
   Box,
   Alert,
+  Checkbox,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Avatar,
+  Typography,
+  ListItemButton,
 } from "@mui/material"
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import dayjs from "dayjs"
 import { ActivityType } from "../types"
 import type { Activity, TripDay } from "../types"
+import { useTripMembers } from "../hooks/useTripMembers"
 
 interface ActivityDialogProps {
   open: boolean
   onClose: (event?: object, reason?: string) => void
-  onSubmit: (data: Partial<Activity> & { tripId: string; tripDayId?: string }) => Promise<void>
+  onSubmit: (
+    data: Partial<Activity> & { tripId: string; tripDayId?: string; participantIds?: string[] },
+  ) => Promise<void>
   isLoading: boolean
   tripId: string
   tripDayId?: string
@@ -56,7 +67,10 @@ const ActivityDialog = ({
   const [latitude, setLatitude] = useState("")
   const [longitude, setLongitude] = useState("")
   const [notes, setNotes] = useState("")
+  const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
+
+  const { members } = useTripMembers(tripId)
 
   useEffect(() => {
     if (open) {
@@ -69,7 +83,10 @@ const ActivityDialog = ({
         setEstimatedCost(activity.estimatedCost?.toString() || "")
         setLatitude(activity.latitude?.toString() || "")
         setLongitude(activity.longitude?.toString() || "")
+        setLatitude(activity.latitude?.toString() || "")
+        setLongitude(activity.longitude?.toString() || "")
         setNotes(activity.notes || "")
+        setSelectedMemberIds(activity.participants?.map((p) => p.memberId) || [])
       } else {
         // Reset for create
         setName("")
@@ -97,11 +114,21 @@ const ActivityDialog = ({
         setEstimatedCost("")
         setLatitude("")
         setLongitude("")
+        setLongitude("")
         setNotes("")
+        setNotes("")
+        setSelectedMemberIds(members.map((m) => m.id))
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
+  }, [open]) // members is external, we rely on open trigger. If members load later, we might miss it unless we add logic.
+  // Ideally members should be passed as prop or stable.
+
+  const handleToggleMember = (memberId: string) => {
+    setSelectedMemberIds((prev) =>
+      prev.includes(memberId) ? prev.filter((id) => id !== memberId) : [...prev, memberId],
+    )
+  }
 
   const validateDates = () => {
     if (!scheduledStart && !scheduledEnd) return true
@@ -182,6 +209,7 @@ const ActivityDialog = ({
         latitude: latitude ? parseFloat(latitude) : undefined,
         longitude: longitude ? parseFloat(longitude) : undefined,
         notes,
+        participantIds: selectedMemberIds,
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
@@ -293,6 +321,45 @@ const ActivityDialog = ({
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
+              </Grid>
+
+              <Grid size={{ xs: 12 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Who's going?
+                </Typography>
+                {members.length > 0 ? (
+                  <List
+                    dense
+                    sx={{ width: "100%", bgcolor: "background.paper", border: "1px solid #e0e0e0", borderRadius: 1 }}
+                  >
+                    {members.map((member) => {
+                      const labelId = `checkbox-list-secondary-label-${member.id}`
+                      return (
+                        <ListItem key={member.id} disablePadding>
+                          <ListItemButton onClick={() => handleToggleMember(member.id)} dense>
+                            <ListItemAvatar>
+                              <Avatar sx={{ bgcolor: member.color, width: 32, height: 32, fontSize: "0.875rem" }}>
+                                {member.name.charAt(0)}
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText id={labelId} primary={member.name} />
+                            <Checkbox
+                              edge="end"
+                              checked={selectedMemberIds.indexOf(member.id) !== -1}
+                              tabIndex={-1}
+                              disableRipple
+                              inputProps={{ "aria-labelledby": labelId }}
+                            />
+                          </ListItemButton>
+                        </ListItem>
+                      )
+                    })}
+                  </List>
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    No members in this trip yet.
+                  </Typography>
+                )}
               </Grid>
             </Grid>
           </Box>

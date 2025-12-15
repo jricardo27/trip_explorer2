@@ -55,11 +55,25 @@ export class TripService {
           include: {
             activities: {
               orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
+              include: {
+                participants: {
+                  include: {
+                    member: true,
+                  },
+                },
+              },
             },
           },
         },
         activities: {
           orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
+          include: {
+            participants: {
+              include: {
+                member: true,
+              },
+            },
+          },
         },
         members: true,
         budgets: true,

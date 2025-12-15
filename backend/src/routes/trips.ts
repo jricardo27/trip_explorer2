@@ -4,11 +4,18 @@ import { validate } from "../middleware/errorHandler"
 import tripService from "../services/TripService"
 import { createTripSchema, updateTripSchema } from "../utils/validation"
 import { authenticateToken } from "../middleware/auth"
+import tripMemberService from "../services/TripMemberService"
+
+import expenseRoutes from "./expenses"
+import * as ExpenseController from "../controllers/ExpenseController"
 
 const router = Router()
 
 // Protect all routes
 router.use(authenticateToken)
+
+// Expenses sub-route or direct controller usage
+router.get("/:tripId/expenses", ExpenseController.getExpenses)
 
 // GET /api/trips - List all trips for a user
 router.get("/", async (req: Request, res: Response) => {
@@ -215,6 +222,120 @@ router.post("/:id/copy", async (req: Request, res: Response) => {
       error: {
         code: "INTERNAL_ERROR",
         message: "Failed to copy trip",
+      },
+    })
+  }
+})
+
+// ===== MEMBER ROUTES =====
+
+// GET /api/trips/:id/members - Get all members for a trip
+router.get("/:id/members", async (req: Request, res: Response) => {
+  try {
+    const members = await tripMemberService.getMembers(req.params.id, (req as any).user.id)
+    res.json({ data: members })
+  } catch (error: any) {
+    if (error.message === "Trip not found or access denied") {
+      return res.status(404).json({
+        error: {
+          code: "NOT_FOUND",
+          message: error.message,
+        },
+      })
+    }
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to fetch members",
+      },
+    })
+  }
+})
+
+// POST /api/trips/:id/members - Add a member to a trip
+router.post("/:id/members", async (req: Request, res: Response) => {
+  try {
+    const member = await tripMemberService.addMember(req.params.id, (req as any).user.id, {
+      name: req.body.name,
+      email: req.body.email,
+      role: req.body.role,
+      color: req.body.color,
+      avatarUrl: req.body.avatarUrl,
+    })
+    res.status(201).json({ data: member })
+  } catch (error: any) {
+    if (error.message === "Trip not found or access denied") {
+      return res.status(404).json({
+        error: {
+          code: "NOT_FOUND",
+          message: error.message,
+        },
+      })
+    }
+    if (error.message === "Member with this email already exists") {
+      return res.status(409).json({
+        error: {
+          code: "CONFLICT",
+          message: error.message,
+        },
+      })
+    }
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to add member",
+      },
+    })
+  }
+})
+
+// PUT /api/trips/:id/members/:memberId - Update a member
+router.put("/:id/members/:memberId", async (req: Request, res: Response) => {
+  try {
+    const member = await tripMemberService.updateMember(req.params.memberId, (req as any).user.id, {
+      name: req.body.name,
+      email: req.body.email,
+      role: req.body.role,
+      color: req.body.color,
+      avatarUrl: req.body.avatarUrl,
+    })
+    res.json({ data: member })
+  } catch (error: any) {
+    if (error.message === "Member not found or access denied") {
+      return res.status(404).json({
+        error: {
+          code: "NOT_FOUND",
+          message: error.message,
+        },
+      })
+    }
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to update member",
+      },
+    })
+  }
+})
+
+// DELETE /api/trips/:id/members/:memberId - Remove a member
+router.delete("/:id/members/:memberId", async (req: Request, res: Response) => {
+  try {
+    await tripMemberService.removeMember(req.params.memberId, (req as any).user.id)
+    res.status(204).send()
+  } catch (error: any) {
+    if (error.message === "Member not found or access denied") {
+      return res.status(404).json({
+        error: {
+          code: "NOT_FOUND",
+          message: error.message,
+        },
+      })
+    }
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to remove member",
       },
     })
   }

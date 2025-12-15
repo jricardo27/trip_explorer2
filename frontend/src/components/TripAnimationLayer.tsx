@@ -96,6 +96,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       for (let i = 0; i < coords.length - 1; i++) {
         const segDist = getDistance(coords[i], coords[i + 1])
         if (currentDist + segDist >= targetDist) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setCurrentSegmentIndex(i)
           setSegmentProgress((targetDist - currentDist) / segDist)
           setIsPaused(false)
@@ -140,6 +141,9 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   }, [zoomPhase, currentSegmentIndex, coords, map, isPlaying, segmentProgress, config])
 
   // Animation Loop
+  // Animation Loop ref to avoid circular dependency
+  const animateRef = useRef<((time: number) => void) | null>(null)
+
   const animate = useCallback(
     (time: number) => {
       if (previousTimeRef.current !== undefined) {
@@ -226,7 +230,9 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
         }
       }
       previousTimeRef.current = time
-      requestRef.current = requestAnimationFrame(animate)
+      if (animateRef.current) {
+        requestRef.current = requestAnimationFrame(animateRef.current)
+      }
     },
     [
       coords,
@@ -240,6 +246,10 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       zoomPhase,
     ],
   )
+
+  useEffect(() => {
+    animateRef.current = animate
+  }, [animate])
 
   useEffect(() => {
     if (isPlaying && coords.length > 1) {
@@ -296,6 +306,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   // Initialize zoom
   useEffect(() => {
     if (isPlaying && currentSegmentIndex === 0 && segmentProgress === 0 && coords.length > 1) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInitialZoomComplete(false)
       setZoomPhase(ZoomPhase.ZOOM_OUT_TO_BOTH)
       setTimeout(() => {
@@ -313,13 +324,13 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     if (currentSegmentIndex < validActivities.length - 1) {
       const nextActivity = validActivities[currentSegmentIndex + 1]
       // Check for transport mode in activity (if available)
-      const mode = (nextActivity as any).transportMode
+      const mode = (nextActivity as { transportMode?: string }).transportMode
       const IconComp = getTransportIconComponent(mode)
-      if (IconComp) return <IconComp />
+      if (IconComp) return IconComp({}) // Call as function to avoid creating component in render
     }
 
     const TravelIcon = getTravelIcon(defaultIcon)
-    return <TravelIcon />
+    return TravelIcon({}) // Call as function
   }, [currentSegmentIndex, validActivities, config])
 
   const divIcon = useMemo(() => {

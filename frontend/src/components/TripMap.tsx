@@ -248,6 +248,7 @@ export const TripMap = (props: TripMapProps) => {
   // Sync activeAnimationId from prop
   useEffect(() => {
     if (propActiveAnimationId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveAnimationId(propActiveAnimationId)
       setIsPlaying(true)
     }

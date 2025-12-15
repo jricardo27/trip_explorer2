@@ -8,6 +8,7 @@ import activityRoutes from "./routes/activities"
 import tripRoutes from "./routes/trips"
 import transportRoutes from "./routes/transport"
 import animationRoutes from "./routes/animations"
+import expenseRoutes from "./routes/expenses"
 
 dotenv.config()
 
@@ -28,6 +29,7 @@ app.use("/api/trips", tripRoutes)
 app.use("/api/activities", activityRoutes)
 app.use("/api/transport", transportRoutes)
 app.use("/api/animations", animationRoutes)
+app.use("/api/expenses", expenseRoutes)
 
 // Error handling
 app.use(errorHandler)
