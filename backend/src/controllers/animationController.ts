@@ -21,7 +21,7 @@ export const createAnimation = async (req: Request, res: Response) => {
   const { name, settings, steps } = req.body
 
   try {
-    await prisma.tripAnimation.create({
+    const animation = await prisma.tripAnimation.create({
       data: {
         tripId,
         name,
