@@ -40,7 +40,7 @@ export const createAnimation = async (req: Request, res: Response) => {
       include: { steps: true },
     })
     res.json({ data: animation })
-  } catch {
+  } catch (error) {
     console.error(error)
     res.status(500).json({ error: { message: "Failed to create animation" } })
   }
@@ -86,7 +86,7 @@ export const updateAnimation = async (req: Request, res: Response) => {
     })
 
     res.json({ data: result })
-  } catch {
+  } catch (error) {
     console.error(error)
     res.status(500).json({ error: { message: "Failed to update animation" } })
   }
