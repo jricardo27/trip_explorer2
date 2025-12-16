@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { Box, CircularProgress, Typography, Alert, Paper, Grid, Button, IconButton, Tooltip } from "@mui/material"
-import { Add as AddIcon, Close as CloseIcon, ExpandMore, ExpandLess, UnfoldLess, UnfoldMore } from "@mui/icons-material"
+import { Add as AddIcon, Close as CloseIcon, ExpandMore, ExpandLess, UnfoldLess, UnfoldMore, Settings as SettingsIcon } from "@mui/icons-material"
 import {
   DndContext,
   closestCorners,
@@ -27,6 +27,7 @@ import { TransportSegment } from "../components/Transport/TransportSegment"
 import { TripMap } from "../components/TripMap"
 import { TripAnimationList } from "../components/TripAnimationList"
 import { useSettingsStore } from "../stores/settingsStore"
+import { TripSettingsDialog } from "../components/TripSettingsDialog"
 import client from "../api/client"
 import { useQueryClient } from "@tanstack/react-query"
 
@@ -69,6 +70,7 @@ const TripDetailsPage = () => {
     reorderActivities,
     createAnimation,
     deleteAnimation,
+    updateTrip,
   } = useTripDetails(tripId!)
 
   // Dialog State
@@ -76,6 +78,7 @@ const TripDetailsPage = () => {
   const [animationDialogOpen, setAnimationDialogOpen] = useState(false)
   const [membersDialogOpen, setMembersDialogOpen] = useState(false)
   const [expensesDialogOpen, setExpensesDialogOpen] = useState(false)
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false)
   const [selectedDayId, setSelectedDayId] = useState<string | undefined>(undefined)
   const [editingActivity, setEditingActivity] = useState<Activity | undefined>(undefined)
   const [editingAnimation, setEditingAnimation] = useState<TripAnimation | undefined>(undefined)
@@ -406,6 +409,9 @@ const TripDetailsPage = () => {
           <Button variant="outlined" size="small" startIcon={<PersonAdd />} onClick={() => setMembersDialogOpen(true)}>
             Members
           </Button>
+          <Button variant="outlined" size="small" startIcon={<SettingsIcon />} onClick={() => setSettingsDialogOpen(true)}>
+            Settings
+          </Button>
           <Button
             variant="outlined"
             size="small"
@@ -673,12 +679,12 @@ const TripDetailsPage = () => {
           initialData={
             editingAnimation
               ? {
-                  ...editingAnimation,
-                  steps: editingAnimation.steps.map((s) => ({
-                    ...s,
-                    activityId: s.activityId || "", // Ensure activityId is string
-                  })),
-                }
+                ...editingAnimation,
+                steps: editingAnimation.steps.map((s) => ({
+                  ...s,
+                  activityId: s.activityId || "", // Ensure activityId is string
+                })),
+              }
               : undefined
           }
           onSubmit={createAnimation}
@@ -692,7 +698,17 @@ const TripDetailsPage = () => {
           open={expensesDialogOpen}
           onClose={() => setExpensesDialogOpen(false)}
           tripId={trip.id}
-          currency={trip.defaultCurrency || "AUD"}
+          defaultCurrency={trip.defaultCurrency || "AUD"}
+          currencies={trip.currencies || ["AUD"]}
+        />
+      )}
+
+      {trip && (
+        <TripSettingsDialog
+          open={settingsDialogOpen}
+          onClose={() => setSettingsDialogOpen(false)}
+          trip={trip}
+          onUpdate={updateTrip}
         />
       )}
     </Box>

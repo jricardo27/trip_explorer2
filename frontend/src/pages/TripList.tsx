@@ -25,6 +25,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs from "dayjs"
 import { Add as AddIcon, CalendarToday, FlightTakeoff, AttachMoney } from "@mui/icons-material"
 import { useTrips, useCreateTrip } from "../hooks/useTrips"
+import { saveAs } from "file-saver"
+import client from "../api/client"
 
 const TripList = () => {
   const navigate = useNavigate()
@@ -122,11 +124,67 @@ const TripList = () => {
       </Box>
 
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs value={tabValue} onChange={(_e, val) => setTabValue(val)} aria-label="trip tabs">
-          <Tab label="Past" />
-          <Tab label="Current" />
-          <Tab label="Future" />
-        </Tabs>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Tabs value={tabValue} onChange={(_e, val) => setTabValue(val)} aria-label="trip tabs">
+            <Tab label="Past" />
+            <Tab label="Current" />
+            <Tab label="Future" />
+          </Tabs>
+          <Box display="flex" gap={1}>
+            {trips && trips.length > 0 && (
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={async () => {
+                  try {
+                    const res = await client.get("/trips/export")
+                    const blob = new Blob([JSON.stringify(res.data.data, null, 2)], { type: "application/json" })
+                    saveAs(blob, `trips_export_${dayjs().format("YYYY-MM-DD")}.json`)
+                  } catch (e) {
+                    alert("Export failed")
+                  }
+                }}
+              >
+                Export All
+              </Button>
+            )}
+            <Button
+              size="small"
+              variant="outlined"
+              component="label"
+            >
+              Import Trip
+              <input
+                type="file"
+                hidden
+                accept=".json"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+
+                  const reader = new FileReader()
+                  reader.onload = async (e) => {
+                    try {
+                      const json = JSON.parse(e.target?.result as string)
+                      // Handle both single object or array
+                      const items = Array.isArray(json) ? json : [json]
+
+                      for (const item of items) {
+                        await client.post("/trips/import", item)
+                      }
+
+                      // Refresh
+                      window.location.reload()
+                    } catch (err) {
+                      alert("Import failed: " + err)
+                    }
+                  }
+                  reader.readAsText(file)
+                }}
+              />
+            </Button>
+          </Box>
+        </Box>
       </Box>
 
       <Grid container spacing={3}>

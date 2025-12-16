@@ -40,6 +40,8 @@ model Trip {
   endDate         DateTime @map("end_date") @db.Date
   budget          Decimal? @db.Decimal(10, 2)
   defaultCurrency String?  @default("AUD") @map("default_currency") @db.Char(3)
+  currencies      String[] @default(["AUD"]) 
+  exchangeRates   Json?    @default("{}") @map("exchange_rates")
   timezone        String?  @default("Australia/Sydney")
   isCompleted     Boolean  @default(false) @map("is_completed")
   isPublic        Boolean  @default(false) @map("is_public")

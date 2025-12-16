@@ -17,6 +17,38 @@ router.use(authenticateToken)
 // Expenses sub-route or direct controller usage
 router.get("/:tripId/expenses", ExpenseController.getExpenses)
 
+// POST /api/trips/import - Import a trip
+router.post("/import", async (req: Request, res: Response) => {
+  try {
+    const trip = await tripService.importTrip(req.body, (req as any).user.id)
+    res.status(201).json({ data: trip })
+  } catch (error: any) {
+    console.error("Import error:", error)
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to import trip",
+        details: error.message
+      }
+    })
+  }
+})
+
+// GET /api/trips/export - Export ALL trips
+router.get("/export", async (req: Request, res: Response) => {
+  try {
+    const trips = await tripService.exportAllTrips((req as any).user.id)
+    res.json({ data: trips })
+  } catch (error: any) {
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to export trips"
+      }
+    })
+  }
+})
+
 // GET /api/trips - List all trips for a user
 router.get("/", async (req: Request, res: Response) => {
   try {
@@ -58,6 +90,8 @@ router.post("/", validate(createTripSchema), async (req: Request, res: Response)
       endDate: new Date(req.body.endDate),
       budget: req.body.budget,
       defaultCurrency: req.body.defaultCurrency,
+      currencies: req.body.currencies,
+      exchangeRates: req.body.exchangeRates,
       timezone: req.body.timezone,
     })
 
@@ -97,6 +131,21 @@ router.get("/:id", async (req: Request, res: Response) => {
   }
 })
 
+// GET /api/trips/:id/export - Export a single trip
+router.get("/:id/export", async (req: Request, res: Response) => {
+  try {
+    const trip = await tripService.exportTrip(req.params.id, (req as any).user.id)
+    res.json({ data: trip })
+  } catch (error: any) {
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to export trip"
+      }
+    })
+  }
+})
+
 // PUT /api/trips/:id - Update trip
 router.put("/:id", validate(updateTripSchema), async (req: Request, res: Response) => {
   try {
@@ -107,6 +156,8 @@ router.put("/:id", validate(updateTripSchema), async (req: Request, res: Respons
     if (req.body.endDate) updateData.endDate = new Date(req.body.endDate)
     if (req.body.budget !== undefined) updateData.budget = req.body.budget
     if (req.body.defaultCurrency) updateData.defaultCurrency = req.body.defaultCurrency
+    if (req.body.currencies) updateData.currencies = req.body.currencies
+    if (req.body.exchangeRates) updateData.exchangeRates = req.body.exchangeRates
     if (req.body.timezone) updateData.timezone = req.body.timezone
     if (req.body.isCompleted !== undefined) updateData.isCompleted = req.body.isCompleted
     if (req.body.isPublic !== undefined) updateData.isPublic = req.body.isPublic

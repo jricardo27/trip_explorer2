@@ -7,6 +7,8 @@ export const createTripSchema = z
     endDate: z.string(),
     budget: z.number().positive().optional(),
     defaultCurrency: z.string().length(3).optional(),
+    currencies: z.array(z.string()).optional(),
+    exchangeRates: z.record(z.number()).optional(),
     timezone: z.string().optional(),
   })
   .refine((data) => new Date(data.endDate) >= new Date(data.startDate), {
@@ -19,6 +21,8 @@ export const updateTripSchema = z.object({
   endDate: z.string().optional(),
   budget: z.number().positive().optional(),
   defaultCurrency: z.string().length(3).optional(),
+  currencies: z.array(z.string()).optional(),
+  exchangeRates: z.record(z.number()).optional(),
   timezone: z.string().optional(),
   isCompleted: z.boolean().optional(),
   isPublic: z.boolean().optional(),

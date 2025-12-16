@@ -1,32 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import client from "../api/client"
-import type { TripMember } from "../types"
-
-export interface Expense {
-  id: string
-  tripId: string
-  activityId?: string
-  description: string
-  category: string
-  amount: number
-  currency: string
-  paidById?: string
-  paymentDate?: string
-  isPaid: boolean
-  splitType: string
-  paidBy?: TripMember
-  splits?: ExpenseSplit[]
-  createdAt: string
-}
-
-export interface ExpenseSplit {
-  id: string
-  expenseId: string
-  memberId: string
-  amount: number
-  member: TripMember
-  isPaid: boolean
-}
+import type { Expense } from "../types"
 
 export interface CreateExpenseRequest {
   tripId: string

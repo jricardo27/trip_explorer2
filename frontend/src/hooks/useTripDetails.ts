@@ -18,6 +18,16 @@ export const useTripDetails = (tripId: string) => {
     },
   })
 
+  const updateTripMutation = useMutation({
+    mutationFn: async (data: Partial<Trip>) => {
+      const response = await client.put<ApiResponse<Trip>>(`/trips/${tripId}`, data)
+      return response.data.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    }
+  })
+
   const createActivityMutation = useMutation({
     mutationFn: async (newActivity: CreateActivityRequest) => {
       const response = await client.post<ApiResponse<Activity>>("/activities", newActivity)
@@ -113,6 +123,8 @@ export const useTripDetails = (tripId: string) => {
     trip,
     isLoading,
     error,
+    updateTrip: updateTripMutation.mutateAsync,
+    isUpdatingTrip: updateTripMutation.isPending,
     createActivity: createActivityMutation.mutateAsync,
     isCreating: createActivityMutation.isPending,
     updateActivity: updateActivityMutation.mutateAsync,

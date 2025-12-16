@@ -23,15 +23,21 @@ import { useExpenses } from "../hooks/useExpenses"
 import { useTripMembers } from "../hooks/useTripMembers"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs, { Dayjs } from "dayjs"
+import { ExpenseSplitInput, type ExpenseSplit, type SplitType } from "./ExpenseSplitInput"
+import { ExpenseBalances } from "./ExpenseBalances"
+import { ExpenseReports } from "./ExpenseReports"
+import type { Trip } from "../types"
 
 interface ExpensesDialogProps {
   open: boolean
   onClose: () => void
   tripId: string
-  currency?: string
+  defaultCurrency?: string
+  currencies?: string[]
+  trip?: Trip
 }
 
-export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: ExpensesDialogProps) => {
+export const ExpensesDialog = ({ open, onClose, tripId, defaultCurrency = "AUD", currencies = ["AUD"], trip }: ExpensesDialogProps) => {
   const { expenses, createExpense, deleteExpense, totalAmount } = useExpenses(tripId)
   const { members } = useTripMembers(tripId)
 
@@ -39,10 +45,16 @@ export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: Expe
 
   // Form State
   const [description, setDescription] = useState("")
+  const [notes, setNotes] = useState("")
   const [amount, setAmount] = useState("")
+  const [currency, setCurrency] = useState(defaultCurrency)
   const [category, setCategory] = useState("Food")
   const [paidById, setPaidById] = useState("")
   const [date, setDate] = useState<Dayjs | null>(dayjs())
+
+  // Split State
+  const [splitType, setSplitType] = useState<SplitType>("equal")
+  const [splits, setSplits] = useState<ExpenseSplit[]>([])
 
   const handleSave = async () => {
     if (!description || !amount || parseFloat(amount) <= 0) return
@@ -50,22 +62,29 @@ export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: Expe
     await createExpense.mutateAsync({
       tripId,
       description,
+      notes,
       amount: parseFloat(amount),
       currency,
       category,
       paidById: paidById || undefined,
       date: date?.toISOString(),
       isPaid: true,
-      splitType: "equal", // Default for now
-      // splits: [] // Backend handles defaults
+      splitType,
+      splits: splits.map(s => ({
+        memberId: s.memberId,
+        amount: s.amount
+      }))
     })
 
     // Reset form
     setDescription("")
+    setNotes("")
     setAmount("")
     setCategory("Food")
     // setPaidById("") // Keep last payer often useful?
     setDate(dayjs())
+    setSplitType("equal")
+    setSplits([])
 
     setTabIndex(0) // Go back to list
   }
@@ -78,7 +97,7 @@ export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: Expe
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           Expenses
@@ -92,10 +111,12 @@ export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: Expe
         <Tabs value={tabIndex} onChange={(_: React.SyntheticEvent, v: number) => setTabIndex(v)} centered>
           <Tab label="All Expenses" />
           <Tab label="Add New" />
+          <Tab label="Balances" />
+          <Tab label="Reports" />
         </Tabs>
       </Box>
 
-      <DialogContent>
+      <DialogContent sx={{ height: 600, display: "flex", flexDirection: "column" }}>
         {tabIndex === 0 && (
           <Box>
             <Box
@@ -110,7 +131,7 @@ export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: Expe
             >
               <Typography variant="subtitle1">Total Spent</Typography>
               <Typography variant="h4">
-                {currency} {totalAmount.toFixed(2)}
+                {defaultCurrency} {totalAmount.toFixed(2)}
               </Typography>
             </Box>
 
@@ -173,6 +194,15 @@ export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: Expe
               autoFocus
             />
 
+            <TextField
+              label="Notes (Optional)"
+              fullWidth
+              multiline
+              rows={2}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+
             <Box display="flex" gap={2}>
               <TextField
                 label="Amount"
@@ -181,7 +211,22 @@ export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: Expe
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 InputProps={{
-                  startAdornment: <InputAdornment position="start">{currency}</InputAdornment>,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <TextField
+                        select
+                        variant="standard"
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value)}
+                        InputProps={{ disableUnderline: true }}
+                        sx={{ width: 60 }}
+                      >
+                        {currencies.map((curr) => (
+                          <MenuItem key={curr} value={curr}>{curr}</MenuItem>
+                        ))}
+                      </TextField>
+                    </InputAdornment>
+                  ),
                 }}
               />
               <TextField
@@ -191,7 +236,7 @@ export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: Expe
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                {["Food", "Transport", "Accommodation", "Activities", "Shopping", "Other"].map((opt) => (
+                {["Food", "Transport", "Accommodation", "Activities", "Shopping", "Flights", "Souvenirs", "Clothes", "Groceries", "Other"].map((opt) => (
                   <MenuItem key={opt} value={opt}>
                     {opt}
                   </MenuItem>
@@ -226,19 +271,49 @@ export const ExpensesDialog = ({ open, onClose, tripId, currency = "AUD" }: Expe
               slotProps={{ textField: { fullWidth: true } }}
             />
 
+            <ExpenseSplitInput
+              members={members}
+              totalAmount={parseFloat(amount) || 0}
+              currency={currency}
+              value={splits}
+              splitType={splitType}
+              onChange={(newSplits, newType) => {
+                setSplits(newSplits)
+                // If type changed, we might want to update it
+                if (newType !== splitType) setSplitType(newType)
+              }}
+            />
+
             <Box mt={2} display="flex" justifyContent="flex-end" gap={1}>
               <Button onClick={() => setTabIndex(0)}>Cancel</Button>
               <Button
                 variant="contained"
                 onClick={handleSave}
-                disabled={!description || !amount || !paidById || createExpense.isPending}
+                disabled={!description || !amount || !paidById || createExpense.isPending || (splitType !== "equal" && Math.abs(splits.reduce((sum, s) => sum + (s.amount || 0), 0) - (parseFloat(amount) || 0)) > 0.1)}
               >
                 Save Expense
               </Button>
             </Box>
           </Box>
         )}
+
+        {tabIndex === 2 && (
+          <ExpenseBalances
+            members={members}
+            expenses={expenses}
+            currency={defaultCurrency}
+          />
+        )}
+
+        {tabIndex === 3 && (
+          <ExpenseReports
+            members={members}
+            expenses={expenses}
+            defaultCurrency={defaultCurrency}
+            exchangeRates={trip?.exchangeRates}
+          />
+        )}
       </DialogContent>
-    </Dialog>
+    </Dialog >
   )
 }

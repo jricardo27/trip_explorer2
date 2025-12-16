@@ -73,6 +73,8 @@ export interface Trip {
   endDate: string
   budget?: number
   defaultCurrency?: string
+  currencies?: string[]
+  exchangeRates?: Record<string, number>
   timezone?: string
   isCompleted: boolean
   isPublic: boolean
@@ -221,6 +223,33 @@ export interface Budget {
   updatedAt: string
 }
 
+export interface ExpenseSplit {
+  id: string
+  expenseId: string
+  memberId: string
+  amount: number
+  percentage?: number
+  isPaid: boolean
+}
+
+export interface Expense {
+  id: string
+  tripId: string
+  activityId?: string
+  description: string
+  category: string
+  amount: number
+  currency: string
+  paidById?: string
+  paymentDate?: string
+  isPaid: boolean
+  splitType: string
+  splits?: ExpenseSplit[]
+  notes?: string
+  createdAt: string
+  updatedAt: string
+}
+
 // API Request/Response types
 export interface ApiResponse<T> {
   data: T
@@ -242,6 +271,8 @@ export interface CreateTripRequest {
   endDate: string
   budget?: number
   defaultCurrency?: string
+  currencies?: string[]
+  exchangeRates?: Record<string, number>
   timezone?: string
 }
 
@@ -251,6 +282,8 @@ export interface UpdateTripRequest {
   endDate?: string
   budget?: number
   defaultCurrency?: string
+  currencies?: string[]
+  exchangeRates?: Record<string, number>
   timezone?: string
   isCompleted?: boolean
   isPublic?: boolean
