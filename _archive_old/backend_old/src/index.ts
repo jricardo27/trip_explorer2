@@ -1138,7 +1138,7 @@ app.put("/api/day-locations/:id", async (req, res) => {
       paramIndex += 2
     } else if (latitude === null || longitude === null) {
       // Allow setting location_coords to NULL
-      setClauses.push(`location_coords = NULL`)
+      setClauses.push("location_coords = NULL")
     }
 
     values.push(id)

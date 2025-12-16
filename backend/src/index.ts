@@ -3,12 +3,12 @@ import dotenv from "dotenv"
 import express from "express"
 
 import { errorHandler } from "./middleware/errorHandler"
-import authRoutes from "./routes/auth"
 import activityRoutes from "./routes/activities"
-import tripRoutes from "./routes/trips"
-import transportRoutes from "./routes/transport"
 import animationRoutes from "./routes/animations"
+import authRoutes from "./routes/auth"
 import expenseRoutes from "./routes/expenses"
+import transportRoutes from "./routes/transport"
+import tripRoutes from "./routes/trips"
 
 dotenv.config()
 

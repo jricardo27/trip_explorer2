@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+
 import { tripApi } from "../api/client"
 import type { CreateTripRequest, UpdateTripRequest } from "../types"
 

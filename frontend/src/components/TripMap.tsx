@@ -1,23 +1,18 @@
-import { useEffect, useState, useRef } from "react"
-import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, GeoJSON } from "react-leaflet"
-import "leaflet/dist/leaflet.css"
-import { Box, Paper, Typography, IconButton, Select, MenuItem, Checkbox, ListItemText } from "@mui/material"
 import { PlayArrow, Pause, Stop } from "@mui/icons-material"
+import { Box, Paper, Typography, IconButton, Select, MenuItem, Checkbox, ListItemText } from "@mui/material"
 import L from "leaflet"
-import iconValidation from "../utils/iconValidation"
-import type { Activity, TripAnimation } from "../types"
-import { MARKER_MANIFEST } from "../data/markerManifest"
-
-// Fix for default markers
-iconValidation()
-
-import { useMapEvents } from "react-leaflet"
-
+import { useEffect, useRef, useState } from "react"
+import "leaflet/dist/leaflet.css"
 import { createRoot } from "react-dom/client"
-import PopupContent from "./PopupContent"
 import { renderToStaticMarkup } from "react-dom/server"
-import { MdHotel, MdKayaking, MdLocalGasStation, MdWc, MdPark, MdPlace } from "react-icons/md"
 import { BsFuelPump } from "react-icons/bs"
+import { MdHotel, MdKayaking, MdLocalGasStation, MdWc, MdPark, MdPlace } from "react-icons/md"
+import { GeoJSON, MapContainer, Marker, Polyline, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet"
+
+import { MARKER_MANIFEST } from "../data/markerManifest"
+import type { Activity, TripAnimation } from "../types"
+
+import PopupContent from "./PopupContent"
 
 // ... imports ...
 
@@ -28,7 +23,7 @@ interface TripMapProps {
   days?: Array<{ id: string; name?: string; dayIndex: number }>
   activeAnimationId?: string
   onMapContextMenu?: (latLng: { lat: number; lng: number }) => void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   onMarkerContextMenu?: (feature: any) => void
   activeFlyToLocation?: { lat: number; lng: number } | null
 }
@@ -53,7 +48,7 @@ const TransportIcon = new L.DivIcon({
 })
 
 // Icon Mapping Helper
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 const getIconForFeature = (feature: any, layerStyle?: any) => {
   const iconKey = feature.properties?.style?.icon || layerStyle?.icon
   const color = feature.properties?.style?.color || layerStyle?.color || "blue"
@@ -116,9 +111,8 @@ const MapInteraction = ({
 }
 
 // GeoJSON Layer Component
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 const GeoJSONLayer = ({ url, onContextMenu }: { url: string; onContextMenu?: (feature: any) => void }) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>(null)
 
   useEffect(() => {
@@ -135,7 +129,6 @@ const GeoJSONLayer = ({ url, onContextMenu }: { url: string; onContextMenu?: (fe
   return (
     <GeoJSON
       data={data}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pointToLayer={(feature: any, latlng) => {
         return L.marker(latlng, { icon: getIconForFeature(feature, layerStyle) })
       }}
@@ -248,9 +241,10 @@ export const TripMap = (props: TripMapProps) => {
   // Sync activeAnimationId from prop
   useEffect(() => {
     if (propActiveAnimationId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveAnimationId(propActiveAnimationId)
-      setIsPlaying(true)
+      setTimeout(() => {
+        setActiveAnimationId(propActiveAnimationId)
+        setIsPlaying(true)
+      }, 0)
     }
   }, [propActiveAnimationId])
 

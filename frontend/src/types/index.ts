@@ -53,7 +53,7 @@ export interface TransportSegment {
   arrivalTime?: string
   carrier?: string
   icon?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   details?: any
 }
 
@@ -93,7 +93,7 @@ export interface TripAnimation {
   tripId: string
   name: string
   description?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   settings: any
   steps: TripAnimationStep[]
   createdAt: string
@@ -121,7 +121,7 @@ export interface TripAnimationStep {
   customLabel?: string
   zoomLevel?: number
   transportMode?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   settings: any
   activity?: Activity
 }
@@ -171,7 +171,7 @@ export interface Activity {
   phone?: string
   email?: string
   website?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   openingHours?: any
   estimatedCost?: number
   actualCost?: number
@@ -259,7 +259,7 @@ export interface ApiError {
   error: {
     code: string
     message: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     details?: any
   }
 }
@@ -338,7 +338,7 @@ export interface TransportAlternative {
   currency?: string
   costPerPerson: boolean
   distanceMeters?: number
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   waypoints?: any
   description?: string
   notes?: string

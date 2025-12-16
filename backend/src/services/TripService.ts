@@ -269,30 +269,30 @@ export class TripService {
               include: {
                 participants: {
                   include: {
-                    member: true
-                  }
-                }
-              }
-            }
-          }
+                    member: true,
+                  },
+                },
+              },
+            },
+          },
         },
         activities: {
-          include: { participants: true }
+          include: { participants: true },
         },
         members: true,
         budgets: true,
         transport: true,
         expenses: {
           include: {
-            splits: true
-          }
+            splits: true,
+          },
         },
         animations: {
           include: {
-            steps: true
-          }
-        }
-      }
+            steps: true,
+          },
+        },
+      },
     })
 
     if (!trip) throw new Error("Trip not found")
@@ -308,29 +308,29 @@ export class TripService {
             activities: {
               include: {
                 participants: {
-                  include: { member: true }
-                }
-              }
-            }
-          }
+                  include: { member: true },
+                },
+              },
+            },
+          },
         },
         activities: {
-          include: { participants: true }
+          include: { participants: true },
         },
         members: true,
         budgets: true,
         transport: true,
         expenses: {
           include: {
-            splits: true
-          }
+            splits: true,
+          },
         },
         animations: {
           include: {
-            steps: true
-          }
-        }
-      }
+            steps: true,
+          },
+        },
+      },
     })
     return trips
   }
@@ -348,8 +348,8 @@ export class TripService {
         exchangeRates: data.exchangeRates || {},
         timezone: data.timezone,
         isCompleted: data.isCompleted,
-        isPublic: false
-      }
+        isPublic: false,
+      },
     })
 
     const dayMap = new Map<string, string>()
@@ -366,8 +366,8 @@ export class TripService {
             role: m.role,
             color: m.color,
             avatarUrl: m.avatarUrl,
-            userId: m.userId === userId ? userId : undefined
-          }
+            userId: m.userId === userId ? userId : undefined,
+          },
         })
         memberMap.set(m.id, newMember.id)
       }
@@ -382,8 +382,8 @@ export class TripService {
             dayIndex: d.dayIndex,
             date: new Date(d.date),
             name: d.name,
-            notes: d.notes
-          }
+            notes: d.notes,
+          },
         })
         dayMap.set(d.id, newDay.id)
       }
@@ -415,8 +415,8 @@ export class TripService {
             isPaid: a.isPaid,
             useDefaultMembers: a.useDefaultMembers,
             isGroupActivity: a.isGroupActivity,
-            orderIndex: a.orderIndex
-          }
+            orderIndex: a.orderIndex,
+          },
         })
         activityMap.set(a.id, newActivity.id)
 
@@ -427,8 +427,8 @@ export class TripService {
               await prisma.activityParticipant.create({
                 data: {
                   activityId: newActivity.id,
-                  memberId: newMemberId
-                }
+                  memberId: newMemberId,
+                },
               })
             }
           }
@@ -455,8 +455,8 @@ export class TripService {
               isSelected: t.isSelected,
               bufferMinutes: t.bufferMinutes,
               costPerPerson: t.costPerPerson,
-              requiresBooking: t.requiresBooking
-            }
+              requiresBooking: t.requiresBooking,
+            },
           })
         }
       }
@@ -472,8 +472,8 @@ export class TripService {
             currency: b.currency,
             spentAmount: b.spentAmount,
             alertThresholdPercentage: b.alertThresholdPercentage,
-            notes: b.notes
-          }
+            notes: b.notes,
+          },
         })
       }
     }
@@ -495,8 +495,8 @@ export class TripService {
             paymentDate: e.paymentDate ? new Date(e.paymentDate) : undefined,
             isPaid: e.isPaid,
             splitType: e.splitType,
-            notes: e.notes
-          }
+            notes: e.notes,
+          },
         })
 
         if (e.splits) {
@@ -509,8 +509,8 @@ export class TripService {
                   memberId: newSplitMemberId,
                   amount: s.amount,
                   percentage: s.percentage,
-                  isPaid: s.isPaid
-                }
+                  isPaid: s.isPaid,
+                },
               })
             }
           }
@@ -526,8 +526,8 @@ export class TripService {
             tripId: trip.id,
             name: anim.name,
             description: anim.description,
-            settings: anim.settings as any
-          }
+            settings: anim.settings as any,
+          },
         })
 
         if (anim.steps) {
@@ -542,8 +542,8 @@ export class TripService {
                 customLabel: s.customLabel,
                 zoomLevel: s.zoomLevel,
                 transportMode: s.transportMode,
-                settings: s.settings as any
-              }
+                settings: s.settings as any,
+              },
             })
           }
         }

@@ -1,6 +1,7 @@
 import { Router } from "express"
-import { authenticateToken } from "../middleware/auth"
+
 import ActivityController from "../controllers/ActivityController"
+import { authenticateToken } from "../middleware/auth"
 
 const router = Router()
 

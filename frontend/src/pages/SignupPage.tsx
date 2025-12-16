@@ -1,6 +1,7 @@
+import { Container, Paper, TextField, Button, Typography, Box, Alert } from "@mui/material"
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { Container, Paper, TextField, Button, Typography, Box, Alert } from "@mui/material"
+
 import client from "../api/client"
 import { useAuthStore } from "../stores/authStore"
 
@@ -23,7 +24,6 @@ const SignupPage = () => {
       const { token, user } = response.data
       setAuth(token, user)
       navigate("/")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const errorData = err.response?.data?.error
       setError(typeof errorData === "string" ? errorData : errorData?.message || "Failed to sign up")

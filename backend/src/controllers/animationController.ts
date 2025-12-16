@@ -1,4 +1,5 @@
 import { Request, Response } from "express"
+
 import prisma from "../utils/prisma"
 
 export const getTripAnimations = async (req: Request, res: Response) => {
@@ -10,7 +11,7 @@ export const getTripAnimations = async (req: Request, res: Response) => {
       orderBy: { createdAt: "desc" },
     })
     res.json({ data: animations })
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: { message: "Failed to fetch animations" } })
   }
 }
@@ -20,7 +21,7 @@ export const createAnimation = async (req: Request, res: Response) => {
   const { name, settings, steps } = req.body
 
   try {
-    const animation = await prisma.tripAnimation.create({
+    await prisma.tripAnimation.create({
       data: {
         tripId,
         name,
@@ -39,7 +40,7 @@ export const createAnimation = async (req: Request, res: Response) => {
       include: { steps: true },
     })
     res.json({ data: animation })
-  } catch (error) {
+  } catch {
     console.error(error)
     res.status(500).json({ error: { message: "Failed to create animation" } })
   }
@@ -52,7 +53,7 @@ export const updateAnimation = async (req: Request, res: Response) => {
   try {
     // Transaction to update animation and replace steps
     const result = await prisma.$transaction(async (tx) => {
-      const animation = await tx.tripAnimation.update({
+      await tx.tripAnimation.update({
         where: { id },
         data: {
           name,
@@ -85,7 +86,7 @@ export const updateAnimation = async (req: Request, res: Response) => {
     })
 
     res.json({ data: result })
-  } catch (error) {
+  } catch {
     console.error(error)
     res.status(500).json({ error: { message: "Failed to update animation" } })
   }
@@ -98,7 +99,7 @@ export const deleteAnimation = async (req: Request, res: Response) => {
       where: { id },
     })
     res.json({ data: { success: true } })
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: { message: "Failed to delete animation" } })
   }
 }

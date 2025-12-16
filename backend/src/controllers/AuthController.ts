@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express"
 import bcrypt from "bcryptjs"
+import { Request, Response, NextFunction } from "express"
 import jwt from "jsonwebtoken"
 import { z } from "zod"
+
 import prisma from "../utils/prisma"
 
 const signupSchema = z.object({

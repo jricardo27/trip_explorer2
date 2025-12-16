@@ -1,5 +1,6 @@
-import prisma from "../utils/prisma"
 import type { MemberRole } from "@prisma/client"
+
+import prisma from "../utils/prisma"
 
 interface CreateMemberData {
   name: string

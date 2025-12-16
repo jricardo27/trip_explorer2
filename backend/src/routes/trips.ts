@@ -1,13 +1,11 @@
 import { Router, Request, Response } from "express"
 
+import * as ExpenseController from "../controllers/ExpenseController"
+import { authenticateToken } from "../middleware/auth"
 import { validate } from "../middleware/errorHandler"
+import tripMemberService from "../services/TripMemberService"
 import tripService from "../services/TripService"
 import { createTripSchema, updateTripSchema } from "../utils/validation"
-import { authenticateToken } from "../middleware/auth"
-import tripMemberService from "../services/TripMemberService"
-
-import expenseRoutes from "./expenses"
-import * as ExpenseController from "../controllers/ExpenseController"
 
 const router = Router()
 
@@ -28,8 +26,8 @@ router.post("/import", async (req: Request, res: Response) => {
       error: {
         code: "INTERNAL_ERROR",
         message: "Failed to import trip",
-        details: error.message
-      }
+        details: error.message,
+      },
     })
   }
 })
@@ -39,12 +37,12 @@ router.get("/export", async (req: Request, res: Response) => {
   try {
     const trips = await tripService.exportAllTrips((req as any).user.id)
     res.json({ data: trips })
-  } catch (error: any) {
+  } catch {
     res.status(500).json({
       error: {
         code: "INTERNAL_ERROR",
-        message: "Failed to export trips"
-      }
+        message: "Failed to export trips",
+      },
     })
   }
 })
@@ -70,7 +68,7 @@ router.get("/", async (req: Request, res: Response) => {
     const trips = await tripService.listTrips(userId, filters)
 
     res.json({ data: trips })
-  } catch (error) {
+  } catch {
     res.status(500).json({
       error: {
         code: "INTERNAL_ERROR",
@@ -96,7 +94,7 @@ router.post("/", validate(createTripSchema), async (req: Request, res: Response)
     })
 
     res.status(201).json({ data: trip })
-  } catch (error) {
+  } catch {
     res.status(500).json({
       error: {
         code: "INTERNAL_ERROR",
@@ -121,7 +119,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     }
 
     res.json({ data: trip })
-  } catch (error) {
+  } catch {
     res.status(500).json({
       error: {
         code: "INTERNAL_ERROR",
@@ -136,12 +134,12 @@ router.get("/:id/export", async (req: Request, res: Response) => {
   try {
     const trip = await tripService.exportTrip(req.params.id, (req as any).user.id)
     res.json({ data: trip })
-  } catch (error: any) {
+  } catch {
     res.status(500).json({
       error: {
         code: "INTERNAL_ERROR",
-        message: "Failed to export trip"
-      }
+        message: "Failed to export trip",
+      },
     })
   }
 })

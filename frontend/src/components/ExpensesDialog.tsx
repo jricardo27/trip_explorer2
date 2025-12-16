@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { Close as CloseIcon, Delete as DeleteIcon, ReceiptLong } from "@mui/icons-material"
 import {
   Dialog,
   DialogTitle,
@@ -18,15 +18,17 @@ import {
   Avatar,
   Chip,
 } from "@mui/material"
-import { Close as CloseIcon, Delete as DeleteIcon, ReceiptLong } from "@mui/icons-material"
-import { useExpenses } from "../hooks/useExpenses"
-import { useTripMembers } from "../hooks/useTripMembers"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs, { Dayjs } from "dayjs"
-import { ExpenseSplitInput, type ExpenseSplit, type SplitType } from "./ExpenseSplitInput"
+import { useState } from "react"
+
+import { useExpenses } from "../hooks/useExpenses"
+import { useTripMembers } from "../hooks/useTripMembers"
+import type { Trip } from "../types"
+
 import { ExpenseBalances } from "./ExpenseBalances"
 import { ExpenseReports } from "./ExpenseReports"
-import type { Trip } from "../types"
+import { ExpenseSplitInput, type ExpenseSplit, type SplitType } from "./ExpenseSplitInput"
 
 interface ExpensesDialogProps {
   open: boolean
@@ -37,7 +39,14 @@ interface ExpensesDialogProps {
   trip?: Trip
 }
 
-export const ExpensesDialog = ({ open, onClose, tripId, defaultCurrency = "AUD", currencies = ["AUD"], trip }: ExpensesDialogProps) => {
+export const ExpensesDialog = ({
+  open,
+  onClose,
+  tripId,
+  defaultCurrency = "AUD",
+  currencies = ["AUD"],
+  trip,
+}: ExpensesDialogProps) => {
   const { expenses, createExpense, deleteExpense, totalAmount } = useExpenses(tripId)
   const { members } = useTripMembers(tripId)
 
@@ -70,10 +79,10 @@ export const ExpensesDialog = ({ open, onClose, tripId, defaultCurrency = "AUD",
       date: date?.toISOString(),
       isPaid: true,
       splitType,
-      splits: splits.map(s => ({
+      splits: splits.map((s) => ({
         memberId: s.memberId,
-        amount: s.amount
-      }))
+        amount: s.amount,
+      })),
     })
 
     // Reset form
@@ -222,7 +231,9 @@ export const ExpensesDialog = ({ open, onClose, tripId, defaultCurrency = "AUD",
                         sx={{ width: 60 }}
                       >
                         {currencies.map((curr) => (
-                          <MenuItem key={curr} value={curr}>{curr}</MenuItem>
+                          <MenuItem key={curr} value={curr}>
+                            {curr}
+                          </MenuItem>
                         ))}
                       </TextField>
                     </InputAdornment>
@@ -236,7 +247,18 @@ export const ExpensesDialog = ({ open, onClose, tripId, defaultCurrency = "AUD",
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                {["Food", "Transport", "Accommodation", "Activities", "Shopping", "Flights", "Souvenirs", "Clothes", "Groceries", "Other"].map((opt) => (
+                {[
+                  "Food",
+                  "Transport",
+                  "Accommodation",
+                  "Activities",
+                  "Shopping",
+                  "Flights",
+                  "Souvenirs",
+                  "Clothes",
+                  "Groceries",
+                  "Other",
+                ].map((opt) => (
                   <MenuItem key={opt} value={opt}>
                     {opt}
                   </MenuItem>
@@ -289,7 +311,14 @@ export const ExpensesDialog = ({ open, onClose, tripId, defaultCurrency = "AUD",
               <Button
                 variant="contained"
                 onClick={handleSave}
-                disabled={!description || !amount || !paidById || createExpense.isPending || (splitType !== "equal" && Math.abs(splits.reduce((sum, s) => sum + (s.amount || 0), 0) - (parseFloat(amount) || 0)) > 0.1)}
+                disabled={
+                  !description ||
+                  !amount ||
+                  !paidById ||
+                  createExpense.isPending ||
+                  (splitType !== "equal" &&
+                    Math.abs(splits.reduce((sum, s) => sum + (s.amount || 0), 0) - (parseFloat(amount) || 0)) > 0.1)
+                }
               >
                 Save Expense
               </Button>
@@ -297,13 +326,7 @@ export const ExpensesDialog = ({ open, onClose, tripId, defaultCurrency = "AUD",
           </Box>
         )}
 
-        {tabIndex === 2 && (
-          <ExpenseBalances
-            members={members}
-            expenses={expenses}
-            currency={defaultCurrency}
-          />
-        )}
+        {tabIndex === 2 && <ExpenseBalances members={members} expenses={expenses} currency={defaultCurrency} />}
 
         {tabIndex === 3 && (
           <ExpenseReports
@@ -314,6 +337,6 @@ export const ExpensesDialog = ({ open, onClose, tripId, defaultCurrency = "AUD",
           />
         )}
       </DialogContent>
-    </Dialog >
+    </Dialog>
   )
 }

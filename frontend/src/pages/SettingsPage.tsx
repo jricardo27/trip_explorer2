@@ -1,6 +1,7 @@
-import { useNavigate } from "react-router-dom"
 import { ArrowBack } from "@mui/icons-material"
 import { Box, Typography, Paper, FormControl, InputLabel, Select, MenuItem, Grid, Button } from "@mui/material"
+import { useNavigate } from "react-router-dom"
+
 import { useSettingsStore } from "../stores/settingsStore"
 
 const SettingsPage = () => {

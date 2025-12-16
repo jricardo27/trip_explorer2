@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { Delete, Edit, PersonAdd } from "@mui/icons-material"
 import {
   Dialog,
   DialogTitle,
@@ -19,7 +19,8 @@ import {
   CircularProgress,
   Chip,
 } from "@mui/material"
-import { Delete, Edit, PersonAdd } from "@mui/icons-material"
+import { useState } from "react"
+
 import { useTripMembers } from "../hooks/useTripMembers"
 import { MemberRole } from "../types"
 import type { Trip } from "../types"
@@ -81,7 +82,6 @@ export const TripMembersDialog = ({ open, onClose, trip }: TripMembersDialogProp
       setNewMemberRole(MemberRole.VIEWER)
       setNewMemberColor(PRESET_COLORS[Math.floor(Math.random() * PRESET_COLORS.length)])
     } catch (err: unknown) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setError((err as any)?.response?.data?.error?.message || "Failed to add member")
     }
   }

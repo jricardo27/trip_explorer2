@@ -1,9 +1,10 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Paper, Box, Typography, IconButton, Tooltip, Avatar, AvatarGroup } from "@mui/material"
 import { Delete as DeleteIcon, Edit as EditIcon, DragIndicator, NearMe, ContentCopy } from "@mui/icons-material"
-import type { Activity } from "../types"
+import { Paper, Box, Typography, IconButton, Tooltip, Avatar, AvatarGroup } from "@mui/material"
+
 import { useSettingsStore } from "../stores/settingsStore"
+import type { Activity } from "../types"
 
 interface SortableActivityCardProps {
   activity: Activity

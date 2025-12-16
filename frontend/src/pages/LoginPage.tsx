@@ -1,6 +1,7 @@
+import { Container, Paper, TextField, Button, Typography, Box, Alert } from "@mui/material"
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { Container, Paper, TextField, Button, Typography, Box, Alert } from "@mui/material"
+
 import client from "../api/client"
 import { useAuthStore } from "../stores/authStore"
 
@@ -18,7 +19,6 @@ const LoginPage = () => {
       const { token, user } = response.data
       setAuth(token, user)
       navigate("/")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const errorData = err.response?.data?.error
       setError(typeof errorData === "string" ? errorData : errorData?.message || "Failed to login")
@@ -64,7 +64,7 @@ const LoginPage = () => {
             <Box textAlign="center">
               <Link to="/signup" style={{ textDecoration: "none" }}>
                 <Typography variant="body2" color="primary">
-                  Don't have an account? Sign Up
+                  Don&apos;t have an account? Sign Up
                 </Typography>
               </Link>
             </Box>

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { PlayArrow, Edit, Delete, Add } from "@mui/icons-material"
 import {
   Box,
   Paper,
@@ -16,7 +16,8 @@ import {
   Button,
   Tooltip,
 } from "@mui/material"
-import { PlayArrow, Edit, Delete, Add } from "@mui/icons-material"
+import { useState } from "react"
+
 import type { TripAnimation } from "../types"
 
 interface TripAnimationListProps {
@@ -140,7 +141,7 @@ export const TripAnimationList: React.FC<TripAnimationListProps> = ({
         <DialogTitle>Delete Animation?</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete "{selectedAnimation?.name}"? This action cannot be undone.
+            Are you sure you want to delete &quot;{selectedAnimation?.name}&quot;? This action cannot be undone.
           </Typography>
         </DialogContent>
         <DialogActions>

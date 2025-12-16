@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express"
+
 import activityService from "../services/ActivityService"
 import tripService from "../services/TripService"
-import { createActivitySchema, updateActivitySchema } from "../utils/validation" // Ensure these exist or create them
-import { z } from "zod"
+import { createActivitySchema } from "../utils/validation" // Ensure these exist or create them
 
 class ActivityController {
   async createActivity(req: Request, res: Response, next: NextFunction) {

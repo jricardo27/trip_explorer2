@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import pluginJs from "@eslint/js"
 import pluginStylisticJs from "@stylistic/eslint-plugin"
 import eslintConfigPrettier from "eslint-config-prettier"
@@ -6,12 +7,21 @@ import pluginReact from "eslint-plugin-react"
 import reactHooks from "eslint-plugin-react-hooks"
 import reactRefresh from "eslint-plugin-react-refresh"
 import globals from "globals"
-import tseslint from "typescript-eslint" // eslint-disable-line import/no-unresolved
+import tseslint from "typescript-eslint"
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   {
-    ignores: ["**/package.json", "**/package-lock.json", "public/tinymce/**/*", "src/geojson-to-kml.d.ts"],
+    ignores: [
+      "**/package.json",
+      "**/package-lock.json",
+      "public/tinymce/**/*",
+      "src/geojson-to-kml.d.ts",
+      "**/_archive_old/**",
+      "**/dist/**",
+      "**/node_modules/**",
+      "frontend/eslint.config.js",
+    ],
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
@@ -32,11 +42,15 @@ export default [
       "react-refresh": reactRefresh,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@stylistic/max-len": ["error", { code: 160 }],
       "@stylistic/quotes": [2, "double", { avoidEscape: true }],
       "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
 

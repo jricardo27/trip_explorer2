@@ -1,4 +1,5 @@
 import { Avatar, Chip, Typography, Box } from "@mui/material"
+
 import type { TripMember } from "../types"
 
 interface MemberChipProps {

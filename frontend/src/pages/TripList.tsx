@@ -1,5 +1,4 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { Add as AddIcon, CalendarToday, FlightTakeoff, AttachMoney } from "@mui/icons-material"
 import {
   Box,
   Typography,
@@ -23,10 +22,12 @@ import {
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs from "dayjs"
-import { Add as AddIcon, CalendarToday, FlightTakeoff, AttachMoney } from "@mui/icons-material"
-import { useTrips, useCreateTrip } from "../hooks/useTrips"
 import { saveAs } from "file-saver"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+
 import client from "../api/client"
+import { useTrips, useCreateTrip } from "../hooks/useTrips"
 
 const TripList = () => {
   const navigate = useNavigate()
@@ -140,7 +141,7 @@ const TripList = () => {
                     const res = await client.get("/trips/export")
                     const blob = new Blob([JSON.stringify(res.data.data, null, 2)], { type: "application/json" })
                     saveAs(blob, `trips_export_${dayjs().format("YYYY-MM-DD")}.json`)
-                  } catch (e) {
+                  } catch {
                     alert("Export failed")
                   }
                 }}
@@ -148,11 +149,7 @@ const TripList = () => {
                 Export All
               </Button>
             )}
-            <Button
-              size="small"
-              variant="outlined"
-              component="label"
-            >
+            <Button size="small" variant="outlined" component="label">
               Import Trip
               <input
                 type="file"

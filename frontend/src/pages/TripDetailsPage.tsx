@@ -1,7 +1,3 @@
-import { useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import { Box, CircularProgress, Typography, Alert, Paper, Grid, Button, IconButton, Tooltip } from "@mui/material"
-import { Add as AddIcon, Close as CloseIcon, ExpandMore, ExpandLess, UnfoldLess, UnfoldMore, Settings as SettingsIcon } from "@mui/icons-material"
 import {
   DndContext,
   closestCorners,
@@ -13,23 +9,36 @@ import {
 } from "@dnd-kit/core"
 import type { DragEndEvent } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import {
+  Add as AddIcon,
+  Close as CloseIcon,
+  ExpandMore,
+  ExpandLess,
+  UnfoldLess,
+  UnfoldMore,
+  Settings as SettingsIcon,
+  PersonAdd,
+  AttachMoney,
+} from "@mui/icons-material"
+import { Box, CircularProgress, Typography, Alert, Paper, Grid, Button, IconButton, Tooltip } from "@mui/material"
+import { useQueryClient } from "@tanstack/react-query"
 import dayjs from "dayjs"
+import { useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 
-import { useTripDetails } from "../hooks/useTripDetails"
-import type { Activity, TripAnimation } from "../types"
-import { TripMembersDialog } from "../components/TripMembersDialog"
-import { ExpensesDialog } from "../components/ExpensesDialog"
-import { PersonAdd, AttachMoney } from "@mui/icons-material"
+import client from "../api/client"
 import ActivityDialog from "../components/ActivityDialog"
 import AnimationConfigDialog from "../components/AnimationConfigDialog"
+import { ExpensesDialog } from "../components/ExpensesDialog"
 import { SortableActivityCard } from "../components/SortableActivityCard"
 import { TransportSegment } from "../components/Transport/TransportSegment"
-import { TripMap } from "../components/TripMap"
 import { TripAnimationList } from "../components/TripAnimationList"
-import { useSettingsStore } from "../stores/settingsStore"
+import { TripMap } from "../components/TripMap"
+import { TripMembersDialog } from "../components/TripMembersDialog"
 import { TripSettingsDialog } from "../components/TripSettingsDialog"
-import client from "../api/client"
-import { useQueryClient } from "@tanstack/react-query"
+import { useTripDetails } from "../hooks/useTripDetails"
+import { useSettingsStore } from "../stores/settingsStore"
+import type { Activity, TripAnimation } from "../types"
 
 const DroppableDay = ({ dayId, children }: { dayId: string; children: React.ReactNode }) => {
   const { setNodeRef } = useDroppable({
@@ -122,7 +131,6 @@ const TripDetailsPage = () => {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmitActivity = async (data: any) => {
     if (data.id) {
       await updateActivity({ id: data.id, data })
@@ -142,19 +150,16 @@ const TripDetailsPage = () => {
     setEditingActivity({
       latitude: latLng.lat,
       longitude: latLng.lng,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any) // Use cast to populate partial data for creation
     setDialogOpen(true)
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleMarkerContextMenu = (feature: any) => {
     const properties = feature.properties
     setEditingActivity({
       name: properties.name || properties.title || properties.label || "New Activity",
       latitude: feature.geometry.coordinates[1],
       longitude: feature.geometry.coordinates[0],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
     setDialogOpen(true)
   }
@@ -358,7 +363,7 @@ const TripDetailsPage = () => {
   if (error || !trip) {
     return (
       <Alert severity="error" sx={{ mt: 2 }}>
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {}
         Failed to load trip: {(error as any)?.message || "Unknown error"}
       </Alert>
     )
@@ -409,7 +414,12 @@ const TripDetailsPage = () => {
           <Button variant="outlined" size="small" startIcon={<PersonAdd />} onClick={() => setMembersDialogOpen(true)}>
             Members
           </Button>
-          <Button variant="outlined" size="small" startIcon={<SettingsIcon />} onClick={() => setSettingsDialogOpen(true)}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<SettingsIcon />}
+            onClick={() => setSettingsDialogOpen(true)}
+          >
             Settings
           </Button>
           <Button
@@ -679,12 +689,12 @@ const TripDetailsPage = () => {
           initialData={
             editingAnimation
               ? {
-                ...editingAnimation,
-                steps: editingAnimation.steps.map((s) => ({
-                  ...s,
-                  activityId: s.activityId || "", // Ensure activityId is string
-                })),
-              }
+                  ...editingAnimation,
+                  steps: editingAnimation.steps.map((s) => ({
+                    ...s,
+                    activityId: s.activityId || "", // Ensure activityId is string
+                  })),
+                }
               : undefined
           }
           onSubmit={createAnimation}

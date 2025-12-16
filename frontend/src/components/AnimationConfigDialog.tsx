@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogTitle,
@@ -10,6 +9,8 @@ import {
   Typography,
   Slider,
 } from "@mui/material"
+import { useState, useEffect } from "react"
+
 import type { Trip } from "../types"
 
 type AnimationSettings = {

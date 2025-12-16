@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react"
 import {
   Dialog,
   DialogTitle,
@@ -24,9 +23,11 @@ import {
 } from "@mui/material"
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import dayjs from "dayjs"
+import { useState, useEffect } from "react"
+
+import { useTripMembers } from "../hooks/useTripMembers"
 import { ActivityType } from "../types"
 import type { Activity, TripDay } from "../types"
-import { useTripMembers } from "../hooks/useTripMembers"
 
 interface ActivityDialogProps {
   open: boolean
@@ -211,7 +212,6 @@ const ActivityDialog = ({
         notes,
         participantIds: selectedMemberIds,
       })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Failed to save activity:", err)
       const errorMessage =
@@ -263,7 +263,6 @@ const ActivityDialog = ({
                   value={scheduledStart}
                   minDate={tripStartDate ? dayjs(tripStartDate) : undefined}
                   maxDate={tripEndDate ? dayjs(tripEndDate) : undefined}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onChange={(newValue: any) => setScheduledStart(newValue)}
                   slotProps={{ textField: { fullWidth: true } }}
                 />
@@ -274,7 +273,6 @@ const ActivityDialog = ({
                   value={scheduledEnd}
                   minDate={tripStartDate ? dayjs(tripStartDate) : undefined}
                   maxDate={tripEndDate ? dayjs(tripEndDate) : undefined}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onChange={(newValue: any) => {
                     if (newValue) {
                       setScheduledEnd(newValue)
@@ -325,7 +323,7 @@ const ActivityDialog = ({
 
               <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Who's going?
+                  Who&apos;s going?
                 </Typography>
                 {members.length > 0 ? (
                   <List

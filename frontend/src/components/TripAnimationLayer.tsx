@@ -96,11 +96,12 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       for (let i = 0; i < coords.length - 1; i++) {
         const segDist = getDistance(coords[i], coords[i + 1])
         if (currentDist + segDist >= targetDist) {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
-          setCurrentSegmentIndex(i)
-          setSegmentProgress((targetDist - currentDist) / segDist)
-          setIsPaused(false)
-          setZoomPhase(ZoomPhase.MAINTAIN)
+          setTimeout(() => {
+            setCurrentSegmentIndex(i)
+            setSegmentProgress((targetDist - currentDist) / segDist)
+            setIsPaused(false)
+            setZoomPhase(ZoomPhase.MAINTAIN)
+          }, 0)
           return
         }
         currentDist += segDist
@@ -306,7 +307,6 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   // Initialize zoom
   useEffect(() => {
     if (isPlaying && currentSegmentIndex === 0 && segmentProgress === 0 && coords.length > 1) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInitialZoomComplete(false)
       setZoomPhase(ZoomPhase.ZOOM_OUT_TO_BOTH)
       setTimeout(() => {

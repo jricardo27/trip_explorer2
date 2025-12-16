@@ -1,3 +1,4 @@
+import { FaPerson } from "react-icons/fa6"
 import {
   MdDirectionsCar,
   MdFlight,
@@ -7,7 +8,6 @@ import {
   MdDirectionsBoat,
   MdTrain,
 } from "react-icons/md"
-import { FaPerson } from "react-icons/fa6"
 
 /**
  * Get icon component for transport mode

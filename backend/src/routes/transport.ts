@@ -1,6 +1,7 @@
 import { Router } from "express"
-import { authenticateToken } from "../middleware/auth"
+
 import TransportController from "../controllers/TransportController"
+import { authenticateToken } from "../middleware/auth"
 
 const router = Router()
 

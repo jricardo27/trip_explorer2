@@ -1,7 +1,8 @@
+import { AccountCircle } from "@mui/icons-material"
+import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Box, Avatar, Container } from "@mui/material"
 import { useState } from "react"
 import { Outlet, useNavigate } from "react-router-dom"
-import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Box, Avatar, Container } from "@mui/material"
-import { AccountCircle } from "@mui/icons-material"
+
 import { useAuthStore } from "../stores/authStore"
 
 export default function Layout() {

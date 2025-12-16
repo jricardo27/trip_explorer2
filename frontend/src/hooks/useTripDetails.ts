@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { transportApi } from "../api/client"
-import client from "../api/client"
+
+import client, { transportApi } from "../api/client"
 import type { Trip, Activity, CreateActivityRequest, UpdateActivityRequest, TripAnimation, ApiResponse } from "../types"
 
 export const useTripDetails = (tripId: string) => {
@@ -25,7 +25,7 @@ export const useTripDetails = (tripId: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
-    }
+    },
   })
 
   const createActivityMutation = useMutation({
@@ -89,7 +89,6 @@ export const useTripDetails = (tripId: string) => {
 
   // Animation Mutations
   const createAnimationMutation = useMutation({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mutationFn: async (data: any) => {
       const response = await client.post(`/animations/trip/${tripId}`, data)
       return response.data.data
@@ -100,7 +99,6 @@ export const useTripDetails = (tripId: string) => {
   })
 
   const updateAnimationMutation = useMutation({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
       const response = await client.put(`/animations/${id}`, updates)
       return response.data.data
@@ -136,7 +134,7 @@ export const useTripDetails = (tripId: string) => {
     createTransport: createTransportMutation.mutateAsync,
     deleteTransport: deleteTransportMutation.mutateAsync,
     selectTransport: selectTransportMutation.mutateAsync,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     createAnimation: (data: any) => createAnimationMutation.mutateAsync(data),
     updateAnimation: (id: string, updates: Partial<TripAnimation>) => updateAnimationMutation.mutate({ id, updates }),
     deleteAnimation: (id: string) => deleteAnimationMutation.mutate(id),

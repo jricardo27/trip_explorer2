@@ -1,4 +1,6 @@
 import axios from "axios"
+
+import { useAuthStore } from "../stores/authStore"
 import type {
   Trip,
   Activity,
@@ -12,8 +14,6 @@ import type {
 } from "../types"
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
-
-import { useAuthStore } from "../stores/authStore"
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -120,9 +120,7 @@ export const activityApi = {
     await apiClient.delete(`/trips/${tripId}/activities/${activityId}`)
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getConflicts: async (tripId: string): Promise<any[]> => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await apiClient.get<ApiResponse<any[]>>(`/trips/${tripId}/activities/conflicts`)
     return response.data.data
   },

@@ -1,5 +1,4 @@
 import prisma from "../utils/prisma"
-import { Expense } from "@prisma/client"
 
 export class ExpenseService {
   async getExpensesByTrip(tripId: string) {

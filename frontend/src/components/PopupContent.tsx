@@ -1,12 +1,11 @@
-import React, { useState } from "react"
 import { Tabs, Tab, Box, Typography } from "@mui/material"
+import React, { useState } from "react"
 import ImageGallery from "react-image-gallery"
 import "react-image-gallery/styles/css/image-gallery.css"
 
 interface PopupContentProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   properties: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   images?: any[]
   title: string
 }
