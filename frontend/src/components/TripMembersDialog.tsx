@@ -29,6 +29,7 @@ interface TripMembersDialogProps {
   open: boolean
   onClose: () => void
   trip: Trip
+  fullScreen?: boolean
 }
 
 const PRESET_COLORS = [
@@ -53,7 +54,7 @@ const PRESET_COLORS = [
   "#607d8b", // Blue Grey
 ]
 
-export const TripMembersDialog = ({ open, onClose, trip }: TripMembersDialogProps) => {
+export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembersDialogProps) => {
   const { members, isLoading, addMember, updateMember, removeMember, isAddingMember } = useTripMembers(trip.id)
 
   const [newMemberName, setNewMemberName] = useState("")
@@ -120,7 +121,7 @@ export const TripMembersDialog = ({ open, onClose, trip }: TripMembersDialogProp
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
       <DialogTitle>Manage Trip Members</DialogTitle>
       <DialogContent>
         {error && (

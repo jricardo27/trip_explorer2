@@ -37,6 +37,7 @@ interface ExpensesDialogProps {
   defaultCurrency?: string
   currencies?: string[]
   trip?: Trip
+  fullScreen?: boolean
 }
 
 export const ExpensesDialog = ({
@@ -46,6 +47,7 @@ export const ExpensesDialog = ({
   defaultCurrency = "AUD",
   currencies = ["AUD"],
   trip,
+  fullScreen,
 }: ExpensesDialogProps) => {
   const { expenses, createExpense, deleteExpense, totalAmount } = useExpenses(tripId)
   const { members } = useTripMembers(tripId)
@@ -106,7 +108,7 @@ export const ExpensesDialog = ({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth fullScreen={fullScreen}>
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           Expenses

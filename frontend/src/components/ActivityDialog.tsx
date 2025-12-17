@@ -42,6 +42,7 @@ interface ActivityDialogProps {
   tripStartDate?: string
   tripEndDate?: string
   tripDays?: TripDay[]
+  fullScreen?: boolean
 }
 
 const ActivityDialog = ({
@@ -55,6 +56,7 @@ const ActivityDialog = ({
   tripStartDate,
   tripEndDate,
   tripDays,
+  fullScreen,
 }: ActivityDialogProps) => {
   const handleClose = (event: object, reason: string) => {
     if (reason === "backdropClick") return
@@ -221,7 +223,7 @@ const ActivityDialog = ({
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
       <form onSubmit={handleSubmit}>
         <DialogTitle>{activity ? "Edit Activity" : "Add Activity"}</DialogTitle>
         <DialogContent>

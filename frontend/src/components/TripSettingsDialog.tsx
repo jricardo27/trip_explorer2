@@ -23,11 +23,12 @@ interface TripSettingsDialogProps {
   onClose: () => void
   trip: Trip
   onUpdate: (data: Partial<Trip>) => Promise<unknown>
+  fullScreen?: boolean
 }
 
 const COMMON_CURRENCIES = ["AUD", "USD", "EUR", "GBP", "JPY", "CAD", "NZD", "SGD", "CHF", "CNY"]
 
-export const TripSettingsDialog = ({ open, onClose, trip, onUpdate }: TripSettingsDialogProps) => {
+export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }: TripSettingsDialogProps) => {
   const [name, setName] = useState(trip.name)
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs(trip.startDate))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs(trip.endDate))
@@ -64,7 +65,7 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate }: TripSettin
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
       <DialogTitle>Trip Settings</DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={3} pt={1}>

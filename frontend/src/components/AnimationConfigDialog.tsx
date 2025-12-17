@@ -39,6 +39,7 @@ interface AnimationConfigDialogProps {
   trip: Trip
   initialData?: AnimationConfig
   onSubmit: (data: AnimationConfig) => Promise<void>
+  fullScreen?: boolean
 }
 
 export default function AnimationConfigDialog({
@@ -47,6 +48,7 @@ export default function AnimationConfigDialog({
   trip,
   initialData,
   onSubmit,
+  fullScreen,
 }: AnimationConfigDialogProps) {
   const [name, setName] = useState("")
   const [speed, setSpeed] = useState(1)
@@ -91,7 +93,7 @@ export default function AnimationConfigDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
       <DialogTitle>Create New Animation</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>

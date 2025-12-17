@@ -19,8 +19,25 @@ import {
   Settings as SettingsIcon,
   PersonAdd,
   AttachMoney,
+  PlayArrow,
+  Map,
+  FormatListBulleted,
 } from "@mui/icons-material"
-import { Box, CircularProgress, Typography, Alert, Paper, Grid, Button, IconButton, Tooltip } from "@mui/material"
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Alert,
+  Paper,
+  Grid,
+  Button,
+  IconButton,
+  Tooltip,
+  useMediaQuery,
+  useTheme,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@mui/material"
 import { useQueryClient } from "@tanstack/react-query"
 import dayjs from "dayjs"
 import { useState } from "react"
@@ -100,6 +117,17 @@ const TripDetailsPage = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   )
+
+  // Mobile Responsiveness
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
+  const [viewMode, setViewMode] = useState<"map" | "list">("list")
+
+  const handleViewModeChange = (_: React.MouseEvent<HTMLElement>, newMode: "map" | "list" | null) => {
+    if (newMode !== null) {
+      setViewMode(newMode)
+    }
+  }
 
   const handleAddActivity = (dayId?: string) => {
     // Default to the first day if no day is specified (e.g. invalid top button)
@@ -410,54 +438,95 @@ const TripDetailsPage = () => {
             )}
           </Box>
         </Box>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button variant="outlined" size="small" startIcon={<PersonAdd />} onClick={() => setMembersDialogOpen(true)}>
-            Members
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<SettingsIcon />}
-            onClick={() => setSettingsDialogOpen(true)}
-          >
-            Settings
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<AttachMoney />}
-            onClick={() => setExpensesDialogOpen(true)}
-          >
-            Expenses
-          </Button>
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          {/* Mobile: Icons only for secondary actions */}
+          {isMobile ? (
+            <>
+              <IconButton size="small" onClick={() => setMembersDialogOpen(true)}>
+                <PersonAdd />
+              </IconButton>
+              <IconButton size="small" onClick={() => setSettingsDialogOpen(true)}>
+                <SettingsIcon />
+              </IconButton>
+              <IconButton size="small" onClick={() => setExpensesDialogOpen(true)}>
+                <AttachMoney />
+              </IconButton>
+              <IconButton size="small" onClick={() => setAnimationDialogOpen(true)}>
+                <PlayArrow />
+              </IconButton>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<PersonAdd />}
+                onClick={() => setMembersDialogOpen(true)}
+              >
+                Members
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<SettingsIcon />}
+                onClick={() => setSettingsDialogOpen(true)}
+              >
+                Settings
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<AttachMoney />}
+                onClick={() => setExpensesDialogOpen(true)}
+              >
+                Expenses
+              </Button>
+              <Button variant="outlined" onClick={() => setAnimationDialogOpen(true)} size="small">
+                Animation
+              </Button>
+            </>
+          )}
+
           {!trip.isCompleted && (
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={() => {
-                setEditingActivity(undefined)
-                setDialogOpen(true)
-              }}
-            >
-              Add Activity
+            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={() => handleAddActivity()}>
+              {isMobile ? "Add" : "Add Activity"}
             </Button>
           )}
         </Box>
-
-        <Box display="flex" gap={1}>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleAddActivity()} size="small">
-            Add Activity
-          </Button>
-          <Button variant="outlined" onClick={() => setAnimationDialogOpen(true)} size="small">
-            Animation
-          </Button>
-        </Box>
       </Paper>
 
-      <Box display="flex" gap={2} sx={{ height: "calc(100vh - 180px)" }}>
-        {/* Fixed Map Panel */}
-        <Box sx={{ flex: "1 1 50%", display: "flex", flexDirection: "column", pr: 1 }}>
+      {/* Mobile View Toggle */}
+      {isMobile && (
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={handleViewModeChange}
+            aria-label="view mode"
+            size="small"
+            fullWidth
+            sx={{ bgcolor: "background.paper" }}
+          >
+            <ToggleButton value="map">
+              <Map sx={{ mr: 1 }} /> Map
+            </ToggleButton>
+            <ToggleButton value="list">
+              <FormatListBulleted sx={{ mr: 1 }} /> Itinerary
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      )}
+
+      <Box display="flex" gap={2} sx={{ height: "calc(100vh - 180px)", flexDirection: isMobile ? "column" : "row" }}>
+        {/* Map Panel */}
+        <Box
+          sx={{
+            flex: isMobile ? "1 1 auto" : "1 1 50%",
+            display: isMobile && viewMode === "list" ? "none" : "flex",
+            flexDirection: "column",
+            pr: isMobile ? 0 : 1,
+          }}
+        >
           <Box sx={{ flexGrow: 1, minHeight: 0 }}>
             {trip && (
               <TripMap
@@ -510,7 +579,14 @@ const TripDetailsPage = () => {
         </Box>
 
         {/* Scrollable Trip Days Panel */}
-        <Box sx={{ flex: "1 1 50%", overflowY: "auto", pr: 1 }}>
+        <Box
+          sx={{
+            flex: isMobile ? "1 1 auto" : "1 1 50%",
+            overflowY: "auto",
+            pr: isMobile ? 0 : 1,
+            display: isMobile && viewMode === "map" ? "none" : "block",
+          }}
+        >
           {/* Collapse/Expand Controls */}
           <Box
             sx={{
@@ -666,6 +742,7 @@ const TripDetailsPage = () => {
       {trip && (
         <ActivityDialog
           open={dialogOpen}
+          fullScreen={isMobile}
           onClose={() => setDialogOpen(false)}
           onSubmit={handleSubmitActivity}
           isLoading={isCreating || isUpdating}
@@ -681,6 +758,7 @@ const TripDetailsPage = () => {
       {trip && (
         <AnimationConfigDialog
           open={animationDialogOpen}
+          fullScreen={isMobile}
           onClose={() => {
             setAnimationDialogOpen(false)
             setEditingAnimation(undefined)
@@ -701,11 +779,19 @@ const TripDetailsPage = () => {
         />
       )}
 
-      {trip && <TripMembersDialog open={membersDialogOpen} onClose={() => setMembersDialogOpen(false)} trip={trip} />}
+      {trip && (
+        <TripMembersDialog
+          open={membersDialogOpen}
+          fullScreen={isMobile}
+          onClose={() => setMembersDialogOpen(false)}
+          trip={trip}
+        />
+      )}
 
       {trip && (
         <ExpensesDialog
           open={expensesDialogOpen}
+          fullScreen={isMobile}
           onClose={() => setExpensesDialogOpen(false)}
           tripId={trip.id}
           defaultCurrency={trip.defaultCurrency || "AUD"}
@@ -716,6 +802,7 @@ const TripDetailsPage = () => {
       {trip && (
         <TripSettingsDialog
           open={settingsDialogOpen}
+          fullScreen={isMobile}
           onClose={() => setSettingsDialogOpen(false)}
           trip={trip}
           onUpdate={updateTrip}
