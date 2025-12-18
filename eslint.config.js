@@ -38,6 +38,7 @@ export default [
       },
     },
     plugins: {
+      react: pluginReact,
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
     },

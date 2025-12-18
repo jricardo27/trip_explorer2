@@ -1,3 +1,4 @@
+import { Map as MapIcon } from "@mui/icons-material"
 import {
   Dialog,
   DialogTitle,
@@ -28,6 +29,8 @@ import { useState, useEffect } from "react"
 import { useTripMembers } from "../hooks/useTripMembers"
 import { ActivityType } from "../types"
 import type { Activity, TripDay } from "../types"
+
+import LocationPickerMap from "./LocationPickerMap"
 
 interface ActivityDialogProps {
   open: boolean
@@ -72,6 +75,7 @@ const ActivityDialog = ({
   const [notes, setNotes] = useState("")
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [mapPickerOpen, setMapPickerOpen] = useState(false)
 
   const { members } = useTripMembers(tripId)
 
@@ -292,7 +296,7 @@ const ActivityDialog = ({
                   InputProps={{ startAdornment: "$" }}
                 />
               </Grid>
-              <Grid size={{ xs: 6 }}>
+              <Grid size={{ xs: 5 }}>
                 <TextField
                   fullWidth
                   label="Latitude"
@@ -302,7 +306,7 @@ const ActivityDialog = ({
                   inputProps={{ step: "any" }}
                 />
               </Grid>
-              <Grid size={{ xs: 6 }}>
+              <Grid size={{ xs: 5 }}>
                 <TextField
                   fullWidth
                   label="Longitude"
@@ -311,6 +315,17 @@ const ActivityDialog = ({
                   onChange={(e) => setLongitude(e.target.value)}
                   inputProps={{ step: "any" }}
                 />
+              </Grid>
+              <Grid size={{ xs: 2 }} sx={{ display: "flex", alignItems: "center" }}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => setMapPickerOpen(true)}
+                  sx={{ height: 56 }}
+                  title="Select from Map"
+                >
+                  <MapIcon />
+                </Button>
               </Grid>
               <Grid size={{ xs: 12 }}>
                 <TextField
@@ -371,6 +386,16 @@ const ActivityDialog = ({
           </Button>
         </DialogActions>
       </form>
+      <LocationPickerMap
+        open={mapPickerOpen}
+        onClose={() => setMapPickerOpen(false)}
+        initialLat={latitude ? parseFloat(latitude) : undefined}
+        initialLng={longitude ? parseFloat(longitude) : undefined}
+        onSelect={(lat, lng) => {
+          setLatitude(lat.toString())
+          setLongitude(lng.toString())
+        }}
+      />
     </Dialog>
   )
 }

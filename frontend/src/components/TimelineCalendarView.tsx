@@ -30,10 +30,10 @@ const getActivityHeight = (start: string, end: string, hourHeight: number, minHe
 
 // Detect if two activities overlap
 const activitiesOverlap = (a: Activity, b: Activity): boolean => {
-  if (!a.scheduledStart || !a.scheduledEnd || !b.scheduledStart || !b.scheduledEnd) return false
-  return (
-    dayjs(a.scheduledStart).isBefore(dayjs(b.scheduledEnd)) && dayjs(b.scheduledStart).isBefore(dayjs(a.scheduledEnd))
-  )
+  if (!a.scheduledStart || !b.scheduledStart) return false
+  const aEnd = a.scheduledEnd || dayjs(a.scheduledStart).endOf("day").toISOString()
+  const bEnd = b.scheduledEnd || dayjs(b.scheduledStart).endOf("day").toISOString()
+  return dayjs(a.scheduledStart).isBefore(dayjs(bEnd)) && dayjs(b.scheduledStart).isBefore(dayjs(aEnd))
 }
 
 // Group overlapping activities into lanes
@@ -47,7 +47,7 @@ const calculateActivityLanes = (activities: Activity[]): Map<string, { lane: num
   const activeLanes: (Activity | null)[] = []
 
   sorted.forEach((activity) => {
-    if (!activity.scheduledStart || !activity.scheduledEnd) return
+    if (!activity.scheduledStart) return
 
     // Find first available lane
     let laneIndex = 0
@@ -66,8 +66,9 @@ const calculateActivityLanes = (activities: Activity[]): Map<string, { lane: num
     activeLanes.forEach((laneActivity, idx) => {
       if (
         laneActivity &&
-        laneActivity.scheduledEnd &&
-        dayjs(laneActivity.scheduledEnd).isBefore(dayjs(activity.scheduledStart))
+        dayjs(laneActivity.scheduledEnd || dayjs(laneActivity.scheduledStart).endOf("day")).isBefore(
+          dayjs(activity.scheduledStart),
+        )
       ) {
         activeLanes[idx] = null
       }
@@ -247,7 +248,7 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
       {/* Day Columns */}
       <Box sx={{ display: "flex", flexGrow: 1, position: "relative" }}>
         {days.map((day) => {
-          const dayActivities = (day.activities || []).filter((a) => a.scheduledStart && a.scheduledEnd)
+          const dayActivities = (day.activities || []).filter((a) => a.scheduledStart)
           const lanes = calculateActivityLanes(dayActivities)
 
           return (
@@ -305,12 +306,16 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                 {/* Activities */}
                 {dayActivities.map((activity) => {
                   const laneInfo = lanes.get(activity.id)
-                  if (!laneInfo || !activity.scheduledStart || !activity.scheduledEnd) return null
+                  if (!laneInfo || !activity.scheduledStart) return null
+
+                  const effectiveEnd =
+                    activity.scheduledEnd || dayjs(activity.scheduledStart).endOf("day").toISOString()
+                  const hasNoEndTime = !activity.scheduledEnd
 
                   const top = getPixelPosition(activity.scheduledStart, day.date, HOUR_HEIGHT)
                   const height = getActivityHeight(
                     activity.scheduledStart,
-                    activity.scheduledEnd,
+                    effectiveEnd,
                     HOUR_HEIGHT,
                     MIN_ACTIVITY_HEIGHT,
                   )
@@ -351,6 +356,15 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                         p: isMobile ? 0.4 : 0.5,
                         cursor: "pointer",
                         bgcolor: "primary.light",
+                        background: hasNoEndTime
+                          ? `repeating-linear-gradient(
+                              45deg,
+                              ${theme.palette.primary.light},
+                              ${theme.palette.primary.light} 10px,
+                              ${theme.palette.primary.main} 10px,
+                              ${theme.palette.primary.main} 20px
+                            )`
+                          : "primary.light",
                         color: "primary.contrastText",
                         overflow: "hidden",
                         opacity: isDragging ? 0.3 : 1,
@@ -358,6 +372,15 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                         boxShadow: isExpanded ? 6 : 1,
                         "&:hover": {
                           bgcolor: "primary.main",
+                          background: hasNoEndTime
+                            ? `repeating-linear-gradient(
+                                45deg,
+                                ${theme.palette.primary.main},
+                                ${theme.palette.primary.main} 10px,
+                                ${theme.palette.primary.dark} 10px,
+                                ${theme.palette.primary.dark} 20px
+                              )`
+                            : "primary.main",
                           zIndex: isExpanded ? 101 : 5,
                           transform: isMobile ? "none" : "scale(1.02)",
                           boxShadow: isExpanded ? 8 : 3,
@@ -381,7 +404,7 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                         sx={{ fontSize: isMobile ? "0.6rem" : "0.65rem", opacity: 0.9, display: "block" }}
                       >
                         {dayjs(activity.scheduledStart).format("HH:mm")} -{" "}
-                        {dayjs(activity.scheduledEnd).format("HH:mm")}
+                        {hasNoEndTime ? "24:00" : dayjs(activity.scheduledEnd).format("HH:mm")}
                       </Typography>
                       {activity.city && (
                         <Typography variant="caption" sx={{ fontSize: "0.6rem", opacity: 0.85, display: "block" }}>

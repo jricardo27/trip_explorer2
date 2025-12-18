@@ -11,6 +11,7 @@ export interface CreateExpenseRequest {
   currency: string
   paidById?: string
   date?: string
+  notes?: string
   isPaid?: boolean
   splitType?: string
   splits?: { memberId: string; amount?: number }[]

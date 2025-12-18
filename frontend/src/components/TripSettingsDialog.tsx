@@ -119,9 +119,10 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
             value={currencies}
             onChange={(_, newValue) => setCurrencies(newValue)}
             renderTags={(value: readonly string[], getTagProps) =>
-              value.map((option: string, index: number) => (
-                <Chip variant="outlined" label={option} {...getTagProps({ index })} /> // eslint-disable-line react/jsx-key
-              ))
+              value.map((option: string, index: number) => {
+                const { key, ...tagProps } = getTagProps({ index })
+                return <Chip key={key} variant="outlined" label={option} {...tagProps} />
+              })
             }
             renderInput={(params) => (
               <TextField
