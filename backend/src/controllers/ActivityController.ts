@@ -92,7 +92,22 @@ class ActivityController {
         return res.status(403).json({ error: "Unauthorized" })
       }
 
-      const updatedActivity = await activityService.updateActivity(id, updateData)
+      // Remove immutable fields that shouldn't be in update data
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id: _, tripId: __, createdAt: ___, participantIds, ...sanitizedData } = updateData
+
+      // Handle participants separately if provided
+      const prismaUpdateData: any = sanitizedData
+
+      if (participantIds !== undefined) {
+        // Delete existing participants and create new ones
+        prismaUpdateData.participants = {
+          deleteMany: {},
+          create: participantIds.map((memberId: string) => ({ memberId })),
+        }
+      }
+
+      const updatedActivity = await activityService.updateActivity(id, prismaUpdateData)
       res.json(updatedActivity)
     } catch (error) {
       next(error)
