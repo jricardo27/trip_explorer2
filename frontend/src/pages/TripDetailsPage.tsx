@@ -20,7 +20,6 @@ import {
   PersonAdd,
   AttachMoney,
   PlayArrow,
-  Map,
   FormatListBulleted,
   CalendarMonth,
 } from "@mui/icons-material"
@@ -123,9 +122,11 @@ const TripDetailsPage = () => {
   // Mobile Responsiveness
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
-  const [viewMode, setViewMode] = useState<"map" | "list" | "timeline">("list")
-
-  const handleViewModeChange = (_: React.MouseEvent<HTMLElement>, newMode: "map" | "list" | "timeline" | null) => {
+  const [viewMode, setViewMode] = useState<"list" | "animation" | "timeline">("list")
+  const handleViewModeChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newMode: "list" | "animation" | "timeline" | null,
+  ) => {
     if (newMode !== null) {
       setViewMode(newMode)
     }
@@ -507,13 +508,11 @@ const TripDetailsPage = () => {
           size="small"
           sx={{ bgcolor: "background.paper" }}
         >
-          {!isMobile && (
-            <ToggleButton value="map">
-              <Map sx={{ mr: 1 }} /> Map
-            </ToggleButton>
-          )}
           <ToggleButton value="list">
-            <FormatListBulleted sx={{ mr: 1 }} /> {isMobile ? "List" : "Itinerary"}
+            <FormatListBulleted sx={{ mr: 1 }} /> Itinerary
+          </ToggleButton>
+          <ToggleButton value="animation">
+            <PlayArrow sx={{ mr: 1 }} /> Animation
           </ToggleButton>
           <ToggleButton value="timeline">
             <CalendarMonth sx={{ mr: 1 }} /> Timeline
@@ -532,14 +531,14 @@ const TripDetailsPage = () => {
         />
       )}
 
-      {/* Map/List Split View */}
+      {/* Map/List/Animation Split View */}
       {viewMode !== "timeline" && (
         <Box display="flex" gap={2} sx={{ height: "calc(100vh - 180px)", flexDirection: isMobile ? "column" : "row" }}>
           {/* Map Panel */}
           <Box
             sx={{
               flex: isMobile ? "1 1 auto" : "1 1 50%",
-              display: isMobile && viewMode === "list" ? "none" : viewMode === "map" || !isMobile ? "flex" : "none",
+              display: isMobile ? (viewMode === "animation" ? "flex" : "none") : "flex",
               flexDirection: "column",
               pr: isMobile ? 0 : 1,
             }}
@@ -559,8 +558,8 @@ const TripDetailsPage = () => {
               )}
             </Box>
 
-            {/* Trip Animations List - Under Map */}
-            {trip && (
+            {/* Trip Animations List - Only on Animation tab */}
+            {viewMode === "animation" && trip && (
               <Box sx={{ mt: 2 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                   <Typography variant="h6" sx={{ fontSize: "1rem" }}>
@@ -595,13 +594,13 @@ const TripDetailsPage = () => {
             )}
           </Box>
 
-          {/* Scrollable Trip Days Panel */}
+          {/* Itinerary Column */}
           <Box
             sx={{
               flex: isMobile ? "1 1 auto" : "1 1 50%",
               overflowY: "auto",
               pr: isMobile ? 0 : 1,
-              display: isMobile && viewMode === "map" ? "none" : "block",
+              display: viewMode === "animation" && isMobile ? "none" : "block",
             }}
           >
             {/* Collapse/Expand Controls */}
