@@ -115,6 +115,13 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
     setDraggedActivityId(activity.id)
   }
 
+  const handleActivityDragEnd = () => {
+    // Reset dragged activity state when drag ends (whether dropped or cancelled)
+    setDraggedActivityId(null)
+    setDragPreview(null)
+    sessionStorage.removeItem("draggedActivity")
+  }
+
   const handleDayDrop = (e: React.DragEvent, day: TripDay) => {
     e.preventDefault()
     setDragPreview(null)
@@ -322,6 +329,7 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                       key={activity.id}
                       draggable
                       onDragStart={(e) => handleActivityDragStart(e, activity)}
+                      onDragEnd={handleActivityDragEnd}
                       onClick={() => onActivityClick?.(activity)}
                       sx={{
                         position: "absolute",
