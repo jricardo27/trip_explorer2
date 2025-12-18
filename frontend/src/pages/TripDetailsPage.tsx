@@ -557,32 +557,6 @@ const TripDetailsPage = () => {
                 />
               )}
             </Box>
-
-            {/* Trip Animations List - Only on Animation tab */}
-            {viewMode === "animation" && trip && (
-              <Box sx={{ mt: 0, height: "100%", overflowY: "auto" }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-                  <Typography variant="h6" sx={{ fontSize: "1rem" }}>
-                    Animations
-                  </Typography>
-                </Box>
-                <TripAnimationList
-                  animations={trip.animations || []}
-                  onPlay={(animation) => {
-                    setActiveAnimationId(animation.id)
-                  }}
-                  onEdit={(animation) => {
-                    setEditingAnimation(animation)
-                    setAnimationDialogOpen(true)
-                  }}
-                  onDelete={(id) => deleteAnimation(id)}
-                  onCreate={() => {
-                    setEditingAnimation(undefined)
-                    setAnimationDialogOpen(true)
-                  }}
-                />
-              </Box>
-            )}
           </Box>
 
           {/* Right Column: Itinerary (List View) or Animation Controls (Animation View) */}
@@ -751,6 +725,29 @@ const TripDetailsPage = () => {
                   </Grid>
                 </DndContext>
               </>
+            )}
+
+            {viewMode === "animation" && trip && (
+              <Box sx={{ p: 2 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Animations
+                </Typography>
+                <TripAnimationList
+                  animations={trip.animations || []}
+                  onPlay={(animation) => {
+                    setActiveAnimationId(animation.id)
+                  }}
+                  onEdit={(animation) => {
+                    setEditingAnimation(animation)
+                    setAnimationDialogOpen(true)
+                  }}
+                  onDelete={(id) => deleteAnimation(id)}
+                  onCreate={() => {
+                    setEditingAnimation(undefined)
+                    setAnimationDialogOpen(true)
+                  }}
+                />
+              </Box>
             )}
           </Box>
         </Box>
