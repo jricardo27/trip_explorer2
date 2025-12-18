@@ -1,20 +1,31 @@
-import { PlayArrow, Pause, Stop } from "@mui/icons-material"
-import { Box, Paper, Typography, IconButton, Select, MenuItem, Checkbox, ListItemText } from "@mui/material"
+import { PlayArrow, Pause, Stop, Layers as LayersIcon } from "@mui/icons-material"
+import { Box, Paper, Typography, IconButton, Select, MenuItem, Checkbox, ListItemText, useTheme } from "@mui/material"
 import L from "leaflet"
-import { useEffect, useRef, useState } from "react"
-import "leaflet/dist/leaflet.css"
+import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { createRoot } from "react-dom/client"
 import { renderToStaticMarkup } from "react-dom/server"
 import { BsFuelPump } from "react-icons/bs"
 import { MdHotel, MdKayaking, MdLocalGasStation, MdWc, MdPark, MdPlace } from "react-icons/md"
-import { GeoJSON, MapContainer, Marker, Polyline, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet"
+import {
+  GeoJSON,
+  MapContainer,
+  Marker,
+  Polyline,
+  Popup,
+  TileLayer,
+  useMap,
+  useMapEvents,
+  LayersControl,
+} from "react-leaflet"
+import "leaflet/dist/leaflet.css"
 
 import { MARKER_MANIFEST } from "../data/markerManifest"
 import type { Activity, TripAnimation } from "../types"
+import { getGreatCirclePath, getGreatCirclePoint } from "../utils/geodesicUtils"
+import { fetchRoute, interpolateAlongPath } from "../utils/routingUtils"
 
+import { BaseLayers } from "./Map/BaseLayers"
 import PopupContent from "./PopupContent"
-
-// ... imports ...
 
 interface TripMapProps {
   activities?: Activity[]
@@ -23,37 +34,61 @@ interface TripMapProps {
   days?: Array<{ id: string; name?: string; dayIndex: number }>
   activeAnimationId?: string
   onMapContextMenu?: (latLng: { lat: number; lng: number }) => void
-
   onMarkerContextMenu?: (feature: any) => void
   activeFlyToLocation?: { lat: number; lng: number } | null
   hideAnimationControl?: boolean
 }
 
+const LIGHT_TILES = {
+  url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+}
+
+const DARK_TILES = {
+  url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+}
+
+// --- Helper Components ---
+
 const MapFlyHandler = ({ location }: { location?: { lat: number; lng: number } | null }) => {
   const map = useMap()
   useEffect(() => {
     if (location) {
-      map.flyTo([location.lat, location.lng], 14, {
-        duration: 1.5,
-      })
+      map.flyTo([location.lat, location.lng], 14, { duration: 1.5 })
     }
   }, [location, map])
   return null
 }
 
-const TransportIcon = new L.DivIcon({
-  className: "custom-transport-icon",
-  html: '<div style="font-size: 24px; text-align: center;">🚗</div>',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
-})
-
-// Icon Mapping Helper
+const MapStateManager = ({
+  onMapMove,
+  onContextMenu,
+}: {
+  onMapMove: (center: [number, number], zoom: number) => void
+  onContextMenu?: (latLng: { lat: number; lng: number }) => void
+}) => {
+  const map = useMap()
+  useMapEvents({
+    moveend: () => {
+      const center = map.getCenter()
+      onMapMove([center.lat, center.lng], map.getZoom())
+    },
+    zoomend: () => {
+      const center = map.getCenter()
+      onMapMove([center.lat, center.lng], map.getZoom())
+    },
+    contextmenu: (e) => {
+      onContextMenu?.(e.latlng)
+    },
+  })
+  return null
+}
 
 const getIconForFeature = (feature: any, layerStyle?: any) => {
   const iconKey = feature.properties?.style?.icon || layerStyle?.icon
   const color = feature.properties?.style?.color || layerStyle?.color || "blue"
-
   let IconComponent = MdPlace
 
   if (iconKey) {
@@ -64,13 +99,11 @@ const getIconForFeature = (feature: any, layerStyle?: any) => {
     else if (iconKey.includes("Park")) IconComponent = MdPark
     else if (iconKey.includes("Fuel")) IconComponent = MdLocalGasStation
   } else {
-    // Fallback guessing
     const name = (feature.properties?.name || feature.properties?.Name || "").toLowerCase()
     const type = (feature.properties?.FacilityType || "").toLowerCase()
-
     if (type.includes("toilet") || name.includes("toilet")) IconComponent = MdWc
     else if (type.includes("park") || name.includes("park")) IconComponent = MdPark
-    else if (name.includes("hotel") || name.includes("park") || name.includes("stay")) IconComponent = MdHotel
+    else if (name.includes("hotel") || name.includes("stay")) IconComponent = MdHotel
   }
 
   const iconHtml = renderToStaticMarkup(
@@ -88,34 +121,8 @@ const getIconForFeature = (feature: any, layerStyle?: any) => {
   })
 }
 
-// Component to handle map view updates and events
-const MapInteraction = ({
-  center,
-  zoom,
-  onContextMenu,
-}: {
-  center: [number, number]
-  zoom: number
-  onContextMenu?: (latLng: { lat: number; lng: number }) => void
-}) => {
-  const map = useMap()
-  useEffect(() => {
-    map.setView(center, zoom)
-  }, [center, zoom, map])
-
-  useMapEvents({
-    contextmenu: (e) => {
-      onContextMenu?.(e.latlng)
-    },
-  })
-  return null
-}
-
-// GeoJSON Layer Component
-
 const GeoJSONLayer = ({ url, onContextMenu }: { url: string; onContextMenu?: (feature: any) => void }) => {
   const [data, setData] = useState<any>(null)
-
   useEffect(() => {
     fetch(url)
       .then((res) => res.json())
@@ -124,32 +131,26 @@ const GeoJSONLayer = ({ url, onContextMenu }: { url: string; onContextMenu?: (fe
   }, [url])
 
   if (!data) return null
-
   const layerStyle = data.properties?.style
 
   return (
     <GeoJSON
       data={data}
-      pointToLayer={(feature: any, latlng) => {
-        return L.marker(latlng, { icon: getIconForFeature(feature, layerStyle) })
-      }}
+      pointToLayer={(feature, latlng) => L.marker(latlng, { icon: getIconForFeature(feature, layerStyle) })}
       onEachFeature={(feature, layer) => {
-        layer.on("contextmenu", () => {
-          onContextMenu?.(feature)
-        })
-
-        // Bind Popup using React Component
+        layer.on("contextmenu", () => onContextMenu?.(feature))
         layer.bindPopup(
           () => {
             const div = document.createElement("div")
             const root = createRoot(div)
             const props = feature.properties
-            const title = props.name || props.Name || "Unknown"
-
-            // Basic image extraction if available in properties
-            const images = props.images || []
-
-            root.render(<PopupContent title={title} properties={props} images={images} />)
+            root.render(
+              <PopupContent
+                title={props.name || props.Name || "Unknown"}
+                properties={props}
+                images={props.images || []}
+              />,
+            )
             return div
           },
           { minWidth: 320 },
@@ -159,7 +160,167 @@ const GeoJSONLayer = ({ url, onContextMenu }: { url: string; onContextMenu?: (fe
   )
 }
 
-// Animation Controller Component
+// --- Animation Components ---
+
+interface AdvancedAnimationLayerProps {
+  steps: any[]
+  isPlaying: boolean
+  onProgressUpdate: (progress: number) => void
+  onAnimationComplete: () => void
+  seekProgress: number | null
+}
+
+const AdvancedAnimationLayer = ({
+  steps,
+  isPlaying,
+  onProgressUpdate,
+  onAnimationComplete,
+  seekProgress,
+}: AdvancedAnimationLayerProps) => {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0)
+  const [stepProgress, setStepProgress] = useState(0)
+  const [cachedRoutes, setCachedRoutes] = useState<Record<string, [number, number][]>>({})
+  const requestRef = useRef<number | null>(null)
+  const previousTimeRef = useRef<number | undefined>(undefined)
+
+  const validSteps = useMemo(() => steps.filter((s) => s.activity?.latitude && s.activity?.longitude), [steps])
+  const coords = useMemo(
+    () => validSteps.map((s) => [s.activity.latitude, s.activity.longitude] as [number, number]),
+    [validSteps],
+  )
+
+  useEffect(() => {
+    const loadRoutes = async () => {
+      const newRoutes: Record<string, [number, number][]> = {}
+      let hasUpdates = false
+      for (let i = 0; i < coords.length - 1; i++) {
+        const key = `${i}-${coords[i].join(",")}-${coords[i + 1].join(",")}`
+        if (cachedRoutes[key]) continue
+        const mode = validSteps[i + 1].transportMode
+        if (mode && mode !== "FLIGHT") {
+          const route = await fetchRoute(coords[i], coords[i + 1], mode)
+          if (route) {
+            newRoutes[key] = route
+            hasUpdates = true
+          }
+        }
+      }
+      if (hasUpdates) setCachedRoutes((prev) => ({ ...prev, ...newRoutes }))
+    }
+    loadRoutes()
+  }, [coords, validSteps, cachedRoutes])
+
+  // Use a ref for the animate function to avoid hoisting issues and redundant dependency changes
+  const animateRef = useRef<(time: number) => void>(() => {})
+
+  useEffect(() => {
+    animateRef.current = (time: number) => {
+      if (previousTimeRef.current !== undefined) {
+        const deltaTime = time - previousTimeRef.current
+        if (isPlaying && currentStepIndex < coords.length - 1) {
+          const speed = 0.0005
+          const newProgress = stepProgress + speed * deltaTime
+          if (newProgress >= 1) {
+            if (currentStepIndex < coords.length - 2) {
+              setCurrentStepIndex((prev) => prev + 1)
+              setStepProgress(0)
+            } else {
+              setStepProgress(1)
+              onAnimationComplete()
+            }
+          } else {
+            setStepProgress(newProgress)
+          }
+        }
+      }
+      previousTimeRef.current = time
+      const totalProgress = coords.length > 1 ? ((currentStepIndex + stepProgress) / (coords.length - 1)) * 100 : 100
+      onProgressUpdate(totalProgress)
+      requestRef.current = requestAnimationFrame(animateRef.current)
+    }
+  }, [isPlaying, currentStepIndex, stepProgress, coords, onAnimationComplete, onProgressUpdate])
+
+  useEffect(() => {
+    if (isPlaying) {
+      requestRef.current = requestAnimationFrame(animateRef.current)
+    } else if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current)
+    }
+    return () => {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current)
+    }
+  }, [isPlaying])
+
+  useEffect(() => {
+    if (seekProgress !== null) {
+      const totalSteps = coords.length - 1
+      if (totalSteps <= 0) return
+      const globalProgress = seekProgress / 100
+      const targetStep = Math.min(Math.floor(globalProgress * totalSteps), totalSteps - 1)
+      const targetStepProgress = (globalProgress * totalSteps) % 1
+      setTimeout(() => {
+        setCurrentStepIndex(targetStep)
+        setStepProgress(targetStepProgress)
+      }, 0)
+    }
+  }, [seekProgress, coords.length])
+
+  const currentPosition = useMemo(() => {
+    if (coords.length < 2) return null
+    if (currentStepIndex >= coords.length - 1) return coords[coords.length - 1]
+    const p1 = coords[currentStepIndex]
+    const p2 = coords[currentStepIndex + 1]
+    const key = `${currentStepIndex}-${p1.join(",")}-${p2.join(",")}`
+    const route = cachedRoutes[key]
+    if (route) return interpolateAlongPath(route, stepProgress)
+    return getGreatCirclePoint(p1, p2, stepProgress)
+  }, [coords, currentStepIndex, stepProgress, cachedRoutes])
+
+  const pathPositions = useMemo(() => {
+    if (coords.length < 2) return []
+    const fullPath: [number, number][] = []
+    for (let i = 0; i <= currentStepIndex; i++) {
+      if (i === coords.length - 1) break
+      const p1 = coords[i]
+      const p2 = coords[i + 1]
+      const key = `${i}-${p1.join(",")}-${p2.join(",")}`
+      const route = cachedRoutes[key]
+      if (route) {
+        if (i < currentStepIndex) fullPath.push(...route)
+        else fullPath.push(...route.slice(0, Math.floor(route.length * stepProgress)))
+      } else {
+        const gcPath = getGreatCirclePath(p1, p2, 20)
+        if (i < currentStepIndex) fullPath.push(...gcPath)
+        else fullPath.push(...gcPath.slice(0, Math.floor(gcPath.length * stepProgress)))
+      }
+    }
+    if (currentPosition) fullPath.push(currentPosition)
+    return fullPath
+  }, [coords, currentStepIndex, stepProgress, cachedRoutes, currentPosition])
+
+  const TransportIcon = useMemo(
+    () =>
+      new L.DivIcon({
+        className: "custom-transport-icon",
+        html: `
+          <div style="font-size: 24px; text-align: center; background: white; border-radius: 50%; padding: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+            🚗
+          </div>
+        `,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+      }),
+    [],
+  )
+
+  return (
+    <>
+      <Polyline positions={pathPositions} color="#1976d2" weight={4} opacity={0.8} />
+      {currentPosition && <Marker position={currentPosition} icon={TransportIcon} zIndexOffset={2000} />}
+    </>
+  )
+}
+
 const AnimationController = ({
   animation,
   isPlaying,
@@ -174,47 +335,58 @@ const AnimationController = ({
   onReset: () => void
   progress: number
   onSeek: (value: number) => void
-}) => {
-  return (
-    <Paper
-      sx={{
-        position: "absolute",
-        bottom: 20,
-        left: "50%",
-        transform: "translateX(-50%)",
-        zIndex: 1000,
-        p: 2,
-        minWidth: 400,
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,
-      }}
-    >
-      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+}) => (
+  <Paper
+    elevation={4}
+    sx={{
+      position: "absolute",
+      bottom: 20,
+      left: "50%",
+      transform: "translateX(-50%)",
+      zIndex: 1000,
+      p: 2,
+      minWidth: 400,
+      borderRadius: 2,
+      display: "flex",
+      flexDirection: "column",
+      gap: 1,
+    }}
+  >
+    <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
         {animation.name}
       </Typography>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <IconButton size="small" onClick={onPlayPause} color="primary">
-          {isPlaying ? <Pause /> : <PlayArrow />}
-        </IconButton>
-        <IconButton size="small" onClick={onReset}>
-          <Stop />
-        </IconButton>
-        <Box sx={{ flexGrow: 1, mx: 2 }}>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={progress}
-            onChange={(e) => onSeek(Number(e.target.value))}
-            style={{ width: "100%" }}
-          />
-        </Box>
-        <Typography variant="caption">{Math.round(progress)}%</Typography>
+      <Typography variant="caption" color="text.secondary">
+        {Math.round(progress)}%
+      </Typography>
+    </Box>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <IconButton
+        size="small"
+        onClick={onPlayPause}
+        color="primary"
+        sx={{ bgcolor: "primary.light", color: "white", "&:hover": { bgcolor: "primary.main" } }}
+      >
+        {isPlaying ? <Pause /> : <PlayArrow />}
+      </IconButton>
+      <IconButton size="small" onClick={onReset} sx={{ bgcolor: "grey.200" }}>
+        <Stop />
+      </IconButton>
+      <Box sx={{ flexGrow: 1, mx: 1, display: "flex", alignItems: "center" }}>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={progress}
+          onChange={(e) => onSeek(Number(e.target.value))}
+          style={{ width: "100%", accentColor: "#1976d2", cursor: "pointer" }}
+        />
       </Box>
-    </Paper>
-  )
-}
+    </Box>
+  </Paper>
+)
+
+// --- Main Component ---
 
 export const TripMap = (props: TripMapProps) => {
   const {
@@ -227,20 +399,33 @@ export const TripMap = (props: TripMapProps) => {
     onMarkerContextMenu,
     hideAnimationControl = false,
   } = props
-  const defaultCenter: [number, number] = [-25.2744, 133.7751]
-  const [center, setCenter] = useState<[number, number]>(defaultCenter)
-  const [zoom, setZoom] = useState(4)
+  const theme = useTheme()
+  const tiles = theme.palette.mode === "light" ? LIGHT_TILES : DARK_TILES
 
-  const [activeAnimationId, setActiveAnimationId] = useState<string>("")
+  const [mapState, setMapState] = useState(() => {
+    const saved = localStorage.getItem("mapState")
+    return saved ? JSON.parse(saved) : { center: [-25.2744, 133.7751] as [number, number], zoom: 4 }
+  })
+
+  const [activeBaseLayer, setActiveBaseLayer] = useState(
+    () => localStorage.getItem("activeBaseLayer") ?? "Esri World Street Map",
+  )
+  const [activeAnimationId, setActiveAnimationId] = useState("")
   const [isPlaying, setIsPlaying] = useState(false)
-  const [currentStepIndex, setCurrentStepIndex] = useState(0)
-  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null)
-  const [pathPositions, setPathPositions] = useState<[number, number][]>([])
+  const [animationProgress, setAnimationProgress] = useState(0)
+  const [seekProgress, setSeekProgress] = useState<number | null>(null)
   const [selectedMarkerLayers, setSelectedMarkerLayers] = useState<string[]>([])
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(true)
 
-  // Sync activeAnimationId from prop
+  const handleMapMove = useCallback((center: [number, number], zoom: number) => {
+    setMapState({ center, zoom })
+    localStorage.setItem("mapState", JSON.stringify({ center, zoom }))
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem("activeBaseLayer", activeBaseLayer)
+  }, [activeBaseLayer])
   useEffect(() => {
     if (propActiveAnimationId) {
       setTimeout(() => {
@@ -250,100 +435,45 @@ export const TripMap = (props: TripMapProps) => {
     }
   }, [propActiveAnimationId])
 
-  const animationRef = useRef<number | null>(null)
-  const mapRef = useRef<L.Map | null>(null)
-
-  // Get unique days from activities with their names
-  const uniqueDays = Array.from(
-    new Map(
-      activities
-        ?.filter((a) => a.tripDayId)
-        .map((a) => {
-          const dayInfo = days?.find((d) => d.id === a.tripDayId)
-          return {
-            id: a.tripDayId!,
-            name: dayInfo?.name || `Day ${(dayInfo?.dayIndex ?? 0) + 1}`,
-          }
-        })
-        .map((day) => [day.id, day]),
-    ).values(),
+  const activeAnimation = useMemo(
+    () => animations?.find((a) => a.id === activeAnimationId),
+    [animations, activeAnimationId],
+  )
+  const uniqueDays = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          activities
+            ?.filter((a) => a.tripDayId)
+            .map((a) => {
+              const dayInfo = days?.find((d) => d.id === a.tripDayId)
+              return { id: a.tripDayId!, name: dayInfo?.name || `Day ${(dayInfo?.dayIndex ?? 0) + 1}` }
+            })
+            .map((day) => [day.id, day]),
+        ).values(),
+      ),
+    [activities, days],
   )
 
-  // Filter activities based on selected days
-  const filteredActivities =
-    selectedDays.length > 0 ? activities?.filter((a) => a.tripDayId && selectedDays.includes(a.tripDayId)) : activities
+  const filteredActivities = useMemo(
+    () =>
+      selectedDays.length > 0
+        ? activities?.filter((a) => a.tripDayId && selectedDays.includes(a.tripDayId))
+        : activities,
+    [activities, selectedDays],
+  )
 
-  const activeAnimation = animations?.find((a) => a.id === activeAnimationId)
-
-  // Calculate bounds when activities change (only if not animating)
   useEffect(() => {
-    if (!isPlaying && activities && activities.length > 0) {
-      const validActivities = activities.filter((a) => a.latitude && a.longitude)
-      if (validActivities.length > 0) {
-        // Focus on selected activity if available, else first
-        const targetActivity = selectedActivityId
-          ? validActivities.find((a) => a.id === selectedActivityId)
-          : validActivities[0]
-
-        const finalActivity = targetActivity || validActivities[0]
-
-        if (finalActivity.latitude && finalActivity.longitude) {
-          // Wrap in timeout to avoid "setState synchronously in effect" warning
-          const timer = setTimeout(() => {
-            setCenter([finalActivity.latitude!, finalActivity.longitude!])
-            setZoom(10)
-          }, 0)
-          return () => clearTimeout(timer)
-        }
-      }
-    }
-  }, [activities, isPlaying, selectedActivityId])
-
-  // Animation Tick
-  useEffect(() => {
-    if (isPlaying && activeAnimation) {
-      const step = activeAnimation.steps[currentStepIndex]
-      if (!step) {
-        setTimeout(() => setIsPlaying(false), 0)
-        return
-      }
-
-      const activity = activities?.find((a) => a.id === step.activityId)
-
+    if (!isPlaying && selectedActivityId) {
+      const activity = activities?.find((a) => a.id === selectedActivityId)
       if (activity?.latitude && activity?.longitude) {
-        // Wrap in timeout to avoid synchronous update warning
-        const updateTimer = setTimeout(() => {
-          setCenter([activity.latitude!, activity.longitude!])
-          setMarkerPosition([activity.latitude!, activity.longitude!])
-          setPathPositions((prev) => [...prev, [activity.latitude!, activity.longitude!]])
-          setZoom(step.zoomLevel || 15) // Zoom in on activity
-        }, 0)
-
-        // For this demo, we simply jump to next step after timeout
-        animationRef.current = window.setTimeout(() => {
-          if (currentStepIndex < activeAnimation.steps.length - 1) {
-            setZoom(5)
-            setCurrentStepIndex((prev) => prev + 1)
-          } else {
-            setIsPlaying(false)
-            setCurrentStepIndex(0)
-            setPathPositions([])
-          }
-        }, 2000)
-        return () => {
-          clearTimeout(updateTimer)
-          if (animationRef.current) {
-            clearTimeout(animationRef.current)
-          }
-        }
-      } else {
-        setTimeout(() => setCurrentStepIndex((prev) => prev + 1), 0)
+        setTimeout(() => setMapState({ center: [activity.latitude!, activity.longitude!], zoom: 14 }), 0)
       }
     }
-  }, [isPlaying, currentStepIndex, activeAnimation, activities])
+  }, [selectedActivityId, activities, isPlaying])
 
   return (
-    <Paper elevation={3} sx={{ p: 1, height: "100%", mb: 0, position: "relative" }}>
+    <Paper elevation={3} sx={{ p: 1, height: "100%", mb: 0, position: "relative", overflow: "hidden" }}>
       {animations && animations.length > 0 && !isPlaying && !hideAnimationControl && (
         <Box
           sx={{
@@ -356,6 +486,7 @@ export const TripMap = (props: TripMapProps) => {
             borderRadius: 1,
             display: "flex",
             gap: 1,
+            boxShadow: 2,
           }}
         >
           <Select
@@ -375,7 +506,7 @@ export const TripMap = (props: TripMapProps) => {
           <IconButton
             disabled={!activeAnimationId}
             onClick={() => {
-              setCurrentStepIndex(0)
+              setSeekProgress(0)
               setIsPlaying(true)
             }}
             color="primary"
@@ -392,79 +523,71 @@ export const TripMap = (props: TripMapProps) => {
           onPlayPause={() => setIsPlaying(!isPlaying)}
           onReset={() => {
             setIsPlaying(false)
-            setCurrentStepIndex(0)
-            setPathPositions([])
+            setSeekProgress(0)
           }}
-          progress={
-            activeAnimation.steps.length > 1
-              ? (currentStepIndex / (activeAnimation.steps.length - 1)) * 100
-              : currentStepIndex === 0 && activeAnimation.steps.length === 1
-                ? 100
-                : 0
-          }
-          onSeek={(value) => {
-            const maxIndex = activeAnimation.steps.length > 0 ? activeAnimation.steps.length - 1 : 0
-            const newIndex = Math.round((value / 100) * maxIndex)
-            setCurrentStepIndex(newIndex)
-          }}
+          progress={animationProgress}
+          onSeek={setSeekProgress}
         />
       )}
 
-      <MapContainer center={center} zoom={zoom} style={{ height: "100%", width: "100%" }} ref={mapRef}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+      <MapContainer
+        center={mapState.center}
+        zoom={mapState.zoom}
+        style={{ height: "100%", width: "100%" }}
+        scrollWheelZoom={true}
+      >
+        <MapStateManager onMapMove={handleMapMove} onContextMenu={onMapContextMenu} />
+        <MapFlyHandler location={props.activeFlyToLocation} />
+        <TileLayer attribution={tiles.attribution} url={tiles.url} maxZoom={20} />
+        <LayersControl position="topright">
+          {Object.entries(BaseLayers).map(([key, layer]) => (
+            <LayersControl.BaseLayer key={key} name={layer.name} checked={activeBaseLayer === layer.name}>
+              <TileLayer
+                attribution={layer.attribution}
+                url={layer.url}
+                maxZoom={layer.maxZoom || 20}
+                eventHandlers={{ add: () => setActiveBaseLayer(layer.name) }}
+              />
+            </LayersControl.BaseLayer>
+          ))}
+        </LayersControl>
 
-        {/* Markers from Manifest - Smart filtering based on trip location */}
         {(() => {
-          // Detect relevant regions based on activity locations
           const relevantRegions = new Set<string>()
-
-          // Simple state detection based on activity coordinates
-          // This is a basic implementation - could be enhanced with reverse geocoding
-          activities?.forEach((activity) => {
-            if (activity.latitude && activity.longitude) {
-              const lat = activity.latitude
-              const lng = activity.longitude
-
-              // Rough bounding boxes for Australian states
+          activities?.forEach((a) => {
+            if (a.latitude && a.longitude) {
+              const { latitude: lat, longitude: lng } = a
               if (lng >= 115 && lng <= 129 && lat >= -35 && lat <= -14) relevantRegions.add("westernAustralia")
-              if (lng >= 129 && lng <= 138 && lat >= -26 && lat <= -11) relevantRegions.add("northernTerritory")
-              if (lng >= 138 && lng <= 141 && lat >= -38 && lat <= -26) relevantRegions.add("southAustralia")
-              if (lng >= 141 && lng <= 154 && lat >= -39 && lat <= -28) relevantRegions.add("victoria")
-              if (lng >= 141 && lng <= 154 && lat >= -29 && lat <= -10) relevantRegions.add("queensland")
-              if (lng >= 141 && lng <= 154 && lat >= -38 && lat <= -28) relevantRegions.add("newSouthWales")
-              if (lng >= 144 && lng <= 149 && lat >= -44 && lat <= -40) relevantRegions.add("tasmania")
-              if (lng >= 148 && lng <= 150 && lat >= -36 && lat <= -35)
+              else if (lng >= 129 && lng <= 138 && lat >= -26 && lat <= -11) relevantRegions.add("northernTerritory")
+              else if (lng >= 138 && lng <= 141 && lat >= -38 && lat <= -26) relevantRegions.add("southAustralia")
+              else if (lng >= 141 && lng <= 154 && lat >= -39 && lat <= -28) relevantRegions.add("victoria")
+              else if (lng >= 141 && lng <= 154 && lat >= -29 && lat <= -10) relevantRegions.add("queensland")
+              else if (lng >= 141 && lng <= 154 && lat >= -38 && lat <= -28) relevantRegions.add("newSouthWales")
+              else if (lng >= 144 && lng <= 149 && lat >= -44 && lat <= -40) relevantRegions.add("tasmania")
+              else if (lng >= 148 && lng <= 150 && lat >= -36 && lat <= -35)
                 relevantRegions.add("australianCapitalTerritory")
-              if (lng >= 166 && lng <= 179 && lat >= -47 && lat <= -34) relevantRegions.add("newZealand")
+              else if (lng >= 166 && lng <= 179 && lat >= -47 && lat <= -34) relevantRegions.add("newZealand")
             }
           })
-
-          // If no activities or no coordinates, show all regions
           const regionsToShow = relevantRegions.size > 0 ? Array.from(relevantRegions) : Object.keys(MARKER_MANIFEST)
-
           return (
             <>
-              {/* Filter Toggle and Content */}
               <Box
                 sx={{
                   position: "absolute",
                   top: 10,
-                  right: 10,
+                  right: 50,
                   zIndex: 1000,
                   bgcolor: "white",
                   borderRadius: 1,
                   boxShadow: 2,
                   p: showFilters ? 1.5 : 1,
                   minWidth: showFilters ? 220 : "auto",
-                  maxWidth: 300,
                 }}
               >
                 {!showFilters && (
-                  <IconButton size="small" onClick={() => setShowFilters(true)} title="Show filters">
-                    <Typography variant="caption">Filters</Typography>
+                  <IconButton size="small" onClick={() => setShowFilters(true)}>
+                    <LayersIcon fontSize="small" />
                   </IconButton>
                 )}
                 {showFilters && (
@@ -473,8 +596,8 @@ export const TripMap = (props: TripMapProps) => {
                       <Typography variant="caption" sx={{ fontWeight: "bold" }}>
                         Filters
                       </Typography>
-                      <IconButton size="small" onClick={() => setShowFilters(false)} title="Hide filters">
-                        <Typography variant="caption">✕</Typography>
+                      <IconButton size="small" onClick={() => setShowFilters(false)}>
+                        ✕
                       </IconButton>
                     </Box>
                     <Select
@@ -483,14 +606,8 @@ export const TripMap = (props: TripMapProps) => {
                       value={selectedDays}
                       onChange={(e) => setSelectedDays(e.target.value as string[])}
                       displayEmpty
-                      sx={{ width: "100%", fontSize: "0.875rem", mb: 2 }}
-                      renderValue={(selected) => {
-                        if ((selected || []).length === 0) return "All days"
-                        const selectedNames = uniqueDays
-                          .filter((d) => (selected || []).includes(d.id))
-                          .map((d) => d.name)
-                        return selectedNames.join(", ")
-                      }}
+                      sx={{ width: "100%", mb: 1 }}
+                      renderValue={(s) => (s.length === 0 ? "All days" : `${s.length} days`)}
                     >
                       {uniqueDays.map((day) => (
                         <MenuItem key={day.id} value={day.id}>
@@ -499,46 +616,27 @@ export const TripMap = (props: TripMapProps) => {
                         </MenuItem>
                       ))}
                     </Select>
-
-                    {/* Marker Layers */}
-                    <Typography variant="caption" sx={{ fontWeight: "bold", display: "block", mb: 1 }}>
-                      Map Layers
-                    </Typography>
                     <Select
                       size="small"
                       multiple
                       value={selectedMarkerLayers}
                       onChange={(e) => setSelectedMarkerLayers(e.target.value as string[])}
                       displayEmpty
-                      renderValue={(selected) =>
-                        (selected || []).length === 0 ? "Select layers..." : `${(selected || []).length} layers`
-                      }
-                      sx={{ width: "100%", fontSize: "0.875rem" }}
+                      sx={{ width: "100%" }}
+                      renderValue={(s) => (s.length === 0 ? "Map Layers" : `${s.length} layers`)}
                     >
-                      {regionsToShow.map((region) => {
-                        const files = MARKER_MANIFEST[region as keyof typeof MARKER_MANIFEST]
-                        return files.map((file) => {
-                          const layerKey = `${region}/${file}`
-                          const displayName = `${region.replace(/([A-Z])/g, " $1").trim()} - ${file.replace(".json", "").replace(/_/g, " ")}`
-                          return (
-                            <MenuItem key={layerKey} value={layerKey}>
-                              {displayName}
-                            </MenuItem>
-                          )
-                        })
-                      })}
+                      {regionsToShow.map((region) =>
+                        MARKER_MANIFEST[region as keyof typeof MARKER_MANIFEST].map((file) => (
+                          <MenuItem key={`${region}/${file}`} value={`${region}/${file}`}>
+                            {region} - {file.replace(".json", "")}
+                          </MenuItem>
+                        )),
+                      )}
                     </Select>
-                    {relevantRegions.size > 0 && (
-                      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
-                        Showing {regionsToShow.length} relevant region(s)
-                      </Typography>
-                    )}
                   </>
                 )}
               </Box>
-
-              {/* Render selected marker layers */}
-              {(selectedMarkerLayers || []).map((layerKey: string) => {
+              {selectedMarkerLayers.map((layerKey) => {
                 const [region, file] = layerKey.split("/")
                 return (
                   <GeoJSONLayer key={layerKey} url={`/markers/${region}/${file}`} onContextMenu={onMarkerContextMenu} />
@@ -548,27 +646,25 @@ export const TripMap = (props: TripMapProps) => {
           )
         })()}
 
-        <MapInteraction center={center} zoom={zoom} onContextMenu={onMapContextMenu} />
-        <MapFlyHandler location={props.activeFlyToLocation} />
-
         {!isPlaying &&
-          filteredActivities?.map((activity) => {
-            if (activity.latitude && activity.longitude) {
-              return (
+          filteredActivities?.map(
+            (activity) =>
+              activity.latitude &&
+              activity.longitude && (
                 <Marker key={activity.id} position={[activity.latitude, activity.longitude]}>
                   <Popup>{activity.name}</Popup>
                 </Marker>
-              )
-            }
-            return null
-          })}
+              ),
+          )}
 
-        {/* Animated Marker */}
-        {isPlaying && markerPosition && (
-          <>
-            <Marker position={markerPosition} icon={TransportIcon} />
-            {pathPositions.length > 0 && <Polyline positions={pathPositions} color="blue" weight={4} opacity={0.6} />}
-          </>
+        {activeAnimation && (
+          <AdvancedAnimationLayer
+            steps={activeAnimation.steps}
+            isPlaying={isPlaying}
+            onProgressUpdate={setAnimationProgress}
+            onAnimationComplete={() => setIsPlaying(false)}
+            seekProgress={seekProgress}
+          />
         )}
       </MapContainer>
     </Paper>
