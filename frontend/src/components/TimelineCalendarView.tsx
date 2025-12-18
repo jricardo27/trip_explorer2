@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Menu, MenuItem } from "@mui/material"
+import { Box, Paper, Typography, Menu, MenuItem, useTheme, useMediaQuery } from "@mui/material"
 import dayjs from "dayjs"
 import { useMemo, useState } from "react"
 
@@ -13,22 +13,19 @@ interface TimelineCalendarViewProps {
   ) => void
 }
 
-const HOUR_HEIGHT = 60 // pixels per hour
-const MIN_ACTIVITY_HEIGHT = 20 // minimum height for very short activities
-const DAY_COLUMN_WIDTH = 200 // width of each day column
-const TIME_RULER_WIDTH = 60 // width of time ruler on the right
+// Responsive constants will be set inside component based on breakpoint
 
 // Helper to convert time to pixel position from day start
-const getPixelPosition = (time: string, dayStart: string): number => {
+const getPixelPosition = (time: string, dayStart: string, hourHeight: number): number => {
   const minutes = dayjs(time).diff(dayjs(dayStart).startOf("day"), "minute")
-  return (minutes / 60) * HOUR_HEIGHT
+  return (minutes / 60) * hourHeight
 }
 
 // Helper to calculate activity height based on duration
-const getActivityHeight = (start: string, end: string): number => {
+const getActivityHeight = (start: string, end: string, hourHeight: number, minHeight: number): number => {
   const durationMinutes = dayjs(end).diff(dayjs(start), "minute")
-  const height = (durationMinutes / 60) * HOUR_HEIGHT
-  return Math.max(height, MIN_ACTIVITY_HEIGHT)
+  const height = (durationMinutes / 60) * hourHeight
+  return Math.max(height, minHeight)
 }
 
 // Detect if two activities overlap
@@ -86,6 +83,16 @@ const calculateActivityLanes = (activities: Activity[]): Map<string, { lane: num
 }
 
 export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }: TimelineCalendarViewProps) => {
+  // Responsive breakpoints
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
+
+  // Responsive constants
+  const HOUR_HEIGHT = isMobile ? 50 : 60
+  const MIN_ACTIVITY_HEIGHT = isMobile ? 40 : 20
+  const DAY_COLUMN_WIDTH = isMobile ? 150 : 200
+  const TIME_RULER_WIDTH = isMobile ? 50 : 60
+
   const hours = useMemo(() => Array.from({ length: 24 }, (_, i) => i), [])
   const [dragPreview, setDragPreview] = useState<{
     dayId: string
@@ -209,13 +216,13 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
     <Box
       sx={{
         display: "flex",
-        height: "calc(100vh - 250px)",
-        maxHeight: "calc(100vh - 250px)",
+        height: isMobile ? "calc(100vh - 200px)" : "calc(100vh - 250px)",
+        maxHeight: isMobile ? "calc(100vh - 200px)" : "calc(100vh - 250px)",
         overflow: "auto",
         position: "relative",
         "&::-webkit-scrollbar": {
-          height: 14,
-          width: 14,
+          height: isMobile ? 10 : 14,
+          width: isMobile ? 10 : 14,
         },
         "&::-webkit-scrollbar-track": {
           bgcolor: "grey.200",
@@ -295,15 +302,20 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                   // Hide activity being dragged
                   if (activity.id === draggedActivityId) return null
 
-                  const top = getPixelPosition(activity.scheduledStart, day.date)
-                  const height = getActivityHeight(activity.scheduledStart, activity.scheduledEnd)
+                  const top = getPixelPosition(activity.scheduledStart, day.date, HOUR_HEIGHT)
+                  const height = getActivityHeight(
+                    activity.scheduledStart,
+                    activity.scheduledEnd,
+                    HOUR_HEIGHT,
+                    MIN_ACTIVITY_HEIGHT,
+                  )
                   const gapSize = 2
                   const width = 100 / laneInfo.totalLanes - (gapSize * (laneInfo.totalLanes - 1)) / laneInfo.totalLanes
                   const left =
                     (laneInfo.lane * 100) / laneInfo.totalLanes + (laneInfo.lane * gapSize) / laneInfo.totalLanes
 
                   // Ensure minimum height for very short activities
-                  const displayHeight = Math.max(height, 50)
+                  const displayHeight = Math.max(height, isMobile ? 44 : 50)
 
                   return (
                     <Paper
@@ -317,8 +329,8 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                         left: `${left}%`,
                         width: `${width}%`,
                         height: `${displayHeight}px`,
-                        minHeight: 50,
-                        p: 0.5,
+                        minHeight: isMobile ? 44 : 50,
+                        p: isMobile ? 0.4 : 0.5,
                         cursor: "pointer",
                         bgcolor: "primary.light",
                         color: "primary.contrastText",
@@ -326,7 +338,7 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                         "&:hover": {
                           bgcolor: "primary.main",
                           zIndex: 5,
-                          transform: "scale(1.02)",
+                          transform: isMobile ? "none" : "scale(1.02)",
                           boxShadow: 3,
                         },
                         transition: "all 0.2s",
@@ -335,11 +347,14 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                       <Typography
                         variant="caption"
                         fontWeight="bold"
-                        sx={{ display: "block", lineHeight: 1.2, mb: 0.25 }}
+                        sx={{ display: "block", lineHeight: 1.2, mb: 0.25, fontSize: isMobile ? "0.7rem" : "0.75rem" }}
                       >
                         {activity.name}
                       </Typography>
-                      <Typography variant="caption" sx={{ fontSize: "0.65rem", opacity: 0.9, display: "block" }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontSize: isMobile ? "0.6rem" : "0.65rem", opacity: 0.9, display: "block" }}
+                      >
                         {dayjs(activity.scheduledStart).format("HH:mm")} -{" "}
                         {dayjs(activity.scheduledEnd).format("HH:mm")}
                       </Typography>
