@@ -110,7 +110,6 @@ const TripDetailsPage = () => {
   const [editingActivity, setEditingActivity] = useState<Activity | undefined>(undefined)
   const [editingAnimation, setEditingAnimation] = useState<TripAnimation | undefined>(undefined)
   const [activeAnimationId, setActiveAnimationId] = useState<string | undefined>(undefined)
-  const [showAnimations, setShowAnimations] = useState(true)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -537,7 +536,7 @@ const TripDetailsPage = () => {
           {/* Map Panel */}
           <Box
             sx={{
-              flex: isMobile ? "1 1 auto" : "1 1 50%",
+              flex: isMobile ? "1 1 auto" : viewMode === "animation" ? "0 0 70%" : "0 0 50%",
               display: isMobile ? (viewMode === "animation" ? "flex" : "none") : "flex",
               flexDirection: "column",
               pr: isMobile ? 0 : 1,
@@ -554,204 +553,205 @@ const TripDetailsPage = () => {
                   onMapContextMenu={handleMapContextMenu}
                   onMarkerContextMenu={handleMarkerContextMenu}
                   activeFlyToLocation={flyToLocation}
+                  hideAnimationControl={true}
                 />
               )}
             </Box>
 
             {/* Trip Animations List - Only on Animation tab */}
             {viewMode === "animation" && trip && (
-              <Box sx={{ mt: 2 }}>
+              <Box sx={{ mt: 0, height: "100%", overflowY: "auto" }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                   <Typography variant="h6" sx={{ fontSize: "1rem" }}>
                     Animations
                   </Typography>
-                  <IconButton
-                    size="small"
-                    onClick={() => setShowAnimations(!showAnimations)}
-                    title={showAnimations ? "Hide animations" : "Show animations"}
-                  >
-                    {showAnimations ? <ExpandLess /> : <ExpandMore />}
-                  </IconButton>
                 </Box>
-                {showAnimations && (
-                  <TripAnimationList
-                    animations={trip.animations || []}
-                    onPlay={(animation) => {
-                      setActiveAnimationId(animation.id)
-                    }}
-                    onEdit={(animation) => {
-                      setEditingAnimation(animation)
-                      setAnimationDialogOpen(true)
-                    }}
-                    onDelete={(id) => deleteAnimation(id)}
-                    onCreate={() => {
-                      setEditingAnimation(undefined)
-                      setAnimationDialogOpen(true)
-                    }}
-                  />
-                )}
+                <TripAnimationList
+                  animations={trip.animations || []}
+                  onPlay={(animation) => {
+                    setActiveAnimationId(animation.id)
+                  }}
+                  onEdit={(animation) => {
+                    setEditingAnimation(animation)
+                    setAnimationDialogOpen(true)
+                  }}
+                  onDelete={(id) => deleteAnimation(id)}
+                  onCreate={() => {
+                    setEditingAnimation(undefined)
+                    setAnimationDialogOpen(true)
+                  }}
+                />
               </Box>
             )}
           </Box>
 
-          {/* Itinerary Column */}
+          {/* Right Column: Itinerary (List View) or Animation Controls (Animation View) */}
           <Box
             sx={{
-              flex: isMobile ? "1 1 auto" : "1 1 50%",
+              flex: isMobile ? "1 1 auto" : viewMode === "animation" ? "0 0 30%" : "0 0 50%",
               overflowY: "auto",
               pr: isMobile ? 0 : 1,
-              display: viewMode === "animation" && isMobile ? "none" : "block",
+              display: isMobile && viewMode !== "list" ? "none" : "block",
             }}
           >
-            {/* Collapse/Expand Controls */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 1,
-                mb: 2,
-                position: "sticky",
-                top: 0,
-                bgcolor: "background.default",
-                zIndex: 1,
-                pb: 1,
-              }}
-            >
-              <Button size="small" startIcon={<UnfoldLess />} onClick={collapseAllDays} variant="outlined">
-                Collapse All
-              </Button>
-              <Button size="small" startIcon={<UnfoldMore />} onClick={expandAllDays} variant="outlined">
-                Expand All
-              </Button>
-            </Box>
+            {viewMode === "list" && (
+              <>
+                {/* Collapse/Expand Controls */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: 1,
+                    mb: 2,
+                    position: "sticky",
+                    top: 0,
+                    bgcolor: "background.default",
+                    zIndex: 1,
+                    pb: 1,
+                  }}
+                >
+                  <Button size="small" startIcon={<UnfoldLess />} onClick={collapseAllDays} variant="outlined">
+                    Collapse All
+                  </Button>
+                  <Button size="small" startIcon={<UnfoldMore />} onClick={expandAllDays} variant="outlined">
+                    Expand All
+                  </Button>
+                </Box>
 
-            <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
-              <Grid container spacing={2}>
-                {trip.days?.map((day) => {
-                  const isCollapsed = collapsedDays.has(day.id)
+                <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
+                  <Grid container spacing={2}>
+                    {trip.days?.map((day) => {
+                      const isCollapsed = collapsedDays.has(day.id)
 
-                  return (
-                    <Grid key={day.id} size={{ xs: 12 }}>
-                      <Paper sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                          <Box display="flex" alignItems="center" gap={1} flex={1}>
-                            <Tooltip title={isCollapsed ? "Expand day" : "Collapse day"}>
-                              <IconButton size="small" onClick={() => toggleDayCollapse(day.id)} sx={{ p: 0.5 }}>
-                                {isCollapsed ? <ExpandMore /> : <ExpandLess />}
-                              </IconButton>
-                            </Tooltip>
-                            <Box>
-                              {editingDayId === day.id ? (
-                                <input
-                                  type="text"
-                                  value={editingDayName}
-                                  onChange={(e) => setEditingDayName(e.target.value)}
-                                  onBlur={handleDayNameSave}
-                                  onKeyDown={handleDayNameKeyDown}
-                                  autoFocus
-                                  style={{
-                                    fontSize: "1.25rem",
-                                    fontWeight: 500,
-                                    border: "1px solid #1976d2",
-                                    borderRadius: "4px",
-                                    padding: "2px 6px",
-                                    outline: "none",
-                                    width: "200px",
-                                  }}
-                                />
-                              ) : (
-                                <Typography
-                                  variant="h6"
-                                  onClick={() => handleDayNameClick(day)}
-                                  sx={{
-                                    cursor: "pointer",
-                                    "&:hover": {
-                                      textDecoration: "underline",
-                                      color: "primary.main",
-                                    },
-                                  }}
-                                >
-                                  {day.name}
-                                </Typography>
-                              )}
-                              <Typography variant="caption" color="text.secondary">
-                                {new Date(day.date).toLocaleDateString(dateFormat, {
-                                  weekday: "long",
-                                  month: "short",
-                                  day: "numeric",
-                                })}
-                              </Typography>
+                      return (
+                        <Grid key={day.id} size={{ xs: 12 }}>
+                          <Paper sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                              <Box display="flex" alignItems="center" gap={1} flex={1}>
+                                <Tooltip title={isCollapsed ? "Expand day" : "Collapse day"}>
+                                  <IconButton size="small" onClick={() => toggleDayCollapse(day.id)} sx={{ p: 0.5 }}>
+                                    {isCollapsed ? <ExpandMore /> : <ExpandLess />}
+                                  </IconButton>
+                                </Tooltip>
+                                <Box>
+                                  {editingDayId === day.id ? (
+                                    <input
+                                      type="text"
+                                      value={editingDayName}
+                                      onChange={(e) => setEditingDayName(e.target.value)}
+                                      onBlur={handleDayNameSave}
+                                      onKeyDown={handleDayNameKeyDown}
+                                      autoFocus
+                                      style={{
+                                        fontSize: "1.25rem",
+                                        fontWeight: 500,
+                                        border: "1px solid #1976d2",
+                                        borderRadius: "4px",
+                                        padding: "2px 6px",
+                                        outline: "none",
+                                        width: "200px",
+                                      }}
+                                    />
+                                  ) : (
+                                    <Typography
+                                      variant="h6"
+                                      onClick={() => handleDayNameClick(day)}
+                                      sx={{
+                                        cursor: "pointer",
+                                        "&:hover": {
+                                          textDecoration: "underline",
+                                          color: "primary.main",
+                                        },
+                                      }}
+                                    >
+                                      {day.name}
+                                    </Typography>
+                                  )}
+                                  <Typography variant="caption" color="text.secondary">
+                                    {new Date(day.date).toLocaleDateString(dateFormat, {
+                                      weekday: "long",
+                                      month: "short",
+                                      day: "numeric",
+                                    })}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                              <Tooltip title="Add activity to this day">
+                                <IconButton size="small" onClick={() => handleAddActivity(day.id)}>
+                                  <AddIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
                             </Box>
-                          </Box>
-                          <Tooltip title="Add activity to this day">
-                            <IconButton size="small" onClick={() => handleAddActivity(day.id)}>
-                              <AddIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
 
-                        {!isCollapsed && (
-                          <DroppableDay dayId={day.id}>
-                            <SortableContext
-                              items={day.activities?.map((a) => a.id) || []}
-                              strategy={verticalListSortingStrategy}
-                              id={day.id}
-                            >
-                              {day.activities?.length === 0 ? (
-                                <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
-                                  Drag items here or add new
-                                </Typography>
-                              ) : (
-                                day.activities?.map((activity: Activity, index: number) => {
-                                  let nextActivity = day.activities?.[index + 1]
+                            {!isCollapsed && (
+                              <DroppableDay dayId={day.id}>
+                                <SortableContext
+                                  items={day.activities?.map((a) => a.id) || []}
+                                  strategy={verticalListSortingStrategy}
+                                  id={day.id}
+                                >
+                                  {day.activities?.length === 0 ? (
+                                    <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
+                                      Drag items here or add new
+                                    </Typography>
+                                  ) : (
+                                    day.activities?.map((activity: Activity, index: number) => {
+                                      let nextActivity = day.activities?.[index + 1]
 
-                                  // Check for cross-day transport (next activity is first of next day)
-                                  if (!nextActivity) {
-                                    const currentDayIndex = trip.days?.findIndex((d) => d.id === day.id) ?? -1
-                                    if (currentDayIndex !== -1 && trip.days && currentDayIndex < trip.days.length - 1) {
-                                      const nextDay = trip.days[currentDayIndex + 1]
-                                      if (nextDay.activities && nextDay.activities.length > 0) {
-                                        nextActivity = nextDay.activities[0]
+                                      // Check for cross-day transport (next activity is first of next day)
+                                      if (!nextActivity) {
+                                        const currentDayIndex = trip.days?.findIndex((d) => d.id === day.id) ?? -1
+                                        if (
+                                          currentDayIndex !== -1 &&
+                                          trip.days &&
+                                          currentDayIndex < trip.days.length - 1
+                                        ) {
+                                          const nextDay = trip.days[currentDayIndex + 1]
+                                          if (nextDay.activities && nextDay.activities.length > 0) {
+                                            nextActivity = nextDay.activities[0]
+                                          }
+                                        }
                                       }
-                                    }
-                                  }
 
-                                  const transportOptions =
-                                    trip.transport?.filter(
-                                      (t) => t.fromActivityId === activity.id && t.toActivityId === nextActivity?.id,
-                                    ) || []
+                                      const transportOptions =
+                                        trip.transport?.filter(
+                                          (t) =>
+                                            t.fromActivityId === activity.id && t.toActivityId === nextActivity?.id,
+                                        ) || []
 
-                                  return (
-                                    <div key={activity.id}>
-                                      <SortableActivityCard
-                                        activity={activity}
-                                        onDelete={handleDeleteActivity}
-                                        onEdit={handleEditActivity}
-                                        onCopy={handleCopyActivity}
-                                        isDeleting={isDeleting}
-                                        onFlyTo={handleFlyTo}
-                                      />
-                                      {nextActivity && (
-                                        <TransportSegment
-                                          tripId={trip.id}
-                                          fromActivityId={activity.id}
-                                          toActivityId={nextActivity.id}
-                                          alternatives={transportOptions}
-                                        />
-                                      )}
-                                    </div>
-                                  )
-                                })
-                              )}
-                            </SortableContext>
-                          </DroppableDay>
-                        )}
-                      </Paper>
-                    </Grid>
-                  )
-                })}
-              </Grid>
-            </DndContext>
+                                      return (
+                                        <div key={activity.id}>
+                                          <SortableActivityCard
+                                            activity={activity}
+                                            onDelete={handleDeleteActivity}
+                                            onEdit={handleEditActivity}
+                                            onCopy={handleCopyActivity}
+                                            isDeleting={isDeleting}
+                                            onFlyTo={handleFlyTo}
+                                          />
+                                          {nextActivity && (
+                                            <TransportSegment
+                                              tripId={trip.id}
+                                              fromActivityId={activity.id}
+                                              toActivityId={nextActivity.id}
+                                              alternatives={transportOptions}
+                                            />
+                                          )}
+                                        </div>
+                                      )
+                                    })
+                                  )}
+                                </SortableContext>
+                              </DroppableDay>
+                            )}
+                          </Paper>
+                        </Grid>
+                      )
+                    })}
+                  </Grid>
+                </DndContext>
+              </>
+            )}
           </Box>
         </Box>
       )}

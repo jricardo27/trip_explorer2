@@ -26,6 +26,7 @@ interface TripMapProps {
 
   onMarkerContextMenu?: (feature: any) => void
   activeFlyToLocation?: { lat: number; lng: number } | null
+  hideAnimationControl?: boolean
 }
 
 const MapFlyHandler = ({ location }: { location?: { lat: number; lng: number } | null }) => {
@@ -224,6 +225,7 @@ export const TripMap = (props: TripMapProps) => {
     activeAnimationId: propActiveAnimationId,
     onMapContextMenu,
     onMarkerContextMenu,
+    hideAnimationControl = false,
   } = props
   const defaultCenter: [number, number] = [-25.2744, 133.7751]
   const [center, setCenter] = useState<[number, number]>(defaultCenter)
@@ -341,8 +343,8 @@ export const TripMap = (props: TripMapProps) => {
   }, [isPlaying, currentStepIndex, activeAnimation, activities])
 
   return (
-    <Paper elevation={3} sx={{ p: 1, height: 600, mb: 3, position: "relative" }}>
-      {animations && animations.length > 0 && !isPlaying && (
+    <Paper elevation={3} sx={{ p: 1, height: "100%", mb: 0, position: "relative" }}>
+      {animations && animations.length > 0 && !isPlaying && !hideAnimationControl && (
         <Box
           sx={{
             position: "absolute",
