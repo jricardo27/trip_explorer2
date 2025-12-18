@@ -107,6 +107,7 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
     dayId: string
     time: string
   } | null>(null)
+  const [expandedActivityId, setExpandedActivityId] = useState<string | null>(null)
 
   const handleActivityDragStart = (e: React.DragEvent, activity: Activity) => {
     e.dataTransfer.effectAllowed = "move"
@@ -306,9 +307,6 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                   const laneInfo = lanes.get(activity.id)
                   if (!laneInfo || !activity.scheduledStart || !activity.scheduledEnd) return null
 
-                  // Hide activity being dragged
-                  if (activity.id === draggedActivityId) return null
-
                   const top = getPixelPosition(activity.scheduledStart, day.date, HOUR_HEIGHT)
                   const height = getActivityHeight(
                     activity.scheduledStart,
@@ -321,8 +319,12 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                   const left =
                     (laneInfo.lane * 100) / laneInfo.totalLanes + (laneInfo.lane * gapSize) / laneInfo.totalLanes
 
-                  // Ensure minimum height for very short activities
-                  const displayHeight = Math.max(height, isMobile ? 44 : 50)
+                  // Check if this activity is being dragged or expanded
+                  const isDragging = activity.id === draggedActivityId
+                  const isExpanded = activity.id === expandedActivityId
+
+                  // Calculate display height (expanded cards get more space)
+                  const displayHeight = isExpanded ? Math.max(height, 80) : Math.max(height, isMobile ? 25 : 20)
 
                   return (
                     <Paper
@@ -330,26 +332,41 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                       draggable
                       onDragStart={(e) => handleActivityDragStart(e, activity)}
                       onDragEnd={handleActivityDragEnd}
-                      onClick={() => onActivityClick?.(activity)}
+                      tabIndex={0}
+                      onMouseOver={() => {
+                        if (displayHeight < 60) setExpandedActivityId(activity.id)
+                      }}
+                      onBlur={() => setExpandedActivityId(null)}
+                      onMouseOut={() => setExpandedActivityId(null)}
+                      onClick={() => {
+                        onActivityClick?.(activity)
+                      }}
                       sx={{
                         position: "absolute",
                         top: `${top}px`,
                         left: `${left}%`,
                         width: `${width}%`,
                         height: `${displayHeight}px`,
-                        minHeight: isMobile ? 44 : 50,
+                        minHeight: isMobile ? 44 : 20,
                         p: isMobile ? 0.4 : 0.5,
                         cursor: "pointer",
                         bgcolor: "primary.light",
                         color: "primary.contrastText",
                         overflow: "hidden",
+                        opacity: isDragging ? 0.3 : 1,
+                        zIndex: isExpanded ? 100 : 1,
+                        boxShadow: isExpanded ? 6 : 1,
                         "&:hover": {
                           bgcolor: "primary.main",
-                          zIndex: 5,
+                          zIndex: isExpanded ? 101 : 5,
                           transform: isMobile ? "none" : "scale(1.02)",
-                          boxShadow: 3,
+                          boxShadow: isExpanded ? 8 : 3,
                         },
-                        transition: "all 0.2s",
+                        transition: "all 0.2s ease-in-out",
+                        outline: "none",
+                        "&:focus": {
+                          boxShadow: (theme) => `0 0 0 2px ${theme.palette.primary.main}`,
+                        },
                       }}
                     >
                       <Typography
@@ -371,7 +388,7 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                           📍 {activity.city}
                         </Typography>
                       )}
-                      {activity.activityType && displayHeight > 60 && (
+                      {(isExpanded || displayHeight > 60) && activity.activityType && (
                         <Typography
                           variant="caption"
                           sx={{ fontSize: "0.6rem", opacity: 0.8, display: "block", mt: 0.25 }}
@@ -392,31 +409,32 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                       left: 0,
                       right: 0,
                       height: `${(dragPreview.duration / 60) * HOUR_HEIGHT}px`,
-                      bgcolor: "primary.main",
-                      opacity: 0.5,
-                      border: "3px dashed",
-                      borderColor: "primary.dark",
+                      bgcolor: "rgba(25, 118, 210, 0.4)",
+                      border: "2px solid #1976d2",
                       borderRadius: 1,
                       pointerEvents: "none",
                       display: "flex",
+                      flexDirection: "column",
                       alignItems: "center",
-                      justifyContent: "center",
+                      justifyContent: "flex-start",
                       zIndex: 1000,
+                      pt: 1,
                     }}
                   >
                     <Typography
-                      variant="body2"
+                      variant="caption"
                       fontWeight="bold"
                       sx={{
                         color: "white",
                         bgcolor: "primary.dark",
-                        px: 1.5,
-                        py: 0.5,
-                        borderRadius: 1,
-                        opacity: 1,
+                        px: 1,
+                        py: 0.25,
+                        borderRadius: 0.5,
+                        boxShadow: 2,
+                        mb: 0.5,
                       }}
                     >
-                      Drop at {dragPreview.time}
+                      {dragPreview.time}
                     </Typography>
                   </Box>
                 )}
