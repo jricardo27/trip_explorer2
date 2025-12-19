@@ -178,7 +178,7 @@ export class TransportService {
           description: transport.name || transport.transportMode,
           category: "Transport",
           paymentDate: new Date(), // Use creation date as default
-          paidById: "", // Needs to be handled? Transport splits usually implies someone paid or it's a future cost.
+          paidById: undefined,
         },
       })
       if (splits) {

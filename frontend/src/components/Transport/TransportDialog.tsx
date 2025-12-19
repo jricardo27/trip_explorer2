@@ -178,8 +178,8 @@ export const TransportDialog = ({
       setSplits(
         expense.splits.map((s) => ({
           memberId: s.memberId,
-          amount: s.amount,
-          percentage: s.percentage,
+          amount: Number(s.amount),
+          percentage: s.percentage ? Number(s.percentage) : undefined,
         })),
       )
       setSplitType((expense.splitType as SplitType) || "equal")

@@ -117,6 +117,45 @@ export const useTripDetails = (tripId: string) => {
     },
   })
 
+  // Day Operations
+  const moveActivitiesMutation = useMutation({
+    mutationFn: async ({ dayId, targetDayId }: { dayId: string; targetDayId: string }) => {
+      await client.post(`/trips/${tripId}/days/${dayId}/move-activities`, { targetDayId })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
+  const swapDaysMutation = useMutation({
+    mutationFn: async ({ dayId1, dayId2 }: { dayId1: string; dayId2: string }) => {
+      await client.post(`/trips/${tripId}/days/swap`, { dayId1, dayId2 })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
+  const moveDayMutation = useMutation({
+    mutationFn: async ({ dayId, newDate }: { dayId: string; newDate: Date }) => {
+      await client.put(`/trips/${tripId}/days/${dayId}/move`, { newDate })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
+  // Day Rename/Notes (General Update)
+  const updateDayMutation = useMutation({
+    mutationFn: async ({ dayId, updates }: { dayId: string; updates: { name?: string; notes?: string } }) => {
+      const response = await client.put(`/trips/${tripId}/days/${dayId}`, updates)
+      return response.data.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
   return {
     trip,
     isLoading,
@@ -139,5 +178,9 @@ export const useTripDetails = (tripId: string) => {
     updateAnimation: (id: string, updates: Partial<TripAnimation>) => updateAnimationMutation.mutate({ id, updates }),
     deleteAnimation: (id: string) => deleteAnimationMutation.mutate(id),
     isCreatingAnimation: createAnimationMutation.isPending,
+    moveActivities: moveActivitiesMutation.mutateAsync,
+    swapDays: swapDaysMutation.mutateAsync,
+    moveDay: moveDayMutation.mutateAsync,
+    updateDay: updateDayMutation.mutateAsync,
   }
 }

@@ -29,7 +29,7 @@ import {
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs, { Dayjs } from "dayjs"
-import { useState, useMemo, Fragment } from "react"
+import { useState, useMemo, Fragment, useCallback } from "react"
 
 import { useExpenses } from "../hooks/useExpenses"
 import { useTripMembers } from "../hooks/useTripMembers"
@@ -45,6 +45,16 @@ interface ExpensesPanelProps {
   currencies?: string[]
   trip?: Trip
   onEditActivity?: (activity: Activity) => void
+}
+
+// Basic mock exchange rates (In real app, fetch from API)
+// Base: USD
+const exchangeRates: Record<string, number> = {
+  AUD: 1.5,
+  USD: 1.0,
+  EUR: 0.92,
+  GBP: 0.79,
+  JPY: 150,
 }
 
 export const ExpensesPanel = ({
@@ -83,8 +93,25 @@ export const ExpensesPanel = ({
       })
   }, [trip, defaultCurrency, expenses])
 
+  const [displayCurrency, setDisplayCurrency] = useState(defaultCurrency)
+
+  const convert = useCallback((amt: number, from: string, to: string) => {
+    if (from === to) return amt
+    // Convert to USD first
+    const fromRate = exchangeRates[from] || 1 // Fallback 1:1 if unknown
+    const inUSD = amt / fromRate
+    // Convert to Target
+    const toRate = exchangeRates[to] || 1
+    return inUSD * toRate
+  }, [])
+
   const allExpenses = useMemo(() => [...expenses, ...transportExpenses], [expenses, transportExpenses])
-  const totalAmount = allExpenses.reduce((sum, e) => sum + Number(e.amount), 0)
+
+  const totalAmount = useMemo(() => {
+    return allExpenses.reduce((sum, e) => {
+      return sum + convert(Number(e.amount), e.currency || "AUD", displayCurrency)
+    }, 0)
+  }, [allExpenses, displayCurrency, convert])
 
   const [tabIndex, setTabIndex] = useState(0)
 
@@ -196,6 +223,41 @@ export const ExpensesPanel = ({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <Box
+        sx={{
+          p: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          bgcolor: "background.paper",
+        }}
+      >
+        <Typography variant="h6">Expenses</Typography>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <TextField
+            select
+            label="Currency"
+            value={displayCurrency}
+            onChange={(e) => setDisplayCurrency(e.target.value)}
+            size="small"
+            sx={{ width: 100 }}
+          >
+            {(currencies || ["AUD"]).map((c) => (
+              <MenuItem key={c} value={c}>
+                {c}
+              </MenuItem>
+            ))}
+          </TextField>
+          <Paper sx={{ p: 1, px: 2, bgcolor: "primary.light", color: "primary.contrastText" }}>
+            <Typography variant="caption" display="block">
+              Total
+            </Typography>
+            <Typography variant="h6" sx={{ lineHeight: 1 }}>
+              {displayCurrency} {totalAmount.toFixed(2)}
+            </Typography>
+          </Paper>
+        </Box>
+      </Box>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={tabIndex}
@@ -549,35 +611,40 @@ export const ExpensesPanel = ({
                         </TableCell>
                       </TableRow>
                       {/* Transport costs from this activity */}
-                      {transportExpenses
-                        .filter((t) => {
-                          // Match transports that start from this activity
-                          const matchingTransport = trip?.transport?.find(
-                            (tr) => tr.fromActivityId === activity.id && tr.isSelected,
+                      {/* Transport costs from this activity */}
+                      {(trip?.transport || [])
+                        .filter((t) => t.fromActivityId === activity.id && t.isSelected)
+                        .map((t) => {
+                          const expense = allExpenses.find((e) => e.transportAlternativeId === t.id)
+                          const amount = expense ? Number(expense.amount) : t.cost || 0
+                          const isPaid = expense ? expense.isPaid : false
+
+                          return (
+                            <TableRow key={`transport-${t.id}`} sx={{ bgcolor: "action.hover" }}>
+                              <TableCell sx={{ pl: 4 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                  ↳ {t.transportMode} {t.name ? `(${t.name})` : ""}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Chip label="Transport" size="small" variant="outlined" color="secondary" />
+                              </TableCell>
+                              <TableCell align="right">
+                                {t.currency || defaultCurrency} {Number(amount).toFixed(2)}
+                              </TableCell>
+                              <TableCell align="right">
+                                {t.currency || defaultCurrency} {Number(amount).toFixed(2)}
+                              </TableCell>
+                              <TableCell align="right">
+                                <Chip
+                                  label={isPaid ? "Paid" : "Pending"}
+                                  size="small"
+                                  color={isPaid ? "success" : "warning"}
+                                />
+                              </TableCell>
+                            </TableRow>
                           )
-                          return matchingTransport && t.description.includes(matchingTransport.transportMode)
-                        })
-                        .map((transport) => (
-                          <TableRow key={`transport-${transport.id}`} sx={{ bgcolor: "action.hover" }}>
-                            <TableCell sx={{ pl: 4 }}>
-                              <Typography variant="body2" color="text.secondary">
-                                ↳ {transport.description}
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Chip label="Transport" size="small" variant="outlined" color="secondary" />
-                            </TableCell>
-                            <TableCell align="right">
-                              {transport.currency} {Number(transport.amount || 0).toFixed(2)}
-                            </TableCell>
-                            <TableCell align="right">
-                              {transport.currency} {Number(transport.amount || 0).toFixed(2)}
-                            </TableCell>
-                            <TableCell align="right">
-                              <Chip label="Paid" size="small" color="success" />
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        })}
                     </Fragment>
                   ))}
                   {(trip?.activities || []).length === 0 && (

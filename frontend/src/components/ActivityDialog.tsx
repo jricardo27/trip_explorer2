@@ -1,4 +1,4 @@
-import { Map as MapIcon, Close as CloseIcon } from "@mui/icons-material"
+import { Map as MapIcon, Close as CloseIcon, Lock, LockOpen } from "@mui/icons-material"
 import {
   Dialog,
   DialogTitle,
@@ -81,6 +81,11 @@ const ActivityDialog = ({
   const [notes, setNotes] = useState("")
   const [availableDays, setAvailableDays] = useState<string[]>([])
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
+
+  // New Fields
+  const [priority, setPriority] = useState<string>("normal")
+  const [isLocked, setIsLocked] = useState(false)
+
   const [error, setError] = useState<string | null>(null)
   const [mapPickerOpen, setMapPickerOpen] = useState(false)
 
@@ -232,6 +237,8 @@ const ActivityDialog = ({
         notes,
         availableDays,
         participantIds: selectedMemberIds,
+        priority,
+        isLocked,
       })
     } catch (err: any) {
       console.error("Failed to save activity:", err)
@@ -271,7 +278,7 @@ const ActivityDialog = ({
                   required
                 />
               </Grid>
-              <Grid size={{ xs: 12 }}>
+              <Grid size={{ xs: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Type</InputLabel>
                   <Select
@@ -282,6 +289,52 @@ const ActivityDialog = ({
                     {Object.values(ActivityType).map((type) => (
                       <MenuItem key={type} value={type}>
                         {type}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Priority</InputLabel>
+                  <Select value={priority} label="Priority" onChange={(e) => setPriority(e.target.value)}>
+                    <MenuItem value="normal">Standard</MenuItem>
+                    <MenuItem value="optional">Optional</MenuItem>
+                    <MenuItem value="mandatory">Mandatory</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Participants</InputLabel>
+                  <Select
+                    multiple
+                    value={selectedMemberIds}
+                    label="Participants"
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setSelectedMemberIds(typeof val === "string" ? val.split(",") : val)
+                    }}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {selected.map((value) => {
+                          const member = members.find((m) => m.id === value)
+                          return (
+                            <Chip
+                              key={value}
+                              label={member?.name || "Unknown"}
+                              size="small"
+                              avatar={member?.avatarUrl ? <Avatar src={member.avatarUrl} /> : undefined}
+                            />
+                          )
+                        })}
+                      </Box>
+                    )}
+                  >
+                    {members.map((member) => (
+                      <MenuItem key={member.id} value={member.id}>
+                        <Checkbox checked={selectedMemberIds.indexOf(member.id) > -1} />
+                        <ListItemText primary={member.name} />
                       </MenuItem>
                     ))}
                   </Select>
@@ -332,9 +385,20 @@ const ActivityDialog = ({
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <Box display="flex" alignItems="center">
-                  <Checkbox checked={isPaid} onChange={(e) => setIsPaid(e.target.checked)} />
-                  <Typography variant="body2">Mark as Paid</Typography>
+                <Box display="flex" alignItems="center" gap={3}>
+                  <Box display="flex" alignItems="center">
+                    <Checkbox checked={isPaid} onChange={(e) => setIsPaid(e.target.checked)} />
+                    <Typography variant="body2">Mark as Paid</Typography>
+                  </Box>
+                  <Box display="flex" alignItems="center">
+                    <Checkbox
+                      checked={isLocked}
+                      onChange={(e) => setIsLocked(e.target.checked)}
+                      icon={<LockOpen fontSize="small" />}
+                      checkedIcon={<Lock fontSize="small" />}
+                    />
+                    <Typography variant="body2">{isLocked ? "Locked to Time" : "Unlocked"}</Typography>
+                  </Box>
                 </Box>
               </Grid>
               <Grid size={{ xs: 5 }}>

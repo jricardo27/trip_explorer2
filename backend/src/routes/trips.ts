@@ -448,4 +448,52 @@ router.post("/documents", documentController.createDocument)
 router.put("/documents/:id", documentController.updateDocument)
 router.delete("/documents/:id", documentController.deleteDocument)
 
+// Day Operations
+router.post("/:tripId/days/:dayId/move-activities", async (req: Request, res: Response) => {
+  try {
+    const { tripId, dayId } = req.params
+    const { targetDayId } = req.body
+    await tripService.moveActivities(tripId, dayId, targetDayId)
+    res.json({ success: true })
+  } catch (error: any) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Update Day (Rename/Notes)
+router.put("/:tripId/days/:dayId", async (req: Request, res: Response) => {
+  try {
+    const { tripId, dayId } = req.params
+    const { name, notes } = req.body
+    const userId = (req as any).user.id
+
+    const day = await tripService.updateDay(tripId, dayId, userId, { name, notes })
+    res.json({ data: day })
+  } catch (error: any) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+router.post("/:tripId/days/swap", async (req: Request, res: Response) => {
+  try {
+    const { tripId } = req.params
+    const { dayId1, dayId2 } = req.body
+    await tripService.swapDays(tripId, dayId1, dayId2)
+    res.json({ success: true })
+  } catch (error: any) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+router.put("/:tripId/days/:dayId/move", async (req: Request, res: Response) => {
+  try {
+    const { tripId, dayId } = req.params
+    const { newDate } = req.body
+    await tripService.moveDay(tripId, dayId, new Date(newDate))
+    res.json({ success: true })
+  } catch (error: any) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router

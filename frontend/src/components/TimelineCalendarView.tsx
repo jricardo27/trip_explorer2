@@ -6,8 +6,28 @@ import {
   Flight,
   DirectionsBoat,
   PedalBike,
+  MoreVert,
 } from "@mui/icons-material"
-import { Box, Paper, Typography, Menu, MenuItem, useTheme, useMediaQuery, Tooltip } from "@mui/material"
+import {
+  Box,
+  Paper,
+  Typography,
+  Menu,
+  MenuItem,
+  useTheme,
+  useMediaQuery,
+  Tooltip,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Button,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  TextField,
+} from "@mui/material"
 import dayjs from "dayjs"
 import { useMemo, useState } from "react"
 
@@ -23,6 +43,7 @@ interface TimelineCalendarViewProps {
     activityId: string,
     updates: { scheduledStart?: string; scheduledEnd?: string; tripDayId?: string },
   ) => void
+  onDayOperation?: (type: "move_all" | "swap" | "rename", dayId: string, payload: any) => Promise<void>
 }
 
 // Responsive constants will be set inside component based on breakpoint
@@ -120,10 +141,11 @@ const getTransportIcon = (mode: TransportMode) => {
 
 export const TimelineCalendarView = ({
   days,
-  transport = [],
+  transport,
   onActivityClick,
   onTransportClick,
   onActivityUpdate,
+  onDayOperation,
 }: TimelineCalendarViewProps) => {
   // Responsive breakpoints
   const theme = useTheme()
@@ -152,6 +174,10 @@ export const TimelineCalendarView = ({
   const [expandedActivityId, setExpandedActivityId] = useState<string | null>(null)
 
   const handleActivityDragStart = (e: React.DragEvent, activity: Activity) => {
+    if (activity.isLocked) {
+      e.preventDefault()
+      return
+    }
     e.dataTransfer.effectAllowed = "move"
     e.dataTransfer.setData("application/json", JSON.stringify(activity))
     sessionStorage.setItem("draggedActivity", JSON.stringify(activity))
@@ -262,359 +288,470 @@ export const TimelineCalendarView = ({
     handleCloseContextMenu()
   }
 
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        height: isMobile ? "calc(100vh - 200px)" : "calc(100vh - 250px)",
-        maxHeight: isMobile ? "calc(100vh - 200px)" : "calc(100vh - 250px)",
-        overflow: "auto",
-        position: "relative",
-        "&::-webkit-scrollbar": {
-          height: isMobile ? 10 : 14,
-          width: isMobile ? 10 : 14,
-        },
-        "&::-webkit-scrollbar-track": {
-          bgcolor: "grey.200",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          bgcolor: "grey.400",
-          borderRadius: 1,
-          "&:hover": {
-            bgcolor: "grey.500",
-          },
-        },
-      }}
-    >
-      {/* Day Columns */}
-      <Box sx={{ display: "flex", flexGrow: 1, position: "relative" }}>
-        {days.map((day) => {
-          const dayActivities = (day.activities || []).filter((a) => a.scheduledStart)
-          const lanes = calculateActivityLanes(dayActivities)
+  // Day Menu Logic
+  const [dayMenuAnchor, setDayMenuAnchor] = useState<{ el: HTMLElement; dayId: string } | null>(null)
+  const [dayOpDialog, setDayOpDialog] = useState<{ type: "move_all" | "swap" | "rename"; dayId: string } | null>(null)
+  const [targetDayId, setTargetDayId] = useState("")
+  const [newName, setNewName] = useState("")
 
-          return (
-            <Box
-              key={day.id}
-              onDrop={(e) => handleDayDrop(e, day)}
-              onDragOver={(e) => handleDragOver(e, day)}
-              onDragLeave={handleDragLeave}
-              onContextMenu={(e) => handleContextMenu(e, day)}
-              sx={{
-                width: DAY_COLUMN_WIDTH,
-                minWidth: DAY_COLUMN_WIDTH,
-                minHeight: HOUR_HEIGHT * 24 + 60, // 24 hours + header height
-                borderRight: "1px solid #e0e0e0",
-                position: "relative",
-                flexShrink: 0,
-              }}
-            >
-              {/* Day Header */}
-              <Paper
+  const handleDayMenuOpen = (e: React.MouseEvent<HTMLElement>, dayId: string) => {
+    e.stopPropagation() // Prevent drop logic interference? Header is sticky so maybe fine but good practice
+    setDayMenuAnchor({ el: e.currentTarget, dayId })
+  }
+
+  const handleDayMenuClose = () => setDayMenuAnchor(null)
+
+  const openDayDialog = (type: "move_all" | "swap" | "rename") => {
+    if (dayMenuAnchor) {
+      setDayOpDialog({ type, dayId: dayMenuAnchor.dayId })
+      setTargetDayId("")
+      setNewName("")
+      // Pre-fill name if renaming?
+      if (type === "rename") {
+        const day = days.find((d) => d.id === dayMenuAnchor.dayId)
+        if (day) setNewName(day.name || "")
+      }
+      handleDayMenuClose()
+    }
+  }
+
+  const handleDayOpSubmit = async () => {
+    if (!dayOpDialog || !onDayOperation) return
+
+    try {
+      if (dayOpDialog.type === "rename") {
+        await onDayOperation("rename", dayOpDialog.dayId, { name: newName })
+      } else {
+        if (!targetDayId) return
+        await onDayOperation(dayOpDialog.type, dayOpDialog.dayId, {
+          targetDayId,
+          dayId1: dayOpDialog.dayId,
+          dayId2: targetDayId,
+        })
+      }
+      setDayOpDialog(null)
+    } catch (error) {
+      console.error("Day Op Failed", error)
+    }
+  }
+
+  return (
+    <>
+      <Menu anchorEl={dayMenuAnchor?.el} open={Boolean(dayMenuAnchor)} onClose={handleDayMenuClose}>
+        <MenuItem onClick={() => openDayDialog("move_all")}>Move all activities...</MenuItem>
+        <MenuItem onClick={() => openDayDialog("swap")}>Swap with day...</MenuItem>
+        <MenuItem onClick={() => openDayDialog("rename")}>Rename Day</MenuItem>
+      </Menu>
+
+      <Dialog open={Boolean(dayOpDialog)} onClose={() => setDayOpDialog(null)}>
+        <DialogTitle>
+          {dayOpDialog?.type === "move_all" && "Move All Activities"}
+          {dayOpDialog?.type === "swap" && "Swap Days"}
+          {dayOpDialog?.type === "rename" && "Rename Day"}
+        </DialogTitle>
+        <DialogContent sx={{ minWidth: 300, pt: 2 }}>
+          {dayOpDialog?.type === "rename" ? (
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <TextField
+                autoFocus
+                label="Day Name"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                fullWidth
+              />
+            </FormControl>
+          ) : (
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <InputLabel>Target Day</InputLabel>
+              <Select value={targetDayId} label="Target Day" onChange={(e) => setTargetDayId(e.target.value)}>
+                {days
+                  .filter((d) => d.id !== dayOpDialog?.dayId)
+                  .map((d) => (
+                    <MenuItem key={d.id} value={d.id}>
+                      {d.name || `Day ${d.dayIndex !== undefined ? d.dayIndex + 1 : "?"}`} (
+                      {dayjs(d.date).format("MMM D")})
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDayOpDialog(null)}>Cancel</Button>
+          <Button onClick={handleDayOpSubmit} variant="contained">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Box
+        sx={{
+          display: "flex",
+          height: isMobile ? "calc(100vh - 200px)" : "calc(100vh - 250px)",
+          maxHeight: isMobile ? "calc(100vh - 200px)" : "calc(100vh - 250px)",
+          overflow: "auto",
+          position: "relative",
+          "&::-webkit-scrollbar": {
+            height: isMobile ? 10 : 14,
+            width: isMobile ? 10 : 14,
+          },
+          "&::-webkit-scrollbar-track": {
+            bgcolor: "grey.200",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            bgcolor: "grey.400",
+            borderRadius: 1,
+            "&:hover": {
+              bgcolor: "grey.500",
+            },
+          },
+        }}
+      >
+        {/* Day Columns */}
+        <Box sx={{ display: "flex", flexGrow: 1, position: "relative" }}>
+          {days.map((day) => {
+            const dayActivities = (day.activities || []).filter((a) => a.scheduledStart)
+            const lanes = calculateActivityLanes(dayActivities)
+
+            return (
+              <Box
+                key={day.id}
+                onDrop={(e) => handleDayDrop(e, day)}
+                onDragOver={(e) => handleDragOver(e, day)}
+                onDragLeave={handleDragLeave}
+                onContextMenu={(e) => handleContextMenu(e, day)}
                 sx={{
-                  p: 1,
-                  textAlign: "center",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 10,
-                  bgcolor: "background.paper",
-                  borderBottom: "2px solid #e0e0e0",
+                  width: DAY_COLUMN_WIDTH,
+                  minWidth: DAY_COLUMN_WIDTH,
+                  minHeight: HOUR_HEIGHT * 24 + 60, // 24 hours + header height
+                  borderRight: "1px solid #e0e0e0",
+                  position: "relative",
+                  flexShrink: 0,
                 }}
               >
-                <Typography variant="subtitle2" fontWeight="bold">
-                  {day.name || `Day ${day.dayNumber || (day.dayIndex !== undefined ? day.dayIndex + 1 : "?")}`}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {dayjs(day.date).format("MMM D")}
-                </Typography>
-              </Paper>
+                <Paper
+                  sx={{
+                    p: 1,
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 10,
+                    bgcolor: "background.paper",
+                    borderBottom: "2px solid #e0e0e0",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box sx={{ flexGrow: 1, textAlign: "center" }}>
+                    <Typography variant="subtitle2" fontWeight="bold">
+                      {day.name || `Day ${day.dayNumber || (day.dayIndex !== undefined ? day.dayIndex + 1 : "?")}`}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {dayjs(day.date).format("MMM D")}
+                    </Typography>
+                  </Box>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleDayMenuOpen(e, day.id)}
+                    sx={{ position: "absolute", right: 2, top: 4 }}
+                  >
+                    <MoreVert fontSize="small" />
+                  </IconButton>
+                </Paper>
 
-              {/* Hour Grid Lines */}
-              <Box sx={{ position: "relative", height: HOUR_HEIGHT * 24, minHeight: HOUR_HEIGHT * 24 }}>
-                {hours.map((hour) => (
-                  <Box
-                    key={hour}
-                    sx={{
-                      position: "absolute",
-                      top: hour * HOUR_HEIGHT,
-                      left: 0,
-                      right: 0,
-                      height: HOUR_HEIGHT,
-                      borderTop: "1px solid #f0f0f0",
-                    }}
-                  />
-                ))}
-
-                {/* Activities */}
-                {dayActivities.map((activity) => {
-                  const laneInfo = lanes.get(activity.id)
-                  if (!laneInfo || !activity.scheduledStart) return null
-
-                  const effectiveEnd =
-                    activity.scheduledEnd || dayjs(activity.scheduledStart).endOf("day").toISOString()
-                  const hasNoEndTime = !activity.scheduledEnd
-
-                  const top = getPixelPosition(activity.scheduledStart, day.date, HOUR_HEIGHT)
-                  const height = getActivityHeight(
-                    activity.scheduledStart,
-                    effectiveEnd,
-                    HOUR_HEIGHT,
-                    MIN_ACTIVITY_HEIGHT,
-                  )
-                  const gapSize = 2
-                  const width = 100 / laneInfo.totalLanes - (gapSize * (laneInfo.totalLanes - 1)) / laneInfo.totalLanes
-                  const left =
-                    (laneInfo.lane * 100) / laneInfo.totalLanes + (laneInfo.lane * gapSize) / laneInfo.totalLanes
-
-                  // Check if this activity is being dragged or expanded
-                  const isDragging = activity.id === draggedActivityId
-                  const isExpanded = activity.id === expandedActivityId
-
-                  // Calculate display height (expanded cards get more space)
-                  const displayHeight = isExpanded ? Math.max(height, 80) : Math.max(height, isMobile ? 25 : 20)
-
-                  return (
-                    <Paper
-                      key={activity.id}
-                      draggable
-                      onDragStart={(e) => handleActivityDragStart(e, activity)}
-                      onDragEnd={handleActivityDragEnd}
-                      tabIndex={0}
-                      onMouseOver={() => {
-                        if (displayHeight < 60) setExpandedActivityId(activity.id)
-                      }}
-                      onBlur={() => setExpandedActivityId(null)}
-                      onMouseOut={() => setExpandedActivityId(null)}
-                      onClick={() => {
-                        onActivityClick?.(activity)
-                      }}
+                {/* Hour Grid Lines */}
+                <Box sx={{ position: "relative", height: HOUR_HEIGHT * 24, minHeight: HOUR_HEIGHT * 24 }}>
+                  {hours.map((hour) => (
+                    <Box
+                      key={hour}
                       sx={{
                         position: "absolute",
-                        top: `${top}px`,
-                        left: `${left}%`,
-                        width: `${width}%`,
-                        height: `${displayHeight}px`,
-                        minHeight: isMobile ? 44 : 20,
-                        p: isMobile ? 0.4 : 0.5,
-                        cursor: "pointer",
-                        bgcolor: "primary.light",
-                        background: hasNoEndTime
-                          ? `repeating-linear-gradient(
+                        top: hour * HOUR_HEIGHT,
+                        left: 0,
+                        right: 0,
+                        height: HOUR_HEIGHT,
+                        borderTop: "1px solid #f0f0f0",
+                      }}
+                    />
+                  ))}
+
+                  {/* Activities */}
+                  {dayActivities.map((activity) => {
+                    const laneInfo = lanes.get(activity.id)
+                    if (!laneInfo || !activity.scheduledStart) return null
+
+                    const effectiveEnd =
+                      activity.scheduledEnd || dayjs(activity.scheduledStart).endOf("day").toISOString()
+                    const hasNoEndTime = !activity.scheduledEnd
+
+                    const top = getPixelPosition(activity.scheduledStart, day.date, HOUR_HEIGHT)
+                    const height = getActivityHeight(
+                      activity.scheduledStart,
+                      effectiveEnd,
+                      HOUR_HEIGHT,
+                      MIN_ACTIVITY_HEIGHT,
+                    )
+                    const gapSize = 2
+                    const width =
+                      100 / laneInfo.totalLanes - (gapSize * (laneInfo.totalLanes - 1)) / laneInfo.totalLanes
+                    const left =
+                      (laneInfo.lane * 100) / laneInfo.totalLanes + (laneInfo.lane * gapSize) / laneInfo.totalLanes
+
+                    // Check if this activity is being dragged or expanded
+                    const isDragging = activity.id === draggedActivityId
+                    const isExpanded = activity.id === expandedActivityId
+
+                    // Calculate display height (expanded cards get more space)
+                    const displayHeight = isExpanded ? Math.max(height, 80) : Math.max(height, isMobile ? 25 : 20)
+
+                    return (
+                      <Paper
+                        key={activity.id}
+                        draggable
+                        onDragStart={(e) => handleActivityDragStart(e, activity)}
+                        onDragEnd={handleActivityDragEnd}
+                        tabIndex={0}
+                        onMouseOver={() => {
+                          if (displayHeight < 60) setExpandedActivityId(activity.id)
+                        }}
+                        onBlur={() => setExpandedActivityId(null)}
+                        onMouseOut={() => setExpandedActivityId(null)}
+                        onClick={() => {
+                          onActivityClick?.(activity)
+                        }}
+                        sx={{
+                          position: "absolute",
+                          top: `${top}px`,
+                          left: `${left}%`,
+                          width: `${width}%`,
+                          height: `${displayHeight}px`,
+                          minHeight: isMobile ? 44 : 20,
+                          p: isMobile ? 0.4 : 0.5,
+                          cursor: "pointer",
+                          bgcolor: "primary.light",
+                          background: hasNoEndTime
+                            ? `repeating-linear-gradient(
                               45deg,
                               ${theme.palette.primary.light},
                               ${theme.palette.primary.light} 10px,
                               ${theme.palette.primary.main} 10px,
                               ${theme.palette.primary.main} 20px
                             )`
-                          : "primary.light",
-                        color: "primary.contrastText",
-                        overflow: "hidden",
-                        opacity: isDragging ? 0.3 : 1,
-                        zIndex: isExpanded ? 100 : 1,
-                        boxShadow: isExpanded ? 6 : 1,
-                        "&:hover": {
-                          bgcolor: "primary.main",
-                          background: hasNoEndTime
-                            ? `repeating-linear-gradient(
+                            : "primary.light",
+                          color: "primary.contrastText",
+                          overflow: "hidden",
+                          opacity: isDragging ? 0.3 : 1,
+                          zIndex: isExpanded ? 100 : 1,
+                          boxShadow: isExpanded ? 6 : 1,
+                          "&:hover": {
+                            bgcolor: "primary.main",
+                            background: hasNoEndTime
+                              ? `repeating-linear-gradient(
                                 45deg,
                                 ${theme.palette.primary.main},
                                 ${theme.palette.primary.main} 10px,
                                 ${theme.palette.primary.dark} 10px,
                                 ${theme.palette.primary.dark} 20px
                               )`
-                            : "primary.main",
-                          zIndex: isExpanded ? 101 : 5,
-                          transform: isMobile ? "none" : "scale(1.02)",
-                          boxShadow: isExpanded ? 8 : 3,
-                        },
-                        transition: "all 0.2s ease-in-out",
-                        outline: "none",
-                        "&:focus": {
-                          boxShadow: (theme) => `0 0 0 2px ${theme.palette.primary.main}`,
-                        },
+                              : "primary.main",
+                            zIndex: isExpanded ? 101 : 5,
+                            transform: isMobile ? "none" : "scale(1.02)",
+                            boxShadow: isExpanded ? 8 : 3,
+                          },
+                          transition: "all 0.2s ease-in-out",
+                          outline: "none",
+                          "&:focus": {
+                            boxShadow: (theme) => `0 0 0 2px ${theme.palette.primary.main}`,
+                          },
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          fontWeight="bold"
+                          sx={{
+                            display: "block",
+                            lineHeight: 1.2,
+                            mb: 0.25,
+                            fontSize: isMobile ? "0.7rem" : "0.75rem",
+                          }}
+                        >
+                          {activity.name}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{ fontSize: isMobile ? "0.6rem" : "0.65rem", opacity: 0.9, display: "block" }}
+                        >
+                          {dayjs(activity.scheduledStart).format("HH:mm")} -{" "}
+                          {hasNoEndTime ? "24:00" : dayjs(activity.scheduledEnd).format("HH:mm")}
+                        </Typography>
+                        {activity.city && (
+                          <Typography variant="caption" sx={{ fontSize: "0.6rem", opacity: 0.85, display: "block" }}>
+                            📍 {activity.city}
+                          </Typography>
+                        )}
+                        {(isExpanded || displayHeight > 60) && activity.activityType && (
+                          <Typography
+                            variant="caption"
+                            sx={{ fontSize: "0.6rem", opacity: 0.8, display: "block", mt: 0.25 }}
+                          >
+                            {activity.activityType}
+                          </Typography>
+                        )}
+                      </Paper>
+                    )
+                  })}
+
+                  {/* Transport Segments */}
+                  {(transport || []).map((trans) => {
+                    if (!trans.isSelected) return null
+                    const fromActivity = dayActivities.find((a) => a.id === trans.fromActivityId)
+                    if (!fromActivity || !fromActivity.scheduledStart) return null
+
+                    // Calculate start time based on activity end
+                    const startBasis =
+                      fromActivity.scheduledEnd || dayjs(fromActivity.scheduledStart).add(1, "hour").toISOString()
+                    const startTime = dayjs(startBasis)
+
+                    // Verify if transport starts on this day (should, if fromActivity is here)
+                    // Note: dayActivities are filtered to this day.
+
+                    const top = getPixelPosition(startTime.toISOString(), day.date, HOUR_HEIGHT)
+                    const height = (trans.durationMinutes / 60) * HOUR_HEIGHT
+
+                    // Position in specific column? For simplicity, we can use a fixed narrow width or overlay
+                    // Let's put it on the right side of the activity column
+                    const width = 15 // %
+                    const left = 85 // %
+
+                    return (
+                      <Tooltip key={trans.id} title={`${trans.transportMode}: ${trans.durationMinutes} min`}>
+                        <Paper
+                          onClick={() => onTransportClick?.(trans)}
+                          sx={{
+                            position: "absolute",
+                            top: `${top}px`,
+                            left: `${left}%`,
+                            width: `${width}%`,
+                            height: `${Math.max(height, 20)}px`,
+                            bgcolor: "secondary.light",
+                            color: "secondary.contrastText",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            zIndex: 50,
+                            cursor: onTransportClick ? "pointer" : "help",
+                            border: "1px dashed",
+                            borderColor: "secondary.main",
+                            overflow: "hidden",
+                            "&:hover": onTransportClick
+                              ? {
+                                  bgcolor: "secondary.main",
+                                  transform: "scale(1.05)",
+                                }
+                              : {},
+                          }}
+                        >
+                          {getTransportIcon(trans.transportMode)}
+                        </Paper>
+                      </Tooltip>
+                    )
+                  })}
+
+                  {/* Drag Preview */}
+                  {dragPreview && dragPreview.dayId === day.id && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: `${dragPreview.yPosition}px`,
+                        left: 0,
+                        right: 0,
+                        height: `${(dragPreview.duration / 60) * HOUR_HEIGHT}px`,
+                        bgcolor: "rgba(25, 118, 210, 0.4)",
+                        border: "2px solid #1976d2",
+                        borderRadius: 1,
+                        pointerEvents: "none",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        zIndex: 1000,
+                        pt: 1,
                       }}
                     >
                       <Typography
                         variant="caption"
                         fontWeight="bold"
-                        sx={{ display: "block", lineHeight: 1.2, mb: 0.25, fontSize: isMobile ? "0.7rem" : "0.75rem" }}
-                      >
-                        {activity.name}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ fontSize: isMobile ? "0.6rem" : "0.65rem", opacity: 0.9, display: "block" }}
-                      >
-                        {dayjs(activity.scheduledStart).format("HH:mm")} -{" "}
-                        {hasNoEndTime ? "24:00" : dayjs(activity.scheduledEnd).format("HH:mm")}
-                      </Typography>
-                      {activity.city && (
-                        <Typography variant="caption" sx={{ fontSize: "0.6rem", opacity: 0.85, display: "block" }}>
-                          📍 {activity.city}
-                        </Typography>
-                      )}
-                      {(isExpanded || displayHeight > 60) && activity.activityType && (
-                        <Typography
-                          variant="caption"
-                          sx={{ fontSize: "0.6rem", opacity: 0.8, display: "block", mt: 0.25 }}
-                        >
-                          {activity.activityType}
-                        </Typography>
-                      )}
-                    </Paper>
-                  )
-                })}
-
-                {/* Transport Segments */}
-                {(transport || []).map((trans) => {
-                  if (!trans.isSelected) return null
-                  const fromActivity = dayActivities.find((a) => a.id === trans.fromActivityId)
-                  if (!fromActivity || !fromActivity.scheduledStart) return null
-
-                  // Calculate start time based on activity end
-                  const startBasis =
-                    fromActivity.scheduledEnd || dayjs(fromActivity.scheduledStart).add(1, "hour").toISOString()
-                  const startTime = dayjs(startBasis)
-
-                  // Verify if transport starts on this day (should, if fromActivity is here)
-                  // Note: dayActivities are filtered to this day.
-
-                  const top = getPixelPosition(startTime.toISOString(), day.date, HOUR_HEIGHT)
-                  const height = (trans.durationMinutes / 60) * HOUR_HEIGHT
-
-                  // Position in specific column? For simplicity, we can use a fixed narrow width or overlay
-                  // Let's put it on the right side of the activity column
-                  const width = 15 // %
-                  const left = 85 // %
-
-                  return (
-                    <Tooltip key={trans.id} title={`${trans.transportMode}: ${trans.durationMinutes} min`}>
-                      <Paper
-                        onClick={() => onTransportClick?.(trans)}
                         sx={{
-                          position: "absolute",
-                          top: `${top}px`,
-                          left: `${left}%`,
-                          width: `${width}%`,
-                          height: `${Math.max(height, 20)}px`,
-                          bgcolor: "secondary.light",
-                          color: "secondary.contrastText",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          zIndex: 50,
-                          cursor: onTransportClick ? "pointer" : "help",
-                          border: "1px dashed",
-                          borderColor: "secondary.main",
-                          overflow: "hidden",
-                          "&:hover": onTransportClick
-                            ? {
-                                bgcolor: "secondary.main",
-                                transform: "scale(1.05)",
-                              }
-                            : {},
+                          color: "white",
+                          bgcolor: "primary.dark",
+                          px: 1,
+                          py: 0.25,
+                          borderRadius: 0.5,
+                          boxShadow: 2,
+                          mb: 0.5,
                         }}
                       >
-                        {getTransportIcon(trans.transportMode)}
-                      </Paper>
-                    </Tooltip>
-                  )
-                })}
-
-                {/* Drag Preview */}
-                {dragPreview && dragPreview.dayId === day.id && (
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: `${dragPreview.yPosition}px`,
-                      left: 0,
-                      right: 0,
-                      height: `${(dragPreview.duration / 60) * HOUR_HEIGHT}px`,
-                      bgcolor: "rgba(25, 118, 210, 0.4)",
-                      border: "2px solid #1976d2",
-                      borderRadius: 1,
-                      pointerEvents: "none",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "flex-start",
-                      zIndex: 1000,
-                      pt: 1,
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      fontWeight="bold"
-                      sx={{
-                        color: "white",
-                        bgcolor: "primary.dark",
-                        px: 1,
-                        py: 0.25,
-                        borderRadius: 0.5,
-                        boxShadow: 2,
-                        mb: 0.5,
-                      }}
-                    >
-                      {dragPreview.time}
-                    </Typography>
-                  </Box>
-                )}
+                        {dragPreview.time}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
               </Box>
-            </Box>
-          )
-        })}
-      </Box>
-
-      {/* Time Ruler (Fixed on Right) */}
-      <Box
-        sx={{
-          width: TIME_RULER_WIDTH,
-          minWidth: TIME_RULER_WIDTH,
-          borderLeft: "2px solid #e0e0e0",
-          position: "sticky",
-          right: 0,
-          bgcolor: "background.paper",
-          flexShrink: 0,
-        }}
-      >
-        {/* Header Spacer */}
-        <Box sx={{ height: 60, borderBottom: "2px solid #e0e0e0" }} />
-
-        {/* Hour Labels */}
-        <Box sx={{ position: "relative", height: HOUR_HEIGHT * 24 }}>
-          {hours.map((hour) => (
-            <Box
-              key={hour}
-              sx={{
-                position: "absolute",
-                top: hour * HOUR_HEIGHT,
-                left: 0,
-                right: 0,
-                height: HOUR_HEIGHT,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderTop: "1px solid #f0f0f0",
-              }}
-            >
-              <Typography variant="caption" color="text.secondary" fontWeight="medium">
-                {hour.toString().padStart(2, "0")}:00
-              </Typography>
-            </Box>
-          ))}
+            )
+          })}
         </Box>
-      </Box>
 
-      {/* Context Menu */}
-      <Menu
-        open={contextMenu !== null}
-        onClose={handleCloseContextMenu}
-        anchorReference="anchorPosition"
-        anchorPosition={contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}
-      >
-        <MenuItem onClick={handleAddActivityFromContext}>
-          Add Activity at {contextMenu && dayjs(contextMenu.time).format("HH:mm")}
-        </MenuItem>
-      </Menu>
-    </Box>
+        {/* Time Ruler (Fixed on Right) */}
+        <Box
+          sx={{
+            width: TIME_RULER_WIDTH,
+            minWidth: TIME_RULER_WIDTH,
+            borderLeft: "2px solid #e0e0e0",
+            position: "sticky",
+            right: 0,
+            bgcolor: "background.paper",
+            flexShrink: 0,
+          }}
+        >
+          {/* Header Spacer */}
+          <Box sx={{ height: 60, borderBottom: "2px solid #e0e0e0" }} />
+
+          {/* Hour Labels */}
+          <Box sx={{ position: "relative", height: HOUR_HEIGHT * 24 }}>
+            {hours.map((hour) => (
+              <Box
+                key={hour}
+                sx={{
+                  position: "absolute",
+                  top: hour * HOUR_HEIGHT,
+                  left: 0,
+                  right: 0,
+                  height: HOUR_HEIGHT,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderTop: "1px solid #f0f0f0",
+                }}
+              >
+                <Typography variant="caption" color="text.secondary" fontWeight="medium">
+                  {hour.toString().padStart(2, "0")}:00
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
+        {/* Context Menu */}
+        <Menu
+          open={contextMenu !== null}
+          onClose={handleCloseContextMenu}
+          anchorReference="anchorPosition"
+          anchorPosition={contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}
+        >
+          <MenuItem onClick={handleAddActivityFromContext}>
+            Add Activity at {contextMenu && dayjs(contextMenu.time).format("HH:mm")}
+          </MenuItem>
+        </Menu>
+      </Box>
+    </>
   )
 }

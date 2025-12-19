@@ -127,7 +127,8 @@ model Activity {
   isAllDay        Boolean        @default(false) @map("is_all_day")
   isFlexible      Boolean        @default(false) @map("is_flexible")
   status          ActivityStatus @default(PLANNED)
-  priority        String?        @default("normal")
+  priority        String?        @default("normal") // 'normal', 'optional', 'mandatory'
+  isLocked        Boolean        @default(false) @map("is_locked")
   orderIndex      Int            @default(0) @map("order_index")
 
   bookingReference   String?   @map("booking_reference")

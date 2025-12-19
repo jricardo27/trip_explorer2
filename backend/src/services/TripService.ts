@@ -1,4 +1,5 @@
 import { Trip, Prisma } from "@prisma/client"
+import dayjs from "dayjs"
 
 import prisma from "../utils/prisma"
 
@@ -740,6 +741,82 @@ export class TripService {
     }
 
     return trip
+  }
+
+  async moveActivities(tripId: string, fromDayId: string, toDayId: string): Promise<void> {
+    const fromDay = await prisma.tripDay.findUnique({ where: { id: fromDayId, tripId } })
+    const toDay = await prisma.tripDay.findUnique({ where: { id: toDayId, tripId } })
+    if (!fromDay || !toDay) throw new Error("Days not found or do not belong to trip")
+
+    const activities = await prisma.activity.findMany({ where: { tripDayId: fromDayId } })
+    const dayDiff = dayjs(toDay.date).diff(dayjs(fromDay.date), "day")
+
+    await prisma.$transaction(
+      activities.map((activity) => {
+        let newStart = activity.scheduledStart
+        let newEnd = activity.scheduledEnd
+
+        if (newStart) newStart = dayjs(newStart).add(dayDiff, "day").toDate()
+        if (newEnd) newEnd = dayjs(newEnd).add(dayDiff, "day").toDate()
+
+        return prisma.activity.update({
+          where: { id: activity.id },
+          data: {
+            tripDayId: toDayId,
+            scheduledStart: newStart,
+            scheduledEnd: newEnd,
+          },
+        })
+      }),
+    )
+  }
+
+  async swapDays(tripId: string, dayId1: string, dayId2: string): Promise<void> {
+    const day1 = await prisma.tripDay.findUnique({ where: { id: dayId1, tripId }, include: { activities: true } })
+    const day2 = await prisma.tripDay.findUnique({ where: { id: dayId2, tripId }, include: { activities: true } })
+    if (!day1 || !day2) throw new Error("Days not found")
+
+    const diff1To2 = dayjs(day2.date).diff(dayjs(day1.date), "day")
+    const diff2To1 = dayjs(day1.date).diff(dayjs(day2.date), "day")
+
+    await prisma.$transaction([
+      ...day1.activities.map((a) => {
+        const newStart = a.scheduledStart ? dayjs(a.scheduledStart).add(diff1To2, "day").toDate() : null
+        const newEnd = a.scheduledEnd ? dayjs(a.scheduledEnd).add(diff1To2, "day").toDate() : null
+        return prisma.activity.update({
+          where: { id: a.id },
+          data: { tripDayId: day2.id, scheduledStart: newStart, scheduledEnd: newEnd },
+        })
+      }),
+
+      ...day2.activities.map((a) => {
+        const newStart = a.scheduledStart ? dayjs(a.scheduledStart).add(diff2To1, "day").toDate() : null
+        const newEnd = a.scheduledEnd ? dayjs(a.scheduledEnd).add(diff2To1, "day").toDate() : null
+        return prisma.activity.update({
+          where: { id: a.id },
+          data: { tripDayId: day1.id, scheduledStart: newStart, scheduledEnd: newEnd },
+        })
+      }),
+    ])
+  }
+
+  async moveDay(tripId: string, dayId: string, newDate: Date): Promise<void> {
+    const day = await prisma.tripDay.findUnique({ where: { id: dayId, tripId }, include: { activities: true } })
+    if (!day) throw new Error("Day not found")
+
+    const dateDiff = dayjs(newDate).diff(dayjs(day.date), "day")
+
+    await prisma.$transaction([
+      prisma.tripDay.update({ where: { id: dayId }, data: { date: newDate } }),
+      ...day.activities.map((a) => {
+        const newStart = a.scheduledStart ? dayjs(a.scheduledStart).add(dateDiff, "day").toDate() : null
+        const newEnd = a.scheduledEnd ? dayjs(a.scheduledEnd).add(dateDiff, "day").toDate() : null
+        return prisma.activity.update({
+          where: { id: a.id },
+          data: { scheduledStart: newStart, scheduledEnd: newEnd },
+        })
+      }),
+    ])
   }
 }
 

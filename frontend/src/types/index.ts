@@ -166,6 +166,7 @@ export interface Activity {
   isFlexible: boolean
   status: ActivityStatus
   priority?: string
+  isLocked?: boolean
   orderIndex?: number
   participants?: ActivityParticipant[]
   bookingReference?: string

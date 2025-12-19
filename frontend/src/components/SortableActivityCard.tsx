@@ -7,6 +7,7 @@ import {
   NearMe,
   ContentCopy,
   Warning,
+  Lock,
 } from "@mui/icons-material"
 import { Paper, Box, Typography, IconButton, Tooltip, Avatar, AvatarGroup } from "@mui/material"
 import dayjs from "dayjs"
@@ -31,7 +32,10 @@ export const SortableActivityCard = ({
   isDeleting,
   onFlyTo,
 }: SortableActivityCardProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: activity.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: activity.id,
+    disabled: activity.isLocked,
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -59,24 +63,28 @@ export const SortableActivityCard = ({
         display: "flex",
         alignItems: "center",
         cursor: "default",
+        borderStyle: activity.priority === "optional" ? "dashed" : "solid",
+        borderWidth: activity.priority === "mandatory" ? 2 : 1,
+        borderColor: activity.priority === "mandatory" ? "primary.main" : "transparent",
+        backgroundColor: activity.isLocked ? "action.hover" : "white",
         "&:hover .drag-handle": { opacity: 1 },
       }}
     >
       <Box
         {...attributes}
-        {...listeners}
+        {...(activity.isLocked ? {} : listeners)}
         className="drag-handle"
         sx={{
-          cursor: "grab",
+          cursor: activity.isLocked ? "default" : "grab",
           mr: 1,
           color: "text.disabled",
-          opacity: 0,
+          opacity: activity.isLocked ? 1 : 0,
           transition: "opacity 0.2s",
           display: "flex",
           alignItems: "center",
         }}
       >
-        <DragIndicator fontSize="small" />
+        {activity.isLocked ? <Lock fontSize="small" /> : <DragIndicator fontSize="small" />}
       </Box>
 
       <Box flexGrow={1}>

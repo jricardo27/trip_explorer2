@@ -23,6 +23,8 @@ import {
   Print as PrintIcon,
   Book as JournalIcon,
   Movie as AnimationIcon,
+  Edit as EditIcon,
+  Download as DownloadIcon,
 } from "@mui/icons-material"
 import {
   Box,
@@ -40,6 +42,11 @@ import {
   Chip,
   Collapse,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from "@mui/material"
 import { useQueryClient } from "@tanstack/react-query"
 import dayjs from "dayjs"
@@ -87,8 +94,19 @@ const TripDetailsPage = () => {
   const { tripId } = useParams<{ tripId: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { trip, isLoading, error, createActivity, updateActivity, deleteActivity, updateTrip, reorderActivities } =
-    useTripDetails(tripId!)
+  const {
+    trip,
+    isLoading,
+    error,
+    createActivity,
+    updateActivity,
+    deleteActivity,
+    updateTrip,
+    reorderActivities,
+    moveActivities,
+    swapDays,
+    updateDay,
+  } = useTripDetails(tripId!)
 
   // UI State
   const [viewMode, setViewMode] = useState<"list" | "animation" | "timeline" | "prep" | "expenses" | "journal">("list")
@@ -108,6 +126,7 @@ const TripDetailsPage = () => {
     fromActivityId: string
     toActivityId: string
   } | null>(null)
+  const [renameDayDialog, setRenameDayDialog] = useState<{ dayId: string; name: string } | null>(null)
 
   // Sensors for DND
   const sensors = useSensors(
@@ -244,6 +263,64 @@ const TripDetailsPage = () => {
     }
   }
 
+  // KML Export
+  const handleExportKML = () => {
+    if (!trip?.activities || trip.activities.length === 0) return
+
+    const kmlHeader = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>${(trip.name || "Trip").replace(/&/g, "&amp;")}</name>`
+
+    const kmlFooter = `
+  </Document>
+</kml>`
+
+    const placemarks = trip.activities
+      .filter((a) => a.latitude && a.longitude)
+      .map(
+        (a) => `
+    <Placemark>
+      <name>${(a.name || "").replace(/&/g, "&amp;")}</name>
+      <description>${(a.description || "").replace(/&/g, "&amp;")}</description>
+      <Point>
+        <coordinates>${a.longitude},${a.latitude},0</coordinates>
+      </Point>
+    </Placemark>`,
+      )
+      .join("")
+
+    const kmlContent = kmlHeader + (placemarks || "") + kmlFooter
+
+    const blob = new Blob([kmlContent], { type: "application/vnd.google-earth.kml+xml" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `${(trip.name || "trip").replace(/\s+/g, "_").toLowerCase()}.kml`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleDayOperation = async (type: "move_all" | "swap" | "rename", dayId: string, payload: any) => {
+    try {
+      if (type === "move_all") {
+        if (!trip?.id) return
+        await moveActivities({ dayId, targetDayId: payload.targetDayId })
+      } else if (type === "swap") {
+        if (!trip?.id) return
+        await swapDays({ dayId1: payload.dayId1, dayId2: payload.dayId2 })
+      } else if (type === "rename") {
+        if (!trip?.id) return
+        await updateDay({ dayId, updates: { name: payload.name } })
+      }
+    } catch (error) {
+      console.error("Day operation failed:", error)
+      // Show error?
+    }
+  }
+
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -321,6 +398,9 @@ const TripDetailsPage = () => {
             <Button variant="outlined" startIcon={<PrintIcon />} size="small" onClick={() => window.print()}>
               Print
             </Button>
+            <Button variant="outlined" startIcon={<DownloadIcon />} size="small" onClick={handleExportKML}>
+              Export KML
+            </Button>
           </Box>
         </Box>
 
@@ -366,6 +446,12 @@ const TripDetailsPage = () => {
                               <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
                                 ({dayjs(day.date).format("MMM D")})
                               </Typography>
+                              <IconButton
+                                size="small"
+                                onClick={() => setRenameDayDialog({ dayId: day.id, name: day.name || "" })}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
                             </Box>
                             <IconButton size="small" onClick={() => handleAddActivity(day.id)}>
                               <AddIcon />
@@ -476,6 +562,7 @@ const TripDetailsPage = () => {
             onActivityClick={handleEditActivity}
             onTransportClick={handleTransportClick}
             onActivityUpdate={(id, data) => updateActivity({ id, data })}
+            onDayOperation={handleDayOperation}
           />
         )}
 
@@ -645,6 +732,41 @@ const TripDetailsPage = () => {
           }
         />
       )}
+
+      <Dialog open={Boolean(renameDayDialog)} onClose={() => setRenameDayDialog(null)}>
+        <DialogTitle>Rename Day</DialogTitle>
+        <DialogContent sx={{ pt: 2, minWidth: 300 }}>
+          <TextField
+            autoFocus
+            fullWidth
+            label="Day Name"
+            value={renameDayDialog?.name || ""}
+            onChange={(e) => setRenameDayDialog((prev) => (prev ? { ...prev, name: e.target.value } : null))}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (renameDayDialog) {
+                  updateDay({ dayId: renameDayDialog.dayId, updates: { name: renameDayDialog.name } })
+                  setRenameDayDialog(null)
+                }
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRenameDayDialog(null)}>Cancel</Button>
+          <Button
+            onClick={() => {
+              if (renameDayDialog) {
+                updateDay({ dayId: renameDayDialog.dayId, updates: { name: renameDayDialog.name } })
+                setRenameDayDialog(null)
+              }
+            }}
+            variant="contained"
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }
