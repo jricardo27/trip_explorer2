@@ -33,8 +33,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
 import { transportApi } from "../../api/client"
+import { useExpenses } from "../../hooks/useExpenses"
+import { useTripMembers } from "../../hooks/useTripMembers"
 import { TransportMode } from "../../types"
 import type { TransportAlternative } from "../../types"
+import { ExpenseSplitInput, type SplitType, type ExpenseSplit } from "../ExpenseSplitInput"
 
 interface TransportDialogProps {
   open: boolean
@@ -77,21 +80,33 @@ export const TransportDialog = ({
   alternatives,
 }: TransportDialogProps) => {
   const queryClient = useQueryClient()
+  const { expenses } = useExpenses(tripId)
+  const { members } = useTripMembers(tripId)
+
   const [newMode, setNewMode] = useState<TransportMode>(TransportMode.DRIVING)
   const [newDuration, setNewDuration] = useState<string>("")
   const [newCost, setNewCost] = useState<string>("")
   const [newCurrency, setNewCurrency] = useState("AUD")
   const [newNotes, setNewNotes] = useState("")
+  const [splits, setSplits] = useState<ExpenseSplit[]>([])
+  const [splitType, setSplitType] = useState<SplitType>("equal")
+
   const [isAdding, setIsAdding] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   const createMutation = useMutation({
     mutationFn: transportApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
-      setIsAdding(false)
-      setNewDuration("")
-      setNewCost("")
-      setNewNotes("")
+      resetForm()
+    },
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => transportApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+      resetForm()
     },
   })
 
@@ -110,7 +125,7 @@ export const TransportDialog = ({
   })
 
   const handleAdd = () => {
-    createMutation.mutate({
+    const payload = {
       tripId,
       fromActivityId,
       toActivityId,
@@ -119,7 +134,24 @@ export const TransportDialog = ({
       cost: newCost ? parseFloat(newCost) : undefined,
       currency: newCurrency,
       notes: newNotes,
-    })
+      splits: newCost ? splits : undefined,
+    }
+
+    if (editingId) {
+      updateMutation.mutate({ id: editingId, data: payload })
+    } else {
+      createMutation.mutate(payload)
+    }
+  }
+
+  const resetForm = () => {
+    setIsAdding(false)
+    setEditingId(null)
+    setNewDuration("")
+    setNewCost("")
+    setNewNotes("")
+    setSplits([])
+    setSplitType("equal")
   }
 
   const handleCopy = (alt: TransportAlternative) => {
@@ -128,6 +160,35 @@ export const TransportDialog = ({
     setNewCost(alt.cost?.toString() || "")
     setNewCurrency(alt.currency || "AUD")
     setNewNotes(alt.notes || "")
+    setSplits([]) // Don't copy splits
+    setIsAdding(true)
+    setEditingId(null)
+  }
+
+  const handleEdit = (alt: TransportAlternative) => {
+    setNewMode(alt.transportMode)
+    setNewDuration(alt.durationMinutes.toString())
+    setNewCost(alt.cost?.toString() || "")
+    setNewCurrency(alt.currency || "AUD")
+    setNewNotes(alt.notes || "")
+
+    // Find associated expense
+    const expense = expenses.find((e) => e.transportAlternativeId === alt.id)
+    if (expense?.splits && expense.splits.length > 0) {
+      setSplits(
+        expense.splits.map((s) => ({
+          memberId: s.memberId,
+          amount: s.amount,
+          percentage: s.percentage,
+        })),
+      )
+      setSplitType((expense.splitType as SplitType) || "equal")
+    } else {
+      setSplits([])
+      setSplitType("equal")
+    }
+
+    setEditingId(alt.id)
     setIsAdding(true)
   }
 
@@ -144,6 +205,11 @@ export const TransportDialog = ({
                   <Tooltip title="Copy">
                     <IconButton edge="end" onClick={() => handleCopy(alt)} sx={{ mr: 1 }}>
                       <CopyIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Edit">
+                    <IconButton edge="end" onClick={() => handleEdit(alt)} sx={{ mr: 1 }}>
+                      <DirectionsCar color="primary" /> {/* Reusing generic icon for edit indicating 'Configure' */}
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Delete">
@@ -236,16 +302,43 @@ export const TransportDialog = ({
                   placeholder="e.g. Booking reference, platform details..."
                 />
               </Grid>
+              {newCost && (
+                <Grid size={12}>
+                  <ExpenseSplitInput
+                    members={members}
+                    totalAmount={parseFloat(newCost) || 0}
+                    currency={newCurrency}
+                    value={splits}
+                    splitType={splitType}
+                    onChange={(newSplits, newType) => {
+                      setSplits(newSplits)
+                      setSplitType(newType)
+                    }}
+                  />
+                </Grid>
+              )}
               <Grid size={12} container justifyContent="flex-end" spacing={1}>
-                <Button onClick={() => setIsAdding(false)}>Cancel</Button>
-                <Button variant="contained" onClick={handleAdd} disabled={createMutation.isPending}>
-                  Add
+                <Button onClick={resetForm}>Cancel</Button>
+                <Button
+                  variant="contained"
+                  onClick={handleAdd}
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                >
+                  {editingId ? "Save" : "Add"}
                 </Button>
               </Grid>
             </Grid>
           </Box>
         ) : (
-          <Button fullWidth variant="outlined" sx={{ mt: 1 }} onClick={() => setIsAdding(true)}>
+          <Button
+            fullWidth
+            variant="outlined"
+            sx={{ mt: 1 }}
+            onClick={() => {
+              resetForm()
+              setIsAdding(true)
+            }}
+          >
             Add Option
           </Button>
         )}

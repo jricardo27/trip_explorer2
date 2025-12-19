@@ -229,6 +229,7 @@ export interface Expense {
   id: string
   tripId: string
   activityId?: string
+  transportAlternativeId?: string
   description: string
   category: string
   amount: number
@@ -353,7 +354,20 @@ export interface CreateTransportRequest {
   durationMinutes: number
   cost?: number
   currency?: string
+  description?: string
   notes?: string
+  splits?: { memberId: string; amount: number; percentage?: number }[]
+}
+
+export interface UpdateTransportRequest {
+  name?: string
+  transportMode?: TransportMode
+  durationMinutes?: number
+  cost?: number
+  currency?: string
+  description?: string
+  notes?: string
+  splits?: { memberId: string; amount: number; percentage?: number }[]
 }
 
 export interface ChecklistTemplate {

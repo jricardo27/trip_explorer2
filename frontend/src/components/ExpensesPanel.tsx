@@ -59,8 +59,11 @@ export const ExpensesPanel = ({
 
   const transportExpenses = useMemo(() => {
     if (!trip?.transport || !trip?.activities) return []
+    // Get IDs of transports that already have a real expense
+    const transportExpenseIds = new Set(expenses.map((e) => e.transportAlternativeId).filter(Boolean))
+
     return trip.transport
-      .filter((t: any) => t.isSelected && t.cost && t.cost > 0)
+      .filter((t: any) => t.isSelected && t.cost && t.cost > 0 && !transportExpenseIds.has(t.id))
       .map((t: any) => {
         const fromActivity = trip?.activities?.find((a: any) => a.id === t.fromActivityId)
         const toActivity = trip?.activities?.find((a: any) => a.id === t.toActivityId)
@@ -78,7 +81,7 @@ export const ExpensesPanel = ({
           isTransport: true,
         } as unknown as Expense
       })
-  }, [trip, defaultCurrency])
+  }, [trip, defaultCurrency, expenses])
 
   const allExpenses = useMemo(() => [...expenses, ...transportExpenses], [expenses, transportExpenses])
   const totalAmount = allExpenses.reduce((sum, e) => sum + Number(e.amount), 0)
