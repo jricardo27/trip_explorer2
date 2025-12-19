@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     },
   },
 })
@@ -42,28 +42,19 @@ const theme = createTheme({
 })
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const { isAuthenticated } = useAuthStore()
   return isAuthenticated() ? <>{children}</> : <Navigate to="/login" />
 }
 
 const App = () => {
-  // ... CheckAuth ...
   const { dateFormat } = useSettingsStore()
-
-  // Assuming 'isChecking' would be defined by the 'CheckAuth' logic.
-  // For this change, we'll proceed without a specific 'isChecking' state
-  // as it's not fully provided in the instruction's snippet.
-  // If 'isChecking' were defined, it would look something like:
-  // const [isChecking, setIsChecking] = React.useState(true);
-  // React.useEffect(() => { /* async auth check */ setIsChecking(false); }, []);
-  // if (isChecking) { return <div>Loading...</div> }
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <BrowserRouter>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dateFormat.toLowerCase()}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dateFormat?.toLowerCase() || "en-au"}>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />

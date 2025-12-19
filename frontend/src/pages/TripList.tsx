@@ -1,4 +1,4 @@
-import { Add as AddIcon, CalendarToday, FlightTakeoff, AttachMoney } from "@mui/icons-material"
+import { Add as AddIcon, CalendarToday, FlightTakeoff, AttachMoney, ContentCopy } from "@mui/icons-material"
 import {
   Box,
   Typography,
@@ -27,13 +27,17 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import client from "../api/client"
-import { useTrips, useCreateTrip } from "../hooks/useTrips"
+import { useTrips, useCreateTrip, useCopyTrip } from "../hooks/useTrips"
+import type { Trip } from "../types"
 
 const TripList = () => {
   const navigate = useNavigate()
   const { data: trips, isLoading, error } = useTrips()
   const createTripMutation = useCreateTrip()
+  const copyTripMutation = useCopyTrip()
   const [open, setOpen] = useState(false)
+  const [copyOpen, setCopyOpen] = useState(false)
+  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null)
 
   // Form state
   const [currency] = useState("AUD") // Default currency
@@ -41,6 +45,10 @@ const TripList = () => {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [budget, setBudget] = useState("")
+
+  // Copy state
+  const [copyName, setCopyName] = useState("")
+  const [copyStartDate, setCopyStartDate] = useState("")
   // 0 = Past, 1 = Current, 2 = Future
   const [tabValue, setTabValue] = useState(2)
 
@@ -100,6 +108,25 @@ const TripList = () => {
     navigate(`/trips/${tripId}`)
   }
 
+  const handleDuplicate = (trip: Trip, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedTrip(trip)
+    setCopyName(`${trip.name} (Copy)`)
+    setCopyStartDate(dayjs(trip.startDate).format("YYYY-MM-DD"))
+    setCopyOpen(true)
+  }
+
+  const confirmDuplicate = async () => {
+    if (selectedTrip && copyName && copyStartDate) {
+      await copyTripMutation.mutateAsync({
+        tripId: selectedTrip.id,
+        name: copyName,
+        startDate: copyStartDate,
+      })
+      setCopyOpen(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" mt={4}>
@@ -122,6 +149,19 @@ const TripList = () => {
         <Typography variant="h4" component="h1">
           My Trips
         </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => {
+            setName("")
+            setStartDate("")
+            setEndDate("")
+            setBudget("")
+            setOpen(true)
+          }}
+        >
+          Create Trip
+        </Button>
       </Box>
 
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
@@ -236,6 +276,14 @@ const TripList = () => {
                 >
                   View Details
                 </Button>
+                <Button
+                  size="small"
+                  startIcon={<ContentCopy />}
+                  onClick={(e) => handleDuplicate(trip, e)}
+                  disabled={copyTripMutation.isPending}
+                >
+                  Duplicate
+                </Button>
               </CardActions>
             </Card>
           </Grid>
@@ -250,6 +298,21 @@ const TripList = () => {
           <Typography variant="body1" color="text.secondary" paragraph>
             Create your first trip to get started!
           </Typography>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<AddIcon />}
+            onClick={() => {
+              setName("")
+              setStartDate("")
+              setEndDate("")
+              setBudget("")
+              setOpen(true)
+            }}
+            sx={{ mt: 2 }}
+          >
+            Create Your First Trip
+          </Button>
         </Box>
       )}
 
@@ -310,6 +373,35 @@ const TripList = () => {
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={handleCreateTrip} variant="contained" disabled={createTripMutation.isPending}>
             {createTripMutation.isPending ? "Creating..." : "Create Trip"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Duplicate Dialog */}
+      <Dialog open={copyOpen} onClose={() => setCopyOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Duplicate Trip</DialogTitle>
+        <DialogContent>
+          <Box pt={1} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Duplicate &quot;{selectedTrip?.name}&quot; including all activities and days.
+            </Typography>
+            <TextField label="New Trip Name" fullWidth value={copyName} onChange={(e) => setCopyName(e.target.value)} />
+            <DatePicker
+              label="New Start Date"
+              value={copyStartDate ? dayjs(copyStartDate) : null}
+              onChange={(newValue) => setCopyStartDate(newValue ? newValue.format("YYYY-MM-DD") : "")}
+              slotProps={{ textField: { fullWidth: true } }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCopyOpen(false)}>Cancel</Button>
+          <Button
+            onClick={confirmDuplicate}
+            variant="contained"
+            disabled={copyTripMutation.isPending || !copyName || !copyStartDate}
+          >
+            {copyTripMutation.isPending ? "Duplicating..." : "Duplicate"}
           </Button>
         </DialogActions>
       </Dialog>

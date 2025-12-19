@@ -1,40 +1,28 @@
-import { PlayArrow, Pause, Stop, Layers as LayersIcon } from "@mui/icons-material"
+import { PlayArrow, Stop, Layers as LayersIcon } from "@mui/icons-material"
 import { Box, Paper, Typography, IconButton, Select, MenuItem, Checkbox, ListItemText, useTheme } from "@mui/material"
 import L from "leaflet"
-import { useEffect, useRef, useState, useCallback, useMemo } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { createRoot } from "react-dom/client"
 import { renderToStaticMarkup } from "react-dom/server"
 import { BsFuelPump } from "react-icons/bs"
 import { MdHotel, MdKayaking, MdLocalGasStation, MdWc, MdPark, MdPlace } from "react-icons/md"
-import {
-  GeoJSON,
-  MapContainer,
-  Marker,
-  Polyline,
-  Popup,
-  TileLayer,
-  useMap,
-  useMapEvents,
-  LayersControl,
-} from "react-leaflet"
+import { GeoJSON, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents, LayersControl } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 
 import { MARKER_MANIFEST } from "../data/markerManifest"
-import type { Activity, TripAnimation } from "../types"
-import { getGreatCirclePath, getGreatCirclePoint } from "../utils/geodesicUtils"
-import { fetchRoute, interpolateAlongPath } from "../utils/routingUtils"
+import type { Activity } from "../types"
 
 import { BaseLayers } from "./Map/BaseLayers"
 import PopupContent from "./PopupContent"
+import { TripAnimationLayer } from "./TripAnimationLayer"
 
 interface TripMapProps {
   activities?: Activity[]
   selectedActivityId?: string
-  animations?: TripAnimation[]
   days?: Array<{ id: string; name?: string; dayIndex: number }>
-  activeAnimationId?: string
   onMapContextMenu?: (latLng: { lat: number; lng: number }) => void
   onMarkerContextMenu?: (feature: any) => void
+  onCreateActivity?: (latLng: { lat: number; lng: number }) => void
   activeFlyToLocation?: { lat: number; lng: number } | null
   hideAnimationControl?: boolean
 }
@@ -162,174 +150,13 @@ const GeoJSONLayer = ({ url, onContextMenu }: { url: string; onContextMenu?: (fe
 
 // --- Animation Components ---
 
-interface AdvancedAnimationLayerProps {
-  steps: any[]
-  isPlaying: boolean
-  onProgressUpdate: (progress: number) => void
-  onAnimationComplete: () => void
-  seekProgress: number | null
-}
-
-const AdvancedAnimationLayer = ({
-  steps,
-  isPlaying,
-  onProgressUpdate,
-  onAnimationComplete,
-  seekProgress,
-}: AdvancedAnimationLayerProps) => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0)
-  const [stepProgress, setStepProgress] = useState(0)
-  const [cachedRoutes, setCachedRoutes] = useState<Record<string, [number, number][]>>({})
-  const requestRef = useRef<number | null>(null)
-  const previousTimeRef = useRef<number | undefined>(undefined)
-
-  const validSteps = useMemo(() => steps.filter((s) => s.activity?.latitude && s.activity?.longitude), [steps])
-  const coords = useMemo(
-    () => validSteps.map((s) => [s.activity.latitude, s.activity.longitude] as [number, number]),
-    [validSteps],
-  )
-
-  useEffect(() => {
-    const loadRoutes = async () => {
-      const newRoutes: Record<string, [number, number][]> = {}
-      let hasUpdates = false
-      for (let i = 0; i < coords.length - 1; i++) {
-        const key = `${i}-${coords[i].join(",")}-${coords[i + 1].join(",")}`
-        if (cachedRoutes[key]) continue
-        const mode = validSteps[i + 1].transportMode
-        if (mode && mode !== "FLIGHT") {
-          const route = await fetchRoute(coords[i], coords[i + 1], mode)
-          if (route) {
-            newRoutes[key] = route
-            hasUpdates = true
-          }
-        }
-      }
-      if (hasUpdates) setCachedRoutes((prev) => ({ ...prev, ...newRoutes }))
-    }
-    loadRoutes()
-  }, [coords, validSteps, cachedRoutes])
-
-  // Use a ref for the animate function to avoid hoisting issues and redundant dependency changes
-  const animateRef = useRef<(time: number) => void>(() => {})
-
-  useEffect(() => {
-    animateRef.current = (time: number) => {
-      if (previousTimeRef.current !== undefined) {
-        const deltaTime = time - previousTimeRef.current
-        if (isPlaying && currentStepIndex < coords.length - 1) {
-          const speed = 0.0005
-          const newProgress = stepProgress + speed * deltaTime
-          if (newProgress >= 1) {
-            if (currentStepIndex < coords.length - 2) {
-              setCurrentStepIndex((prev) => prev + 1)
-              setStepProgress(0)
-            } else {
-              setStepProgress(1)
-              onAnimationComplete()
-            }
-          } else {
-            setStepProgress(newProgress)
-          }
-        }
-      }
-      previousTimeRef.current = time
-      const totalProgress = coords.length > 1 ? ((currentStepIndex + stepProgress) / (coords.length - 1)) * 100 : 100
-      onProgressUpdate(totalProgress)
-      requestRef.current = requestAnimationFrame(animateRef.current)
-    }
-  }, [isPlaying, currentStepIndex, stepProgress, coords, onAnimationComplete, onProgressUpdate])
-
-  useEffect(() => {
-    if (isPlaying) {
-      requestRef.current = requestAnimationFrame(animateRef.current)
-    } else if (requestRef.current) {
-      cancelAnimationFrame(requestRef.current)
-    }
-    return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current)
-    }
-  }, [isPlaying])
-
-  useEffect(() => {
-    if (seekProgress !== null) {
-      const totalSteps = coords.length - 1
-      if (totalSteps <= 0) return
-      const globalProgress = seekProgress / 100
-      const targetStep = Math.min(Math.floor(globalProgress * totalSteps), totalSteps - 1)
-      const targetStepProgress = (globalProgress * totalSteps) % 1
-      setTimeout(() => {
-        setCurrentStepIndex(targetStep)
-        setStepProgress(targetStepProgress)
-      }, 0)
-    }
-  }, [seekProgress, coords.length])
-
-  const currentPosition = useMemo(() => {
-    if (coords.length < 2) return null
-    if (currentStepIndex >= coords.length - 1) return coords[coords.length - 1]
-    const p1 = coords[currentStepIndex]
-    const p2 = coords[currentStepIndex + 1]
-    const key = `${currentStepIndex}-${p1.join(",")}-${p2.join(",")}`
-    const route = cachedRoutes[key]
-    if (route) return interpolateAlongPath(route, stepProgress)
-    return getGreatCirclePoint(p1, p2, stepProgress)
-  }, [coords, currentStepIndex, stepProgress, cachedRoutes])
-
-  const pathPositions = useMemo(() => {
-    if (coords.length < 2) return []
-    const fullPath: [number, number][] = []
-    for (let i = 0; i <= currentStepIndex; i++) {
-      if (i === coords.length - 1) break
-      const p1 = coords[i]
-      const p2 = coords[i + 1]
-      const key = `${i}-${p1.join(",")}-${p2.join(",")}`
-      const route = cachedRoutes[key]
-      if (route) {
-        if (i < currentStepIndex) fullPath.push(...route)
-        else fullPath.push(...route.slice(0, Math.floor(route.length * stepProgress)))
-      } else {
-        const gcPath = getGreatCirclePath(p1, p2, 20)
-        if (i < currentStepIndex) fullPath.push(...gcPath)
-        else fullPath.push(...gcPath.slice(0, Math.floor(gcPath.length * stepProgress)))
-      }
-    }
-    if (currentPosition) fullPath.push(currentPosition)
-    return fullPath
-  }, [coords, currentStepIndex, stepProgress, cachedRoutes, currentPosition])
-
-  const TransportIcon = useMemo(
-    () =>
-      new L.DivIcon({
-        className: "custom-transport-icon",
-        html: `
-          <div style="font-size: 24px; text-align: center; background: white; border-radius: 50%; padding: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
-            🚗
-          </div>
-        `,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-      }),
-    [],
-  )
-
-  return (
-    <>
-      <Polyline positions={pathPositions} color="#1976d2" weight={4} opacity={0.8} />
-      {currentPosition && <Marker position={currentPosition} icon={TransportIcon} zIndexOffset={2000} />}
-    </>
-  )
-}
-
 const AnimationController = ({
-  animation,
   isPlaying,
   onPlayPause,
   onReset,
   progress,
   onSeek,
 }: {
-  animation: TripAnimation
   isPlaying: boolean
   onPlayPause: () => void
   onReset: () => void
@@ -354,7 +181,7 @@ const AnimationController = ({
   >
     <Box display="flex" justifyContent="space-between" alignItems="center">
       <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-        {animation.name}
+        Trip Animation
       </Typography>
       <Typography variant="caption" color="text.secondary">
         {Math.round(progress)}%
@@ -367,7 +194,7 @@ const AnimationController = ({
         color="primary"
         sx={{ bgcolor: "primary.light", color: "white", "&:hover": { bgcolor: "primary.main" } }}
       >
-        {isPlaying ? <Pause /> : <PlayArrow />}
+        {isPlaying ? <Stop /> : <PlayArrow />}
       </IconButton>
       <IconButton size="small" onClick={onReset} sx={{ bgcolor: "grey.200" }}>
         <Stop />
@@ -392,11 +219,10 @@ export const TripMap = (props: TripMapProps) => {
   const {
     activities,
     selectedActivityId,
-    animations,
     days,
-    activeAnimationId: propActiveAnimationId,
     onMapContextMenu,
     onMarkerContextMenu,
+    onCreateActivity,
     hideAnimationControl = false,
   } = props
   const theme = useTheme()
@@ -410,13 +236,22 @@ export const TripMap = (props: TripMapProps) => {
   const [activeBaseLayer, setActiveBaseLayer] = useState(
     () => localStorage.getItem("activeBaseLayer") ?? "Esri World Street Map",
   )
-  const [activeAnimationId, setActiveAnimationId] = useState("")
   const [isPlaying, setIsPlaying] = useState(false)
   const [animationProgress, setAnimationProgress] = useState(0)
   const [seekProgress, setSeekProgress] = useState<number | null>(null)
   const [selectedMarkerLayers, setSelectedMarkerLayers] = useState<string[]>([])
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(true)
+
+  // Sort activities for animation
+  const sortedActivities = useMemo(
+    () =>
+      activities?.slice().sort((a, b) => {
+        if (!a.scheduledStart || !b.scheduledStart) return 0
+        return new Date(a.scheduledStart).getTime() - new Date(b.scheduledStart).getTime()
+      }),
+    [activities],
+  )
 
   const handleMapMove = useCallback((center: [number, number], zoom: number) => {
     setMapState({ center, zoom })
@@ -426,19 +261,7 @@ export const TripMap = (props: TripMapProps) => {
   useEffect(() => {
     localStorage.setItem("activeBaseLayer", activeBaseLayer)
   }, [activeBaseLayer])
-  useEffect(() => {
-    if (propActiveAnimationId) {
-      setTimeout(() => {
-        setActiveAnimationId(propActiveAnimationId)
-        setIsPlaying(true)
-      }, 0)
-    }
-  }, [propActiveAnimationId])
 
-  const activeAnimation = useMemo(
-    () => animations?.find((a) => a.id === activeAnimationId),
-    [animations, activeAnimationId],
-  )
   const uniqueDays = useMemo(
     () =>
       Array.from(
@@ -474,51 +297,30 @@ export const TripMap = (props: TripMapProps) => {
 
   return (
     <Paper elevation={3} sx={{ p: 1, height: "100%", mb: 0, position: "relative", overflow: "hidden" }}>
-      {animations && animations.length > 0 && !isPlaying && !hideAnimationControl && (
-        <Box
+      {!isPlaying && !hideAnimationControl && sortedActivities && sortedActivities.length > 0 && (
+        <IconButton
+          onClick={() => {
+            setSeekProgress(0)
+            setIsPlaying(true)
+          }}
+          color="primary"
           sx={{
             position: "absolute",
             top: 10,
             left: 60,
             zIndex: 1000,
-            bgcolor: "white",
-            p: 1,
-            borderRadius: 1,
-            display: "flex",
-            gap: 1,
-            boxShadow: 2,
+            bgcolor: "primary.main",
+            color: "white",
+            "&:hover": { bgcolor: "primary.dark" },
+            boxShadow: 3,
           }}
         >
-          <Select
-            value={activeAnimationId}
-            onChange={(e) => setActiveAnimationId(e.target.value)}
-            displayEmpty
-            size="small"
-            sx={{ minWidth: 150 }}
-          >
-            <MenuItem value="">Select Animation...</MenuItem>
-            {animations.map((a) => (
-              <MenuItem key={a.id} value={a.id}>
-                {a.name}
-              </MenuItem>
-            ))}
-          </Select>
-          <IconButton
-            disabled={!activeAnimationId}
-            onClick={() => {
-              setSeekProgress(0)
-              setIsPlaying(true)
-            }}
-            color="primary"
-          >
-            <PlayArrow />
-          </IconButton>
-        </Box>
+          <PlayArrow />
+        </IconButton>
       )}
 
-      {isPlaying && activeAnimation && (
+      {isPlaying && (
         <AnimationController
-          animation={activeAnimation}
           isPlaying={isPlaying}
           onPlayPause={() => setIsPlaying(!isPlaying)}
           onReset={() => {
@@ -536,7 +338,7 @@ export const TripMap = (props: TripMapProps) => {
         style={{ height: "100%", width: "100%" }}
         scrollWheelZoom={true}
       >
-        <MapStateManager onMapMove={handleMapMove} onContextMenu={onMapContextMenu} />
+        <MapStateManager onMapMove={handleMapMove} onContextMenu={onCreateActivity || onMapContextMenu} />
         <MapFlyHandler location={props.activeFlyToLocation} />
         <TileLayer attribution={tiles.attribution} url={tiles.url} maxZoom={20} />
         <LayersControl position="topright">
@@ -657,9 +459,9 @@ export const TripMap = (props: TripMapProps) => {
               ),
           )}
 
-        {activeAnimation && (
-          <AdvancedAnimationLayer
-            steps={activeAnimation.steps}
+        {isPlaying && sortedActivities && sortedActivities.length > 0 && (
+          <TripAnimationLayer
+            activities={sortedActivities}
             isPlaying={isPlaying}
             onProgressUpdate={setAnimationProgress}
             onAnimationComplete={() => setIsPlaying(false)}

@@ -1,4 +1,4 @@
-import { Delete, Edit, PersonAdd } from "@mui/icons-material"
+import { Delete, Edit, PersonAdd, Close as CloseIcon } from "@mui/icons-material"
 import {
   Dialog,
   DialogTitle,
@@ -122,7 +122,16 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
-      <DialogTitle>Manage Trip Members</DialogTitle>
+      <DialogTitle>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          Manage Trip Members
+          {fullScreen && (
+            <IconButton onClick={onClose} size="small">
+              <CloseIcon />
+            </IconButton>
+          )}
+        </Box>
+      </DialogTitle>
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>

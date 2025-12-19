@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express"
 
+import documentController from "../controllers/DocumentController"
 import * as ExpenseController from "../controllers/ExpenseController"
 import { authenticateToken } from "../middleware/auth"
 import { validate } from "../middleware/errorHandler"
@@ -161,7 +162,6 @@ router.put("/:id", validate(updateTripSchema), async (req: Request, res: Respons
     if (req.body.isPublic !== undefined) updateData.isPublic = req.body.isPublic
 
     const trip = await tripService.updateTrip(req.params.id, (req as any).user.id, updateData)
-
     res.json({ data: trip })
   } catch (error: any) {
     if (error.code === "P2025") {
@@ -172,13 +172,27 @@ router.put("/:id", validate(updateTripSchema), async (req: Request, res: Respons
         },
       })
     }
-
     res.status(500).json({
       error: {
         code: "INTERNAL_ERROR",
         message: "Failed to update trip",
       },
     })
+  }
+})
+
+// PATCH /api/trips/:id/categories - Update checklist/packing categories
+router.patch("/:id/categories", async (req: Request, res: Response) => {
+  try {
+    const { checklistCategories, packingCategories } = req.body
+    const updateData: any = {}
+    if (checklistCategories) updateData.checklistCategories = checklistCategories
+    if (packingCategories) updateData.packingCategories = packingCategories
+
+    const trip = await tripService.updateTrip(req.params.id, (req as any).user.id, updateData)
+    res.json({ data: trip })
+  } catch (error: any) {
+    res.status(500).json({ error: error.message })
   }
 })
 
@@ -271,6 +285,44 @@ router.post("/:id/copy", async (req: Request, res: Response) => {
       error: {
         code: "INTERNAL_ERROR",
         message: "Failed to copy trip",
+        details: error.message,
+      },
+    })
+  }
+})
+
+// PATCH /api/trips/:id/shift - Shift trip dates
+router.patch("/:id/shift", async (req: Request, res: Response) => {
+  try {
+    const { days } = req.body
+    if (days === undefined) {
+      return res.status(400).json({
+        error: {
+          code: "MISSING_PARAMETER",
+          message: "days is required",
+        },
+      })
+    }
+
+    const trip = await tripService.shiftTripDates(req.params.id, (req as any).user.id, Number(days))
+
+    res.json({ data: trip })
+  } catch (error: any) {
+    console.error("Shift error:", error)
+    if (error.message === "Trip not found") {
+      return res.status(404).json({
+        error: {
+          code: "NOT_FOUND",
+          message: "Trip not found",
+        },
+      })
+    }
+
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to shift trip dates",
+        details: error.message,
       },
     })
   }
@@ -389,5 +441,11 @@ router.delete("/:id/members/:memberId", async (req: Request, res: Response) => {
     })
   }
 })
+
+// ===== DOCUMENT ROUTES =====
+router.get("/documents/list", documentController.listDocuments)
+router.post("/documents", documentController.createDocument)
+router.put("/documents/:id", documentController.updateDocument)
+router.delete("/documents/:id", documentController.deleteDocument)
 
 export default router

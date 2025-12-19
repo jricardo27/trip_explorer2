@@ -1,12 +1,24 @@
-import { Box, Paper, Typography, Menu, MenuItem, useTheme, useMediaQuery } from "@mui/material"
+import {
+  DirectionsCar,
+  DirectionsBus,
+  DirectionsWalk,
+  Train,
+  Flight,
+  DirectionsBoat,
+  PedalBike,
+} from "@mui/icons-material"
+import { Box, Paper, Typography, Menu, MenuItem, useTheme, useMediaQuery, Tooltip } from "@mui/material"
 import dayjs from "dayjs"
 import { useMemo, useState } from "react"
 
-import type { Activity, TripDay } from "../types"
+import { TransportMode } from "../types"
+import type { Activity, TripDay, TransportAlternative } from "../types"
 
 interface TimelineCalendarViewProps {
   days: TripDay[]
+  transport?: TransportAlternative[]
   onActivityClick?: (activity: Activity) => void
+  onTransportClick?: (transport: TransportAlternative) => void
   onActivityUpdate?: (
     activityId: string,
     updates: { scheduledStart?: string; scheduledEnd?: string; tripDayId?: string },
@@ -83,7 +95,36 @@ const calculateActivityLanes = (activities: Activity[]): Map<string, { lane: num
   return lanes
 }
 
-export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }: TimelineCalendarViewProps) => {
+const getTransportIcon = (mode: TransportMode) => {
+  switch (mode) {
+    case TransportMode.DRIVING:
+      return <DirectionsCar fontSize="small" />
+    case TransportMode.WALKING:
+      return <DirectionsWalk fontSize="small" />
+    case TransportMode.CYCLING:
+      return <PedalBike fontSize="small" />
+    case TransportMode.TRANSIT:
+      return <DirectionsBus fontSize="small" />
+    case TransportMode.BUS:
+      return <DirectionsBus fontSize="small" />
+    case TransportMode.TRAIN:
+      return <Train fontSize="small" />
+    case TransportMode.FLIGHT:
+      return <Flight fontSize="small" />
+    case TransportMode.FERRY:
+      return <DirectionsBoat fontSize="small" />
+    default:
+      return <DirectionsCar fontSize="small" />
+  }
+}
+
+export const TimelineCalendarView = ({
+  days,
+  transport = [],
+  onActivityClick,
+  onTransportClick,
+  onActivityUpdate,
+}: TimelineCalendarViewProps) => {
   // Responsive breakpoints
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
@@ -280,7 +321,7 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                 }}
               >
                 <Typography variant="subtitle2" fontWeight="bold">
-                  {day.name || `Day ${day.dayIndex + 1}`}
+                  {day.name || `Day ${day.dayNumber || (day.dayIndex !== undefined ? day.dayIndex + 1 : "?")}`}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {dayjs(day.date).format("MMM D")}
@@ -420,6 +461,62 @@ export const TimelineCalendarView = ({ days, onActivityClick, onActivityUpdate }
                         </Typography>
                       )}
                     </Paper>
+                  )
+                })}
+
+                {/* Transport Segments */}
+                {(transport || []).map((trans) => {
+                  if (!trans.isSelected) return null
+                  const fromActivity = dayActivities.find((a) => a.id === trans.fromActivityId)
+                  if (!fromActivity || !fromActivity.scheduledStart) return null
+
+                  // Calculate start time based on activity end
+                  const startBasis =
+                    fromActivity.scheduledEnd || dayjs(fromActivity.scheduledStart).add(1, "hour").toISOString()
+                  const startTime = dayjs(startBasis)
+
+                  // Verify if transport starts on this day (should, if fromActivity is here)
+                  // Note: dayActivities are filtered to this day.
+
+                  const top = getPixelPosition(startTime.toISOString(), day.date, HOUR_HEIGHT)
+                  const height = (trans.durationMinutes / 60) * HOUR_HEIGHT
+
+                  // Position in specific column? For simplicity, we can use a fixed narrow width or overlay
+                  // Let's put it on the right side of the activity column
+                  const width = 15 // %
+                  const left = 85 // %
+
+                  return (
+                    <Tooltip key={trans.id} title={`${trans.transportMode}: ${trans.durationMinutes} min`}>
+                      <Paper
+                        onClick={() => onTransportClick?.(trans)}
+                        sx={{
+                          position: "absolute",
+                          top: `${top}px`,
+                          left: `${left}%`,
+                          width: `${width}%`,
+                          height: `${Math.max(height, 20)}px`,
+                          bgcolor: "secondary.light",
+                          color: "secondary.contrastText",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          zIndex: 50,
+                          cursor: onTransportClick ? "pointer" : "help",
+                          border: "1px dashed",
+                          borderColor: "secondary.main",
+                          overflow: "hidden",
+                          "&:hover": onTransportClick
+                            ? {
+                                bgcolor: "secondary.main",
+                                transform: "scale(1.05)",
+                              }
+                            : {},
+                        }}
+                      >
+                        {getTransportIcon(trans.transportMode)}
+                      </Paper>
+                    </Tooltip>
                   )
                 })}
 

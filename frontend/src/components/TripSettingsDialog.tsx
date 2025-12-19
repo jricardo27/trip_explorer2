@@ -1,3 +1,4 @@
+import { Close as CloseIcon } from "@mui/icons-material"
 import {
   Dialog,
   DialogTitle,
@@ -9,6 +10,10 @@ import {
   Typography,
   Autocomplete,
   Chip,
+  FormControlLabel,
+  Switch,
+  IconButton,
+  Tooltip,
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs, { Dayjs } from "dayjs"
@@ -16,6 +21,7 @@ import { saveAs } from "file-saver"
 import { useState, useEffect } from "react"
 
 import client from "../api/client"
+import { useShiftTrip } from "../hooks/useTrips"
 import type { Trip } from "../types"
 
 interface TripSettingsDialogProps {
@@ -36,6 +42,12 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
   const [currencies, setCurrencies] = useState<string[]>(trip.currencies || ["AUD"])
   const [defaultCurrency, setDefaultCurrency] = useState(trip.defaultCurrency || "AUD")
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>(trip.exchangeRates || {})
+  const [isCompleted, setIsCompleted] = useState(trip.isCompleted || false)
+  const [isPublic, setIsPublic] = useState(trip.isPublic || false)
+
+  // Shift state
+  const [shiftDays, setShiftDays] = useState("")
+  const shiftTripMutation = useShiftTrip()
 
   useEffect(() => {
     if (open) {
@@ -47,26 +59,86 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
         setDefaultCurrency(trip.defaultCurrency || "AUD")
         setCurrencies(trip.currencies || ["AUD"])
         setExchangeRates(trip.exchangeRates || {})
+        setIsCompleted(trip.isCompleted || false)
+        setIsPublic(trip.isPublic || false)
       }, 0)
     }
   }, [open, trip])
 
   const handleSave = async () => {
-    await onUpdate({
-      name,
+    // Aggressively ensure all exchange rates are finite positive numbers before sending to backend
+    const numericExchangeRates: Record<string, number> = {}
+    Object.entries(exchangeRates).forEach(([key, value]) => {
+      // Ensure we have a number. If it's a string from TextField, parse it.
+      const n = typeof value === "string" ? parseFloat(value) : Number(value)
+      if (!isNaN(n) && isFinite(n) && n > 0) {
+        numericExchangeRates[key] = n
+      } else {
+        // If invalid or zero/negative, skip it or default to 1 (but skip is safer if it's optional)
+        // numericExchangeRates[key] = 1
+      }
+    })
+
+    const parsedBudget = budget ? parseFloat(budget) : undefined
+
+    const payload = {
+      name: name.trim(),
       startDate: startDate?.toISOString(),
       endDate: endDate?.toISOString(),
-      budget: budget ? parseFloat(budget) : undefined,
+      budget: parsedBudget && parsedBudget > 0 ? parsedBudget : undefined,
       currencies,
       defaultCurrency,
-      exchangeRates,
-    })
-    onClose()
+      exchangeRates: numericExchangeRates,
+      isCompleted,
+      isPublic,
+    }
+
+    console.log("Trip update payload:", JSON.stringify(payload, null, 2))
+
+    try {
+      await onUpdate(payload)
+      onClose()
+    } catch (err: any) {
+      const errorData = err.response?.data
+      console.error("Trip update failed:", errorData || err.message)
+
+      const errorMessage = errorData?.error?.message || errorData?.message || err.message
+      const details = errorData?.error?.details ? `\n\nDetails: ${JSON.stringify(errorData.error.details)}` : ""
+      alert(`Failed to update trip: ${errorMessage}${details}`)
+    }
+  }
+
+  const handleShift = async () => {
+    const days = parseInt(shiftDays)
+    if (isNaN(days) || days === 0) return
+
+    if (
+      window.confirm(
+        `Are you sure you want to shift the entire trip by ${days} days? This affects all days, activities, and recorded expenses.`,
+      )
+    ) {
+      try {
+        await shiftTripMutation.mutateAsync({ tripId: trip.id, days })
+        setShiftDays("")
+        onClose()
+      } catch (err: any) {
+        alert("Failed to shift trip: " + err.message)
+      }
+    }
   }
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
-      <DialogTitle>Trip Settings</DialogTitle>
+      <DialogTitle>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          Trip Settings
+          {fullScreen && (
+            <IconButton onClick={onClose} size="small">
+              <CloseIcon />
+            </IconButton>
+          )}
+        </Box>
+      </DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={3} pt={1}>
           <TextField label="Trip Name" fullWidth value={name} onChange={(e) => setName(e.target.value)} />
@@ -150,17 +222,66 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
                       size="small"
                       fullWidth
                       value={exchangeRates[currency] || ""}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value)
                         setExchangeRates({
                           ...exchangeRates,
-                          [currency]: parseFloat(e.target.value),
+                          [currency]: isNaN(val) ? 1 : val,
                         })
-                      }
+                      }}
                     />
                   ))}
               </Box>
             </Box>
           )}
+
+          <Box display="flex" gap={4}>
+            <Tooltip title="Mark this trip as completed to archive it from your active trips list" placement="top">
+              <FormControlLabel
+                control={<Switch checked={isCompleted} onChange={(e) => setIsCompleted(e.target.checked)} />}
+                label="Completed (Archive)"
+              />
+            </Tooltip>
+            <Tooltip
+              title="Make this trip visible to other users. Anyone with the link can view trip details, but cannot edit."
+              placement="top"
+            >
+              <FormControlLabel
+                control={<Switch checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />}
+                label="Public Trip"
+              />
+            </Tooltip>
+          </Box>
+
+          <Box
+            sx={{ mt: 1, p: 2, border: "1px solid", borderColor: "divider", borderRadius: 1, bgcolor: "action.hover" }}
+          >
+            <Typography variant="subtitle2" gutterBottom fontWeight="bold">
+              Shift Timeline
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Move all activities, days, and recorded expenses forward or backward by a specific number of days.
+            </Typography>
+            <Box display="flex" gap={2} alignItems="center">
+              <TextField
+                type="number"
+                label="Days to Shift"
+                size="small"
+                value={shiftDays}
+                onChange={(e) => setShiftDays(e.target.value)}
+                sx={{ width: 120 }}
+                placeholder="e.g. 7 or -3"
+              />
+              <Button
+                variant="outlined"
+                color="warning"
+                onClick={handleShift}
+                disabled={!shiftDays || shiftDays === "0" || shiftTripMutation.isPending}
+              >
+                {shiftTripMutation.isPending ? "Shifting..." : "Shift All Dates"}
+              </Button>
+            </Box>
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>

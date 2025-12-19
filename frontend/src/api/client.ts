@@ -11,6 +11,13 @@ import type {
   UpdateActivityRequest,
   TransportAlternative,
   CreateTransportRequest,
+  ChecklistTemplate,
+  TripChecklistItem,
+  PackingListTemplate,
+  TripPackingItem,
+  TripDocument,
+  CreateDocumentRequest,
+  UpdateDocumentRequest,
 } from "../types"
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
@@ -70,6 +77,19 @@ export const tripApi = {
 
   copy: async (tripId: string, name: string, startDate: string): Promise<Trip> => {
     const response = await apiClient.post<ApiResponse<Trip>>(`/trips/${tripId}/copy`, { name, startDate })
+    return response.data.data
+  },
+
+  shift: async (tripId: string, days: number): Promise<Trip> => {
+    const response = await apiClient.patch<ApiResponse<Trip>>(`/trips/${tripId}/shift`, { days })
+    return response.data.data
+  },
+
+  updateCategories: async (
+    tripId: string,
+    data: { checklistCategories?: string[]; packingCategories?: string[] },
+  ): Promise<Trip> => {
+    const response = await apiClient.patch<ApiResponse<Trip>>(`/trips/${tripId}/categories`, data)
     return response.data.data
   },
 }
@@ -150,6 +170,100 @@ export const transportApi = {
   select: async (id: string): Promise<TransportAlternative> => {
     const response = await apiClient.put<ApiResponse<TransportAlternative>>(`/transport/${id}/select`, {})
     return response.data.data
+  },
+}
+
+// Checklist API
+export const checklistApi = {
+  listTemplates: async (): Promise<ChecklistTemplate[]> => {
+    const response = await apiClient.get<ChecklistTemplate[]>("/checklists/templates")
+    return response.data
+  },
+  createTemplate: async (data: { task: string; category: string; priority?: number }): Promise<ChecklistTemplate> => {
+    const response = await apiClient.post<ChecklistTemplate>("/checklists/templates", data)
+    return response.data
+  },
+  deleteTemplate: async (id: string): Promise<void> => {
+    await apiClient.delete(`/checklists/templates/${id}`)
+  },
+  listTripItems: async (tripId: string): Promise<TripChecklistItem[]> => {
+    const response = await apiClient.get<TripChecklistItem[]>(`/checklists/trip/${tripId}`)
+    return response.data
+  },
+  createTripItem: async (
+    tripId: string,
+    data: { task: string; category?: string; priority?: number },
+  ): Promise<TripChecklistItem> => {
+    const response = await apiClient.post<TripChecklistItem>(`/checklists/trip/${tripId}`, data)
+    return response.data
+  },
+  updateTripItem: async (id: string, data: Partial<TripChecklistItem>): Promise<TripChecklistItem> => {
+    const response = await apiClient.put<TripChecklistItem>(`/checklists/item/${id}`, data)
+    return response.data
+  },
+  deleteTripItem: async (id: string): Promise<void> => {
+    await apiClient.delete(`/checklists/item/${id}`)
+  },
+  importTemplates: async (tripId: string, templateIds: string[]): Promise<void> => {
+    await apiClient.post(`/checklists/trip/${tripId}/import`, { templateIds })
+  },
+}
+
+// Packing List API
+export const packingApi = {
+  listTemplates: async (): Promise<PackingListTemplate[]> => {
+    const response = await apiClient.get<PackingListTemplate[]>("/packing/templates")
+    return response.data
+  },
+  createTemplate: async (data: { item: string; category: string; priority?: number }): Promise<PackingListTemplate> => {
+    const response = await apiClient.post<PackingListTemplate>("/packing/templates", data)
+    return response.data
+  },
+  deleteTemplate: async (id: string): Promise<void> => {
+    await apiClient.delete(`/packing/templates/${id}`)
+  },
+  listTripItems: async (tripId: string): Promise<TripPackingItem[]> => {
+    const response = await apiClient.get<TripPackingItem[]>(`/packing/trip/${tripId}`)
+    return response.data
+  },
+  createTripItem: async (
+    tripId: string,
+    data: { item: string; category?: string; quantity?: number; priority?: number },
+  ): Promise<TripPackingItem> => {
+    const response = await apiClient.post<TripPackingItem>(`/packing/trip/${tripId}`, data)
+    return response.data
+  },
+  updateTripItem: async (id: string, data: Partial<TripPackingItem>): Promise<TripPackingItem> => {
+    const response = await apiClient.put<TripPackingItem>(`/packing/item/${id}`, data)
+    return response.data
+  },
+  deleteTripItem: async (id: string): Promise<void> => {
+    await apiClient.delete(`/packing/item/${id}`)
+  },
+  importTemplates: async (tripId: string, templateIds: string[]): Promise<void> => {
+    await apiClient.post(`/packing/trip/${tripId}/import`, { templateIds })
+  },
+}
+
+// Document API
+export const documentApi = {
+  list: async (tripId: string): Promise<TripDocument[]> => {
+    const response = await apiClient.get<ApiResponse<TripDocument[]>>(`/trips/documents/list?tripId=${tripId}`)
+    return response.data.data
+  },
+
+  create: async (data: CreateDocumentRequest): Promise<TripDocument> => {
+    const response = await apiClient.post<ApiResponse<TripDocument>>("/trips/documents", data)
+    return response.data.data
+  },
+
+  update: async (id: string, data: UpdateDocumentRequest): Promise<TripDocument> => {
+    const response = await apiClient.put<ApiResponse<TripDocument>>(`/trips/documents/${id}`, data)
+    return response.data.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/trips/documents/${id}`)
   },
 }
 

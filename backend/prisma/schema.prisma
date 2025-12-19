@@ -55,6 +55,12 @@ model Trip {
   photos     TripPhoto[]
   transport  TransportAlternative[]
   animations TripAnimation[]
+  checklistItems TripChecklistItem[]
+  packingItems   TripPackingItem[]
+  documents      TripDocument[]
+
+  checklistCategories String[] @default(["General", "Preparation", "Booking", "Packing"]) @map("checklist_categories")
+  packingCategories   String[] @default(["Clothing", "Electronics", "Toiletries", "Gear", "Misc"]) @map("packing_categories")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -148,6 +154,7 @@ model Activity {
   source     String?  @default("manual")
   externalId String?  @map("external_id")
   tags       String[]
+  availableDays String[] @map("available_days")
 
   trip         Trip                   @relation(fields: [tripId], references: [id], onDelete: Cascade)
   tripDay      TripDay?               @relation(fields: [tripDayId], references: [id], onDelete: Cascade)
@@ -419,4 +426,73 @@ model TripAnimationStep {
   activity        Activity?     @relation(fields: [activityId], references: [id], onDelete: Cascade)
 
   @@map("trip_animation_steps")
+}
+// ============================================
+// CHECKLISTS & PACKING LISTS
+// ============================================
+
+model ChecklistTemplate {
+  id        String   @id @default(uuid())
+  category  String   // e.g., "Preparation", "Documents"
+  task      String
+  priority  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("checklist_templates")
+}
+
+model TripChecklistItem {
+  id        String   @id @default(uuid())
+  tripId    String   @map("trip_id")
+  task      String
+  isDone    Boolean  @default(false) @map("is_done")
+  category  String?
+  priority  Int      @default(0)
+  
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("trip_checklist_items")
+}
+
+model PackingListTemplate {
+  id        String   @id @default(uuid())
+  category  String   // e.g., "Clothing", "Electronics"
+  item      String
+  priority  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("packing_list_templates")
+}
+
+model TripPackingItem {
+  id        String   @id @default(uuid())
+  tripId    String   @map("trip_id")
+  item      String
+  quantity  Int      @default(1)
+  isPacked  Boolean  @default(false) @map("is_packed")
+  category  String?
+  priority  Int      @default(0)
+
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("trip_packing_items")
+}
+
+model TripDocument {
+  id        String   @id @default(uuid())
+  tripId    String   @map("trip_id")
+  title     String
+  url       String
+  notes     String?
+  category  String?  @default("General")
+  
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("trip_documents")
 }

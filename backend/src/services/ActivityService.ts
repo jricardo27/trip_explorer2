@@ -21,6 +21,7 @@ export class ActivityService {
     estimatedCost?: number
     currency?: string
     participantIds?: string[]
+    availableDays?: string[]
   }): Promise<Activity> {
     // Calculate next order index
     let orderIndex = 0
@@ -51,6 +52,7 @@ export class ActivityService {
         estimatedCost: data.estimatedCost,
         currency: data.currency || "AUD",
         orderIndex,
+        availableDays: data.availableDays || [],
         participants: data.participantIds
           ? {
               create: data.participantIds.map((memberId) => ({ memberId })),
@@ -184,6 +186,7 @@ export class ActivityService {
         estimatedCost: originalActivity.estimatedCost,
         currency: originalActivity.currency,
         notes: originalActivity.notes,
+        availableDays: originalActivity.availableDays,
         orderIndex: originalActivity.orderIndex + 1, // Place after original
       },
     })

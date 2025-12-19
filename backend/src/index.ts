@@ -6,7 +6,9 @@ import { errorHandler } from "./middleware/errorHandler"
 import activityRoutes from "./routes/activities"
 import animationRoutes from "./routes/animations"
 import authRoutes from "./routes/auth"
+import checklistRoutes from "./routes/checklists"
 import expenseRoutes from "./routes/expenses"
+import packingRoutes from "./routes/packing"
 import transportRoutes from "./routes/transport"
 import tripRoutes from "./routes/trips"
 
@@ -30,6 +32,8 @@ app.use("/api/activities", activityRoutes)
 app.use("/api/transport", transportRoutes)
 app.use("/api/animations", animationRoutes)
 app.use("/api/expenses", expenseRoutes)
+app.use("/api/checklists", checklistRoutes)
+app.use("/api/packing", packingRoutes)
 
 // Error handling
 app.use(errorHandler)

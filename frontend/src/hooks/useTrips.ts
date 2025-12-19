@@ -63,3 +63,15 @@ export const useCopyTrip = () => {
     },
   })
 }
+
+export const useShiftTrip = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ tripId, days }: { tripId: string; days: number }) => tripApi.shift(tripId, days),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trips"] })
+      queryClient.invalidateQueries({ queryKey: ["trip", variables.tripId] })
+    },
+  })
+}

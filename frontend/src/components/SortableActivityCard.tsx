@@ -1,9 +1,17 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Delete as DeleteIcon, Edit as EditIcon, DragIndicator, NearMe, ContentCopy } from "@mui/icons-material"
+import {
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  DragIndicator,
+  NearMe,
+  ContentCopy,
+  Warning,
+} from "@mui/icons-material"
 import { Paper, Box, Typography, IconButton, Tooltip, Avatar, AvatarGroup } from "@mui/material"
+import dayjs from "dayjs"
+import { useMemo } from "react"
 
-import { useSettingsStore } from "../stores/settingsStore"
 import type { Activity } from "../types"
 
 interface SortableActivityCardProps {
@@ -23,7 +31,6 @@ export const SortableActivityCard = ({
   isDeleting,
   onFlyTo,
 }: SortableActivityCardProps) => {
-  const { dateFormat } = useSettingsStore()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: activity.id })
 
   const style = {
@@ -31,6 +38,15 @@ export const SortableActivityCard = ({
     transition,
     opacity: isDragging ? 0.5 : 1,
   }
+
+  const isAvailable = useMemo(() => {
+    if (!activity.availableDays || activity.availableDays.length === 0) return true
+    const dateToCheck = activity.scheduledStart || activity.tripDay?.date
+    if (!dateToCheck) return true
+
+    const scheduledDay = dayjs(dateToCheck).format("dddd")
+    return activity.availableDays.includes(scheduledDay)
+  }, [activity.availableDays, activity.scheduledStart, activity.tripDay?.date])
 
   return (
     <Paper
@@ -68,12 +84,19 @@ export const SortableActivityCard = ({
           {activity.name}
         </Typography>
         <Typography variant="caption" display="block">
-          {activity.scheduledStart
-            ? new Date(activity.scheduledStart).toLocaleTimeString(dateFormat, { hour: "2-digit", minute: "2-digit" })
-            : "No time"}
+          {activity.scheduledStart ? dayjs(activity.scheduledStart).format("h:mm A") : "No time"}
         </Typography>
       </Box>
       <Box display="flex" alignItems="center">
+        {!isAvailable && (
+          <Tooltip
+            title={`Warning: This activity is usually not available on ${dayjs(
+              activity.scheduledStart || activity.tripDay?.date,
+            ).format("dddd")}. Available days: ${activity.availableDays.join(", ")}`}
+          >
+            <Warning color="warning" fontSize="small" sx={{ mr: 1 }} />
+          </Tooltip>
+        )}
         {activity.participants && activity.participants.length > 0 && (
           <AvatarGroup max={3} sx={{ mr: 1, "& .MuiAvatar-root": { width: 24, height: 24, fontSize: "0.75rem" } }}>
             {activity.participants.map((p) => (

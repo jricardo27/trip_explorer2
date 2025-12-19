@@ -4,26 +4,22 @@ export const TransportMode = {
   FLIGHT: "FLIGHT",
   TRAIN: "TRAIN",
   BUS: "BUS",
-  CAR: "CAR",
-  WALK: "WALK",
-  BOAT: "BOAT",
-  OTHER: "OTHER", // Make sure this matches backend if needed, or remove if not present in schema enum normally
-  // Aliases or additional modes used in code
   DRIVING: "DRIVING",
   WALKING: "WALKING",
   CYCLING: "CYCLING",
   TRANSIT: "TRANSIT",
   FERRY: "FERRY",
+  OTHER: "OTHER",
 } as const
 
 export type TransportMode = (typeof TransportMode)[keyof typeof TransportMode]
 
 export const ActivityType = {
   ACCOMMODATION: "ACCOMMODATION",
-  RESTAURANT: "RESTAURANT", // Was DINING
+  RESTAURANT: "RESTAURANT",
   ATTRACTION: "ATTRACTION",
   TRANSPORT: "TRANSPORT",
-  CUSTOM: "CUSTOM", // Was OTHER
+  CUSTOM: "CUSTOM",
 } as const
 
 export type ActivityType = (typeof ActivityType)[keyof typeof ActivityType]
@@ -53,7 +49,6 @@ export interface TransportSegment {
   arrivalTime?: string
   carrier?: string
   icon?: string
-
   details?: any
 }
 
@@ -69,21 +64,32 @@ export interface Trip {
   id: string
   userId: string
   name: string
+  title?: string // Aliased in some places
+  description?: string
+  destination?: string
   startDate: string
   endDate: string
   budget?: number
   defaultCurrency?: string
+  baseCurrency?: string
   currencies?: string[]
   exchangeRates?: Record<string, number>
   timezone?: string
+  status?: string
   isCompleted: boolean
   isPublic: boolean
   days?: TripDay[]
   activities?: Activity[]
   members?: TripMember[]
+  expenses?: Expense[]
   budgets?: Budget[]
   transport?: TransportAlternative[]
+  checklistItems?: TripChecklistItem[]
+  packingItems?: TripPackingItem[]
   animations?: TripAnimation[]
+  documents?: TripDocument[]
+  checklistCategories?: string[]
+  packingCategories?: string[]
   createdAt: string
   updatedAt: string
 }
@@ -93,7 +99,6 @@ export interface TripAnimation {
   tripId: string
   name: string
   description?: string
-
   settings: any
   steps: TripAnimationStep[]
   createdAt: string
@@ -121,7 +126,6 @@ export interface TripAnimationStep {
   customLabel?: string
   zoomLevel?: number
   transportMode?: string
-
   settings: any
   activity?: Activity
 }
@@ -129,17 +133,18 @@ export interface TripAnimationStep {
 export interface TripDay {
   id: string
   tripId: string
-  dayIndex: number
+  dayNumber: number
+  dayIndex?: number // In some places used interchangeably
   date: string
   name?: string
   notes?: string
-  activities?: Activity[]
+  activities: Activity[]
 }
 
 export interface Activity {
   id: string
   tripId: string
-  tripDayId?: string
+  tripDayId: string
   activityType: ActivityType
   activitySubtype?: string
   category?: string
@@ -171,7 +176,6 @@ export interface Activity {
   phone?: string
   email?: string
   website?: string
-
   openingHours?: any
   estimatedCost?: number
   actualCost?: number
@@ -184,6 +188,7 @@ export interface Activity {
   source?: string
   externalId?: string
   tags: string[]
+  availableDays: string[]
   tripDay?: TripDay
   createdAt: string
   updatedAt: string
@@ -194,18 +199,6 @@ export interface ActivityParticipant {
   activityId: string
   memberId: string
   member: TripMember
-  createdAt: string
-}
-
-export interface TripMember {
-  id: string
-  tripId: string
-  userId?: string
-  name: string
-  email?: string
-  role: MemberRole
-  avatarUrl?: string
-  color?: string
   createdAt: string
 }
 
@@ -250,7 +243,6 @@ export interface Expense {
   updatedAt: string
 }
 
-// API Request/Response types
 export interface ApiResponse<T> {
   data: T
 }
@@ -259,7 +251,6 @@ export interface ApiError {
   error: {
     code: string
     message: string
-
     details?: any
   }
 }
@@ -271,20 +262,15 @@ export interface CreateTripRequest {
   endDate: string
   budget?: number
   defaultCurrency?: string
-  currencies?: string[]
-  exchangeRates?: Record<string, number>
-  timezone?: string
 }
 
 export interface UpdateTripRequest {
   name?: string
+  title?: string
   startDate?: string
   endDate?: string
   budget?: number
   defaultCurrency?: string
-  currencies?: string[]
-  exchangeRates?: Record<string, number>
-  timezone?: string
   isCompleted?: boolean
   isPublic?: boolean
 }
@@ -299,15 +285,10 @@ export interface CreateActivityRequest {
   scheduledStart?: string
   scheduledEnd?: string
   durationMinutes?: number
-  city?: string
-  country?: string
-  countryCode?: string
-  estimatedCost?: number
-  currency?: string
-  participantIds?: string[]
 }
 
 export interface UpdateActivityRequest {
+  tripDayId?: string
   name?: string
   description?: string
   notes?: string
@@ -321,7 +302,18 @@ export interface UpdateActivityRequest {
   estimatedCost?: number
   actualCost?: number
   isPaid?: boolean
-  participantIds?: string[]
+  availableDays?: string[]
+}
+
+export interface CopyTripRequest {
+  id: string
+  name: string
+  startDate: string
+}
+
+export interface ShiftTripRequest {
+  id: string
+  days: number
 }
 
 export interface TransportAlternative {
@@ -338,7 +330,6 @@ export interface TransportAlternative {
   currency?: string
   costPerPerson: boolean
   distanceMeters?: number
-
   waypoints?: any
   description?: string
   notes?: string
@@ -362,5 +353,68 @@ export interface CreateTransportRequest {
   durationMinutes: number
   cost?: number
   currency?: string
-  description?: string
+  notes?: string
+}
+
+export interface ChecklistTemplate {
+  id: string
+  category: string
+  task: string
+  priority: number
+}
+
+export interface TripChecklistItem {
+  id: string
+  tripId: string
+  task: string
+  isDone: boolean
+  category?: string
+  priority: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PackingListTemplate {
+  id: string
+  category: string
+  item: string
+  priority: number
+}
+
+export interface TripPackingItem {
+  id: string
+  tripId: string
+  item: string
+  quantity: number
+  isPacked: boolean
+  category?: string
+  priority: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TripDocument {
+  id: string
+  tripId: string
+  title: string
+  url: string
+  notes?: string
+  category?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateDocumentRequest {
+  tripId: string
+  title: string
+  url: string
+  notes?: string
+  category?: string
+}
+
+export interface UpdateDocumentRequest {
+  title?: string
+  url?: string
+  notes?: string
+  category?: string
 }

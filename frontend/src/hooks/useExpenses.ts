@@ -17,6 +17,10 @@ export interface CreateExpenseRequest {
   splits?: { memberId: string; amount?: number }[]
 }
 
+export interface UpdateExpenseRequest extends Partial<Omit<CreateExpenseRequest, "tripId">> {
+  id: string
+}
+
 export const useExpenses = (tripId: string) => {
   const queryClient = useQueryClient()
 
@@ -54,6 +58,18 @@ export const useExpenses = (tripId: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses", tripId] })
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
+  const updateExpense = useMutation({
+    mutationFn: async ({ id, ...data }: UpdateExpenseRequest) => {
+      const response = await client.patch(`/expenses/${id}`, data)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["expenses", tripId] })
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
     },
   })
 
@@ -64,5 +80,6 @@ export const useExpenses = (tripId: string) => {
     error,
     createExpense,
     deleteExpense,
+    updateExpense,
   }
 }

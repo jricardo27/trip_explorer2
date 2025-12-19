@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express"
 
 import activityService from "../services/ActivityService"
 import tripService from "../services/TripService"
-import { createActivitySchema } from "../utils/validation" // Ensure these exist or create them
+import { createActivitySchema, updateActivitySchema } from "../utils/validation" // Ensure these exist or create them
 
 class ActivityController {
   async createActivity(req: Request, res: Response, next: NextFunction) {
@@ -80,7 +80,7 @@ class ActivityController {
     try {
       const { id } = req.params
       const userId = (req as any).user.id
-      const updateData = req.body
+      const activityData = req.body
 
       const activity = await activityService.getActivityById(id)
       if (!activity) {
@@ -92,19 +92,32 @@ class ActivityController {
         return res.status(403).json({ error: "Unauthorized" })
       }
 
-      // Remove immutable fields that shouldn't be in update data
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { id: _, tripId: __, createdAt: ___, participantIds, ...sanitizedData } = updateData
+      // Validate using Zod
+      const validatedData = updateActivitySchema.parse(activityData)
 
-      // Handle participants separately if provided
-      const prismaUpdateData: any = sanitizedData
+      // Transform dates and relations for Prisma
+      const prismaUpdateData: any = {
+        ...validatedData,
+      }
 
-      if (participantIds !== undefined) {
-        // Delete existing participants and create new ones
+      if (validatedData.scheduledStart) prismaUpdateData.scheduledStart = new Date(validatedData.scheduledStart)
+      if (validatedData.scheduledEnd) prismaUpdateData.scheduledEnd = new Date(validatedData.scheduledEnd)
+      if (validatedData.actualStart) prismaUpdateData.actualStart = new Date(validatedData.actualStart)
+      if (validatedData.actualEnd) prismaUpdateData.actualEnd = new Date(validatedData.actualEnd)
+
+      if (validatedData.tripDayId) {
+        prismaUpdateData.tripDay = {
+          connect: { id: validatedData.tripDayId },
+        }
+        delete prismaUpdateData.tripDayId
+      }
+
+      if (validatedData.participantIds !== undefined) {
         prismaUpdateData.participants = {
           deleteMany: {},
-          create: participantIds.map((memberId: string) => ({ memberId })),
+          create: validatedData.participantIds.map((memberId: string) => ({ memberId })),
         }
+        delete prismaUpdateData.participantIds
       }
 
       const updatedActivity = await activityService.updateActivity(id, prismaUpdateData)

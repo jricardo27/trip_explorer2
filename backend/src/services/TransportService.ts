@@ -13,6 +13,7 @@ export class TransportService {
     cost?: number
     currency?: string
     description?: string
+    notes?: string
   }): Promise<TransportAlternative> {
     // Check if we should auto-select this (e.g. if it's the first one)
     const existingCount = await prisma.transportAlternative.count({
@@ -34,6 +35,7 @@ export class TransportService {
         cost: data.cost,
         currency: data.currency || "AUD",
         description: data.description,
+        notes: data.notes,
         isSelected,
       },
     })

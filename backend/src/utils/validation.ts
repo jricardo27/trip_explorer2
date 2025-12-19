@@ -8,7 +8,7 @@ export const createTripSchema = z
     budget: z.number().positive().optional(),
     defaultCurrency: z.string().length(3).optional(),
     currencies: z.array(z.string()).optional(),
-    exchangeRates: z.record(z.number()).optional(),
+    exchangeRates: z.record(z.string(), z.number()).optional(),
     timezone: z.string().optional(),
   })
   .refine((data) => new Date(data.endDate) >= new Date(data.startDate), {
@@ -22,7 +22,7 @@ export const updateTripSchema = z.object({
   budget: z.number().positive().optional(),
   defaultCurrency: z.string().length(3).optional(),
   currencies: z.array(z.string()).optional(),
-  exchangeRates: z.record(z.number()).optional(),
+  exchangeRates: z.record(z.string(), z.number()).optional(),
   timezone: z.string().optional(),
   isCompleted: z.boolean().optional(),
   isPublic: z.boolean().optional(),
@@ -46,9 +46,12 @@ export const createActivitySchema = z.object({
   estimatedCost: z.number().positive().optional(),
   currency: z.string().length(3).optional(),
   participantIds: z.array(z.string().uuid()).optional(),
+  availableDays: z.array(z.string()).optional(),
 })
 
 export const updateActivitySchema = z.object({
+  tripDayId: z.string().uuid().optional(),
+  activityType: z.enum(["ACCOMMODATION", "RESTAURANT", "ATTRACTION", "TRANSPORT", "CUSTOM"]).optional(),
   name: z.string().min(1).max(255).optional(),
   description: z.string().optional(),
   notes: z.string().optional(),
@@ -59,10 +62,13 @@ export const updateActivitySchema = z.object({
   durationMinutes: z.number().int().positive().optional(),
   status: z.enum(["PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED", "SKIPPED"]).optional(),
   priority: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   estimatedCost: z.number().positive().optional(),
   actualCost: z.number().positive().optional(),
   isPaid: z.boolean().optional(),
   participantIds: z.array(z.string().uuid()).optional(),
+  availableDays: z.array(z.string()).optional(),
 })
 
 export const createExpenseSchema = z.object({
@@ -75,7 +81,7 @@ export const createExpenseSchema = z.object({
   paidById: z.string().uuid().optional(),
   date: z.string().datetime().optional(),
   isPaid: z.boolean().default(true),
-  splitType: z.enum(["equal", "itemized"]).default("equal"),
+  splitType: z.enum(["equal", "percentage", "amount", "shares"]).default("equal"),
   splits: z
     .array(
       z.object({
@@ -94,7 +100,7 @@ export const updateExpenseSchema = z.object({
   paidById: z.string().uuid().optional(),
   date: z.string().datetime().optional(),
   isPaid: z.boolean().optional(),
-  splitType: z.enum(["equal", "itemized"]).optional(),
+  splitType: z.enum(["equal", "percentage", "amount", "shares"]).optional(),
   splits: z
     .array(
       z.object({

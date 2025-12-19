@@ -1,4 +1,4 @@
-import { Map as MapIcon } from "@mui/icons-material"
+import { Map as MapIcon, Close as CloseIcon } from "@mui/icons-material"
 import {
   Dialog,
   DialogTitle,
@@ -21,6 +21,8 @@ import {
   Avatar,
   Typography,
   ListItemButton,
+  Chip,
+  IconButton,
 } from "@mui/material"
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import dayjs from "dayjs"
@@ -31,6 +33,8 @@ import { ActivityType } from "../types"
 import type { Activity, TripDay } from "../types"
 
 import LocationPickerMap from "./LocationPickerMap"
+
+const DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 interface ActivityDialogProps {
   open: boolean
@@ -70,9 +74,12 @@ const ActivityDialog = ({
   const [scheduledStart, setScheduledStart] = useState<dayjs.Dayjs | null>(null)
   const [scheduledEnd, setScheduledEnd] = useState<dayjs.Dayjs | null>(null)
   const [estimatedCost, setEstimatedCost] = useState("")
+  const [actualCost, setActualCost] = useState("")
+  const [isPaid, setIsPaid] = useState(false)
   const [latitude, setLatitude] = useState("")
   const [longitude, setLongitude] = useState("")
   const [notes, setNotes] = useState("")
+  const [availableDays, setAvailableDays] = useState<string[]>([])
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
   const [mapPickerOpen, setMapPickerOpen] = useState(false)
@@ -88,11 +95,14 @@ const ActivityDialog = ({
         setScheduledStart(activity.scheduledStart ? dayjs(activity.scheduledStart) : null)
         setScheduledEnd(activity.scheduledEnd ? dayjs(activity.scheduledEnd) : null)
         setEstimatedCost(activity.estimatedCost?.toString() || "")
+        setActualCost(activity.actualCost?.toString() || "")
+        setIsPaid(activity.isPaid || false)
         setLatitude(activity.latitude?.toString() || "")
         setLongitude(activity.longitude?.toString() || "")
         setLatitude(activity.latitude?.toString() || "")
         setLongitude(activity.longitude?.toString() || "")
         setNotes(activity.notes || "")
+        setAvailableDays(activity.availableDays || [])
         setSelectedMemberIds(activity.participants?.map((p) => p.memberId) || [])
       } else {
         // Reset for create
@@ -119,11 +129,13 @@ const ActivityDialog = ({
         setScheduledStart(defaultStart)
         setScheduledEnd(defaultEnd)
         setEstimatedCost("")
+        setActualCost("")
+        setIsPaid(false)
         setLatitude("")
         setLongitude("")
         setLongitude("")
         setNotes("")
-        setNotes("")
+        setAvailableDays([])
         setSelectedMemberIds(members.map((m) => m.id))
       }
     }
@@ -213,9 +225,12 @@ const ActivityDialog = ({
         scheduledStart: scheduledStart ? scheduledStart.toISOString() : undefined,
         scheduledEnd: scheduledEnd ? scheduledEnd.toISOString() : undefined,
         estimatedCost: estimatedCost ? parseFloat(estimatedCost) : undefined,
+        actualCost: actualCost ? parseFloat(actualCost) : undefined,
+        isPaid,
         latitude: latitude ? parseFloat(latitude) : undefined,
         longitude: longitude ? parseFloat(longitude) : undefined,
         notes,
+        availableDays,
         participantIds: selectedMemberIds,
       })
     } catch (err: any) {
@@ -228,9 +243,18 @@ const ActivityDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
-      <form onSubmit={handleSubmit}>
-        <DialogTitle>{activity ? "Edit Activity" : "Add Activity"}</DialogTitle>
-        <DialogContent>
+      <DialogTitle>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          {activity ? "Edit Activity" : "Add Activity"}
+          {fullScreen && (
+            <IconButton onClick={() => onClose(undefined, "closeButton")} size="small">
+              <CloseIcon />
+            </IconButton>
+          )}
+        </Box>
+      </DialogTitle>
+      <DialogContent dividers>
+        <form id="activity-form" onSubmit={handleSubmit}>
           <Box pt={2}>
             {error && (
               <Alert severity="error" sx={{ mb: 2 }}>
@@ -284,9 +308,10 @@ const ActivityDialog = ({
                       setScheduledEnd(newValue)
                     }
                   }}
+                  slotProps={{ textField: { fullWidth: true } }}
                 />
               </Grid>
-              <Grid size={{ xs: 12 }}>
+              <Grid size={{ xs: 6 }}>
                 <TextField
                   fullWidth
                   label="Estimated Cost"
@@ -295,6 +320,22 @@ const ActivityDialog = ({
                   onChange={(e) => setEstimatedCost(e.target.value)}
                   InputProps={{ startAdornment: "$" }}
                 />
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <TextField
+                  fullWidth
+                  label="Actual Cost"
+                  type="number"
+                  value={actualCost}
+                  onChange={(e) => setActualCost(e.target.value)}
+                  InputProps={{ startAdornment: "$" }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <Box display="flex" alignItems="center">
+                  <Checkbox checked={isPaid} onChange={(e) => setIsPaid(e.target.checked)} />
+                  <Typography variant="body2">Mark as Paid</Typography>
+                </Box>
               </Grid>
               <Grid size={{ xs: 5 }}>
                 <TextField
@@ -339,6 +380,37 @@ const ActivityDialog = ({
               </Grid>
 
               <Grid size={{ xs: 12 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Available Days (Optional)</InputLabel>
+                  <Select
+                    multiple
+                    value={availableDays}
+                    label="Available Days (Optional)"
+                    onChange={(e) =>
+                      setAvailableDays(typeof e.target.value === "string" ? e.target.value.split(",") : e.target.value)
+                    }
+                    renderValue={(selected) => (
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip key={value} label={value} size="small" />
+                        ))}
+                      </Box>
+                    )}
+                  >
+                    {DAYS_OF_WEEK.map((day) => (
+                      <MenuItem key={day} value={day}>
+                        <Checkbox checked={availableDays.indexOf(day) > -1} />
+                        <ListItemText primary={day} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                    Leave empty if available every day.
+                  </Typography>
+                </FormControl>
+              </Grid>
+
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle2" gutterBottom>
                   Who&apos;s going?
                 </Typography>
@@ -378,14 +450,14 @@ const ActivityDialog = ({
               </Grid>
             </Grid>
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => onClose(undefined, "cancelButton")}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={isLoading}>
-            {isLoading ? "Saving..." : activity ? "Save Changes" : "Add Activity"}
-          </Button>
-        </DialogActions>
-      </form>
+        </form>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => onClose(undefined, "cancelButton")}>Cancel</Button>
+        <Button type="submit" form="activity-form" variant="contained" disabled={isLoading}>
+          {isLoading ? "Saving..." : activity ? "Save Changes" : "Add Activity"}
+        </Button>
+      </DialogActions>
       <LocationPickerMap
         open={mapPickerOpen}
         onClose={() => setMapPickerOpen(false)}

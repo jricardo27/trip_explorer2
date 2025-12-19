@@ -1,4 +1,5 @@
 import {
+  ContentCopy as CopyIcon,
   Delete as DeleteIcon,
   DirectionsCar,
   DirectionsBus,
@@ -26,6 +27,7 @@ import {
   Typography,
   Box,
   Radio,
+  Tooltip,
 } from "@mui/material"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
@@ -78,6 +80,8 @@ export const TransportDialog = ({
   const [newMode, setNewMode] = useState<TransportMode>(TransportMode.DRIVING)
   const [newDuration, setNewDuration] = useState<string>("")
   const [newCost, setNewCost] = useState<string>("")
+  const [newCurrency, setNewCurrency] = useState("AUD")
+  const [newNotes, setNewNotes] = useState("")
   const [isAdding, setIsAdding] = useState(false)
 
   const createMutation = useMutation({
@@ -87,6 +91,7 @@ export const TransportDialog = ({
       setIsAdding(false)
       setNewDuration("")
       setNewCost("")
+      setNewNotes("")
     },
   })
 
@@ -112,7 +117,18 @@ export const TransportDialog = ({
       transportMode: newMode,
       durationMinutes: parseInt(newDuration) || 0,
       cost: newCost ? parseFloat(newCost) : undefined,
+      currency: newCurrency,
+      notes: newNotes,
     })
+  }
+
+  const handleCopy = (alt: TransportAlternative) => {
+    setNewMode(alt.transportMode)
+    setNewDuration(alt.durationMinutes.toString())
+    setNewCost(alt.cost?.toString() || "")
+    setNewCurrency(alt.currency || "AUD")
+    setNewNotes(alt.notes || "")
+    setIsAdding(true)
   }
 
   return (
@@ -124,9 +140,18 @@ export const TransportDialog = ({
             <ListItem
               key={alt.id}
               secondaryAction={
-                <IconButton edge="end" onClick={() => deleteMutation.mutate(alt.id)}>
-                  <DeleteIcon />
-                </IconButton>
+                <Box>
+                  <Tooltip title="Copy">
+                    <IconButton edge="end" onClick={() => handleCopy(alt)} sx={{ mr: 1 }}>
+                      <CopyIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton edge="end" onClick={() => deleteMutation.mutate(alt.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               }
             >
               <ListItemIcon onClick={() => selectMutation.mutate(alt.id)} style={{ cursor: "pointer" }}>
@@ -173,13 +198,42 @@ export const TransportDialog = ({
                   onChange={(e) => setNewDuration(e.target.value)}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={4}>
                 <TextField
                   label="Cost"
                   type="number"
                   fullWidth
                   value={newCost}
                   onChange={(e) => setNewCost(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <TextField
+                        select
+                        variant="standard"
+                        value={newCurrency}
+                        onChange={(e) => setNewCurrency(e.target.value)}
+                        InputProps={{ disableUnderline: true }}
+                        sx={{ width: 60, mr: 1 }}
+                      >
+                        {["AUD", "USD", "EUR", "GBP", "JPY", "CAD", "NZD"].map((curr) => (
+                          <MenuItem key={curr} value={curr}>
+                            {curr}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid size={12}>
+                <TextField
+                  label="Notes"
+                  fullWidth
+                  multiline
+                  rows={2}
+                  value={newNotes}
+                  onChange={(e) => setNewNotes(e.target.value)}
+                  placeholder="e.g. Booking reference, platform details..."
                 />
               </Grid>
               <Grid size={12} container justifyContent="flex-end" spacing={1}>

@@ -82,6 +82,12 @@ export class TripService {
         members: true,
         budgets: true,
         transport: true,
+        checklistItems: {
+          orderBy: [{ category: "asc" }, { priority: "desc" }],
+        },
+        packingItems: {
+          orderBy: [{ category: "asc" }, { priority: "desc" }],
+        },
         animations: {
           include: {
             steps: {
@@ -89,6 +95,9 @@ export class TripService {
             },
           },
           orderBy: { createdAt: "desc" },
+        },
+        documents: {
+          orderBy: { createdAt: "asc" },
         },
       },
     })
@@ -147,6 +156,8 @@ export class TripService {
       timezone: string
       isCompleted: boolean
       isPublic: boolean
+      checklistCategories: string[]
+      packingCategories: string[]
     }>,
   ): Promise<Trip> {
     const trip = await prisma.trip.update({
@@ -205,9 +216,19 @@ export class TripService {
     const originalTrip = await prisma.trip.findFirst({
       where: { id: tripId, userId },
       include: {
-        days: true,
-        activities: true,
+        days: {
+          include: {
+            activities: {
+              include: {
+                participants: true,
+              },
+            },
+          },
+        },
+        members: true,
         budgets: true,
+        checklistItems: true,
+        packingItems: true,
       },
     })
 
@@ -217,7 +238,9 @@ export class TripService {
 
     const duration = originalTrip.endDate.getTime() - originalTrip.startDate.getTime()
     const newEndDate = new Date(newStartDate.getTime() + duration)
+    const shiftMs = newStartDate.getTime() - originalTrip.startDate.getTime()
 
+    // 1. Create the Trip
     const newTrip = await prisma.trip.create({
       data: {
         userId,
@@ -229,34 +252,196 @@ export class TripService {
         currencies: originalTrip.currencies,
         exchangeRates: originalTrip.exchangeRates || {},
         timezone: originalTrip.timezone,
-        days: {
-          create: originalTrip.days.map((day, i) => {
-            const date = new Date(newStartDate)
-            date.setDate(date.getDate() + i)
-            return {
-              dayIndex: day.dayIndex,
-              date: date,
-              name: day.name,
-              notes: day.notes,
-            }
-          }),
-        },
-        budgets: {
-          create: originalTrip.budgets.map((budget) => ({
-            category: budget.category,
-            amount: budget.amount,
-            currency: budget.currency,
-            alertThresholdPercentage: budget.alertThresholdPercentage,
-            notes: budget.notes,
-          })),
-        },
-      },
-      include: {
-        days: true,
       },
     })
 
+    // Map to keep track of old IDs to new IDs
+    const memberMap = new Map<string, string>()
+
+    // 2. Copy Members (as Editors, except the owner)
+    for (const member of originalTrip.members) {
+      const newMember = await prisma.tripMember.create({
+        data: {
+          tripId: newTrip.id,
+          userId: member.userId,
+          name: member.name,
+          email: member.email,
+          role: member.userId === userId ? "OWNER" : "EDITOR",
+          avatarUrl: member.avatarUrl,
+          color: member.color,
+        },
+      })
+      memberMap.set(member.id, newMember.id)
+    }
+
+    // 3. Copy Days & Activities
+    for (const day of originalTrip.days) {
+      const newDay = await prisma.tripDay.create({
+        data: {
+          tripId: newTrip.id,
+          dayIndex: day.dayIndex,
+          date: new Date(day.date.getTime() + shiftMs),
+          name: day.name,
+          notes: day.notes,
+        },
+      })
+
+      for (const activity of day.activities) {
+        const newActivity = await prisma.activity.create({
+          data: {
+            tripId: newTrip.id,
+            tripDayId: newDay.id,
+            activityType: activity.activityType,
+            activitySubtype: activity.activitySubtype,
+            name: activity.name,
+            description: activity.description,
+            notes: activity.notes,
+            address: activity.address,
+            city: activity.city,
+            country: activity.country,
+            countryCode: activity.countryCode,
+            latitude: activity.latitude,
+            longitude: activity.longitude,
+            scheduledStart: activity.scheduledStart ? new Date(activity.scheduledStart.getTime() + shiftMs) : null,
+            scheduledEnd: activity.scheduledEnd ? new Date(activity.scheduledEnd.getTime() + shiftMs) : null,
+            durationMinutes: activity.durationMinutes,
+            isAllDay: activity.isAllDay,
+            isFlexible: activity.isFlexible,
+            status: "PLANNED",
+            priority: activity.priority,
+            orderIndex: activity.orderIndex,
+            estimatedCost: activity.estimatedCost,
+            currency: activity.currency,
+            availableDays: activity.availableDays,
+          },
+        })
+
+        // Copy Participants
+        for (const p of activity.participants) {
+          const newMemberId = memberMap.get(p.memberId)
+          if (newMemberId) {
+            await prisma.activityParticipant.create({
+              data: {
+                activityId: newActivity.id,
+                memberId: newMemberId,
+              },
+            })
+          }
+        }
+      }
+    }
+
+    // 4. Copy Budgets
+    for (const budget of originalTrip.budgets) {
+      await prisma.budget.create({
+        data: {
+          tripId: newTrip.id,
+          category: budget.category,
+          amount: budget.amount,
+          currency: budget.currency,
+          alertThresholdPercentage: budget.alertThresholdPercentage,
+          notes: budget.notes,
+        },
+      })
+    }
+
+    // 5. Copy Checklist/Packing Items
+    for (const item of originalTrip.checklistItems) {
+      await prisma.tripChecklistItem.create({
+        data: {
+          tripId: newTrip.id,
+          task: item.task,
+          category: item.category,
+          priority: item.priority,
+          isDone: false,
+        },
+      })
+    }
+    for (const item of originalTrip.packingItems) {
+      await prisma.tripPackingItem.create({
+        data: {
+          tripId: newTrip.id,
+          item: item.item,
+          category: item.category,
+          priority: item.priority,
+          quantity: item.quantity,
+          isPacked: false,
+        },
+      })
+    }
+
     return newTrip
+  }
+
+  async shiftTripDates(tripId: string, userId: string, daysToShift: number): Promise<Trip> {
+    const trip = await prisma.trip.findFirst({
+      where: { id: tripId, userId },
+      include: {
+        days: true,
+        activities: true,
+        expenses: true,
+      },
+    })
+
+    if (!trip) throw new Error("Trip not found")
+
+    const shiftMs = daysToShift * 24 * 60 * 60 * 1000
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Shift Trip Dates
+      await tx.trip.update({
+        where: { id: tripId },
+        data: {
+          startDate: new Date(trip.startDate.getTime() + shiftMs),
+          endDate: new Date(trip.endDate.getTime() + shiftMs),
+        },
+      })
+
+      // 2. Shift Day Dates
+      for (const day of trip.days) {
+        await tx.tripDay.update({
+          where: { id: day.id },
+          data: {
+            date: new Date(day.date.getTime() + shiftMs),
+          },
+        })
+      }
+
+      // 3. Shift Activity Scheduled Times
+      for (const activity of trip.activities) {
+        const updates: any = {}
+        if (activity.scheduledStart) {
+          updates.scheduledStart = new Date(activity.scheduledStart.getTime() + shiftMs)
+        }
+        if (activity.scheduledEnd) {
+          updates.scheduledEnd = new Date(activity.scheduledEnd.getTime() + shiftMs)
+        }
+        if (activity.bookingDeadline) {
+          updates.bookingDeadline = new Date(activity.bookingDeadline.getTime() + shiftMs)
+        }
+
+        if (Object.keys(updates).length > 0) {
+          await tx.activity.update({
+            where: { id: activity.id },
+            data: updates,
+          })
+        }
+      }
+
+      // 4. Shift Expenses
+      for (const expense of trip.expenses) {
+        if (expense.paymentDate) {
+          await tx.expense.update({
+            where: { id: expense.id },
+            data: {
+              paymentDate: new Date(expense.paymentDate.getTime() + shiftMs),
+            },
+          })
+        }
+      }
+    })
+
+    return (await this.getTripById(tripId, userId)) as Trip
   }
 
   async exportTrip(id: string, userId: string): Promise<any> {
@@ -282,6 +467,8 @@ export class TripService {
         members: true,
         budgets: true,
         transport: true,
+        checklistItems: true,
+        packingItems: true,
         expenses: {
           include: {
             splits: true,
@@ -320,6 +507,8 @@ export class TripService {
         members: true,
         budgets: true,
         transport: true,
+        checklistItems: true,
+        packingItems: true,
         expenses: {
           include: {
             splits: true,

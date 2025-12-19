@@ -29,18 +29,25 @@ import { useMemo, useState } from "react"
 import { Pie, Bar } from "react-chartjs-2"
 import * as XLSX from "xlsx"
 
-import type { Expense, TripMember } from "../types"
+import type { Activity, Expense, TripMember } from "../types"
 
 ChartJS.register(ArcElement, ChartTooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
 
 interface ExpenseReportsProps {
   expenses: Expense[]
+  activities: Activity[]
   members: TripMember[]
   defaultCurrency: string
   exchangeRates?: Record<string, number>
 }
 
-export const ExpenseReports = ({ expenses, members, defaultCurrency, exchangeRates = {} }: ExpenseReportsProps) => {
+export const ExpenseReports = ({
+  expenses,
+  activities,
+  members,
+  defaultCurrency,
+  exchangeRates = {},
+}: ExpenseReportsProps) => {
   // State
   const [viewMode, setViewMode] = useState<"charts" | "spreadsheet">("charts")
 
@@ -107,6 +114,58 @@ export const ExpenseReports = ({ expenses, members, defaultCurrency, exchangeRat
       ],
     }
   }, [processedExpenses, defaultCurrency])
+
+  const plannedVsSpentData = useMemo(() => {
+    const categories = ["Accommodation", "Transport", "Attraction", "Food", "Other"]
+    const planned: Record<string, number> = {}
+    const spent: Record<string, number> = {}
+
+    // Initialize
+    categories.forEach((cat) => {
+      planned[cat] = 0
+      spent[cat] = 0
+    })
+
+    // Process Activities (Planned and potentially Spent)
+    activities.forEach((a) => {
+      const cat = a.activityType || "Other"
+      const rate = a.currency === defaultCurrency ? 1 : exchangeRates[a.currency || ""] || 1
+
+      const p = Number(a.estimatedCost || 0) * rate
+      const s = Number(a.actualCost || 0) * rate
+
+      const key = categories.includes(cat) ? cat : "Other"
+      planned[key] += p
+      spent[key] += s
+    })
+
+    // Process independent Expenses (Spent)
+    processedExpenses.forEach((e) => {
+      // Avoid double counting if expense is linked to activity (already handled in activities.actualCost?)
+      // Actually, many users might use one OR the other.
+      // If we have an activity.id on the expense, we should prioritize the expense as the 'actual' spent amount.
+      if (!e.activityId) {
+        const key = categories.includes(e.category) ? e.category : "Other"
+        spent[key] += e.convertedAmount
+      }
+    })
+
+    return {
+      labels: categories,
+      datasets: [
+        {
+          label: "Planned (Est.)",
+          data: categories.map((c) => planned[c]),
+          backgroundColor: "rgba(153, 102, 255, 0.5)",
+        },
+        {
+          label: "Spent (Actual)",
+          data: categories.map((c) => spent[c]),
+          backgroundColor: "rgba(75, 192, 192, 0.5)",
+        },
+      ],
+    }
+  }, [activities, processedExpenses, defaultCurrency, exchangeRates])
 
   const handleExport = () => {
     const dataToExport = processedExpenses.map((e) => ({
@@ -196,6 +255,57 @@ export const ExpenseReports = ({ expenses, members, defaultCurrency, exchangeRat
                       }}
                     />
                   </Box>
+                </Paper>
+              </Grid>
+              {/* @ts-expect-error -- Grid types out of sync with MUI version */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <Typography variant="h6" gutterBottom>
+                    Planned vs Spent ({defaultCurrency})
+                  </Typography>
+                  <Box sx={{ height: 350, width: "100%", position: "relative", mb: 4 }}>
+                    <Bar
+                      data={plannedVsSpentData}
+                      options={{
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } },
+                      }}
+                    />
+                  </Box>
+
+                  <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid", borderColor: "divider" }}>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Category</TableCell>
+                          <TableCell align="right">Planned</TableCell>
+                          <TableCell align="right">Spent</TableCell>
+                          <TableCell align="right">Difference</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {plannedVsSpentData.labels.map((cat, i) => {
+                          const p = plannedVsSpentData.datasets[0].data[i] as number
+                          const s = plannedVsSpentData.datasets[1].data[i] as number
+                          const diff = p - s
+                          return (
+                            <TableRow key={cat.toString()}>
+                              <TableCell>{cat.toString()}</TableCell>
+                              <TableCell align="right">{p.toFixed(2)}</TableCell>
+                              <TableCell align="right">{s.toFixed(2)}</TableCell>
+                              <TableCell
+                                align="right"
+                                sx={{ color: diff < 0 ? "error.main" : "success.main", fontWeight: "bold" }}
+                              >
+                                {diff > 0 ? "+" : ""}
+                                {diff.toFixed(2)}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </Paper>
               </Grid>
             </Grid>
