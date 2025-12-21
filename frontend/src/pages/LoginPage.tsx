@@ -28,8 +28,16 @@ const LoginPage = () => {
   return (
     <Container maxWidth="xs">
       <Box sx={{ mt: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
-          <Typography component="h1" variant="h5" align="center" gutterBottom>
+        <Paper elevation={3} sx={{ p: 4, width: "100%", borderRadius: 2 }}>
+          <Box sx={{ mb: 3, textAlign: "center" }}>
+            <Typography variant="h4" component="h1" fontWeight="bold" color="primary">
+              Trip Explorer
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Plan your next adventure with ease
+            </Typography>
+          </Box>
+          <Typography component="h2" variant="h5" align="center" gutterBottom>
             Sign In
           </Typography>
           {error && (
