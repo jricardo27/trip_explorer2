@@ -29,12 +29,14 @@ echo "=== Local Build & Push (Generic SSH) ==="
 # 1. Build Frontend
 echo "--- Frontend: Building Locally ---"
 cd "$PROJECT_ROOT/frontend"
+rm -rf dist
 npm install
 npm run build
 
 # 2. Build Backend
 echo "--- Backend: Building Locally ---"
 cd "$PROJECT_ROOT/backend"
+rm -rf dist
 npm install
 npm run build
 
