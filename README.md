@@ -50,10 +50,10 @@ This method avoids taxing your VM's resources by building on your local machine 
 2. **Run the Build & Push script** (from your local machine):
 
    ```bash
-   ./scripts/build-and-push.sh trip-app-vm /var/www/trip_explorer
+   ./scripts/build-and-push.sh ubuntu@123.123.123.123 /var/www/trip_explorer
    ```
 
-   This script builds the app locally and uses `rsync` to transfer `dist/`, `package.json`, `prisma/`, and `scripts/` to the VM.
+   This script builds the app locally, packages it, and uses standard `scp` and `ssh` to transfer and extract the files on the VM.
 
 3. **Finalize on the VM**:
    SSH into your VM, navigate to the deployment directory, and run:
