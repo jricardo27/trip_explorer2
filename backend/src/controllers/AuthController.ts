@@ -37,7 +37,7 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
     })
 
     const token = generateToken(user.id)
-    res.status(201).json({ token, user: { id: user.id, email: user.email } })
+    res.status(201).json({ data: { token, user: { id: user.id, email: user.email } } })
   } catch (error) {
     next(error)
   }
@@ -58,7 +58,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const token = generateToken(user.id)
-    res.json({ token, user: { id: user.id, email: user.email } })
+    res.json({ data: { token, user: { id: user.id, email: user.email } } })
   } catch (error) {
     next(error)
   }
