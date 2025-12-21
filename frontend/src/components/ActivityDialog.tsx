@@ -50,6 +50,7 @@ interface ActivityDialogProps {
   tripEndDate?: string
   tripDays?: TripDay[]
   fullScreen?: boolean
+  initialCoordinates?: { lat: number; lng: number }
 }
 
 const ActivityDialog = ({
@@ -64,6 +65,7 @@ const ActivityDialog = ({
   tripEndDate,
   tripDays,
   fullScreen,
+  initialCoordinates,
 }: ActivityDialogProps) => {
   const handleClose = (event: object, reason: string) => {
     if (reason === "backdropClick") return
@@ -104,8 +106,6 @@ const ActivityDialog = ({
         setIsPaid(activity.isPaid || false)
         setLatitude(activity.latitude?.toString() || "")
         setLongitude(activity.longitude?.toString() || "")
-        setLatitude(activity.latitude?.toString() || "")
-        setLongitude(activity.longitude?.toString() || "")
         setNotes(activity.notes || "")
         setAvailableDays(activity.availableDays || [])
         setSelectedMemberIds(activity.participants?.map((p) => p.memberId) || [])
@@ -136,9 +136,8 @@ const ActivityDialog = ({
         setEstimatedCost("")
         setActualCost("")
         setIsPaid(false)
-        setLatitude("")
-        setLongitude("")
-        setLongitude("")
+        setLatitude(initialCoordinates?.lat.toString() || "")
+        setLongitude(initialCoordinates?.lng.toString() || "")
         setNotes("")
         setAvailableDays([])
         setSelectedMemberIds(members.map((m) => m.id))

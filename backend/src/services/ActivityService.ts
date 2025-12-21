@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto"
+
 import { Activity, Prisma, ActivityType, ActivityStatus } from "@prisma/client"
 
 import prisma from "../utils/prisma"
@@ -128,11 +130,54 @@ export class ActivityService {
   }
 
   async updateActivity(id: string, data: Prisma.ActivityUpdateInput): Promise<Activity> {
-    const activity = await prisma.activity.update({
+    const activity = await prisma.activity.findUnique({ where: { id } })
+    if (!activity) throw new Error("Activity not found")
+
+    const updatedActivity = await prisma.activity.update({
       where: { id },
       data,
     })
-    return activity
+
+    // Propagate changes if soft linked
+    if (activity.linkedGroupId) {
+      // Fields to sync (exclude ID, tripId, tripDayId, orderIndex, dates if we want them separate)
+      // Requirement says "modifications... are applied to all", so let's sync most fields.
+      const syncFields = [
+        "name",
+        "description",
+        "notes",
+        "address",
+        "city",
+        "country",
+        "countryCode",
+        "latitude",
+        "longitude",
+        "estimatedCost",
+        "currency",
+        "activityType",
+        "activitySubtype",
+        "category",
+      ]
+
+      const syncData: any = {}
+      for (const field of syncFields) {
+        if (data[field as keyof typeof data] !== undefined) {
+          syncData[field] = data[field as keyof typeof data]
+        }
+      }
+
+      if (Object.keys(syncData).length > 0) {
+        await prisma.activity.updateMany({
+          where: {
+            linkedGroupId: activity.linkedGroupId,
+            id: { not: id },
+          },
+          data: syncData,
+        })
+      }
+    }
+
+    return updatedActivity
   }
 
   async deleteActivity(id: string, userId: string): Promise<void> {
@@ -151,17 +196,40 @@ export class ActivityService {
     })
   }
 
-  async copyActivity(id: string, userId: string): Promise<any> {
+  async copyActivity(id: string, userId: string, userEmail?: string): Promise<any> {
     // Get the original activity
     const originalActivity = await prisma.activity.findUnique({
       where: { id },
       include: {
-        trip: true,
+        trip: {
+          include: {
+            members: {
+              where: {
+                OR: [{ userId }, { email: userEmail }],
+              },
+            },
+          },
+        },
       },
     })
 
-    if (!originalActivity || originalActivity.trip.userId !== userId) {
+    if (
+      !originalActivity ||
+      (originalActivity.trip.userId !== userId &&
+        !originalActivity.trip.members.some((m) => ["OWNER", "EDITOR"].includes(m.role)))
+    ) {
       throw new Error("Activity not found or unauthorized")
+    }
+
+    let linkedGroupId = originalActivity.linkedGroupId
+    if (!linkedGroupId) {
+      // Generate unique group ID
+      linkedGroupId = randomUUID()
+      // Update original activity with new group ID
+      await prisma.activity.update({
+        where: { id },
+        data: { linkedGroupId },
+      })
     }
 
     // Create a copy with a new ID
@@ -169,7 +237,8 @@ export class ActivityService {
       data: {
         tripId: originalActivity.tripId,
         tripDayId: originalActivity.tripDayId,
-        name: `${originalActivity.name} (Copy)`,
+        linkedGroupId: linkedGroupId,
+        name: originalActivity.name, // Soft copy: keep name the same (sync will handle it anyway)
         description: originalActivity.description,
         activityType: originalActivity.activityType,
         activitySubtype: originalActivity.activitySubtype,

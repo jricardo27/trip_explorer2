@@ -88,7 +88,7 @@ const TripList = () => {
 
   const handleCreateTrip = async () => {
     if (name && startDate && endDate) {
-      await createTripMutation.mutateAsync({
+      const newTrip = await createTripMutation.mutateAsync({
         name,
         startDate: new Date(startDate).toISOString(),
         endDate: new Date(endDate).toISOString(),
@@ -101,6 +101,8 @@ const TripList = () => {
       setStartDate("")
       setEndDate("")
       setBudget("")
+      // Navigate to new trip
+      navigate(`/trips/${newTrip.id}`)
     }
   }
 
@@ -118,12 +120,13 @@ const TripList = () => {
 
   const confirmDuplicate = async () => {
     if (selectedTrip && copyName && copyStartDate) {
-      await copyTripMutation.mutateAsync({
+      const newTrip = await copyTripMutation.mutateAsync({
         tripId: selectedTrip.id,
         name: copyName,
         startDate: copyStartDate,
       })
       setCopyOpen(false)
+      navigate(`/trips/${newTrip.id}`)
     }
   }
 

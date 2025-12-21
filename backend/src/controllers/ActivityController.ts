@@ -1,23 +1,18 @@
 import { Request, Response, NextFunction } from "express"
 
 import activityService from "../services/ActivityService"
-import tripService from "../services/TripService"
 import { createActivitySchema, updateActivitySchema } from "../utils/validation" // Ensure these exist or create them
 
 class ActivityController {
   async createActivity(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const activityData = req.body
 
       // Validate using Zod
       const validatedData = createActivitySchema.parse(activityData)
 
-      // Check trip ownership
-      const trip = await tripService.getTripById(validatedData.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized or Trip not found" })
-      }
+      // Permission already checked by middleware (checkTripPermission("EDITOR"))
+      // req.trip and req.userRole are available if needed.
 
       // Transform date strings to Date objects for service
       const serviceData = {
@@ -36,18 +31,13 @@ class ActivityController {
   async getActivity(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params
-      const userId = (req as any).user.id
 
       const activity = await activityService.getActivityById(id)
       if (!activity) {
         return res.status(404).json({ error: "Activity not found" })
       }
 
-      // Check access (trip ownership)
-      const trip = await tripService.getTripById(activity.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
+      // Permission already checked by middleware (checkTripPermission("VIEWER"))
 
       res.json(activity)
     } catch (error) {
@@ -57,17 +47,13 @@ class ActivityController {
 
   async listActivities(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { tripId } = req.query as { tripId: string }
 
       if (!tripId) {
         return res.status(400).json({ error: "tripId is required" })
       }
 
-      const trip = await tripService.getTripById(tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
+      // Permission already checked by middleware (checkTripPermission("VIEWER"))
 
       const activities = await activityService.listActivitiesByTrip(tripId, req.query as any)
       res.json(activities)
@@ -79,7 +65,6 @@ class ActivityController {
   async updateActivity(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params
-      const userId = (req as any).user.id
       const activityData = req.body
 
       const activity = await activityService.getActivityById(id)
@@ -87,11 +72,7 @@ class ActivityController {
         return res.status(404).json({ error: "Activity not found" })
       }
 
-      const trip = await tripService.getTripById(activity.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
-
+      // Permission already checked by middleware (checkTripPermission("EDITOR"))
       // Validate using Zod
       const validatedData = updateActivitySchema.parse(activityData)
 
@@ -137,11 +118,7 @@ class ActivityController {
         return res.status(404).json({ error: "Activity not found" })
       }
 
-      const trip = await tripService.getTripById(activity.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
-
+      // Permission checked by middleware (EDITOR)
       await activityService.deleteActivity(id, userId)
       res.status(204).send()
     } catch (error) {
@@ -154,7 +131,7 @@ class ActivityController {
       const userId = (req as any).user.id
       const { id } = req.params
 
-      const copiedActivity = await activityService.copyActivity(id, userId)
+      const copiedActivity = await activityService.copyActivity(id, userId, (req as any).user.email)
       res.status(201).json(copiedActivity)
     } catch (error: any) {
       if (error.message === "Activity not found or unauthorized") {
@@ -166,19 +143,13 @@ class ActivityController {
 
   async reorder(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { tripId, updates } = req.body
 
       if (!tripId || !updates || !Array.isArray(updates)) {
         return res.status(400).json({ error: "Invalid request" })
       }
 
-      // Check access
-      const trip = await tripService.getTripById(tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
-
+      // Permission checked by middleware (EDITOR)
       await activityService.reorderActivities(tripId, updates)
       res.json({ message: "Activities reordered successfully" })
     } catch (error) {
@@ -188,7 +159,6 @@ class ActivityController {
 
   async addParticipant(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { id } = req.params // activityId
       const { memberId } = req.body
 
@@ -201,11 +171,7 @@ class ActivityController {
         return res.status(404).json({ error: "Activity not found" })
       }
 
-      const trip = await tripService.getTripById(activity.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
-
+      // Permission checked by middleware (EDITOR)
       const participant = await activityService.addParticipant(id, memberId)
       res.status(201).json(participant)
     } catch (error: any) {
@@ -218,7 +184,6 @@ class ActivityController {
 
   async removeParticipant(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { id, memberId } = req.params
 
       const activity = await activityService.getActivityById(id)
@@ -226,11 +191,7 @@ class ActivityController {
         return res.status(404).json({ error: "Activity not found" })
       }
 
-      const trip = await tripService.getTripById(activity.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
-
+      // Permission checked by middleware (EDITOR)
       await activityService.removeParticipant(id, memberId)
       res.status(204).send()
     } catch (error) {

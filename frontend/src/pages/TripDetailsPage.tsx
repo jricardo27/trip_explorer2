@@ -67,6 +67,7 @@ import { TripMap } from "../components/TripMap"
 import { TripMembersDialog } from "../components/TripMembersDialog"
 import { TripSettingsDialog } from "../components/TripSettingsDialog"
 import { useTripDetails } from "../hooks/useTripDetails"
+import { useAuthStore } from "../stores/authStore"
 import type { Activity } from "../types"
 
 const DroppableDay = ({ dayId, children }: { dayId: string; children: React.ReactNode }) => {
@@ -108,6 +109,14 @@ const TripDetailsPage = () => {
     updateDay,
   } = useTripDetails(tripId!)
 
+  const currentUser = useAuthStore((state) => state.user)
+  const isOwner = trip?.userId === currentUser?.id
+  const userMember = trip?.members?.find(
+    (m) => m.userId === currentUser?.id || (currentUser?.email && m.email === currentUser.email),
+  )
+  const userRole = isOwner ? "OWNER" : userMember?.role || "VIEWER"
+  const canEdit = userRole === "OWNER" || userRole === "EDITOR"
+
   // UI State
   const [viewMode, setViewMode] = useState<"list" | "animation" | "timeline" | "prep" | "expenses" | "journal">("list")
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -127,6 +136,7 @@ const TripDetailsPage = () => {
     toActivityId: string
   } | null>(null)
   const [renameDayDialog, setRenameDayDialog] = useState<{ dayId: string; name: string } | null>(null)
+  const [prefilledCoordinates, setPrefilledCoordinates] = useState<{ lat: number; lng: number } | undefined>(undefined)
 
   // Sensors for DND
   const sensors = useSensors(
@@ -157,9 +167,10 @@ const TripDetailsPage = () => {
     setCollapsedDays(newCollapsed)
   }
 
-  const handleAddActivity = (dayId?: string) => {
+  const handleAddActivity = (dayId?: string, coordinates?: { lat: number; lng: number }) => {
     setSelectedDayId(dayId || trip?.days?.[0]?.id)
     setEditingActivity(undefined)
+    setPrefilledCoordinates(coordinates)
     setDialogOpen(true)
   }
 
@@ -207,7 +218,7 @@ const TripDetailsPage = () => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
-    if (!over) return
+    if (!over || !canEdit) return
 
     const activeId = active.id as string
     const overId = over.id as string
@@ -384,6 +395,7 @@ const TripDetailsPage = () => {
               startIcon={<SettingsIcon />}
               size="small"
               onClick={() => setSettingsDialogOpen(true)}
+              disabled={!canEdit}
             >
               Settings
             </Button>
@@ -392,6 +404,7 @@ const TripDetailsPage = () => {
               startIcon={<PeopleIcon />}
               size="small"
               onClick={() => setMembersDialogOpen(true)}
+              disabled={!canEdit}
             >
               Members
             </Button>
@@ -446,16 +459,20 @@ const TripDetailsPage = () => {
                               <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
                                 ({dayjs(day.date).format("MMM D")})
                               </Typography>
-                              <IconButton
-                                size="small"
-                                onClick={() => setRenameDayDialog({ dayId: day.id, name: day.name || "" })}
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
+                              {canEdit && (
+                                <IconButton
+                                  size="small"
+                                  onClick={() => setRenameDayDialog({ dayId: day.id, name: day.name || "" })}
+                                >
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              )}
                             </Box>
-                            <IconButton size="small" onClick={() => handleAddActivity(day.id)}>
-                              <AddIcon />
-                            </IconButton>
+                            {canEdit && (
+                              <IconButton size="small" onClick={() => handleAddActivity(day.id)}>
+                                <AddIcon />
+                              </IconButton>
+                            )}
                           </Box>
                           <Collapse in={!isCollapsed}>
                             <DroppableDay dayId={day.id}>
@@ -473,6 +490,7 @@ const TripDetailsPage = () => {
                                     <Box key={activity.id}>
                                       <SortableActivityCard
                                         activity={activity}
+                                        canEdit={canEdit}
                                         onEdit={() => handleEditActivity(activity)}
                                         onDelete={() => handleDeleteActivity(activity.id)}
                                         onCopy={() => handleCopyActivity(activity)}
@@ -527,11 +545,8 @@ const TripDetailsPage = () => {
                       activities={trip.activities}
                       days={trip.days?.map((d) => ({ id: d.id, name: d.name, dayIndex: d.dayNumber - 1 }))}
                       activeFlyToLocation={activeFlyToLocation}
-                      onCreateActivity={() => {
-                        setSelectedDayId(trip.days?.[0]?.id)
-                        setEditingActivity(undefined)
-                        setDialogOpen(true)
-                        // TODO: Pre-fill coordinates in ActivityDialog
+                      onCreateActivity={(latLng) => {
+                        handleAddActivity(undefined, latLng)
                       }}
                     />
                   </Box>
@@ -685,10 +700,11 @@ const TripDetailsPage = () => {
         activity={editingActivity}
         tripDayId={selectedDayId}
         tripId={trip.id}
+        tripEndDate={trip.endDate}
         tripDays={trip.days}
         tripStartDate={trip.startDate}
-        tripEndDate={trip.endDate}
         fullScreen={isMobile}
+        initialCoordinates={prefilledCoordinates}
       />
       <TripMembersDialog
         open={membersDialogOpen}

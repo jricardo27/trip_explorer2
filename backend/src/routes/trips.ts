@@ -1,9 +1,10 @@
-import { Router, Request, Response } from "express"
+import { NextFunction, Request, Response, Router } from "express"
 
 import documentController from "../controllers/DocumentController"
 import * as ExpenseController from "../controllers/ExpenseController"
 import { authenticateToken } from "../middleware/auth"
 import { validate } from "../middleware/errorHandler"
+import { checkTripPermission } from "../middleware/permission"
 import tripMemberService from "../services/TripMemberService"
 import tripService from "../services/TripService"
 import { createTripSchema, updateTripSchema } from "../utils/validation"
@@ -66,7 +67,7 @@ router.get("/", async (req: Request, res: Response) => {
       filters.endBefore = new Date(req.query.end_before as string)
     }
 
-    const trips = await tripService.listTrips(userId, filters)
+    const trips = await tripService.listTrips(userId, (req as any).user.email, filters)
 
     res.json({ data: trips })
   } catch {
@@ -106,20 +107,10 @@ router.post("/", validate(createTripSchema), async (req: Request, res: Response)
 })
 
 // GET /api/trips/:id - Get trip details
-router.get("/:id", async (req: Request, res: Response) => {
+router.get("/:id", checkTripPermission("VIEWER"), async (req: Request, res: Response) => {
   try {
-    const trip = await tripService.getTripById(req.params.id, (req as any).user.id)
-
-    if (!trip) {
-      return res.status(404).json({
-        error: {
-          code: "NOT_FOUND",
-          message: "Trip not found",
-        },
-      })
-    }
-
-    res.json({ data: trip })
+    // req.trip is already populated by middleware
+    res.json({ data: req.trip })
   } catch {
     res.status(500).json({
       error: {
@@ -131,9 +122,9 @@ router.get("/:id", async (req: Request, res: Response) => {
 })
 
 // GET /api/trips/:id/export - Export a single trip
-router.get("/:id/export", async (req: Request, res: Response) => {
+router.get("/:id/export", checkTripPermission("VIEWER"), async (req: Request, res: Response) => {
   try {
-    const trip = await tripService.exportTrip(req.params.id, (req as any).user.id)
+    const trip = await tripService.exportTrip(req.params.id, (req as any).user.id, (req as any).user.email)
     res.json({ data: trip })
   } catch {
     res.status(500).json({
@@ -146,7 +137,7 @@ router.get("/:id/export", async (req: Request, res: Response) => {
 })
 
 // PUT /api/trips/:id - Update trip
-router.put("/:id", validate(updateTripSchema), async (req: Request, res: Response) => {
+router.put("/:id", checkTripPermission("EDITOR"), validate(updateTripSchema), async (req: Request, res: Response) => {
   try {
     const updateData: any = {}
 
@@ -161,7 +152,7 @@ router.put("/:id", validate(updateTripSchema), async (req: Request, res: Respons
     if (req.body.isCompleted !== undefined) updateData.isCompleted = req.body.isCompleted
     if (req.body.isPublic !== undefined) updateData.isPublic = req.body.isPublic
 
-    const trip = await tripService.updateTrip(req.params.id, (req as any).user.id, updateData)
+    const trip = await tripService.updateTrip(req.params.id, (req as any).user.id, (req as any).user.email, updateData)
     res.json({ data: trip })
   } catch (error: any) {
     if (error.code === "P2025") {
@@ -182,14 +173,14 @@ router.put("/:id", validate(updateTripSchema), async (req: Request, res: Respons
 })
 
 // PATCH /api/trips/:id/categories - Update checklist/packing categories
-router.patch("/:id/categories", async (req: Request, res: Response) => {
+router.patch("/:id/categories", checkTripPermission("EDITOR"), async (req: Request, res: Response) => {
   try {
     const { checklistCategories, packingCategories } = req.body
     const updateData: any = {}
     if (checklistCategories) updateData.checklistCategories = checklistCategories
     if (packingCategories) updateData.packingCategories = packingCategories
 
-    const trip = await tripService.updateTrip(req.params.id, (req as any).user.id, updateData)
+    const trip = await tripService.updateTrip(req.params.id, (req as any).user.id, (req as any).user.email, updateData)
     res.json({ data: trip })
   } catch (error: any) {
     res.status(500).json({ error: error.message })
@@ -197,7 +188,7 @@ router.patch("/:id/categories", async (req: Request, res: Response) => {
 })
 
 // DELETE /api/trips/:id - Delete trip
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete("/:id", checkTripPermission("OWNER"), async (req: Request, res: Response) => {
   try {
     await tripService.deleteTrip(req.params.id, (req as any).user.id)
 
@@ -222,14 +213,20 @@ router.delete("/:id", async (req: Request, res: Response) => {
 })
 
 // PUT /api/trips/:id/days/:dayId - Update trip day
-router.put("/:id/days/:dayId", async (req: Request, res: Response) => {
+router.put("/:id/days/:dayId", checkTripPermission("EDITOR"), async (req: Request, res: Response) => {
   try {
     const updateData: any = {}
 
     if (req.body.name) updateData.name = req.body.name
     if (req.body.notes !== undefined) updateData.notes = req.body.notes
 
-    const day = await tripService.updateDay(req.params.id, req.params.dayId, (req as any).user.id, updateData)
+    const day = await tripService.updateDay(
+      req.params.id,
+      req.params.dayId,
+      (req as any).user.id,
+      (req as any).user.email,
+      updateData,
+    )
 
     res.json({ data: day })
   } catch (error: any) {
@@ -252,7 +249,7 @@ router.put("/:id/days/:dayId", async (req: Request, res: Response) => {
 })
 
 // POST /api/trips/:id/copy - Copy trip
-router.post("/:id/copy", async (req: Request, res: Response) => {
+router.post("/:id/copy", checkTripPermission("VIEWER"), async (req: Request, res: Response) => {
   try {
     if (!req.body.name || !req.body.startDate) {
       return res.status(400).json({
@@ -266,6 +263,7 @@ router.post("/:id/copy", async (req: Request, res: Response) => {
     const trip = await tripService.copyTrip(
       req.params.id,
       (req as any).user.id,
+      (req as any).user.email,
       req.body.name,
       new Date(req.body.startDate),
     )
@@ -292,7 +290,7 @@ router.post("/:id/copy", async (req: Request, res: Response) => {
 })
 
 // PATCH /api/trips/:id/shift - Shift trip dates
-router.patch("/:id/shift", async (req: Request, res: Response) => {
+router.patch("/:id/shift", checkTripPermission("EDITOR"), async (req: Request, res: Response) => {
   try {
     const { days } = req.body
     if (days === undefined) {
@@ -304,7 +302,12 @@ router.patch("/:id/shift", async (req: Request, res: Response) => {
       })
     }
 
-    const trip = await tripService.shiftTripDates(req.params.id, (req as any).user.id, Number(days))
+    const trip = await tripService.shiftTripDates(
+      req.params.id,
+      (req as any).user.id,
+      (req as any).user.email,
+      Number(days),
+    )
 
     res.json({ data: trip })
   } catch (error: any) {
@@ -331,9 +334,9 @@ router.patch("/:id/shift", async (req: Request, res: Response) => {
 // ===== MEMBER ROUTES =====
 
 // GET /api/trips/:id/members - Get all members for a trip
-router.get("/:id/members", async (req: Request, res: Response) => {
+router.get("/:id/members", checkTripPermission("VIEWER"), async (req: Request, res: Response) => {
   try {
-    const members = await tripMemberService.getMembers(req.params.id, (req as any).user.id)
+    const members = await tripMemberService.getMembers(req.params.id, (req as any).user.id, (req as any).user.email)
     res.json({ data: members })
   } catch (error: any) {
     if (error.message === "Trip not found or access denied") {
@@ -354,9 +357,9 @@ router.get("/:id/members", async (req: Request, res: Response) => {
 })
 
 // POST /api/trips/:id/members - Add a member to a trip
-router.post("/:id/members", async (req: Request, res: Response) => {
+router.post("/:id/members", checkTripPermission("OWNER"), async (req: Request, res: Response) => {
   try {
-    const member = await tripMemberService.addMember(req.params.id, (req as any).user.id, {
+    const member = await tripMemberService.addMember(req.params.id, (req as any).user.id, (req as any).user.email, {
       name: req.body.name,
       email: req.body.email,
       role: req.body.role,
@@ -391,15 +394,20 @@ router.post("/:id/members", async (req: Request, res: Response) => {
 })
 
 // PUT /api/trips/:id/members/:memberId - Update a member
-router.put("/:id/members/:memberId", async (req: Request, res: Response) => {
+router.put("/:id/members/:memberId", checkTripPermission("OWNER"), async (req: Request, res: Response) => {
   try {
-    const member = await tripMemberService.updateMember(req.params.memberId, (req as any).user.id, {
-      name: req.body.name,
-      email: req.body.email,
-      role: req.body.role,
-      color: req.body.color,
-      avatarUrl: req.body.avatarUrl,
-    })
+    const member = await tripMemberService.updateMember(
+      req.params.memberId,
+      (req as any).user.id,
+      (req as any).user.email,
+      {
+        name: req.body.name,
+        email: req.body.email,
+        role: req.body.role,
+        color: req.body.color,
+        avatarUrl: req.body.avatarUrl,
+      },
+    )
     res.json({ data: member })
   } catch (error: any) {
     if (error.message === "Member not found or access denied") {
@@ -420,9 +428,9 @@ router.put("/:id/members/:memberId", async (req: Request, res: Response) => {
 })
 
 // DELETE /api/trips/:id/members/:memberId - Remove a member
-router.delete("/:id/members/:memberId", async (req: Request, res: Response) => {
+router.delete("/:id/members/:memberId", checkTripPermission("OWNER"), async (req: Request, res: Response) => {
   try {
-    await tripMemberService.removeMember(req.params.memberId, (req as any).user.id)
+    await tripMemberService.removeMember(req.params.memberId, (req as any).user.id, (req as any).user.email)
     res.status(204).send()
   } catch (error: any) {
     if (error.message === "Member not found or access denied") {
@@ -443,57 +451,80 @@ router.delete("/:id/members/:memberId", async (req: Request, res: Response) => {
 })
 
 // ===== DOCUMENT ROUTES =====
-router.get("/documents/list", documentController.listDocuments)
-router.post("/documents", documentController.createDocument)
-router.put("/documents/:id", documentController.updateDocument)
-router.delete("/documents/:id", documentController.deleteDocument)
+router.get("/documents/list", checkTripPermission("VIEWER"), documentController.listDocuments)
+router.post("/documents", checkTripPermission("EDITOR"), documentController.createDocument)
+router.put("/documents/:id", checkTripPermission("EDITOR"), documentController.updateDocument)
+router.delete("/documents/:id", checkTripPermission("EDITOR"), documentController.deleteDocument)
 
 // Day Operations
-router.post("/:tripId/days/:dayId/move-activities", async (req: Request, res: Response) => {
-  try {
-    const { tripId, dayId } = req.params
-    const { targetDayId } = req.body
-    await tripService.moveActivities(tripId, dayId, targetDayId)
-    res.json({ success: true })
-  } catch (error: any) {
-    res.status(500).json({ error: error.message })
-  }
-})
+router.post(
+  "/:tripId/days/:dayId/move-activities",
+  checkTripPermission("EDITOR"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { tripId, dayId } = req.params
+      const { targetDayId } = req.body
+      const userId = (req as any).user.id
+      const userEmail = (req as any).user.email
+      await tripService.moveActivities(tripId, dayId, targetDayId, userId, userEmail)
+      res.json({ success: true })
+    } catch (error: any) {
+      next(error)
+    }
+  },
+)
 
 // Update Day (Rename/Notes)
-router.put("/:tripId/days/:dayId", async (req: Request, res: Response) => {
-  try {
-    const { tripId, dayId } = req.params
-    const { name, notes } = req.body
-    const userId = (req as any).user.id
+router.put(
+  "/:tripId/days/:dayId",
+  checkTripPermission("EDITOR"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { tripId, dayId } = req.params
+      const { name, notes } = req.body
+      const userId = (req as any).user.id
+      const userEmail = (req as any).user.email
 
-    const day = await tripService.updateDay(tripId, dayId, userId, { name, notes })
-    res.json({ data: day })
-  } catch (error: any) {
-    res.status(500).json({ error: error.message })
-  }
-})
+      const day = await tripService.updateDay(tripId, dayId, userId, userEmail, { name, notes })
+      res.json({ data: day })
+    } catch (error: any) {
+      next(error)
+    }
+  },
+)
 
-router.post("/:tripId/days/swap", async (req: Request, res: Response) => {
-  try {
-    const { tripId } = req.params
-    const { dayId1, dayId2 } = req.body
-    await tripService.swapDays(tripId, dayId1, dayId2)
-    res.json({ success: true })
-  } catch (error: any) {
-    res.status(500).json({ error: error.message })
-  }
-})
+router.post(
+  "/:tripId/days/swap",
+  checkTripPermission("EDITOR"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { tripId } = req.params
+      const { dayId1, dayId2 } = req.body
+      const userId = (req as any).user.id
+      const userEmail = (req as any).user.email
+      await tripService.swapDays(tripId, dayId1, dayId2, userId, userEmail)
+      res.json({ success: true })
+    } catch (error: any) {
+      next(error)
+    }
+  },
+)
 
-router.put("/:tripId/days/:dayId/move", async (req: Request, res: Response) => {
-  try {
-    const { tripId, dayId } = req.params
-    const { newDate } = req.body
-    await tripService.moveDay(tripId, dayId, new Date(newDate))
-    res.json({ success: true })
-  } catch (error: any) {
-    res.status(500).json({ error: error.message })
-  }
-})
+router.put(
+  "/:tripId/days/:dayId/move",
+  checkTripPermission("EDITOR"),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { tripId, dayId } = req.params
+      const { newDate } = req.body
+      const userId = (req as any).user.id
+      const userEmail = (req as any).user.email
+      await tripService.moveDay(tripId, dayId, new Date(newDate), userId, userEmail)
+      res.json({ success: true })
+    } catch (error: any) {
+      next(error)
+    }
+  },
+)
 
 export default router

@@ -1,19 +1,13 @@
 import { Request, Response, NextFunction } from "express"
 
 import transportService from "../services/TransportService"
-import tripService from "../services/TripService"
 
 class TransportController {
   async createTransport(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const data = req.body
 
-      // Validate permission
-      const trip = await tripService.getTripById(data.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized or Trip not found" })
-      }
+      // Permission already checked by middleware (checkTripPermission("EDITOR"))
 
       const transport = await transportService.createTransport(data)
       res.status(201).json(transport)
@@ -24,17 +18,13 @@ class TransportController {
 
   async listTransport(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { tripId } = req.query as { tripId: string }
 
       if (!tripId) {
         return res.status(400).json({ error: "tripId is required" })
       }
 
-      const trip = await tripService.getTripById(tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
+      // Permission already checked by middleware (checkTripPermission("VIEWER"))
 
       const transport = await transportService.listTransportByTrip(tripId)
       res.json(transport)
@@ -45,7 +35,6 @@ class TransportController {
 
   async getTransport(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { id } = req.params
 
       const transport = await transportService.getTransportById(id)
@@ -53,11 +42,7 @@ class TransportController {
         return res.status(404).json({ error: "Transport not found" })
       }
 
-      const trip = await tripService.getTripById(transport.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
-
+      // Permission already checked by middleware (checkTripPermission("VIEWER"))
       res.json(transport)
     } catch (error) {
       next(error)
@@ -66,7 +51,6 @@ class TransportController {
 
   async updateTransport(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { id } = req.params
       const data = req.body
 
@@ -75,10 +59,7 @@ class TransportController {
         return res.status(404).json({ error: "Transport not found" })
       }
 
-      const trip = await tripService.getTripById(transport.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
+      // Permission already checked by middleware (checkTripPermission("EDITOR"))
 
       const updated = await transportService.updateTransport(id, data)
       res.json(updated)
@@ -89,7 +70,6 @@ class TransportController {
 
   async deleteTransport(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { id } = req.params
 
       const transport = await transportService.getTransportById(id)
@@ -97,10 +77,7 @@ class TransportController {
         return res.status(404).json({ error: "Transport not found" })
       }
 
-      const trip = await tripService.getTripById(transport.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
+      // Permission already checked by middleware (checkTripPermission("EDITOR"))
 
       await transportService.deleteTransport(id)
       res.status(204).send()
@@ -111,7 +88,6 @@ class TransportController {
 
   async selectTransport(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { id } = req.params
 
       const transport = await transportService.getTransportById(id)
@@ -119,10 +95,7 @@ class TransportController {
         return res.status(404).json({ error: "Transport not found" })
       }
 
-      const trip = await tripService.getTripById(transport.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
+      // Permission already checked by middleware (checkTripPermission("EDITOR"))
 
       const selected = await transportService.selectTransport(id)
       res.json(selected)

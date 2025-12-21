@@ -48,11 +48,11 @@ export class TripService {
     return trip
   }
 
-  async getTripById(id: string, userId: string): Promise<Trip | null> {
+  async getTripById(id: string, userId: string, userEmail?: string): Promise<Trip | null> {
     const trip = await prisma.trip.findFirst({
       where: {
         id,
-        userId,
+        OR: [{ userId }, { members: { some: { OR: [{ userId }, { email: userEmail }] } } }],
       },
       include: {
         days: {
@@ -108,6 +108,7 @@ export class TripService {
 
   async listTrips(
     userId: string,
+    userEmail?: string,
     filters?: {
       isCompleted?: boolean
       startAfter?: Date
@@ -115,7 +116,7 @@ export class TripService {
     },
   ): Promise<Trip[]> {
     const where: Prisma.TripWhereInput = {
-      userId,
+      OR: [{ userId }, { members: { some: { OR: [{ userId }, { email: userEmail }] } } }],
     }
 
     if (filters?.isCompleted !== undefined) {
@@ -146,6 +147,7 @@ export class TripService {
   async updateTrip(
     id: string,
     userId: string,
+    userEmail: string | undefined,
     data: Partial<{
       name: string
       startDate: Date
@@ -176,6 +178,7 @@ export class TripService {
   }
 
   async deleteTrip(id: string, userId: string): Promise<void> {
+    // Only owner can delete trip
     await prisma.trip.delete({
       where: {
         id,
@@ -188,18 +191,25 @@ export class TripService {
     tripId: string,
     dayId: string,
     userId: string,
+    userEmail: string | undefined,
     data: Partial<{
       name: string
       notes: string
     }>,
   ): Promise<any> {
-    // Verify trip belongs to user
+    // Verify user has edit access to trip
     const trip = await prisma.trip.findFirst({
-      where: { id: tripId, userId },
+      where: {
+        id: tripId,
+        OR: [
+          { userId },
+          { members: { some: { OR: [{ userId }, { email: userEmail }], role: { in: ["OWNER", "EDITOR"] } } } },
+        ],
+      },
     })
 
     if (!trip) {
-      throw new Error("Trip not found")
+      throw new Error("Trip not found or unauthorized")
     }
 
     // Update the day
@@ -213,9 +223,18 @@ export class TripService {
     return day
   }
 
-  async copyTrip(tripId: string, userId: string, newName: string, newStartDate: Date): Promise<Trip> {
+  async copyTrip(
+    tripId: string,
+    userId: string,
+    userEmail: string | undefined,
+    newName: string,
+    newStartDate: Date,
+  ): Promise<Trip> {
     const originalTrip = await prisma.trip.findFirst({
-      where: { id: tripId, userId },
+      where: {
+        id: tripId,
+        OR: [{ userId }, { members: { some: { OR: [{ userId }, { email: userEmail }] } } }],
+      },
       include: {
         days: {
           include: {
@@ -374,9 +393,20 @@ export class TripService {
     return newTrip
   }
 
-  async shiftTripDates(tripId: string, userId: string, daysToShift: number): Promise<Trip> {
+  async shiftTripDates(
+    tripId: string,
+    userId: string,
+    userEmail: string | undefined,
+    daysToShift: number,
+  ): Promise<Trip> {
     const trip = await prisma.trip.findFirst({
-      where: { id: tripId, userId },
+      where: {
+        id: tripId,
+        OR: [
+          { userId },
+          { members: { some: { OR: [{ userId }, { email: userEmail }], role: { in: ["OWNER", "EDITOR"] } } } },
+        ],
+      },
       include: {
         days: true,
         activities: true,
@@ -445,9 +475,12 @@ export class TripService {
     return (await this.getTripById(tripId, userId)) as Trip
   }
 
-  async exportTrip(id: string, userId: string): Promise<any> {
+  async exportTrip(id: string, userId: string, userEmail?: string): Promise<any> {
     const trip = await prisma.trip.findFirst({
-      where: { id, userId },
+      where: {
+        id,
+        OR: [{ userId }, { members: { some: { OR: [{ userId }, { email: userEmail }] } } }],
+      },
       include: {
         days: {
           include: {
@@ -743,10 +776,38 @@ export class TripService {
     return trip
   }
 
-  async moveActivities(tripId: string, fromDayId: string, toDayId: string): Promise<void> {
-    const fromDay = await prisma.tripDay.findUnique({ where: { id: fromDayId, tripId } })
-    const toDay = await prisma.tripDay.findUnique({ where: { id: toDayId, tripId } })
-    if (!fromDay || !toDay) throw new Error("Days not found or do not belong to trip")
+  async moveActivities(
+    tripId: string,
+    fromDayId: string,
+    toDayId: string,
+    userId: string,
+    userEmail?: string,
+  ): Promise<void> {
+    const fromDay = await prisma.tripDay.findFirst({
+      where: {
+        id: fromDayId,
+        tripId,
+        trip: {
+          OR: [
+            { userId },
+            { members: { some: { OR: [{ userId }, { email: userEmail }], role: { in: ["OWNER", "EDITOR"] } } } },
+          ],
+        },
+      },
+    })
+    const toDay = await prisma.tripDay.findFirst({
+      where: {
+        id: toDayId,
+        tripId,
+        trip: {
+          OR: [
+            { userId },
+            { members: { some: { OR: [{ userId }, { email: userEmail }], role: { in: ["OWNER", "EDITOR"] } } } },
+          ],
+        },
+      },
+    })
+    if (!fromDay || !toDay) throw new Error("Days not found or unauthorized")
 
     const activities = await prisma.activity.findMany({ where: { tripDayId: fromDayId } })
     const dayDiff = dayjs(toDay.date).diff(dayjs(fromDay.date), "day")
@@ -771,10 +832,34 @@ export class TripService {
     )
   }
 
-  async swapDays(tripId: string, dayId1: string, dayId2: string): Promise<void> {
-    const day1 = await prisma.tripDay.findUnique({ where: { id: dayId1, tripId }, include: { activities: true } })
-    const day2 = await prisma.tripDay.findUnique({ where: { id: dayId2, tripId }, include: { activities: true } })
-    if (!day1 || !day2) throw new Error("Days not found")
+  async swapDays(tripId: string, dayId1: string, dayId2: string, userId: string, userEmail?: string): Promise<void> {
+    const day1 = await prisma.tripDay.findFirst({
+      where: {
+        id: dayId1,
+        tripId,
+        trip: {
+          OR: [
+            { userId },
+            { members: { some: { OR: [{ userId }, { email: userEmail }], role: { in: ["OWNER", "EDITOR"] } } } },
+          ],
+        },
+      },
+      include: { activities: true },
+    })
+    const day2 = await prisma.tripDay.findFirst({
+      where: {
+        id: dayId2,
+        tripId,
+        trip: {
+          OR: [
+            { userId },
+            { members: { some: { OR: [{ userId }, { email: userEmail }], role: { in: ["OWNER", "EDITOR"] } } } },
+          ],
+        },
+      },
+      include: { activities: true },
+    })
+    if (!day1 || !day2) throw new Error("Days not found or unauthorized")
 
     const diff1To2 = dayjs(day2.date).diff(dayjs(day1.date), "day")
     const diff2To1 = dayjs(day1.date).diff(dayjs(day2.date), "day")
@@ -800,9 +885,21 @@ export class TripService {
     ])
   }
 
-  async moveDay(tripId: string, dayId: string, newDate: Date): Promise<void> {
-    const day = await prisma.tripDay.findUnique({ where: { id: dayId, tripId }, include: { activities: true } })
-    if (!day) throw new Error("Day not found")
+  async moveDay(tripId: string, dayId: string, newDate: Date, userId: string, userEmail?: string): Promise<void> {
+    const day = await prisma.tripDay.findFirst({
+      where: {
+        id: dayId,
+        tripId,
+        trip: {
+          OR: [
+            { userId },
+            { members: { some: { OR: [{ userId }, { email: userEmail }], role: { in: ["OWNER", "EDITOR"] } } } },
+          ],
+        },
+      },
+      include: { activities: true },
+    })
+    if (!day) throw new Error("Day not found or unauthorized")
 
     const dateDiff = dayjs(newDate).diff(dayjs(day.date), "day")
 

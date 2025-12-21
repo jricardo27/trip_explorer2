@@ -166,6 +166,7 @@ model Activity {
   transportFrom TransportAlternative[] @relation("FromActivity")
   transportTo   TransportAlternative[] @relation("ToActivity")
   animationSteps TripAnimationStep[]
+  linkedGroupId  String?              @map("linked_group_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

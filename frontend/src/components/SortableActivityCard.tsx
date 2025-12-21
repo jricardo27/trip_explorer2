@@ -22,6 +22,7 @@ interface SortableActivityCardProps {
   onCopy?: (activity: Activity) => void
   isDeleting?: boolean
   onFlyTo?: (activity: Activity) => void
+  canEdit?: boolean
 }
 
 export const SortableActivityCard = ({
@@ -31,10 +32,11 @@ export const SortableActivityCard = ({
   onCopy,
   isDeleting,
   onFlyTo,
+  canEdit = true,
 }: SortableActivityCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: activity.id,
-    disabled: activity.isLocked,
+    disabled: activity.isLocked || !canEdit,
   })
 
   const style = {
@@ -122,21 +124,25 @@ export const SortableActivityCard = ({
               </IconButton>
             </Tooltip>
           )}
-          <Tooltip title="Copy this activity">
-            <IconButton size="small" onClick={() => onCopy && onCopy(activity)} sx={{ mr: 0.5 }}>
-              <ContentCopy fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Edit activity">
-            <IconButton size="small" onClick={() => onEdit(activity)} sx={{ mr: 0.5 }}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete activity">
-            <IconButton size="small" onClick={() => onDelete(activity.id)} disabled={isDeleting} color="error">
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {canEdit && (
+            <>
+              <Tooltip title="Copy this activity">
+                <IconButton size="small" onClick={() => onCopy && onCopy(activity)} sx={{ mr: 0.5 }}>
+                  <ContentCopy fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Edit activity">
+                <IconButton size="small" onClick={() => onEdit(activity)} sx={{ mr: 0.5 }}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete activity">
+                <IconButton size="small" onClick={() => onDelete(activity.id)} disabled={isDeleting} color="error">
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
         </Box>
       </Box>
     </Paper>

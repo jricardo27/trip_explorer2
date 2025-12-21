@@ -15,8 +15,8 @@ const loginSchema = z.object({
   password: z.string(),
 })
 
-const generateToken = (userId: string) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET as string, { expiresIn: "7d" })
+const generateToken = (userId: string, email: string) => {
+  return jwt.sign({ id: userId, email }, process.env.JWT_SECRET as string, { expiresIn: "7d" })
 }
 
 export const signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -36,7 +36,14 @@ export const signup = async (req: Request, res: Response, next: NextFunction) =>
       },
     })
 
-    const token = generateToken(user.id)
+    // Link existing trip memberships
+    await prisma.tripMember.updateMany({
+      where: { email: user.email, userId: null },
+      data: { userId: user.id },
+    })
+
+    const token = generateToken(user.id, user.email)
+
     res.status(201).json({ data: { token, user: { id: user.id, email: user.email } } })
   } catch (error) {
     next(error)
@@ -57,7 +64,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).json({ error: "Invalid credentials" })
     }
 
-    const token = generateToken(user.id)
+    const token = generateToken(user.id, user.email)
     res.json({ data: { token, user: { id: user.id, email: user.email } } })
   } catch (error) {
     next(error)

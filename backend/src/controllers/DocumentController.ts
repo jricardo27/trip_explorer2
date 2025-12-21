@@ -1,18 +1,13 @@
 import { NextFunction, Request, Response } from "express"
 
 import documentService from "../services/DocumentService"
-import tripService from "../services/TripService"
 
 class DocumentController {
   async createDocument(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { tripId, title, url, notes, category } = req.body
 
-      const trip = await tripService.getTripById(tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized or Trip not found" })
-      }
+      // Permission already checked by middleware (checkTripPermission("EDITOR"))
 
       const document = await documentService.createDocument({
         tripId,
@@ -29,17 +24,13 @@ class DocumentController {
 
   async listDocuments(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
       const { tripId } = req.query as { tripId: string }
 
       if (!tripId) {
         return res.status(400).json({ error: "tripId is required" })
       }
 
-      const trip = await tripService.getTripById(tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
+      // Permission already checked by middleware (checkTripPermission("VIEWER"))
 
       const documents = await documentService.listDocumentsByTrip(tripId)
       res.json(documents)
@@ -51,7 +42,6 @@ class DocumentController {
   async updateDocument(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params
-      const userId = (req as any).user.id
       const data = req.body
 
       const document = await documentService.getDocumentById(id)
@@ -59,10 +49,7 @@ class DocumentController {
         return res.status(404).json({ error: "Document not found" })
       }
 
-      const trip = await tripService.getTripById(document.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
+      // Permission already checked by middleware (checkTripPermission("EDITOR"))
 
       const updated = await documentService.updateDocument(id, data)
       res.json(updated)
@@ -74,17 +61,13 @@ class DocumentController {
   async deleteDocument(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params
-      const userId = (req as any).user.id
 
       const document = await documentService.getDocumentById(id)
       if (!document) {
         return res.status(404).json({ error: "Document not found" })
       }
 
-      const trip = await tripService.getTripById(document.tripId, userId)
-      if (!trip) {
-        return res.status(403).json({ error: "Unauthorized" })
-      }
+      // Permission already checked by middleware (checkTripPermission("EDITOR"))
 
       await documentService.deleteDocument(id)
       res.status(204).send()

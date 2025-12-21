@@ -19,12 +19,12 @@ interface UpdateMemberData {
 }
 
 class TripMemberService {
-  async getMembers(tripId: string, userId: string) {
+  async getMembers(tripId: string, userId: string, userEmail?: string) {
     // Verify user has access to trip
     const trip = await prisma.trip.findFirst({
       where: {
         id: tripId,
-        userId,
+        OR: [{ userId }, { members: { some: { OR: [{ userId }, { email: userEmail }] } } }],
       },
     })
 
@@ -38,12 +38,15 @@ class TripMemberService {
     })
   }
 
-  async addMember(tripId: string, userId: string, data: CreateMemberData) {
+  async addMember(tripId: string, userId: string, userEmail: string | undefined, data: CreateMemberData) {
     // Verify user owns the trip
     const trip = await prisma.trip.findFirst({
       where: {
         id: tripId,
-        userId,
+        OR: [
+          { userId },
+          { members: { some: { OR: [{ userId }, { email: userEmail }], role: { in: ["OWNER", "EDITOR"] } } } },
+        ],
       },
     })
 
@@ -77,12 +80,22 @@ class TripMemberService {
     })
   }
 
-  async updateMember(memberId: string, userId: string, data: UpdateMemberData) {
-    // Get member and verify ownership
+  async updateMember(memberId: string, userId: string, userEmail: string | undefined, data: UpdateMemberData) {
+    // Get member and verify ownership (only owner can modify members usually, or editor can?)
+    // User requested "Verify and enforce Viewer role". Let's say only OWNER can manage members.
     const member = await prisma.tripMember.findUnique({
       where: { id: memberId },
       include: {
-        trip: true,
+        trip: {
+          include: {
+            members: {
+              where: {
+                OR: [{ userId }, { email: userEmail }],
+                role: "OWNER",
+              },
+            },
+          },
+        },
       },
     })
 
@@ -102,12 +115,21 @@ class TripMemberService {
     })
   }
 
-  async removeMember(memberId: string, userId: string) {
-    // Get member and verify ownership
+  async removeMember(memberId: string, userId: string, userEmail?: string) {
+    // Only owner can remove members
     const member = await prisma.tripMember.findUnique({
       where: { id: memberId },
       include: {
-        trip: true,
+        trip: {
+          include: {
+            members: {
+              where: {
+                OR: [{ userId }, { email: userEmail }],
+                role: "OWNER",
+              },
+            },
+          },
+        },
       },
     })
 

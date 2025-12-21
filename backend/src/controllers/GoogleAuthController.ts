@@ -6,8 +6,8 @@ import prisma from "../utils/prisma"
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
-const generateToken = (userId: string) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET as string, { expiresIn: "7d" })
+const generateToken = (userId: string, email: string) => {
+  return jwt.sign({ id: userId, email }, process.env.JWT_SECRET as string, { expiresIn: "7d" })
 }
 
 export const googleAuth = async (req: Request, res: Response) => {
@@ -52,10 +52,23 @@ export const googleAuth = async (req: Request, res: Response) => {
             // Since it's a social login, passwordHash remains null
           },
         })
+
+        // Link existing trip memberships
+        await prisma.tripMember.updateMany({
+          where: { email: user.email, userId: null },
+          data: { userId: user.id },
+        })
       }
     }
 
-    const token = generateToken(user.id)
+    const token = generateToken(user.id, user.email)
+
+    // Link any existing shared trips
+    await prisma.tripMember.updateMany({
+      where: { email: user.email, userId: null },
+      data: { userId: user.id },
+    })
+
     res.json({ data: { token, user: { id: user.id, email: user.email } } })
   } catch (error) {
     console.error("Google Auth Error:", error)

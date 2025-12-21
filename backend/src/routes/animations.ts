@@ -7,6 +7,7 @@ import {
   updateAnimation,
 } from "../controllers/animationController"
 import { authenticateToken } from "../middleware/auth"
+import { checkTripPermission } from "../middleware/permission"
 
 const router = express.Router()
 
@@ -28,9 +29,9 @@ router.use(authenticateToken)
 // I will mount this router at /api/animations.
 // And I will add specific routes for trip-related actions usually under /api/trips, but I can put them here if I use full path.
 
-router.get("/trip/:tripId", getTripAnimations)
-router.post("/trip/:tripId", createAnimation)
-router.put("/:id", updateAnimation)
-router.delete("/:id", deleteAnimation)
+router.get("/trip/:tripId", checkTripPermission("VIEWER"), getTripAnimations)
+router.post("/trip/:tripId", checkTripPermission("EDITOR"), createAnimation)
+router.put("/:id", checkTripPermission("EDITOR"), updateAnimation)
+router.delete("/:id", checkTripPermission("EDITOR"), deleteAnimation)
 
 export default router
