@@ -23,6 +23,7 @@
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.3",
     "prisma": "^5.22.0",
     "zod": "^4.1.13"

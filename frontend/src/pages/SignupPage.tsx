@@ -1,8 +1,9 @@
-import { Container, Paper, TextField, Button, Typography, Box, Alert } from "@mui/material"
+import { Container, Paper, TextField, Button, Typography, Box, Alert, Divider } from "@mui/material"
+import { GoogleLogin } from "@react-oauth/google"
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 
-import client from "../api/client"
+import { authApi } from "../api/client"
 import { useAuthStore } from "../stores/authStore"
 
 const SignupPage = () => {
@@ -20,13 +21,25 @@ const SignupPage = () => {
       return
     }
     try {
-      const response = await client.post("/auth/signup", { email, password })
-      const { token, user } = response.data
+      const { token, user } = await authApi.signup({ email, password })
       setAuth(token, user)
       navigate("/")
     } catch (err: any) {
       const errorData = err.response?.data?.error
       setError(typeof errorData === "string" ? errorData : errorData?.message || "Failed to sign up")
+    }
+  }
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      if (credentialResponse.credential) {
+        const { token, user } = await authApi.google(credentialResponse.credential)
+        setAuth(token, user)
+        navigate("/")
+      }
+    } catch (err: any) {
+      console.error("Google login error:", err)
+      setError("Google Login failed. Please try again.")
     }
   }
 
@@ -50,6 +63,22 @@ const SignupPage = () => {
               {error}
             </Alert>
           )}
+
+          <Box sx={{ mb: 2, display: "flex", justifyContent: "center" }}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => {
+                console.log("Login Failed")
+                setError("Google Login failed.")
+              }}
+              useOneTap
+              shape="rectangular"
+              width="100%"
+            />
+          </Box>
+
+          <Divider sx={{ mb: 2 }}>or</Divider>
+
           <form onSubmit={handleSubmit}>
             <TextField
               margin="normal"

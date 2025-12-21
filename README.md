@@ -85,3 +85,48 @@ sudo systemctl restart nginx
 ```bash
 sudo certbot --nginx -d trip-explorer.mooo.com
 ```
+
+## Troubleshooting
+
+If the server is not working, follow these steps on the VM:
+
+### 1. Check Backend (PM2)
+
+Check if the backend process is running and look for errors in the logs:
+
+```bash
+pm2 status
+pm2 logs trip-explorer-backend
+```
+
+_Common issues: Missing `.env` file, database connection error, or port 3001 already in use._
+
+### 2. Check Nginx
+
+Verify Nginx is running and check its error logs:
+
+```bash
+sudo systemctl status nginx
+sudo tail -n 50 /var/log/nginx/trip_explorer_error.log
+```
+
+_Common issues: Syntax error in `nginx.bare.conf`, incorrect root path, or permissions._
+
+### 3. Test API Connectivity
+
+Try to reach the backend directly from the VM:
+
+```bash
+curl -i http://localhost:3001/api/trips
+```
+
+If this fails, the backend is not responding even internally.
+
+### 4. Database Issues
+
+Verify migrations are applied:
+
+```bash
+cd /path/to/remote/dir/backend
+npx prisma migrate status
+```

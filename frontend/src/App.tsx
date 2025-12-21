@@ -1,6 +1,7 @@
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { GoogleOAuthProvider } from "@react-oauth/google"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import React from "react"
@@ -48,34 +49,37 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => {
   const { dateFormat } = useSettingsStore()
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ""
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dateFormat?.toLowerCase() || "en-au"}>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route
-                element={
-                  <ProtectedRoute>
-                    <Layout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route path="/" element={<TripList />} />
-                <Route path="/trips" element={<TripList />} />
-                <Route path="/trips/:tripId" element={<TripDetailsPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-              </Route>
-            </Routes>
-          </LocalizationProvider>
-        </BrowserRouter>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </ThemeProvider>
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <BrowserRouter>
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dateFormat?.toLowerCase() || "en-au"}>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route
+                  element={
+                    <ProtectedRoute>
+                      <Layout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route path="/" element={<TripList />} />
+                  <Route path="/trips" element={<TripList />} />
+                  <Route path="/trips/:tripId" element={<TripDetailsPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                </Route>
+              </Routes>
+            </LocalizationProvider>
+          </BrowserRouter>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   )
 }
 

@@ -38,6 +38,31 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
+// Auth API
+export const authApi = {
+  login: async (data: any): Promise<{ token: string; user: { id: string; email: string } }> => {
+    const response = await apiClient.post<ApiResponse<{ token: string; user: { id: string; email: string } }>>(
+      "/auth/login",
+      data,
+    )
+    return response.data.data
+  },
+  signup: async (data: any): Promise<{ token: string; user: { id: string; email: string } }> => {
+    const response = await apiClient.post<ApiResponse<{ token: string; user: { id: string; email: string } }>>(
+      "/auth/signup",
+      data,
+    )
+    return response.data.data
+  },
+  google: async (idToken: string): Promise<{ token: string; user: { id: string; email: string } }> => {
+    const response = await apiClient.post<ApiResponse<{ token: string; user: { id: string; email: string } }>>(
+      "/auth/google",
+      { idToken },
+    )
+    return response.data.data
+  },
+}
+
 // Trip API
 export const tripApi = {
   list: async (filters?: { isCompleted?: boolean; startAfter?: string; endBefore?: string }): Promise<Trip[]> => {
