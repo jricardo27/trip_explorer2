@@ -57,7 +57,8 @@ cp "$PROJECT_ROOT/nginx.bare.conf" "$STAGING_DIR/"
 
 # 4. Compress
 echo "--- Compressing Files ---"
-tar -czf "$ARCHIVE_NAME" -C "$STAGING_DIR" .
+# Use COPYFILE_DISABLE=1 and --no-xattrs to avoid macOS specific extended attributes errors on Linux
+COPYFILE_DISABLE=1 tar -czf "$ARCHIVE_NAME" --no-xattrs -C "$STAGING_DIR" .
 
 # 5. Push and Extract
 echo "--- Pushing and Extracting on VM ---"
