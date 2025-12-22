@@ -57,6 +57,17 @@ export interface HighlightsData {
     type: string
     count: number
   }>
+  activities: Array<{
+    id: string
+    name: string
+    activityType: string
+    city: string | null
+    countryCode: string | null
+    latitude: number
+    longitude: number
+    scheduledStart: string | null
+    tripId: string
+  }>
 }
 
 export const useHighlights = () => {

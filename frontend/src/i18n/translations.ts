@@ -34,6 +34,7 @@ export const translations = {
     yes: "Yes",
     no: "No",
     ok: "OK",
+    clear: "Clear",
 
     // Highlights Page
     travelHighlights: "Travel Highlights",
@@ -45,17 +46,19 @@ export const translations = {
     recalculateStatistics: "Recalculate Statistics",
     populateLocations: "Populate Locations",
     noTravelData: "No travel data yet. Start creating trips to see your highlights!",
-    failedToLoadHighlights: "Failed to load highlights. Please try again.",
+    failedToLoadHighlights: "Failed to load travel highlights",
     overview: "Overview",
     countries: "Countries",
     cities: "Cities",
     activityTypes: "Activity Types",
-    firstVisit: "First visit",
-    lastVisit: "Last visit",
+    firstVisit: "First Visit",
+    lastVisit: "Last Visit",
     population: "Population",
     duration: "Duration",
     days: "days",
     ofTotal: "of total",
+    statisticsRecalculated: "Statistics recalculated successfully",
+    locationsPopulated: "{count} activities updated with location data",
 
     // Trip Management
     createTrip: "Create Trip",
@@ -363,8 +366,6 @@ export const translations = {
     deletedSuccessfully: "Deleted successfully!",
     createdSuccessfully: "Created successfully!",
     updatedSuccessfully: "Updated successfully!",
-    statisticsRecalculated: "Statistics recalculated successfully!",
-    locationsPopulated: "Populated {count} activities with location data!",
   },
   es: {
     // Navigation
@@ -401,9 +402,10 @@ export const translations = {
     yes: "Sí",
     no: "No",
     ok: "OK",
+    clear: "Limpiar",
 
     // Highlights Page
-    travelHighlights: "Destacados de Viaje",
+    travelHighlights: "Momentos Destacados",
     countriesVisited: "Países Visitados",
     citiesExplored: "Ciudades Exploradas",
     totalTrips: "Viajes Totales",
@@ -411,18 +413,20 @@ export const translations = {
     topCountries: "Principales Países",
     recalculateStatistics: "Recalcular Estadísticas",
     populateLocations: "Poblar Ubicaciones",
-    noTravelData: "Aún no hay datos de viaje. ¡Comienza a crear viajes para ver tus destacados!",
-    failedToLoadHighlights: "Error al cargar destacados. Por favor, inténtalo de nuevo.",
+    noTravelData: "Aún no hay datos de viajes. ¡Empieza a crear viajes para ver tus momentos destacados!",
+    failedToLoadHighlights: "Error al cargar los momentos destacados",
     overview: "Resumen",
     countries: "Países",
     cities: "Ciudades",
     activityTypes: "Tipos de Actividad",
-    firstVisit: "Primera visita",
-    lastVisit: "Última visita",
+    firstVisit: "Primera Visita",
+    lastVisit: "Última Visita",
     population: "Población",
     duration: "Duración",
     days: "días",
     ofTotal: "del total",
+    statisticsRecalculated: "Estadísticas recalculadas con éxito",
+    locationsPopulated: "{count} actividades actualizadas con datos de ubicación",
 
     // Trip Management
     createTrip: "Crear Viaje",
@@ -730,8 +734,6 @@ export const translations = {
     deletedSuccessfully: "¡Eliminado exitosamente!",
     createdSuccessfully: "¡Creado exitosamente!",
     updatedSuccessfully: "¡Actualizado exitosamente!",
-    statisticsRecalculated: "¡Estadísticas recalculadas exitosamente!",
-    locationsPopulated: "¡{count} actividades pobladas con datos de ubicación!",
   },
 }
 

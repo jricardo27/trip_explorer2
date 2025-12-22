@@ -2,53 +2,110 @@ import prisma from "../utils/prisma"
 
 class HighlightsService {
   /**
+   * Check if a point is inside a GeoJSON geometry
+   */
+  private isPointInGeometry(lat: number, lng: number, geometry: any): boolean {
+    if (!geometry) return false
+
+    if (geometry.type === "Polygon") {
+      return this.isPointInPolygon([lng, lat], geometry.coordinates)
+    }
+
+    if (geometry.type === "MultiPolygon") {
+      return geometry.coordinates.some((polygon: any) => this.isPointInPolygon([lng, lat], polygon))
+    }
+
+    return false
+  }
+
+  private isPointInPolygon(point: [number, number], polygon: number[][][]): boolean {
+    const [lng, lat] = point
+    let isInside = false
+    const vs = polygon[0] // Exterior ring
+
+    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+      const xi = vs[i][0],
+        yi = vs[i][1]
+      const xj = vs[j][0],
+        yj = vs[j][1]
+
+      const intersect = yi > lat !== yj > lat && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi
+      if (intersect) isInside = !isInside
+    }
+
+    return isInside
+  }
+
+  /**
    * Reverse geocode coordinates to find country and city
    */
   private async reverseGeocode(latitude: number, longitude: number) {
-    // Find country by proximity to centroid
+    // 1. Find country
     const countries = await prisma.country.findMany({
-      select: { id: true, code: true, name: true, centroid: true },
+      select: { id: true, code: true, name: true, centroid: true, boundary: true },
     })
 
-    let closestCountry = null
-    let minDistance = Infinity
+    let matchedCountry = null
 
+    // First try exact boundary match
     for (const country of countries) {
-      if (country.centroid && typeof country.centroid === "object") {
-        const centroid = country.centroid as any
-        const distance = Math.sqrt(Math.pow(centroid.lat - latitude, 2) + Math.pow(centroid.lng - longitude, 2))
-        if (distance < minDistance) {
-          minDistance = distance
-          closestCountry = country
+      if (this.isPointInGeometry(latitude, longitude, country.boundary)) {
+        matchedCountry = country
+        break
+      }
+    }
+
+    // If no boundary match, fall back to nearest centroid
+    if (!matchedCountry) {
+      let minDistance = Infinity
+      for (const country of countries) {
+        if (country.centroid && typeof country.centroid === "object") {
+          const centroid = country.centroid as any
+          const distance = Math.sqrt(Math.pow(centroid.lat - latitude, 2) + Math.pow(centroid.lng - longitude, 2))
+          if (distance < minDistance) {
+            minDistance = distance
+            matchedCountry = country
+          }
         }
       }
     }
 
-    if (!closestCountry) {
+    if (!matchedCountry) {
       return null
     }
 
-    // Find nearest city in that country
+    // 2. Find city
     const cities = await prisma.city.findMany({
-      where: { countryId: closestCountry.id },
-      select: { id: true, name: true, latitude: true, longitude: true },
+      where: { countryId: matchedCountry.id },
+      select: { id: true, name: true, latitude: true, longitude: true, boundary: true },
     })
 
-    let closestCity = null
-    let minCityDistance = Infinity
+    let matchedCity = null
 
+    // First try exact boundary match
     for (const city of cities) {
-      const distance = Math.sqrt(Math.pow(city.latitude - latitude, 2) + Math.pow(city.longitude - longitude, 2))
-      if (distance < minCityDistance) {
-        minCityDistance = distance
-        closestCity = city
+      if (city.boundary && this.isPointInGeometry(latitude, longitude, city.boundary)) {
+        matchedCity = city
+        break
+      }
+    }
+
+    // If no boundary match, fall back to nearest point
+    if (!matchedCity) {
+      let minCityDistance = Infinity
+      for (const city of cities) {
+        const distance = Math.sqrt(Math.pow(city.latitude - latitude, 2) + Math.pow(city.longitude - longitude, 2))
+        if (distance < minCityDistance) {
+          minCityDistance = distance
+          matchedCity = city
+        }
       }
     }
 
     return {
-      country: closestCountry.name,
-      countryCode: closestCountry.code,
-      city: closestCity?.name || null,
+      country: matchedCountry.name,
+      countryCode: matchedCountry.code,
+      city: matchedCity?.name || null,
     }
   }
 
@@ -67,6 +124,41 @@ class HighlightsService {
       scheduledStart?: Date | null
     },
   ) {
+    // If we have coordinates but no city/country info, try to reverse geocode
+    if (activityData.latitude && activityData.longitude && (!activityData.city || !activityData.countryCode)) {
+      try {
+        const location = await this.reverseGeocode(activityData.latitude, activityData.longitude)
+        if (location) {
+          activityData.city = location.city
+          activityData.country = location.country
+          activityData.countryCode = location.countryCode
+
+          // Update the activity in DB so we don't have to geocode again
+          const activity = await prisma.activity.findFirst({
+            where: {
+              tripId: activityData.tripId,
+              latitude: activityData.latitude,
+              longitude: activityData.longitude,
+              city: null,
+            },
+          })
+
+          if (activity) {
+            await prisma.activity.update({
+              where: { id: activity.id },
+              data: {
+                city: location.city,
+                country: location.country,
+                countryCode: location.countryCode,
+              },
+            })
+          }
+        }
+      } catch (error) {
+        console.error("Auto-geocoding failed:", error)
+      }
+    }
+
     // 1. Match country
     let country = null
     if (activityData.countryCode) {
@@ -289,6 +381,27 @@ class HighlightsService {
       orderBy: { _count: { activityType: "desc" } },
     })
 
+    // Get all activities for map and lists
+    const activities = await prisma.activity.findMany({
+      where: {
+        trip: { userId },
+        latitude: { not: null },
+        longitude: { not: null },
+      },
+      select: {
+        id: true,
+        name: true,
+        activityType: true,
+        city: true,
+        countryCode: true,
+        latitude: true,
+        longitude: true,
+        scheduledStart: true,
+        tripId: true,
+      },
+      orderBy: { scheduledStart: "desc" },
+    })
+
     return {
       statistics: stats || {
         totalTrips: 0,
@@ -311,6 +424,7 @@ class HighlightsService {
         type: type.activityType,
         count: type._count.activityType,
       })),
+      activities,
     }
   }
 

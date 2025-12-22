@@ -10,8 +10,6 @@ import {
   CircularProgress,
   Snackbar,
   Button,
-  Tabs,
-  Tab,
   Chip,
 } from "@mui/material"
 import { useState } from "react"
@@ -21,7 +19,7 @@ import { StatisticsCards } from "../components/StatisticsCards"
 import { useHighlights, useRecalculateHighlights, usePopulateActivityLocations } from "../hooks/useHighlights"
 import { useLanguageStore } from "../stores/languageStore"
 
-type FilterView = "overview" | "countries" | "cities" | "trips" | "activityTypes"
+type FilterView = "countries" | "cities" | "trips" | "activityTypes"
 
 export const HighlightsPage = () => {
   const { t } = useLanguageStore()
@@ -30,7 +28,9 @@ export const HighlightsPage = () => {
   const populateMutation = usePopulateActivityLocations()
   const [showSuccess, setShowSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
-  const [filterView, setFilterView] = useState<FilterView>("overview")
+  const [filterView, setFilterView] = useState<FilterView>("countries")
+  const [selectedContextId, setSelectedContextId] = useState<string | null>(null)
+  const [highlightedId, setHighlightedId] = useState<string | null>(null)
 
   const handleRecalculate = () => {
     recalculateMutation.mutate(undefined, {
@@ -52,6 +52,23 @@ export const HighlightsPage = () => {
 
   const handleCloseSnackbar = () => {
     setShowSuccess(false)
+  }
+
+  const handleItemClick = (id: string) => {
+    setSelectedContextId(id)
+    setHighlightedId(id)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
+  const handleActivityClick = (id: string) => {
+    setHighlightedId(id)
+    // Don't scroll to top here, just zoom the map
+  }
+
+  const handleViewChange = (view: FilterView) => {
+    setFilterView(view)
+    setSelectedContextId(null)
+    setHighlightedId(null)
   }
 
   return (
@@ -94,152 +111,290 @@ export const HighlightsPage = () => {
         </Alert>
       )}
 
-      <Box sx={{ mb: 3 }}>
-        <StatisticsCards stats={data?.statistics} isLoading={isLoading} />
-      </Box>
-
-      <Paper sx={{ mb: 3 }}>
-        <Tabs
-          value={filterView}
-          onChange={(_, value) => setFilterView(value)}
-          sx={{ borderBottom: 1, borderColor: "divider" }}
-        >
-          <Tab label={t("overview")} value="overview" />
-          <Tab label={t("countries")} value="countries" />
-          <Tab label={t("cities")} value="cities" />
-          <Tab label={t("trips")} value="trips" />
-          <Tab label={t("activityTypes")} value="activityTypes" />
-        </Tabs>
+      {/* Map - Always Visible */}
+      <Paper sx={{ height: 500, overflow: "hidden", mb: 4, borderRadius: 2, boxShadow: 3 }}>
+        <HighlightsMap data={data} isLoading={isLoading} highlightedId={highlightedId} />
       </Paper>
 
-      {filterView === "overview" && (
-        <Paper sx={{ height: 600, overflow: "hidden", mb: 3 }}>
-          <HighlightsMap data={data} isLoading={isLoading} />
-        </Paper>
-      )}
+      {/* Statistics Cards - Act as Tabs */}
+      <Box sx={{ mb: 4 }}>
+        <StatisticsCards
+          stats={data?.statistics}
+          isLoading={isLoading}
+          activeView={filterView}
+          onCardClick={handleViewChange}
+        />
+      </Box>
 
-      {filterView === "countries" && data && data.countries.length > 0 && (
-        <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
-          {data.countries.map((visit) => (
-            <Paper key={visit.id} sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                {visit.country.name}
+      {/* Detail Views */}
+      <Box sx={{ mt: 2, mb: 4 }}>
+        {filterView === "countries" && data && (
+          <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
+            {data.countries.length > 0 ? (
+              data.countries.map((visit) => (
+                <Paper
+                  key={visit.id}
+                  onClick={() => handleItemClick(visit.country.code)}
+                  sx={{
+                    p: 2,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    border: selectedContextId === visit.country.code ? "2px solid" : "1px solid",
+                    borderColor: selectedContextId === visit.country.code ? "primary.main" : "divider",
+                    boxShadow: selectedContextId === visit.country.code ? 4 : 1,
+                    "&:hover": { boxShadow: 2, borderColor: "primary.light" },
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom>
+                    {visit.country.name}
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
+                    <Chip
+                      label={`${visit.activityCount} ${t("activities").toLowerCase()}`}
+                      size="small"
+                      color="primary"
+                    />
+                    <Chip label={`${visit.visitCount} ${t("trips").toLowerCase()}`} size="small" />
+                    {visit.country.continent && (
+                      <Chip label={visit.country.continent} size="small" variant="outlined" />
+                    )}
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    {t("firstVisit")}: {new Date(visit.firstVisit).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    {t("lastVisit")}: {new Date(visit.lastVisit).toLocaleDateString()}
+                  </Typography>
+                </Paper>
+              ))
+            ) : (
+              <Typography color="text.secondary" sx={{ p: 2 }}>
+                {t("noTravelData")}
               </Typography>
-              <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
-                <Chip label={`${visit.activityCount} ${t("activities").toLowerCase()}`} size="small" color="primary" />
-                <Chip label={`${visit.visitCount} ${t("trips").toLowerCase()}`} size="small" />
-                {visit.country.continent && <Chip label={visit.country.continent} size="small" variant="outlined" />}
-              </Box>
-              <Typography variant="caption" color="text.secondary" display="block">
-                {t("firstVisit")}: {new Date(visit.firstVisit).toLocaleDateString()}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" display="block">
-                {t("lastVisit")}: {new Date(visit.lastVisit).toLocaleDateString()}
-              </Typography>
-            </Paper>
-          ))}
-        </Box>
-      )}
+            )}
+          </Box>
+        )}
 
-      {filterView === "cities" && data && data.cities.length > 0 && (
-        <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
-          {data.cities.map((visit) => (
-            <Paper key={visit.id} sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                {visit.city.name}
+        {filterView === "cities" && data && (
+          <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
+            {data.cities.length > 0 ? (
+              data.cities.map((visit) => (
+                <Paper
+                  key={visit.id}
+                  onClick={() => handleItemClick(visit.city.name)}
+                  sx={{
+                    p: 2,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    border: selectedContextId === visit.city.name ? "2px solid" : "1px solid",
+                    borderColor: selectedContextId === visit.city.name ? "primary.main" : "divider",
+                    boxShadow: selectedContextId === visit.city.name ? 4 : 1,
+                    "&:hover": { boxShadow: 2, borderColor: "primary.light" },
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom>
+                    {visit.city.name}
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
+                    <Chip
+                      label={`${visit.activityCount} ${t("activities").toLowerCase()}`}
+                      size="small"
+                      color="primary"
+                    />
+                    <Chip label={`${visit.visitCount} ${t("trips").toLowerCase()}`} size="small" />
+                    <Chip label={visit.city.countryCode} size="small" variant="outlined" />
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    {t("firstVisit")}: {new Date(visit.firstVisit).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    {t("lastVisit")}: {new Date(visit.lastVisit).toLocaleDateString()}
+                  </Typography>
+                  {visit.city.population && (
+                    <Typography variant="caption" color="text.secondary" display="block">
+                      {t("population")}: {visit.city.population.toLocaleString()}
+                    </Typography>
+                  )}
+                </Paper>
+              ))
+            ) : (
+              <Typography color="text.secondary" sx={{ p: 2 }}>
+                {t("noTravelData")}
               </Typography>
-              <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
-                <Chip label={`${visit.activityCount} ${t("activities").toLowerCase()}`} size="small" color="primary" />
-                <Chip label={`${visit.visitCount} ${t("trips").toLowerCase()}`} size="small" />
-                <Chip label={visit.city.countryCode} size="small" variant="outlined" />
-              </Box>
-              <Typography variant="caption" color="text.secondary" display="block">
-                {t("firstVisit")}: {new Date(visit.firstVisit).toLocaleDateString()}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" display="block">
-                {t("lastVisit")}: {new Date(visit.lastVisit).toLocaleDateString()}
-              </Typography>
-              {visit.city.population && (
-                <Typography variant="caption" color="text.secondary" display="block">
-                  {t("population")}: {visit.city.population.toLocaleString()}
-                </Typography>
-              )}
-            </Paper>
-          ))}
-        </Box>
-      )}
+            )}
+          </Box>
+        )}
 
-      {filterView === "trips" && data && data.trips && data.trips.length > 0 && (
-        <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))" }}>
-          {data.trips.map((trip) => (
-            <Paper key={trip.id} sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                {trip.name}
+        {filterView === "trips" && data && (
+          <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))" }}>
+            {data.trips.length > 0 ? (
+              data.trips.map((trip) => (
+                <Paper
+                  key={trip.id}
+                  onClick={() => handleItemClick(trip.id)}
+                  sx={{
+                    p: 2,
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    border: selectedContextId === trip.id ? "2px solid" : "1px solid",
+                    borderColor: selectedContextId === trip.id ? "primary.main" : "divider",
+                    boxShadow: selectedContextId === trip.id ? 4 : 1,
+                    "&:hover": { boxShadow: 2, borderColor: "primary.light" },
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom>
+                    {trip.name}
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
+                    <Chip
+                      label={`${trip.activityCount} ${t("activities").toLowerCase()}`}
+                      size="small"
+                      color="primary"
+                    />
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    {t("duration")}:{" "}
+                    {Math.ceil(
+                      (new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) / (1000 * 60 * 60 * 24),
+                    )}{" "}
+                    {t("days")}
+                  </Typography>
+                </Paper>
+              ))
+            ) : (
+              <Typography color="text.secondary" sx={{ p: 2 }}>
+                {t("noTravelData")}
               </Typography>
-              <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
-                <Chip label={`${trip.activityCount} ${t("activities").toLowerCase()}`} size="small" color="primary" />
-              </Box>
-              <Typography variant="caption" color="text.secondary" display="block">
-                {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" display="block">
-                {t("duration")}:{" "}
-                {Math.ceil(
-                  (new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) / (1000 * 60 * 60 * 24),
-                )}{" "}
-                {t("days")}
-              </Typography>
-            </Paper>
-          ))}
-        </Box>
-      )}
+            )}
+          </Box>
+        )}
 
-      {filterView === "activityTypes" && data && data.activityTypes && data.activityTypes.length > 0 && (
-        <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))" }}>
-          {data.activityTypes.map((activityType) => (
-            <Paper key={activityType.type} sx={{ p: 3, textAlign: "center" }}>
-              <Typography variant="h3" color="primary" gutterBottom>
-                {activityType.count}
+        {filterView === "activityTypes" && data && (
+          <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))" }}>
+            {data.activityTypes.length > 0 ? (
+              data.activityTypes.map((activityType) => (
+                <Paper
+                  key={activityType.type}
+                  onClick={() => handleItemClick(activityType.type)}
+                  sx={{
+                    p: 3,
+                    textAlign: "center",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    border: selectedContextId === activityType.type ? "2px solid" : "1px solid",
+                    borderColor: selectedContextId === activityType.type ? "primary.main" : "divider",
+                    boxShadow: selectedContextId === activityType.type ? 4 : 1,
+                    "&:hover": { boxShadow: 2, borderColor: "primary.light" },
+                  }}
+                >
+                  <Typography variant="h3" color="primary" gutterBottom>
+                    {activityType.count}
+                  </Typography>
+                  <Typography variant="h6" gutterBottom>
+                    {t(activityType.type as any)}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {((activityType.count / (data.statistics?.totalActivities || 1)) * 100).toFixed(1)}% {t("ofTotal")}
+                  </Typography>
+                </Paper>
+              ))
+            ) : (
+              <Typography color="text.secondary" sx={{ p: 2 }}>
+                {t("noTravelData")}
               </Typography>
-              <Typography variant="h6" gutterBottom>
-                {t(activityType.type as any)}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {((activityType.count / (data.statistics?.totalActivities || 1)) * 100).toFixed(1)}% {t("ofTotal")}
-              </Typography>
-            </Paper>
-          ))}
-        </Box>
-      )}
+            )}
+          </Box>
+        )}
+      </Box>
 
-      {filterView === "overview" && data && data.countries.length > 0 && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            {t("topCountries")}
+      {/* Filtered Activities List */}
+      {selectedContextId && data?.activities && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h5" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {t("activities")}
+            <Chip
+              label={
+                data.activities.filter(
+                  (a) =>
+                    a.city === selectedContextId ||
+                    a.countryCode === selectedContextId ||
+                    a.tripId === selectedContextId ||
+                    a.activityType === selectedContextId,
+                ).length
+              }
+              size="small"
+              color="primary"
+            />
+            <Button size="small" onClick={() => handleViewChange(filterView)}>
+              {t("clear")}
+            </Button>
           </Typography>
-          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-            {data.countries.slice(0, 10).map((visit) => (
-              <Paper
-                key={visit.id}
-                sx={{
-                  p: 2,
-                  minWidth: 200,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 0.5,
-                }}
-              >
-                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                  {visit.country.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {visit.activityCount} {t("activities").toLowerCase()}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {visit.country.continent}
-                </Typography>
-              </Paper>
-            ))}
+          <Box sx={{ display: "grid", gap: 1 }}>
+            {data.activities
+              .filter(
+                (a) =>
+                  a.city === selectedContextId ||
+                  a.countryCode === selectedContextId ||
+                  a.tripId === selectedContextId ||
+                  a.activityType === selectedContextId,
+              )
+              .map((activity) => (
+                <Paper
+                  key={activity.id}
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    border: highlightedId === activity.id ? "2px solid" : "1px solid",
+                    borderColor: highlightedId === activity.id ? "secondary.main" : "transparent",
+                    bgcolor: highlightedId === activity.id ? "action.selected" : "background.paper",
+                    "&:hover": { bgcolor: "action.hover" },
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleActivityClick(activity.id)}
+                >
+                  <Box
+                    sx={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      bgcolor:
+                        {
+                          ACCOMMODATION: "#E91E63",
+                          RESTAURANT: "#FF9800",
+                          ATTRACTION: "#9C27B0",
+                          TRANSPORT: "#2196F3",
+                          FLIGHT: "#03A9F4",
+                          ACTIVITY: "#4CAF50",
+                          TOUR: "#8BC34A",
+                          EVENT: "#FFC107",
+                          LOCATION: "#795548",
+                          CUSTOM: "#607D8B",
+                        }[activity.activityType] || "#000",
+                    }}
+                  />
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle1" component="span">
+                      {activity.name}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ ml: 2 }}>
+                      {t(activity.activityType as any)}
+                    </Typography>
+                  </Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {activity.city}
+                    {activity.city && activity.countryCode ? ", " : ""}
+                    {activity.countryCode}
+                  </Typography>
+                  <Typography variant="caption" sx={{ minWidth: 100, textAlign: "right" }}>
+                    {activity.scheduledStart ? new Date(activity.scheduledStart).toLocaleDateString() : ""}
+                  </Typography>
+                </Paper>
+              ))}
           </Box>
         </Box>
       )}

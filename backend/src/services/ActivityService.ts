@@ -193,6 +193,20 @@ export class ActivityService {
       }
     }
 
+    // Update highlights aggregations
+    const trip = await prisma.trip.findUnique({ where: { id: updatedActivity.tripId } })
+    if (trip) {
+      await highlightsService.updateAggregationsForActivity(trip.userId, {
+        tripId: updatedActivity.tripId,
+        city: updatedActivity.city,
+        country: updatedActivity.country,
+        countryCode: updatedActivity.countryCode,
+        latitude: updatedActivity.latitude,
+        longitude: updatedActivity.longitude,
+        scheduledStart: updatedActivity.scheduledStart,
+      })
+    }
+
     return updatedActivity
   }
 
@@ -275,6 +289,20 @@ export class ActivityService {
         orderIndex: originalActivity.orderIndex + 1, // Place after original
       },
     })
+
+    // Update highlights aggregations
+    const trip = await prisma.trip.findUnique({ where: { id: copiedActivity.tripId } })
+    if (trip) {
+      await highlightsService.updateAggregationsForActivity(trip.userId, {
+        tripId: copiedActivity.tripId,
+        city: copiedActivity.city,
+        country: copiedActivity.country,
+        countryCode: copiedActivity.countryCode,
+        latitude: copiedActivity.latitude,
+        longitude: copiedActivity.longitude,
+        scheduledStart: copiedActivity.scheduledStart,
+      })
+    }
 
     return copiedActivity
   }
