@@ -8,7 +8,10 @@ interface CreateTripDialogProps {
   isLoading?: boolean
 }
 
+import { useLanguageStore } from "../stores/languageStore"
+
 export default function CreateTripDialog({ open, onClose, onSubmit, isLoading }: CreateTripDialogProps) {
+  const { t } = useLanguageStore()
   const [name, setName] = useState("")
   const [currency, setCurrency] = useState("AUD")
   const [startDate, setStartDate] = useState("")
@@ -26,11 +29,11 @@ export default function CreateTripDialog({ open, onClose, onSubmit, isLoading }:
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Create New Trip</DialogTitle>
+        <DialogTitle>{t("createTrip")}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
             <TextField
-              label="Trip Name"
+              label={t("tripName")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -38,7 +41,7 @@ export default function CreateTripDialog({ open, onClose, onSubmit, isLoading }:
               autoFocus
             />
             <TextField
-              label="Start Date"
+              label={t("startDate")}
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
@@ -47,7 +50,7 @@ export default function CreateTripDialog({ open, onClose, onSubmit, isLoading }:
               InputLabelProps={{ shrink: true }}
             />
             <TextField
-              label="End Date"
+              label={t("endDate")}
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
@@ -59,10 +62,10 @@ export default function CreateTripDialog({ open, onClose, onSubmit, isLoading }:
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} disabled={isLoading}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button type="submit" variant="contained" disabled={isLoading}>
-            Create
+            {t("create")}
           </Button>
         </DialogActions>
       </form>

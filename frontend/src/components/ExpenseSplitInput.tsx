@@ -15,6 +15,7 @@ import {
 } from "@mui/material"
 import React from "react"
 
+import { useLanguageStore } from "../stores/languageStore"
 import type { TripMember } from "../types"
 
 export type SplitType = "equal" | "percentage" | "amount" | "shares"
@@ -45,6 +46,7 @@ export const ExpenseSplitInput: React.FC<ExpenseSplitInputProps> = ({
   onChange,
   error,
 }) => {
+  const { t } = useLanguageStore()
   // Internal state for manual inputs adds smoother typing
   // Effects will sync it back to parent
 
@@ -197,12 +199,12 @@ export const ExpenseSplitInput: React.FC<ExpenseSplitInputProps> = ({
         >
           <ToggleButton value="equal" aria-label="equal split">
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              = <Typography variant="caption">Equal</Typography>
+              = <Typography variant="caption">{t("equal")}</Typography>
             </Box>
           </ToggleButton>
           <ToggleButton value="amount" aria-label="exact amount">
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <AttachMoney fontSize="small" /> <Typography variant="caption">Amount</Typography>
+              <AttachMoney fontSize="small" /> <Typography variant="caption">{t("amount")}</Typography>
             </Box>
           </ToggleButton>
           <ToggleButton value="percentage" aria-label="percentage">
@@ -212,7 +214,7 @@ export const ExpenseSplitInput: React.FC<ExpenseSplitInputProps> = ({
           </ToggleButton>
           <ToggleButton value="shares" aria-label="shares">
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <PieChart fontSize="small" /> <Typography variant="caption">Shares</Typography>
+              <PieChart fontSize="small" /> <Typography variant="caption">{t("shares")}</Typography>
             </Box>
           </ToggleButton>
         </ToggleButtonGroup>
@@ -291,7 +293,7 @@ export const ExpenseSplitInput: React.FC<ExpenseSplitInputProps> = ({
       {splitType !== "equal" && (
         <Box sx={{ display: "flex", justifyContent: "space-between", px: 2, mt: 1 }}>
           <Typography variant="caption" color="text.secondary">
-            Total allocated:
+            {t("totalAllocated")}:
           </Typography>
           <Typography
             variant="caption"

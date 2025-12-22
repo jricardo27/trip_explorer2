@@ -9,6 +9,7 @@ export const TransportMode = {
   CYCLING: "CYCLING",
   TRANSIT: "TRANSIT",
   FERRY: "FERRY",
+  RIDE_SHARE: "RIDE_SHARE",
   OTHER: "OTHER",
 } as const
 
@@ -19,6 +20,11 @@ export const ActivityType = {
   RESTAURANT: "RESTAURANT",
   ATTRACTION: "ATTRACTION",
   TRANSPORT: "TRANSPORT",
+  FLIGHT: "FLIGHT",
+  ACTIVITY: "ACTIVITY",
+  TOUR: "TOUR",
+  EVENT: "EVENT",
+  LOCATION: "LOCATION",
   CUSTOM: "CUSTOM",
 } as const
 

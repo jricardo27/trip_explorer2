@@ -23,8 +23,11 @@ model User {
   googleId     String?  @unique @map("google_id")
   createdAt    DateTime @default(now()) @map("created_at")
 
-  trips       Trip[]
-  memberships TripMember[]
+  trips          Trip[]
+  memberships    TripMember[]
+  travelStats    UserTravelStats?
+  countryVisits  UserCountryVisit[]
+  cityVisits     UserCityVisit[]
 
   @@map("users")
 }
@@ -93,6 +96,11 @@ enum ActivityType {
   RESTAURANT
   ATTRACTION
   TRANSPORT
+  FLIGHT
+  ACTIVITY
+  TOUR
+  EVENT
+  LOCATION
   CUSTOM
 }
 
@@ -187,6 +195,7 @@ enum TransportMode {
   TRAIN
   BUS
   FERRY
+  RIDE_SHARE
   OTHER
 }
 
@@ -499,3 +508,100 @@ model TripDocument {
 
   @@map("trip_documents")
 }
+
+// ============================================
+// HIGHLIGHTS & TRAVEL STATISTICS
+// ============================================
+
+model Country {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  code       String   @unique @db.Char(2) // ISO 3166-1 alpha-2
+  code3      String?  @unique @db.Char(3) // ISO 3166-1 alpha-3
+  continent  String?
+  region     String?
+  boundary   Json     // GeoJSON Polygon/MultiPolygon
+  centroid   Json?    // { lat, lng } for map centering
+
+  userVisits UserCountryVisit[]
+  cities     City[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("countries")
+}
+
+model City {
+  id          String  @id @default(uuid())
+  name        String
+  countryId   String  @map("country_id")
+  countryCode String  @db.Char(2)
+  adminLevel  String? // State/Province
+  population  Int?
+  boundary    Json?   // GeoJSON Polygon (optional, can use point)
+  latitude    Float
+  longitude   Float
+
+  country    Country         @relation(fields: [countryId], references: [id])
+  userVisits UserCityVisit[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([name, countryCode])
+  @@index([countryId])
+  @@map("cities")
+}
+
+model UserTravelStats {
+  id              String    @id @default(uuid())
+  userId          String    @unique @map("user_id")
+  totalTrips      Int       @default(0) @map("total_trips")
+  totalActivities Int       @default(0) @map("total_activities")
+  totalCountries  Int       @default(0) @map("total_countries")
+  totalCities     Int       @default(0) @map("total_cities")
+  firstTripDate   DateTime? @map("first_trip_date")
+  lastTripDate    DateTime? @map("last_trip_date")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  lastRecalculated DateTime @default(now()) @map("last_recalculated")
+
+  @@map("user_travel_stats")
+}
+
+model UserCountryVisit {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  countryId     String   @map("country_id")
+  visitCount    Int      @default(0) @map("visit_count") // Number of trips
+  activityCount Int      @default(0) @map("activity_count")
+  firstVisit    DateTime @map("first_visit")
+  lastVisit     DateTime @map("last_visit")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  country Country @relation(fields: [countryId], references: [id])
+
+  @@unique([userId, countryId])
+  @@index([userId])
+  @@map("user_country_visits")
+}
+
+model UserCityVisit {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  cityId        String   @map("city_id")
+  visitCount    Int      @default(0) @map("visit_count")
+  activityCount Int      @default(0) @map("activity_count")
+  firstVisit    DateTime @map("first_visit")
+  lastVisit     DateTime @map("last_visit")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  city City @relation(fields: [cityId], references: [id])
+
+  @@unique([userId, cityId])
+  @@index([userId])
+  @@map("user_city_visits")
+}
+

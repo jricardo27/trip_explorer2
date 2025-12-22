@@ -51,6 +51,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState, useMemo } from "react"
 
 import { checklistApi, tripApi } from "../api/client"
+import { useLanguageStore } from "../stores/languageStore"
 import type { Trip, TripChecklistItem } from "../types"
 
 interface ChecklistPanelProps {
@@ -132,6 +133,7 @@ const DroppableCategory = ({ category, children }: { category: string; children:
 }
 
 export const ChecklistPanel = ({ trip }: ChecklistPanelProps) => {
+  const { t } = useLanguageStore()
   const { id: tripId, checklistItems: items = [] } = trip
   const queryClient = useQueryClient()
   const [newTask, setNewTask] = useState("")
@@ -271,22 +273,26 @@ export const ChecklistPanel = ({ trip }: ChecklistPanelProps) => {
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Pre-Trip Checklist</Typography>
+        <Typography variant="h6">{t("preTripChecklist")}</Typography>
         <Button
           startIcon={<ImportIcon />}
           size="small"
           onClick={() => setIsImportOpen(true)}
           disabled={!templates || templates.length === 0}
         >
-          Import Templates
+          {t("importTemplates")}
         </Button>
       </Box>
 
       <Paper sx={{ p: 2, mb: 3 }}>
         <Box display="flex" gap={2} alignItems="center">
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Category</InputLabel>
-            <Select value={selectedCategory} label="Category" onChange={(e) => setSelectedCategory(e.target.value)}>
+            <InputLabel>{t("category")}</InputLabel>
+            <Select
+              value={selectedCategory}
+              label={t("category")}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
               {categories.map((cat) => (
                 <MenuItem key={cat} value={cat}>
                   {cat}
@@ -294,14 +300,14 @@ export const ChecklistPanel = ({ trip }: ChecklistPanelProps) => {
               ))}
             </Select>
           </FormControl>
-          <Tooltip title="Add New Category">
+          <Tooltip title={t("addNewCategory")}>
             <IconButton onClick={() => setIsNewCategoryDialogOpen(true)} color="primary">
               <AddCategoryIcon />
             </IconButton>
           </Tooltip>
           <TextField
             size="small"
-            label="New Task"
+            label={t("newTask")}
             fullWidth
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
@@ -351,7 +357,7 @@ export const ChecklistPanel = ({ trip }: ChecklistPanelProps) => {
                     color="text.disabled"
                     sx={{ p: 2, display: "block", textAlign: "center" }}
                   >
-                    Drag items here
+                    {t("dragItemsHere")}
                   </Typography>
                 )}
               </List>
@@ -363,18 +369,18 @@ export const ChecklistPanel = ({ trip }: ChecklistPanelProps) => {
 
       {items.length === 0 && (
         <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 4 }}>
-          No tasks yet. Add one above or import from templates.
+          {t("noTasks")}
         </Typography>
       )}
 
       {/* New Category Dialog */}
       <Dialog open={isNewCategoryDialogOpen} onClose={() => setIsNewCategoryDialogOpen(false)}>
-        <DialogTitle>Add New Category</DialogTitle>
+        <DialogTitle>{t("addNewCategory")}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Category Name"
+            label={t("categoryName")}
             fullWidth
             variant="standard"
             value={newCategoryName}
@@ -383,16 +389,16 @@ export const ChecklistPanel = ({ trip }: ChecklistPanelProps) => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsNewCategoryDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setIsNewCategoryDialogOpen(false)}>{t("cancel")}</Button>
           <Button onClick={handleAddCategory} variant="contained" disabled={!newCategoryName.trim()}>
-            Add
+            {t("add")}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Import Dialog */}
       <Dialog open={isImportOpen} onClose={() => setIsImportOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Import from Global Templates</DialogTitle>
+        <DialogTitle>{t("importTemplates")}</DialogTitle>
         <DialogContent dividers>
           <List>
             {templates?.map((t) => (
@@ -424,13 +430,13 @@ export const ChecklistPanel = ({ trip }: ChecklistPanelProps) => {
           </List>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsImportOpen(false)}>Cancel</Button>
+          <Button onClick={() => setIsImportOpen(false)}>{t("cancel")}</Button>
           <Button
             variant="contained"
             onClick={() => importMutation.mutate(selectedTemplates)}
             disabled={selectedTemplates.length === 0}
           >
-            Import {selectedTemplates.length} Items
+            {t("import")} {selectedTemplates.length} {t("items")}
           </Button>
         </DialogActions>
       </Dialog>

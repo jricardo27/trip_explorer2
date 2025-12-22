@@ -30,6 +30,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import React, { useState } from "react"
 
 import { documentApi } from "../api/client"
+import { useLanguageStore } from "../stores/languageStore"
 import type { Trip, TripDocument } from "../types"
 
 interface DocumentOrganizerProps {
@@ -37,6 +38,7 @@ interface DocumentOrganizerProps {
 }
 
 export const DocumentOrganizer: React.FC<DocumentOrganizerProps> = ({ trip }) => {
+  const { t } = useLanguageStore()
   const tripId = trip.id
   const queryClient = useQueryClient()
   const [isAddOpen, setIsAddOpen] = useState(false)
@@ -137,9 +139,9 @@ export const DocumentOrganizer: React.FC<DocumentOrganizerProps> = ({ trip }) =>
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Documents & Links</Typography>
+        <Typography variant="h6">{t("documentsLinks")}</Typography>
         <Button startIcon={<AddIcon />} variant="contained" size="small" onClick={handleOpenAdd}>
-          Add Document
+          {t("addDocument")}
         </Button>
       </Box>
 
@@ -147,7 +149,7 @@ export const DocumentOrganizer: React.FC<DocumentOrganizerProps> = ({ trip }) =>
         {!documents || documents.length === 0 ? (
           <Box p={4} textAlign="center">
             <DocIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
-            <Typography color="text.secondary">No documents or links added yet.</Typography>
+            <Typography color="text.secondary">{t("noDocuments")}</Typography>
           </Box>
         ) : (
           <List>
@@ -193,7 +195,7 @@ export const DocumentOrganizer: React.FC<DocumentOrganizerProps> = ({ trip }) =>
                   <IconButton
                     edge="end"
                     onClick={() => {
-                      if (confirm("Are you sure you want to delete this document?")) {
+                      if (confirm(t("areYouSureDeleteDocument"))) {
                         deleteMutation.mutate(doc.id)
                       }
                     }}
@@ -209,11 +211,11 @@ export const DocumentOrganizer: React.FC<DocumentOrganizerProps> = ({ trip }) =>
       </Paper>
 
       <Dialog open={isAddOpen} onClose={handleCloseAdd} maxWidth="xs" fullWidth>
-        <DialogTitle>Add Document / Link</DialogTitle>
+        <DialogTitle>{t("addDocument")}</DialogTitle>
         <DialogContent dividers>
           <Box display="flex" flexDirection="column" gap={2} mt={1}>
             <TextField
-              label="Title"
+              label={t("title")}
               fullWidth
               value={formTitle}
               onChange={(e) => setFormTitle(e.target.value)}
@@ -221,41 +223,41 @@ export const DocumentOrganizer: React.FC<DocumentOrganizerProps> = ({ trip }) =>
               autoFocus
             />
             <TextField
-              label="URL"
+              label={t("url")}
               fullWidth
               value={formUrl}
               onChange={(e) => setFormUrl(e.target.value)}
               placeholder="e.g. https://..."
             />
             <TextField
-              label="Notes"
+              label={t("notes")}
               fullWidth
               multiline
               rows={2}
               value={formNotes}
               onChange={(e) => setFormNotes(e.target.value)}
-              placeholder="Add some notes about this document..."
+              placeholder={t("documentNotesPlaceholder")}
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAdd}>Cancel</Button>
+          <Button onClick={handleCloseAdd}>{t("cancel")}</Button>
           <Button
             onClick={handleAddSubmit}
             variant="contained"
             disabled={!formTitle || !formUrl || createMutation.isPending}
           >
-            {createMutation.isPending ? "Adding..." : "Add"}
+            {createMutation.isPending ? t("saving") : t("add")}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={isEditOpen} onClose={handleCloseEdit} maxWidth="xs" fullWidth>
-        <DialogTitle>Edit Document / Link</DialogTitle>
+        <DialogTitle>{t("editDocument")}</DialogTitle>
         <DialogContent dividers>
           <Box display="flex" flexDirection="column" gap={2} mt={1}>
             <TextField
-              label="Title"
+              label={t("title")}
               fullWidth
               value={formTitle}
               onChange={(e) => setFormTitle(e.target.value)}
@@ -263,31 +265,31 @@ export const DocumentOrganizer: React.FC<DocumentOrganizerProps> = ({ trip }) =>
               autoFocus
             />
             <TextField
-              label="URL"
+              label={t("url")}
               fullWidth
               value={formUrl}
               onChange={(e) => setFormUrl(e.target.value)}
               placeholder="e.g. https://..."
             />
             <TextField
-              label="Notes"
+              label={t("notes")}
               fullWidth
               multiline
               rows={2}
               value={formNotes}
               onChange={(e) => setFormNotes(e.target.value)}
-              placeholder="Add some notes about this document..."
+              placeholder={t("documentNotesPlaceholder")}
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseEdit}>Cancel</Button>
+          <Button onClick={handleCloseEdit}>{t("cancel")}</Button>
           <Button
             onClick={handleEditSubmit}
             variant="contained"
             disabled={!formTitle || !formUrl || updateMutation.isPending}
           >
-            {updateMutation.isPending ? "Saving..." : "Save Changes"}
+            {updateMutation.isPending ? t("saving") : t("saveChanges")}
           </Button>
         </DialogActions>
       </Dialog>

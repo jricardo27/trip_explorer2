@@ -13,6 +13,7 @@ import { Paper, Box, Typography, IconButton, Tooltip, Avatar, AvatarGroup } from
 import dayjs from "dayjs"
 import { useMemo } from "react"
 
+import { useLanguageStore } from "../stores/languageStore"
 import type { Activity } from "../types"
 
 interface SortableActivityCardProps {
@@ -34,6 +35,7 @@ export const SortableActivityCard = ({
   onFlyTo,
   canEdit = true,
 }: SortableActivityCardProps) => {
+  const { t } = useLanguageStore()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: activity.id,
     disabled: activity.isLocked || !canEdit,
@@ -94,15 +96,19 @@ export const SortableActivityCard = ({
           {activity.name}
         </Typography>
         <Typography variant="caption" display="block">
-          {activity.scheduledStart ? dayjs(activity.scheduledStart).format("h:mm A") : "No time"}
+          {activity.scheduledStart ? dayjs(activity.scheduledStart).format("h:mm A") : t("noTime")}
         </Typography>
       </Box>
       <Box display="flex" alignItems="center">
         {!isAvailable && (
           <Tooltip
-            title={`Warning: This activity is usually not available on ${dayjs(
-              activity.scheduledStart || activity.tripDay?.date,
-            ).format("dddd")}. Available days: ${activity.availableDays.join(", ")}`}
+            title={`${t("warning")}: ${t("notAvailableOn")} ${t(
+              dayjs(activity.scheduledStart || activity.tripDay?.date)
+                .format("dddd")
+                .toLowerCase() as any,
+            )}. ${t("availableDaysLabel")}: ${activity.availableDays
+              ?.map((d) => t(d.toLowerCase() as any))
+              .join(", ")}`}
           >
             <Warning color="warning" fontSize="small" sx={{ mr: 1 }} />
           </Tooltip>
@@ -118,7 +124,7 @@ export const SortableActivityCard = ({
         )}
         <Box>
           {activity.latitude && activity.longitude && (
-            <Tooltip title="Fly to location on map">
+            <Tooltip title={t("flyToLocation")}>
               <IconButton size="small" onClick={() => onFlyTo && onFlyTo(activity)} sx={{ mr: 0.5 }} color="primary">
                 <NearMe fontSize="small" />
               </IconButton>
@@ -126,17 +132,17 @@ export const SortableActivityCard = ({
           )}
           {canEdit && (
             <>
-              <Tooltip title="Copy this activity">
+              <Tooltip title={t("copyActivity")}>
                 <IconButton size="small" onClick={() => onCopy && onCopy(activity)} sx={{ mr: 0.5 }}>
                   <ContentCopy fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Edit activity">
+              <Tooltip title={t("editActivity")}>
                 <IconButton size="small" onClick={() => onEdit(activity)} sx={{ mr: 0.5 }}>
                   <EditIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Delete activity">
+              <Tooltip title={t("deleteActivity")}>
                 <IconButton size="small" onClick={() => onDelete(activity.id)} disabled={isDeleting} color="error">
                   <DeleteIcon fontSize="small" />
                 </IconButton>

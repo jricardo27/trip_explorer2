@@ -1,14 +1,29 @@
 import { AccountCircle } from "@mui/icons-material"
-import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Box, Avatar, Container } from "@mui/material"
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  Box,
+  Avatar,
+  Container,
+  Tabs,
+  Tab,
+} from "@mui/material"
 import { useState } from "react"
 import { Outlet, useNavigate } from "react-router-dom"
 
 import { useAuthStore } from "../stores/authStore"
+import { useLanguageStore } from "../stores/languageStore"
 
 export default function Layout() {
   const { user, logout } = useAuthStore()
+  const { t, language, setLanguage } = useLanguageStore()
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [currentTab, setCurrentTab] = useState(window.location.pathname.includes("/highlights") ? 1 : 0)
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -28,9 +43,22 @@ export default function Layout() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" component="div" sx={{ mr: 4 }}>
             Trip Explorer
           </Typography>
+          <Tabs
+            value={currentTab}
+            onChange={(_, newValue) => {
+              setCurrentTab(newValue)
+              navigate(newValue === 0 ? "/" : "/highlights")
+            }}
+            sx={{ flexGrow: 1 }}
+            textColor="inherit"
+            indicatorColor="secondary"
+          >
+            <Tab label={t("myTrips")} />
+            <Tab label={t("highlights")} />
+          </Tabs>
           <div>
             <IconButton
               size="large"
@@ -69,9 +97,18 @@ export default function Layout() {
                   navigate("/settings")
                 }}
               >
-                Settings
+                {t("settings")}
               </MenuItem>
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+
+              <MenuItem
+                onClick={() => {
+                  setLanguage(language === "en" ? "es" : "en")
+                }}
+              >
+                Language: {language === "en" ? "English" : "Español"}
+              </MenuItem>
+
+              <MenuItem onClick={handleLogout}>{t("logout")}</MenuItem>
             </Menu>
           </div>
         </Toolbar>

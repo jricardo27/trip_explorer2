@@ -2,6 +2,7 @@ import { ArrowForward } from "@mui/icons-material"
 import { Box, Typography, Avatar, List, ListItem, Divider } from "@mui/material"
 import React, { useMemo } from "react"
 
+import { useLanguageStore } from "../stores/languageStore"
 import type { TripMember, Expense } from "../types"
 
 interface ExpenseBalancesProps {
@@ -17,6 +18,7 @@ interface Debt {
 }
 
 export const ExpenseBalances: React.FC<ExpenseBalancesProps> = ({ members, expenses, currency }) => {
+  const { t } = useLanguageStore()
   // Calculate balances
   const debts = useMemo(() => {
     // 1. Calculate net balance for each member
@@ -103,7 +105,7 @@ export const ExpenseBalances: React.FC<ExpenseBalancesProps> = ({ members, expen
   if (debts.length === 0) {
     return (
       <Box textAlign="center" py={4}>
-        <Typography color="text.secondary">No debts. Everyone is settled up!</Typography>
+        <Typography color="text.secondary">{t("noDebts")}</Typography>
       </Box>
     )
   }
@@ -129,7 +131,7 @@ export const ExpenseBalances: React.FC<ExpenseBalancesProps> = ({ members, expen
 
                 <Box display="flex" flexDirection="column" alignItems="center">
                   <Typography variant="caption" color="text.secondary">
-                    owes
+                    {t("owes")}
                   </Typography>
                   <ArrowForward color="action" fontSize="small" />
                   <Typography fontWeight="bold" color="error.main">

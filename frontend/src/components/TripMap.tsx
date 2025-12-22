@@ -10,6 +10,7 @@ import { GeoJSON, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents, 
 import "leaflet/dist/leaflet.css"
 
 import { MARKER_MANIFEST } from "../data/markerManifest"
+import { useLanguageStore } from "../stores/languageStore"
 import type { Activity } from "../types"
 
 import { BaseLayers } from "./Map/BaseLayers"
@@ -156,12 +157,14 @@ const AnimationController = ({
   onReset,
   progress,
   onSeek,
+  t,
 }: {
   isPlaying: boolean
   onPlayPause: () => void
   onReset: () => void
   progress: number
   onSeek: (value: number) => void
+  t: (key: any) => string
 }) => (
   <Paper
     elevation={4}
@@ -181,7 +184,7 @@ const AnimationController = ({
   >
     <Box display="flex" justifyContent="space-between" alignItems="center">
       <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-        Trip Animation
+        {t("tripAnimation")}
       </Typography>
       <Typography variant="caption" color="text.secondary">
         {Math.round(progress)}%
@@ -216,6 +219,7 @@ const AnimationController = ({
 // --- Main Component ---
 
 export const TripMap = (props: TripMapProps) => {
+  const { t } = useLanguageStore()
   const {
     activities,
     selectedActivityId,
@@ -329,6 +333,7 @@ export const TripMap = (props: TripMapProps) => {
           }}
           progress={animationProgress}
           onSeek={setSeekProgress}
+          t={t}
         />
       )}
 
@@ -396,7 +401,7 @@ export const TripMap = (props: TripMapProps) => {
                   <>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                       <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                        Filters
+                        {t("filters")}
                       </Typography>
                       <IconButton size="small" onClick={() => setShowFilters(false)}>
                         ✕
@@ -409,7 +414,7 @@ export const TripMap = (props: TripMapProps) => {
                       onChange={(e) => setSelectedDays(e.target.value as string[])}
                       displayEmpty
                       sx={{ width: "100%", mb: 1 }}
-                      renderValue={(s) => (s.length === 0 ? "All days" : `${s.length} days`)}
+                      renderValue={(s) => (s.length === 0 ? t("allDays") : `${s.length} ${t("days")}`)}
                     >
                       {uniqueDays.map((day) => (
                         <MenuItem key={day.id} value={day.id}>
@@ -425,7 +430,7 @@ export const TripMap = (props: TripMapProps) => {
                       onChange={(e) => setSelectedMarkerLayers(e.target.value as string[])}
                       displayEmpty
                       sx={{ width: "100%" }}
-                      renderValue={(s) => (s.length === 0 ? "Map Layers" : `${s.length} layers`)}
+                      renderValue={(s) => (s.length === 0 ? t("mapLayers") : `${s.length} ${t("layers")}`)}
                     >
                       {regionsToShow.map((region) =>
                         MARKER_MANIFEST[region as keyof typeof MARKER_MANIFEST].map((file) => (

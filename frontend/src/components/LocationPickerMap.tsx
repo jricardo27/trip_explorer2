@@ -6,6 +6,8 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png"
 import { useState, useEffect } from "react"
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet"
 
+import { useLanguageStore } from "../stores/languageStore"
+
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
   shadowUrl: markerShadow,
@@ -46,6 +48,7 @@ const LocationPickerMap = ({ open, onClose, onSelect, initialLat, initialLng }: 
   const [position, setPosition] = useState<[number, number] | null>(
     initialLat && initialLng ? [initialLat, initialLng] : null,
   )
+  const { t } = useLanguageStore()
 
   const defaultCenter: [number, number] = [-25.2744, 133.7751] // Australia center
 
@@ -58,7 +61,7 @@ const LocationPickerMap = ({ open, onClose, onSelect, initialLat, initialLng }: 
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Select Location</DialogTitle>
+      <DialogTitle>{t("selectLocation")}</DialogTitle>
       <DialogContent sx={{ p: 0, height: 500, display: "flex", flexDirection: "column" }}>
         <Box sx={{ flexGrow: 1, position: "relative" }}>
           <MapContainer
@@ -78,15 +81,15 @@ const LocationPickerMap = ({ open, onClose, onSelect, initialLat, initialLng }: 
         <Box sx={{ p: 1, textAlign: "center", bgcolor: "background.paper" }}>
           <Typography variant="caption" color="text.secondary">
             {position
-              ? `Selected: ${position[0].toFixed(6)}, ${position[1].toFixed(6)}`
-              : "Click on the map to select a location"}
+              ? `${t("selectedCoordinates")}: ${position[0].toFixed(6)}, ${position[1].toFixed(6)}`
+              : t("clickToSelectLocation")}
           </Typography>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t("cancel")}</Button>
         <Button onClick={handleConfirm} variant="contained" disabled={!position}>
-          Confirm Selection
+          {t("confirmSelection")}
         </Button>
       </DialogActions>
     </Dialog>

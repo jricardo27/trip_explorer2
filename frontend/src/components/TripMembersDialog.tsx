@@ -22,6 +22,7 @@ import {
 import { useState } from "react"
 
 import { useTripMembers } from "../hooks/useTripMembers"
+import { useLanguageStore } from "../stores/languageStore"
 import { MemberRole } from "../types"
 import type { Trip } from "../types"
 
@@ -55,6 +56,7 @@ const PRESET_COLORS = [
 ]
 
 export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembersDialogProps) => {
+  const { t } = useLanguageStore()
   const { members, isLoading, addMember, updateMember, removeMember, isAddingMember } = useTripMembers(trip.id)
 
   const [newMemberName, setNewMemberName] = useState("")
@@ -83,7 +85,7 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
       setNewMemberRole(MemberRole.VIEWER)
       setNewMemberColor(PRESET_COLORS[Math.floor(Math.random() * PRESET_COLORS.length)])
     } catch (err: unknown) {
-      setError((err as any)?.response?.data?.error?.message || "Failed to add member")
+      setError((err as any)?.response?.data?.error?.message || t("failedToIntroMember"))
     }
   }
 
@@ -105,17 +107,17 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
         // Actually for a simple UI, selecting a color should just update it.
       }
     } catch {
-      setError("Failed to update member")
+      setError(t("failedToUpdateMember"))
     }
   }
 
   const handleRemoveMember = async (memberId: string) => {
-    if (window.confirm("Are you sure you want to remove this member?")) {
+    if (window.confirm(t("removeMemberConfirmation"))) {
       try {
         setError(null)
         await removeMember(memberId)
       } catch {
-        setError("Failed to remove member")
+        setError(t("failedToRemoveMember"))
       }
     }
   }
@@ -124,7 +126,7 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          Manage Trip Members
+          {t("manageTripMembers")}
           {fullScreen && (
             <IconButton onClick={onClose} size="small">
               <CloseIcon />
@@ -142,20 +144,20 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
         {/* Add New Member Form */}
         <Box sx={{ mb: 4, p: 2, bgcolor: "background.default", borderRadius: 1 }}>
           <Typography variant="subtitle2" gutterBottom>
-            Add New Member
+            {t("addNewMember")}
           </Typography>
           <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
             <TextField
               fullWidth
               size="small"
-              label="Name"
+              label={t("memberName")}
               value={newMemberName}
               onChange={(e) => setNewMemberName(e.target.value)}
             />
             <TextField
               fullWidth
               size="small"
-              label="Email (Optional)"
+              label={t("memberEmail")}
               value={newMemberEmail}
               onChange={(e) => setNewMemberEmail(e.target.value)}
             />
@@ -164,14 +166,14 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
             <TextField
               select
               size="small"
-              label="Role"
+              label={t("role")}
               value={newMemberRole}
               onChange={(e) => setNewMemberRole(e.target.value as MemberRole)}
               sx={{ minWidth: 120 }}
             >
-              <MenuItem value={MemberRole.OWNER}>Owner</MenuItem>
-              <MenuItem value={MemberRole.EDITOR}>Editor</MenuItem>
-              <MenuItem value={MemberRole.VIEWER}>Viewer</MenuItem>
+              <MenuItem value={MemberRole.OWNER}>{t("owner")}</MenuItem>
+              <MenuItem value={MemberRole.EDITOR}>{t("editor")}</MenuItem>
+              <MenuItem value={MemberRole.VIEWER}>{t("viewer")}</MenuItem>
             </TextField>
 
             <Box sx={{ display: "flex", gap: 0.5 }}>
@@ -198,14 +200,14 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
               disabled={!newMemberName || isAddingMember}
               sx={{ ml: "auto" }}
             >
-              Add
+              {t("add")}
             </Button>
           </Box>
         </Box>
 
         {/* Members List */}
         <Typography variant="subtitle2" gutterBottom>
-          Current Members ({members?.length || 0})
+          {t("currentMembers")} ({members?.length || 0})
         </Typography>
         {isLoading ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
@@ -218,7 +220,7 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
                 <ListItemAvatar>
                   <Avatar sx={{ bgcolor: member.color }}>{member.name.charAt(0)}</Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={member.name} secondary={member.email || "No email"} />
+                <ListItemText primary={member.name} secondary={member.email || t("noEmail")} />
 
                 {editingId === member.id ? (
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -245,12 +247,12 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
                       onChange={(e) => handleUpdateMember(member.id, { role: e.target.value as MemberRole })}
                       sx={{ width: 100 }}
                     >
-                      <MenuItem value={MemberRole.OWNER}>Owner</MenuItem>
-                      <MenuItem value={MemberRole.EDITOR}>Editor</MenuItem>
-                      <MenuItem value={MemberRole.VIEWER}>Viewer</MenuItem>
+                      <MenuItem value={MemberRole.OWNER}>{t("owner")}</MenuItem>
+                      <MenuItem value={MemberRole.EDITOR}>{t("editor")}</MenuItem>
+                      <MenuItem value={MemberRole.VIEWER}>{t("viewer")}</MenuItem>
                     </TextField>
                     <IconButton size="small" onClick={() => setEditingId(null)}>
-                      <Typography variant="caption">Done</Typography>
+                      <Typography variant="caption">{t("done")}</Typography>
                     </IconButton>
                   </Box>
                 ) : (
@@ -279,14 +281,14 @@ export const TripMembersDialog = ({ open, onClose, trip, fullScreen }: TripMembe
             ))}
             {members?.length === 0 && (
               <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
-                No members yet
+                {t("noMembers")}
               </Typography>
             )}
           </List>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t("close")}</Button>
       </DialogActions>
     </Dialog>
   )

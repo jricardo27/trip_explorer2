@@ -28,9 +28,11 @@ import { useNavigate } from "react-router-dom"
 
 import client from "../api/client"
 import { useTrips, useCreateTrip, useCopyTrip } from "../hooks/useTrips"
+import { useLanguageStore } from "../stores/languageStore"
 import type { Trip } from "../types"
 
 const TripList = () => {
+  const { t } = useLanguageStore()
   const navigate = useNavigate()
   const { data: trips, isLoading, error } = useTrips()
   const createTripMutation = useCreateTrip()
@@ -150,7 +152,7 @@ const TripList = () => {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" component="h1">
-          My Trips
+          {t("myTrips")}
         </Typography>
         <Button
           variant="contained"
@@ -163,16 +165,16 @@ const TripList = () => {
             setOpen(true)
           }}
         >
-          Create Trip
+          {t("createTrip")}
         </Button>
       </Box>
 
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Tabs value={tabValue} onChange={(_e, val) => setTabValue(val)} aria-label="trip tabs">
-            <Tab label="Past" />
-            <Tab label="Current" />
-            <Tab label="Future" />
+            <Tab label={t("past")} />
+            <Tab label={t("current")} />
+            <Tab label={t("future")} />
           </Tabs>
           <Box display="flex" gap={1}>
             {trips && trips.length > 0 && (
@@ -247,16 +249,16 @@ const TripList = () => {
                 <Box display="flex" alignItems="center" color="text.secondary" mb={2}>
                   <AttachMoney fontSize="small" sx={{ mr: 1 }} />
                   <Typography variant="body2">
-                    {trip.budget ? `${trip.defaultCurrency} ${trip.budget}` : "No budget set"}
+                    {trip.budget ? `${trip.defaultCurrency} ${trip.budget}` : t("noBudgetSet")}
                   </Typography>
                 </Box>
                 <Chip
                   label={
                     dayjs(trip.startDate).isAfter(dayjs())
-                      ? "Upcoming"
+                      ? t("upcoming")
                       : dayjs(trip.endDate).isBefore(dayjs())
-                        ? "Past"
-                        : "Ongoing"
+                        ? t("past")
+                        : t("current")
                   }
                   color={
                     dayjs(trip.startDate).isAfter(dayjs())
@@ -277,7 +279,7 @@ const TripList = () => {
                     handleViewDetails(trip.id)
                   }}
                 >
-                  View Details
+                  {t("viewDetails")}
                 </Button>
                 <Button
                   size="small"
@@ -285,7 +287,7 @@ const TripList = () => {
                   onClick={(e) => handleDuplicate(trip, e)}
                   disabled={copyTripMutation.isPending}
                 >
-                  Duplicate
+                  {t("duplicate")}
                 </Button>
               </CardActions>
             </Card>
@@ -296,10 +298,10 @@ const TripList = () => {
       {trips && trips.length === 0 && (
         <Box textAlign="center" py={8}>
           <Typography variant="h5" color="text.secondary" gutterBottom>
-            No trips yet
+            {t("noTrips")}
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph>
-            Create your first trip to get started!
+            {t("noTravelData")}
           </Typography>
           <Button
             variant="contained"
@@ -314,7 +316,7 @@ const TripList = () => {
             }}
             sx={{ mt: 2 }}
           >
-            Create Your First Trip
+            {t("createTrip")}
           </Button>
         </Box>
       )}
@@ -335,12 +337,18 @@ const TripList = () => {
       </Fab>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Create New Trip</DialogTitle>
+        <DialogTitle>{t("createTrip")}</DialogTitle>
         <DialogContent>
           <Box pt={1} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <TextField autoFocus label="Trip Name" fullWidth value={name} onChange={(e) => setName(e.target.value)} />
+            <TextField
+              autoFocus
+              label={t("tripName")}
+              fullWidth
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
             <DatePicker
-              label="Start Date"
+              label={t("startDate")}
               value={startDate ? dayjs(startDate) : null}
               onChange={(newValue) => {
                 const isoDate = newValue ? newValue.format("YYYY-MM-DD") : ""
@@ -355,13 +363,13 @@ const TripList = () => {
               slotProps={{ textField: { fullWidth: true } }}
             />
             <DatePicker
-              label="End Date"
+              label={t("endDate")}
               value={endDate ? dayjs(endDate) : null}
               onChange={(newValue) => setEndDate(newValue ? newValue.format("YYYY-MM-DD") : "")}
               slotProps={{ textField: { fullWidth: true } }}
             />
             <TextField
-              label="Budget (Optional)"
+              label={t("budgetOptional")}
               type="number"
               fullWidth
               value={budget}
@@ -373,24 +381,29 @@ const TripList = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={() => setOpen(false)}>{t("cancel")}</Button>
           <Button onClick={handleCreateTrip} variant="contained" disabled={createTripMutation.isPending}>
-            {createTripMutation.isPending ? "Creating..." : "Create Trip"}
+            {createTripMutation.isPending ? t("loading") : t("createTrip")}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Duplicate Dialog */}
       <Dialog open={copyOpen} onClose={() => setCopyOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Duplicate Trip</DialogTitle>
+        <DialogTitle>{t("duplicate")}</DialogTitle>
         <DialogContent>
           <Box pt={1} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Typography variant="body2" color="text.secondary">
               Duplicate &quot;{selectedTrip?.name}&quot; including all activities and days.
             </Typography>
-            <TextField label="New Trip Name" fullWidth value={copyName} onChange={(e) => setCopyName(e.target.value)} />
+            <TextField
+              label={t("newTripName")}
+              fullWidth
+              value={copyName}
+              onChange={(e) => setCopyName(e.target.value)}
+            />
             <DatePicker
-              label="New Start Date"
+              label={t("newStartDate")}
               value={copyStartDate ? dayjs(copyStartDate) : null}
               onChange={(newValue) => setCopyStartDate(newValue ? newValue.format("YYYY-MM-DD") : "")}
               slotProps={{ textField: { fullWidth: true } }}
@@ -398,13 +411,13 @@ const TripList = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCopyOpen(false)}>Cancel</Button>
+          <Button onClick={() => setCopyOpen(false)}>{t("cancel")}</Button>
           <Button
             onClick={confirmDuplicate}
             variant="contained"
             disabled={copyTripMutation.isPending || !copyName || !copyStartDate}
           >
-            {copyTripMutation.isPending ? "Duplicating..." : "Duplicate"}
+            {copyTripMutation.isPending ? t("loading") : t("duplicate")}
           </Button>
         </DialogActions>
       </Dialog>

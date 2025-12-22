@@ -31,6 +31,7 @@ import {
 import dayjs from "dayjs"
 import { useMemo, useState } from "react"
 
+import { useLanguageStore } from "../stores/languageStore"
 import { TransportMode } from "../types"
 import type { Activity, TripDay, TransportAlternative } from "../types"
 
@@ -148,6 +149,7 @@ export const TimelineCalendarView = ({
   onDayOperation,
 }: TimelineCalendarViewProps) => {
   // Responsive breakpoints
+  const { t } = useLanguageStore()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
@@ -338,23 +340,23 @@ export const TimelineCalendarView = ({
   return (
     <>
       <Menu anchorEl={dayMenuAnchor?.el} open={Boolean(dayMenuAnchor)} onClose={handleDayMenuClose}>
-        <MenuItem onClick={() => openDayDialog("move_all")}>Move all activities...</MenuItem>
-        <MenuItem onClick={() => openDayDialog("swap")}>Swap with day...</MenuItem>
-        <MenuItem onClick={() => openDayDialog("rename")}>Rename Day</MenuItem>
+        <MenuItem onClick={() => openDayDialog("move_all")}>{t("moveAllActivities")}...</MenuItem>
+        <MenuItem onClick={() => openDayDialog("swap")}>{t("swapDays")}...</MenuItem>
+        <MenuItem onClick={() => openDayDialog("rename")}>{t("renameDay")}</MenuItem>
       </Menu>
 
       <Dialog open={Boolean(dayOpDialog)} onClose={() => setDayOpDialog(null)}>
         <DialogTitle>
-          {dayOpDialog?.type === "move_all" && "Move All Activities"}
-          {dayOpDialog?.type === "swap" && "Swap Days"}
-          {dayOpDialog?.type === "rename" && "Rename Day"}
+          {dayOpDialog?.type === "move_all" && t("moveAllActivities")}
+          {dayOpDialog?.type === "swap" && t("swapDays")}
+          {dayOpDialog?.type === "rename" && t("renameDay")}
         </DialogTitle>
         <DialogContent sx={{ minWidth: 300, pt: 2 }}>
           {dayOpDialog?.type === "rename" ? (
             <FormControl fullWidth sx={{ mt: 2 }}>
               <TextField
                 autoFocus
-                label="Day Name"
+                label={t("dayName")}
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 fullWidth
@@ -362,8 +364,8 @@ export const TimelineCalendarView = ({
             </FormControl>
           ) : (
             <FormControl fullWidth sx={{ mt: 2 }}>
-              <InputLabel>Target Day</InputLabel>
-              <Select value={targetDayId} label="Target Day" onChange={(e) => setTargetDayId(e.target.value)}>
+              <InputLabel>{t("targetDay")}</InputLabel>
+              <Select value={targetDayId} label={t("targetDay")} onChange={(e) => setTargetDayId(e.target.value)}>
                 {days
                   .filter((d) => d.id !== dayOpDialog?.dayId)
                   .map((d) => (
@@ -377,9 +379,9 @@ export const TimelineCalendarView = ({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDayOpDialog(null)}>Cancel</Button>
+          <Button onClick={() => setDayOpDialog(null)}>{t("cancel")}</Button>
           <Button onClick={handleDayOpSubmit} variant="contained">
-            Confirm
+            {t("confirm")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -748,7 +750,7 @@ export const TimelineCalendarView = ({
           anchorPosition={contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}
         >
           <MenuItem onClick={handleAddActivityFromContext}>
-            Add Activity at {contextMenu && dayjs(contextMenu.time).format("HH:mm")}
+            {t("addActivityAt")} {contextMenu && dayjs(contextMenu.time).format("HH:mm")}
           </MenuItem>
         </Menu>
       </Box>

@@ -29,6 +29,7 @@ import dayjs from "dayjs"
 import { useState, useEffect } from "react"
 
 import { useTripMembers } from "../hooks/useTripMembers"
+import { useLanguageStore } from "../stores/languageStore"
 import { ActivityType } from "../types"
 import type { Activity, TripDay } from "../types"
 
@@ -71,6 +72,7 @@ const ActivityDialog = ({
     if (reason === "backdropClick") return
     onClose(event, reason)
   }
+  const { t } = useLanguageStore()
   const [name, setName] = useState("")
   const [activityType, setActivityType] = useState<ActivityType>(ActivityType.ATTRACTION)
   const [scheduledStart, setScheduledStart] = useState<dayjs.Dayjs | null>(null)
@@ -162,7 +164,7 @@ const ActivityDialog = ({
     const tripEnd = tripEndDate ? new Date(tripEndDate) : null
 
     if (start && end && end < start) {
-      setError("End date must be after start date")
+      setError(t("endDateBeforeStart"))
       return false
     }
 
@@ -177,7 +179,7 @@ const ActivityDialog = ({
       const activityEnd = dayjs(end)
 
       if (start && (activityStart.isBefore(tripStartDay) || activityStart.isAfter(tripEndDay))) {
-        setError(`Start date must be within trip dates (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`)
+        setError(`${t("dateOutsideTripRange")} (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`)
         return false
       }
       if (end && (activityEnd.isBefore(tripStartDay) || activityEnd.isAfter(tripEndDay))) {
@@ -242,7 +244,7 @@ const ActivityDialog = ({
     } catch (err: any) {
       console.error("Failed to save activity:", err)
       const errorMessage =
-        err.response?.data?.error?.message || err.response?.data?.error || err.message || "Failed to save activity"
+        err.response?.data?.error?.message || err.response?.data?.error || err.message || t("failedToSave")
       setError(typeof errorMessage === "object" ? JSON.stringify(errorMessage) : errorMessage)
     }
   }
@@ -251,7 +253,7 @@ const ActivityDialog = ({
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          {activity ? "Edit Activity" : "Add Activity"}
+          {activity ? t("editActivity") : t("addActivity")}
           {fullScreen && (
             <IconButton onClick={() => onClose(undefined, "closeButton")} size="small">
               <CloseIcon />
@@ -271,7 +273,7 @@ const ActivityDialog = ({
               <Grid size={{ xs: 12 }}>
                 <TextField
                   fullWidth
-                  label="Activity Name"
+                  label={t("activityName")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -279,15 +281,15 @@ const ActivityDialog = ({
               </Grid>
               <Grid size={{ xs: 6 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Type</InputLabel>
+                  <InputLabel>{t("type")}</InputLabel>
                   <Select
                     value={activityType}
-                    label="Type"
+                    label={t("type")}
                     onChange={(e) => setActivityType(e.target.value as ActivityType)}
                   >
                     {Object.values(ActivityType).map((type) => (
                       <MenuItem key={type} value={type}>
-                        {type}
+                        {t(type as any)}
                       </MenuItem>
                     ))}
                   </Select>
@@ -295,21 +297,21 @@ const ActivityDialog = ({
               </Grid>
               <Grid size={{ xs: 6 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Priority</InputLabel>
-                  <Select value={priority} label="Priority" onChange={(e) => setPriority(e.target.value)}>
-                    <MenuItem value="normal">Standard</MenuItem>
-                    <MenuItem value="optional">Optional</MenuItem>
-                    <MenuItem value="mandatory">Mandatory</MenuItem>
+                  <InputLabel>{t("priority")}</InputLabel>
+                  <Select value={priority} label={t("priority")} onChange={(e) => setPriority(e.target.value)}>
+                    <MenuItem value="normal">{t("standard")}</MenuItem>
+                    <MenuItem value="optional">{t("optional")}</MenuItem>
+                    <MenuItem value="mandatory">{t("mandatory")}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
               <Grid size={{ xs: 12 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Participants</InputLabel>
+                  <InputLabel>{t("participants")}</InputLabel>
                   <Select
                     multiple
                     value={selectedMemberIds}
-                    label="Participants"
+                    label={t("participants")}
                     onChange={(e) => {
                       const val = e.target.value
                       setSelectedMemberIds(typeof val === "string" ? val.split(",") : val)
@@ -341,7 +343,7 @@ const ActivityDialog = ({
               </Grid>
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
-                  label="Start Time"
+                  label={t("startTime")}
                   value={scheduledStart}
                   minDate={tripStartDate ? dayjs(tripStartDate) : undefined}
                   maxDate={tripEndDate ? dayjs(tripEndDate) : undefined}
@@ -351,7 +353,7 @@ const ActivityDialog = ({
               </Grid>
               <Grid size={{ xs: 6 }}>
                 <DateTimePicker
-                  label="End Time"
+                  label={t("endTime")}
                   value={scheduledEnd}
                   minDate={tripStartDate ? dayjs(tripStartDate) : undefined}
                   maxDate={tripEndDate ? dayjs(tripEndDate) : undefined}
@@ -366,7 +368,7 @@ const ActivityDialog = ({
               <Grid size={{ xs: 6 }}>
                 <TextField
                   fullWidth
-                  label="Estimated Cost"
+                  label={t("estimatedCost")}
                   type="number"
                   value={estimatedCost}
                   onChange={(e) => setEstimatedCost(e.target.value)}
@@ -376,7 +378,7 @@ const ActivityDialog = ({
               <Grid size={{ xs: 6 }}>
                 <TextField
                   fullWidth
-                  label="Actual Cost"
+                  label={t("actualCost")}
                   type="number"
                   value={actualCost}
                   onChange={(e) => setActualCost(e.target.value)}
@@ -387,7 +389,7 @@ const ActivityDialog = ({
                 <Box display="flex" alignItems="center" gap={3}>
                   <Box display="flex" alignItems="center">
                     <Checkbox checked={isPaid} onChange={(e) => setIsPaid(e.target.checked)} />
-                    <Typography variant="body2">Mark as Paid</Typography>
+                    <Typography variant="body2">{t("markAsPaid")}</Typography>
                   </Box>
                   <Box display="flex" alignItems="center">
                     <Checkbox
@@ -396,14 +398,14 @@ const ActivityDialog = ({
                       icon={<LockOpen fontSize="small" />}
                       checkedIcon={<Lock fontSize="small" />}
                     />
-                    <Typography variant="body2">{isLocked ? "Locked to Time" : "Unlocked"}</Typography>
+                    <Typography variant="body2">{isLocked ? t("locked") : t("unlocked")}</Typography>
                   </Box>
                 </Box>
               </Grid>
               <Grid size={{ xs: 5 }}>
                 <TextField
                   fullWidth
-                  label="Latitude"
+                  label={t("latitude")}
                   type="number"
                   value={latitude}
                   onChange={(e) => setLatitude(e.target.value)}
@@ -413,7 +415,7 @@ const ActivityDialog = ({
               <Grid size={{ xs: 5 }}>
                 <TextField
                   fullWidth
-                  label="Longitude"
+                  label={t("longitude")}
                   type="number"
                   value={longitude}
                   onChange={(e) => setLongitude(e.target.value)}
@@ -426,7 +428,7 @@ const ActivityDialog = ({
                   fullWidth
                   onClick={() => setMapPickerOpen(true)}
                   sx={{ height: 56 }}
-                  title="Select from Map"
+                  title={t("selectFromMap")}
                 >
                   <MapIcon />
                 </Button>
@@ -434,7 +436,7 @@ const ActivityDialog = ({
               <Grid size={{ xs: 12 }}>
                 <TextField
                   fullWidth
-                  label="Notes"
+                  label={t("activityNotes")}
                   multiline
                   rows={3}
                   value={notes}
@@ -444,11 +446,11 @@ const ActivityDialog = ({
 
               <Grid size={{ xs: 12 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Available Days (Optional)</InputLabel>
+                  <InputLabel>{t("availableDays")}</InputLabel>
                   <Select
                     multiple
                     value={availableDays}
-                    label="Available Days (Optional)"
+                    label={t("availableDays")}
                     onChange={(e) =>
                       setAvailableDays(typeof e.target.value === "string" ? e.target.value.split(",") : e.target.value)
                     }
@@ -463,19 +465,19 @@ const ActivityDialog = ({
                     {DAYS_OF_WEEK.map((day) => (
                       <MenuItem key={day} value={day}>
                         <Checkbox checked={availableDays.indexOf(day) > -1} />
-                        <ListItemText primary={day} />
+                        <ListItemText primary={t(day.toLowerCase() as any) || day} />
                       </MenuItem>
                     ))}
                   </Select>
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                    Leave empty if available every day.
+                    {t("availableDaysHint")}
                   </Typography>
                 </FormControl>
               </Grid>
 
               <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Who&apos;s going?
+                  {t("whoIsGoing")}
                 </Typography>
                 {members.length > 0 ? (
                   <List
@@ -507,7 +509,7 @@ const ActivityDialog = ({
                   </List>
                 ) : (
                   <Typography variant="body2" color="text.secondary">
-                    No members in this trip yet.
+                    {t("noMembers")}
                   </Typography>
                 )}
               </Grid>
@@ -516,9 +518,9 @@ const ActivityDialog = ({
         </form>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => onClose(undefined, "cancelButton")}>Cancel</Button>
+        <Button onClick={() => onClose(undefined, "cancelButton")}>{t("cancel")}</Button>
         <Button type="submit" form="activity-form" variant="contained" disabled={isLoading}>
-          {isLoading ? "Saving..." : activity ? "Save Changes" : "Add Activity"}
+          {isLoading ? t("saving") + "..." : activity ? t("saveChanges") : t("addActivity")}
         </Button>
       </DialogActions>
       <LocationPickerMap

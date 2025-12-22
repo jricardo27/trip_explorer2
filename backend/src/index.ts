@@ -8,6 +8,7 @@ import animationRoutes from "./routes/animations"
 import authRoutes from "./routes/auth"
 import checklistRoutes from "./routes/checklists"
 import expenseRoutes from "./routes/expenses"
+import highlightsRoutes from "./routes/highlights"
 import packingRoutes from "./routes/packing"
 import transportRoutes from "./routes/transport"
 import tripRoutes from "./routes/trips"
@@ -34,6 +35,7 @@ app.use("/api/animations", animationRoutes)
 app.use("/api/expenses", expenseRoutes)
 app.use("/api/checklists", checklistRoutes)
 app.use("/api/packing", packingRoutes)
+app.use("/api/highlights", highlightsRoutes)
 
 // Error handling
 app.use(errorHandler)

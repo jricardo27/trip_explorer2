@@ -2,6 +2,7 @@ import { Checklist as ChecklistIcon, Inventory as PackingIcon, Description as Do
 import { Box, Grid, Tabs, Tab, Paper } from "@mui/material"
 import { useState } from "react"
 
+import { useLanguageStore } from "../stores/languageStore"
 import type { Trip } from "../types"
 
 import { ChecklistPanel } from "./ChecklistPanel"
@@ -13,6 +14,7 @@ interface PreparationTabProps {
 }
 
 export const PreparationTab = ({ trip }: PreparationTabProps) => {
+  const { t } = useLanguageStore()
   const [tabValue, setTabValue] = useState(0)
 
   return (
@@ -25,9 +27,9 @@ export const PreparationTab = ({ trip }: PreparationTabProps) => {
           textColor="primary"
           centered
         >
-          <Tab icon={<ChecklistIcon />} label="Checklist" iconPosition="start" />
-          <Tab icon={<PackingIcon />} label="Packing List" iconPosition="start" />
-          <Tab icon={<DocIcon />} label="Documents & Links" iconPosition="start" />
+          <Tab icon={<ChecklistIcon />} label={t("checklist")} iconPosition="start" />
+          <Tab icon={<PackingIcon />} label={t("packingList")} iconPosition="start" />
+          <Tab icon={<DocIcon />} label={t("documentsLinks")} iconPosition="start" />
         </Tabs>
       </Paper>
 

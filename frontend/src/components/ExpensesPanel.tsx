@@ -33,6 +33,7 @@ import { useState, useMemo, Fragment, useCallback } from "react"
 
 import { useExpenses } from "../hooks/useExpenses"
 import { useTripMembers } from "../hooks/useTripMembers"
+import { useLanguageStore } from "../stores/languageStore"
 import type { Trip, Expense, Activity } from "../types"
 
 import { ExpenseBalances } from "./ExpenseBalances"
@@ -64,6 +65,7 @@ export const ExpensesPanel = ({
   trip,
   onEditActivity,
 }: ExpensesPanelProps) => {
+  const { t } = useLanguageStore()
   const { expenses, createExpense, updateExpense, deleteExpense } = useExpenses(tripId)
   const { members } = useTripMembers(tripId)
 
@@ -216,7 +218,7 @@ export const ExpensesPanel = ({
     if (confirmDeleteId) {
       await deleteExpense.mutateAsync(confirmDeleteId)
       setConfirmDeleteId(null)
-      setSnackbarMessage("Expense deleted successfully")
+      setSnackbarMessage(t("deletedSuccessfully"))
       setSnackbarOpen(true)
     }
   }
@@ -232,11 +234,11 @@ export const ExpensesPanel = ({
           bgcolor: "background.paper",
         }}
       >
-        <Typography variant="h6">Expenses</Typography>
+        <Typography variant="h6">{t("expenses")}</Typography>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <TextField
             select
-            label="Currency"
+            label={t("currency")}
             value={displayCurrency}
             onChange={(e) => setDisplayCurrency(e.target.value)}
             size="small"
@@ -267,11 +269,11 @@ export const ExpensesPanel = ({
           }}
           centered
         >
-          <Tab label="All Expenses" />
-          <Tab label={editingExpenseId ? "Edit Expense" : "Add New"} />
-          <Tab label="Balances" />
-          <Tab label="Budget Details" />
-          <Tab label="Reports" />
+          <Tab label={t("allExpenses")} />
+          <Tab label={editingExpenseId ? t("editExpense") : t("addExpense")} />
+          <Tab label={t("balances")} />
+          <Tab label={t("budgetDetails")} />
+          <Tab label={t("reports")} />
         </Tabs>
       </Box>
 
@@ -291,7 +293,7 @@ export const ExpensesPanel = ({
               <Box display="flex" gap={4}>
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
-                    Total Budget
+                    {t("totalBudget")}
                   </Typography>
                   <Typography variant="h6">
                     {defaultCurrency} {Number(totalBudget).toFixed(2)}
@@ -299,7 +301,7 @@ export const ExpensesPanel = ({
                 </Box>
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
-                    Total Spent
+                    {t("totalSpent")}
                   </Typography>
                   <Typography variant="h6" color={remainingBudget < 0 ? "error.main" : "text.primary"}>
                     {defaultCurrency} {Number(totalAmount).toFixed(2)}
@@ -307,7 +309,7 @@ export const ExpensesPanel = ({
                 </Box>
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
-                    Remaining
+                    {t("remaining")}
                   </Typography>
                   <Typography variant="h6" color={remainingBudget < 0 ? "error.main" : "success.main"}>
                     {defaultCurrency} {remainingBudget.toFixed(2)}
@@ -325,7 +327,7 @@ export const ExpensesPanel = ({
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 sx={{ minWidth: 200 }}
               >
-                <MenuItem value="All">All Categories</MenuItem>
+                <MenuItem value="All">{t("allCategories")}</MenuItem>
                 {[
                   "Food",
                   "Transport",
@@ -339,7 +341,7 @@ export const ExpensesPanel = ({
                   "Other",
                 ].map((opt) => (
                   <MenuItem key={opt} value={opt}>
-                    {opt}
+                    {t(opt.toLowerCase() as any)}
                   </MenuItem>
                 ))}
               </TextField>
@@ -348,9 +350,9 @@ export const ExpensesPanel = ({
             {expenses.length === 0 ? (
               <Box textAlign="center" py={4}>
                 <ReceiptLong sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
-                <Typography color="text.secondary">No expenses recorded yet.</Typography>
+                <Typography color="text.secondary">{t("noExpenses")}</Typography>
                 <Button variant="outlined" sx={{ mt: 2 }} onClick={() => setTabIndex(1)}>
-                  Add First Expense
+                  {t("addFirstExpense")}
                 </Button>
               </Box>
             ) : (
@@ -404,12 +406,12 @@ export const ExpensesPanel = ({
               </List>
             )}
             <Dialog open={!!confirmDeleteId} onClose={() => setConfirmDeleteId(null)}>
-              <DialogTitle>Confirm Delete</DialogTitle>
-              <DialogContent>Are you sure you want to delete this expense?</DialogContent>
+              <DialogTitle>{t("confirmDelete")}</DialogTitle>
+              <DialogContent>{t("areYouSureDeleteExpense")}</DialogContent>
               <DialogActions>
-                <Button onClick={() => setConfirmDeleteId(null)}>Cancel</Button>
+                <Button onClick={() => setConfirmDeleteId(null)}>{t("cancel")}</Button>
                 <Button onClick={handleConfirmDelete} color="error" variant="contained">
-                  Delete
+                  {t("delete")}
                 </Button>
               </DialogActions>
             </Dialog>
@@ -425,7 +427,7 @@ export const ExpensesPanel = ({
         {tabIndex === 1 && (
           <Box pt={2} display="flex" flexDirection="column" gap={2}>
             <TextField
-              label="Description"
+              label={t("description")}
               fullWidth
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -433,7 +435,7 @@ export const ExpensesPanel = ({
             />
 
             <TextField
-              label="Notes (Optional)"
+              label={`${t("activityNotes")} (${t("optional")})`}
               fullWidth
               multiline
               rows={2}
@@ -443,7 +445,7 @@ export const ExpensesPanel = ({
 
             <Box display="flex" gap={2}>
               <TextField
-                label="Amount"
+                label={t("amount")}
                 type="number"
                 fullWidth
                 value={amount}
@@ -470,7 +472,7 @@ export const ExpensesPanel = ({
                 }}
               />
               <TextField
-                label="Category"
+                label={t("category")}
                 select
                 fullWidth
                 value={category}
@@ -489,14 +491,14 @@ export const ExpensesPanel = ({
                   "Other",
                 ].map((opt) => (
                   <MenuItem key={opt} value={opt}>
-                    {opt}
+                    {t(opt.toLowerCase() as any)}
                   </MenuItem>
                 ))}
               </TextField>
             </Box>
 
             <TextField
-              label="Paid By"
+              label={t("paidBy")}
               select
               fullWidth
               value={paidById}
@@ -541,7 +543,7 @@ export const ExpensesPanel = ({
                   setTabIndex(0)
                 }}
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button
                 variant="contained"
@@ -555,7 +557,7 @@ export const ExpensesPanel = ({
                     Math.abs(splits.reduce((sum, s) => sum + (s.amount || 0), 0) - (parseFloat(amount) || 0)) > 0.1)
                 }
               >
-                {editingExpenseId ? "Update Expense" : "Save Expense"}
+                {editingExpenseId ? t("update") : t("save")}
               </Button>
             </Box>
           </Box>
@@ -566,17 +568,17 @@ export const ExpensesPanel = ({
         {tabIndex === 3 && (
           <Box>
             <Typography variant="h6" gutterBottom>
-              Budget vs. Actual by Activity
+              {t("budgetVsActual")}
             </Typography>
             <TableContainer component={Paper} elevation={0} sx={{ border: "1px solid", borderColor: "divider" }}>
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Activity</TableCell>
-                    <TableCell>Category</TableCell>
-                    <TableCell align="right">Estimated</TableCell>
-                    <TableCell align="right">Actual</TableCell>
-                    <TableCell align="right">Status</TableCell>
+                    <TableCell>{t("activities")}</TableCell>
+                    <TableCell>{t("category")}</TableCell>
+                    <TableCell align="right">{t("estimatedCost")}</TableCell>
+                    <TableCell align="right">{t("actualCost")}</TableCell>
+                    <TableCell align="right">{t("status")}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -594,7 +596,11 @@ export const ExpensesPanel = ({
                           </Box>
                         </TableCell>
                         <TableCell>
-                          <Chip label={activity.activityType} size="small" variant="outlined" />
+                          <Chip
+                            label={t(activity.activityType as any) || activity.activityType}
+                            size="small"
+                            variant="outlined"
+                          />
                         </TableCell>
                         <TableCell align="right">
                           {activity.currency} {Number(activity.estimatedCost || 0).toFixed(2)}
@@ -604,7 +610,7 @@ export const ExpensesPanel = ({
                         </TableCell>
                         <TableCell align="right">
                           <Chip
-                            label={activity.isPaid ? "Paid" : "Pending"}
+                            label={activity.isPaid ? t("paid") : t("pending")}
                             size="small"
                             color={activity.isPaid ? "success" : "warning"}
                           />
@@ -613,31 +619,31 @@ export const ExpensesPanel = ({
                       {/* Transport costs from this activity */}
                       {/* Transport costs from this activity */}
                       {(trip?.transport || [])
-                        .filter((t) => t.fromActivityId === activity.id && t.isSelected)
-                        .map((t) => {
-                          const expense = allExpenses.find((e) => e.transportAlternativeId === t.id)
-                          const amount = expense ? Number(expense.amount) : t.cost || 0
+                        .filter((trans) => trans.fromActivityId === activity.id && trans.isSelected)
+                        .map((trans) => {
+                          const expense = allExpenses.find((e) => e.transportAlternativeId === trans.id)
+                          const amount = expense ? Number(expense.amount) : trans.cost || 0
                           const isPaid = expense ? expense.isPaid : false
 
                           return (
-                            <TableRow key={`transport-${t.id}`} sx={{ bgcolor: "action.hover" }}>
+                            <TableRow key={`transport-${trans.id}`} sx={{ bgcolor: "action.hover" }}>
                               <TableCell sx={{ pl: 4 }}>
                                 <Typography variant="body2" color="text.secondary">
-                                  ↳ {t.transportMode} {t.name ? `(${t.name})` : ""}
+                                  ↳ {trans.transportMode} {trans.name ? `(${trans.name})` : ""}
                                 </Typography>
                               </TableCell>
                               <TableCell>
-                                <Chip label="Transport" size="small" variant="outlined" color="secondary" />
+                                <Chip label={t("transport")} size="small" variant="outlined" color="secondary" />
                               </TableCell>
                               <TableCell align="right">
-                                {t.currency || defaultCurrency} {Number(amount).toFixed(2)}
+                                {trans.currency || defaultCurrency} {Number(amount).toFixed(2)}
                               </TableCell>
                               <TableCell align="right">
-                                {t.currency || defaultCurrency} {Number(amount).toFixed(2)}
+                                {trans.currency || defaultCurrency} {Number(amount).toFixed(2)}
                               </TableCell>
                               <TableCell align="right">
                                 <Chip
-                                  label={isPaid ? "Paid" : "Pending"}
+                                  label={isPaid ? t("paid") : t("pending")}
                                   size="small"
                                   color={isPaid ? "success" : "warning"}
                                 />

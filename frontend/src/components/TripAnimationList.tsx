@@ -18,6 +18,7 @@ import {
 } from "@mui/material"
 import { useState } from "react"
 
+import { useLanguageStore } from "../stores/languageStore"
 import type { TripAnimation } from "../types"
 
 interface TripAnimationListProps {
@@ -37,6 +38,7 @@ export const TripAnimationList: React.FC<TripAnimationListProps> = ({
   onCreate,
   isDeleting,
 }) => {
+  const { t } = useLanguageStore()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedAnimation, setSelectedAnimation] = useState<TripAnimation | null>(null)
 
@@ -61,15 +63,15 @@ export const TripAnimationList: React.FC<TripAnimationListProps> = ({
   return (
     <Paper sx={{ p: 2 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Trip Animations</Typography>
+        <Typography variant="h6">{t("tripAnimations")}</Typography>
         <Button variant="contained" startIcon={<Add />} onClick={onCreate} size="small">
-          Create Animation
+          {t("createAnimation")}
         </Button>
       </Box>
 
       {animations.length === 0 ? (
         <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 4 }}>
-          No animations yet. Create one to visualize your trip!
+          {t("noAnimations")}
         </Typography>
       ) : (
         <List sx={{ maxHeight: 300, overflowY: "auto" }}>
@@ -90,7 +92,7 @@ export const TripAnimationList: React.FC<TripAnimationListProps> = ({
                 primary={
                   <Box display="flex" alignItems="center" gap={1}>
                     <Typography variant="subtitle1">{animation.name}</Typography>
-                    <Chip label={`${animation.steps.length} steps`} size="small" variant="outlined" />
+                    <Chip label={`${animation.steps.length} ${t("steps")}`} size="small" variant="outlined" />
                   </Box>
                 }
                 secondary={
@@ -108,17 +110,17 @@ export const TripAnimationList: React.FC<TripAnimationListProps> = ({
               />
               <ListItemSecondaryAction>
                 <Box display="flex" gap={0.5}>
-                  <Tooltip title="Play Animation">
+                  <Tooltip title={t("playAnimation")}>
                     <IconButton edge="end" onClick={() => onPlay(animation)} color="primary" size="small">
                       <PlayArrow />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Edit Animation">
+                  <Tooltip title={t("editAnimation")}>
                     <IconButton edge="end" onClick={() => onEdit(animation)} size="small">
                       <Edit fontSize="small" />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Delete Animation">
+                  <Tooltip title={t("deleteAnimation")}>
                     <IconButton
                       edge="end"
                       onClick={() => handleDeleteClick(animation)}
@@ -138,16 +140,16 @@ export const TripAnimationList: React.FC<TripAnimationListProps> = ({
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
-        <DialogTitle>Delete Animation?</DialogTitle>
+        <DialogTitle>{t("deleteAnimationTitle")}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete &quot;{selectedAnimation?.name}&quot;? This action cannot be undone.
+            {t("deleteAnimationConfirmation")} &quot;{selectedAnimation?.name}&quot;?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelDelete}>Cancel</Button>
+          <Button onClick={handleCancelDelete}>{t("cancel")}</Button>
           <Button onClick={handleConfirmDelete} color="error" variant="contained">
-            Delete
+            {t("delete")}
           </Button>
         </DialogActions>
       </Dialog>

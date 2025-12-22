@@ -8,6 +8,7 @@ import React from "react"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 
 import Layout from "./components/Layout"
+import { HighlightsPage } from "./pages/HighlightsPage"
 import LoginPage from "./pages/LoginPage"
 import SettingsPage from "./pages/SettingsPage"
 import SignupPage from "./pages/SignupPage"
@@ -71,6 +72,7 @@ const App = () => {
                   <Route path="/" element={<TripList />} />
                   <Route path="/trips" element={<TripList />} />
                   <Route path="/trips/:tripId" element={<TripDetailsPage />} />
+                  <Route path="/highlights" element={<HighlightsPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                 </Route>
               </Routes>

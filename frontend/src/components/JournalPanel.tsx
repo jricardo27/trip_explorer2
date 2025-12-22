@@ -21,6 +21,7 @@ import React, { useState, useMemo, useRef, useEffect } from "react"
 import ReactMarkdown from "react-markdown"
 
 import client from "../api/client"
+import { useLanguageStore } from "../stores/languageStore"
 import type { TripDay } from "../types"
 
 interface JournalPanelProps {
@@ -34,6 +35,7 @@ interface JournalEditorProps {
 }
 
 const JournalEditor: React.FC<JournalEditorProps> = ({ tripId, day }) => {
+  const { t } = useLanguageStore()
   const queryClient = useQueryClient()
   const [localNotes, setLocalNotes] = useState<string>(day.notes || "")
   const [isPreview, setIsPreview] = useState(false)
@@ -81,7 +83,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ tripId, day }) => {
         <Box display="flex" alignItems="center" gap={3}>
           {isSaving && (
             <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
-              Saving...
+              {t("saving")}...
             </Typography>
           )}
           <Button
@@ -89,7 +91,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ tripId, day }) => {
             startIcon={isPreview ? <Edit /> : <Visibility />}
             onClick={() => setIsPreview(!isPreview)}
           >
-            {isPreview ? "Edit" : "Preview"}
+            {isPreview ? t("edit") : t("preview")}
           </Button>
         </Box>
       </Box>
@@ -117,7 +119,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ tripId, day }) => {
             fullWidth
             multiline
             variant="standard"
-            placeholder="Write your thoughts for today (Markdown supported)..."
+            placeholder={t("writeThoughts")}
             value={localNotes}
             onChange={handleNoteChange}
             InputProps={{
@@ -134,6 +136,7 @@ const JournalEditor: React.FC<JournalEditorProps> = ({ tripId, day }) => {
 }
 
 export const JournalPanel: React.FC<JournalPanelProps> = ({ tripId, days }) => {
+  const { t } = useLanguageStore()
   const [selectedDayId, setSelectedDayId] = useState<string>(days[0]?.id || "")
   const [search, setSearch] = useState("")
 
@@ -152,7 +155,7 @@ export const JournalPanel: React.FC<JournalPanelProps> = ({ tripId, days }) => {
   if (days.length === 0) {
     return (
       <Box p={4} textAlign="center">
-        <Typography color="text.secondary">No days found for this trip.</Typography>
+        <Typography color="text.secondary">{t("noDaysFound")}</Typography>
       </Box>
     )
   }
@@ -181,7 +184,7 @@ export const JournalPanel: React.FC<JournalPanelProps> = ({ tripId, days }) => {
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Search days..."
+                placeholder={t("searchDays")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />

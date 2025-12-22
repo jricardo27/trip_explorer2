@@ -11,6 +11,7 @@ import {
 } from "@mui/material"
 import { useState, useEffect } from "react"
 
+import { useLanguageStore } from "../stores/languageStore"
 import type { Trip } from "../types"
 
 type AnimationSettings = {
@@ -50,6 +51,7 @@ export default function AnimationConfigDialog({
   onSubmit,
   fullScreen,
 }: AnimationConfigDialogProps) {
+  const { t } = useLanguageStore()
   const [name, setName] = useState("")
   const [speed, setSpeed] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
@@ -94,12 +96,12 @@ export default function AnimationConfigDialog({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
-      <DialogTitle>Create New Animation</DialogTitle>
+      <DialogTitle>{t("createAnimation")}</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-          <TextField label="Animation Name" value={name} onChange={(e) => setName(e.target.value)} fullWidth />
+          <TextField label={t("animationName")} value={name} onChange={(e) => setName(e.target.value)} fullWidth />
 
-          <Typography gutterBottom>Animation Speed (x)</Typography>
+          <Typography gutterBottom>{t("animationSpeed")}</Typography>
           <Slider
             value={speed}
             onChange={(_, v) => setSpeed(v as number)}
@@ -111,14 +113,14 @@ export default function AnimationConfigDialog({
           />
 
           <Typography variant="caption" color="text.secondary">
-            This will create an animation sequence including all current activities in order.
+            {t("animationHelpText")}
           </Typography>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t("cancel")}</Button>
         <Button onClick={handleSubmit} variant="contained" disabled={isLoading || !name}>
-          {isLoading ? "Creating..." : "Create"}
+          {isLoading ? t("creating") : t("create")}
         </Button>
       </DialogActions>
     </Dialog>

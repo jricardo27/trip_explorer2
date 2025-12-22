@@ -4,6 +4,8 @@ import { Activity, Prisma, ActivityType, ActivityStatus } from "@prisma/client"
 
 import prisma from "../utils/prisma"
 
+import highlightsService from "./HighlightsService"
+
 export class ActivityService {
   async createActivity(data: {
     tripId: string
@@ -70,6 +72,20 @@ export class ActivityService {
         },
       },
     })
+
+    // Update highlights aggregations
+    const trip = await prisma.trip.findUnique({ where: { id: data.tripId } })
+    if (trip) {
+      await highlightsService.updateAggregationsForActivity(trip.userId, {
+        tripId: data.tripId,
+        city: data.city,
+        country: data.country,
+        countryCode: data.countryCode,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        scheduledStart: data.scheduledStart,
+      })
+    }
 
     return activity
   }

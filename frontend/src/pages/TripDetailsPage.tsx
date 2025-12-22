@@ -68,6 +68,7 @@ import { TripMembersDialog } from "../components/TripMembersDialog"
 import { TripSettingsDialog } from "../components/TripSettingsDialog"
 import { useTripDetails } from "../hooks/useTripDetails"
 import { useAuthStore } from "../stores/authStore"
+import { useLanguageStore } from "../stores/languageStore"
 import type { Activity } from "../types"
 
 const DroppableDay = ({ dayId, children }: { dayId: string; children: React.ReactNode }) => {
@@ -92,6 +93,7 @@ const DroppableDay = ({ dayId, children }: { dayId: string; children: React.Reac
 }
 
 const TripDetailsPage = () => {
+  const { t } = useLanguageStore()
   const { tripId } = useParams<{ tripId: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -189,7 +191,7 @@ const TripDetailsPage = () => {
   }
 
   const handleDeleteActivity = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this activity?")) {
+    if (window.confirm(t("areYouSureDeleteActivity"))) {
       await deleteActivity(id)
     }
   }
@@ -343,7 +345,9 @@ const TripDetailsPage = () => {
   if (error || !trip) {
     return (
       <Box p={3}>
-        <Alert severity="error">Failed to load trip: {(error as any)?.message || "Unknown error"}</Alert>
+        <Alert severity="error">
+          {t("failedToLoad")}: {(error as any)?.message || "Unknown error"}
+        </Alert>
       </Box>
     )
   }
@@ -397,7 +401,7 @@ const TripDetailsPage = () => {
               onClick={() => setSettingsDialogOpen(true)}
               disabled={!canEdit}
             >
-              Settings
+              {t("settings")}
             </Button>
             <Button
               variant="outlined"
@@ -406,13 +410,13 @@ const TripDetailsPage = () => {
               onClick={() => setMembersDialogOpen(true)}
               disabled={!canEdit}
             >
-              Members
+              {t("members")}
             </Button>
             <Button variant="outlined" startIcon={<PrintIcon />} size="small" onClick={() => window.print()}>
-              Print
+              {t("print")}
             </Button>
             <Button variant="outlined" startIcon={<DownloadIcon />} size="small" onClick={handleExportKML}>
-              Export KML
+              {t("exportKML")}
             </Button>
           </Box>
         </Box>
@@ -423,17 +427,17 @@ const TripDetailsPage = () => {
             variant="outlined"
           />
           {trip.destination && <Chip label={trip.destination} variant="outlined" />}
-          <Chip label={`${trip.days?.length || 0} Days`} variant="outlined" />
+          <Chip label={`${trip.days?.length || 0} ${t("days")}`} variant="outlined" />
         </Box>
       </Paper>
       <Box className="no-print" sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
         <Tabs value={viewMode} onChange={handleViewModeChange} sx={{ bgcolor: "background.paper" }}>
-          <Tab icon={<ListIcon />} label="Itinerary" iconPosition="start" value="list" />
-          <Tab icon={<PrepIcon />} label="Preparation" iconPosition="start" value="prep" />
-          <Tab icon={<ExpenseIcon />} label="Expenses" iconPosition="start" value="expenses" />
-          <Tab icon={<TimelineIcon />} label="Timeline" iconPosition="start" value="timeline" />
-          <Tab icon={<JournalIcon />} label="Journal" iconPosition="start" value="journal" />
-          <Tab icon={<AnimationIcon />} label="Animation" iconPosition="start" value="animation" />
+          <Tab icon={<ListIcon />} label={t("itinerary")} iconPosition="start" value="list" />
+          <Tab icon={<PrepIcon />} label={t("preparation")} iconPosition="start" value="prep" />
+          <Tab icon={<ExpenseIcon />} label={t("expenses")} iconPosition="start" value="expenses" />
+          <Tab icon={<TimelineIcon />} label={t("timeline")} iconPosition="start" value="timeline" />
+          <Tab icon={<JournalIcon />} label={t("journal")} iconPosition="start" value="journal" />
+          <Tab icon={<AnimationIcon />} label={t("animation")} iconPosition="start" value="animation" />
         </Tabs>
       </Box>
 
@@ -454,7 +458,7 @@ const TripDetailsPage = () => {
                                 {isCollapsed ? <ExpandMore /> : <ExpandLess />}
                               </IconButton>
                               <Typography variant="h6" color="primary">
-                                {day.name || `Day ${day.dayNumber}`}
+                                {day.name || `${t("day")} ${day.dayNumber}`}
                               </Typography>
                               <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
                                 ({dayjs(day.date).format("MMM D")})
@@ -538,7 +542,7 @@ const TripDetailsPage = () => {
                         startIcon={mapExpanded ? <ExpandLess /> : <TimelineIcon />}
                         onClick={() => setMapExpanded(!mapExpanded)}
                       >
-                        {mapExpanded ? "Show Activities" : "Maximize Map"}
+                        {mapExpanded ? t("showActivities") : t("maximizeMap")}
                       </Button>
                     </Box>
                     <TripMap
@@ -614,22 +618,21 @@ const TripDetailsPage = () => {
             <Box sx={{ flex: { xs: "1", md: "0 0 40%" }, height: "100%" }}>
               <Paper sx={{ height: "100%", p: 2, overflowY: "auto" }}>
                 <Typography variant="h6" gutterBottom>
-                  Trip Animation
+                  {t("animation")}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                  Use the &quot;Play Trip&quot; button on the map to animate your journey chronologically through all
-                  activities.
+                  {t("animationInstructions")}
                 </Typography>
                 <Box sx={{ mt: 2 }}>
                   <Typography variant="subtitle2" gutterBottom fontWeight="bold">
-                    Animation Features:
+                    {t("animationFeaturesTitle")}
                   </Typography>
                   <Typography variant="body2" component="ul" sx={{ pl: 2 }}>
-                    <li>Follows the route through all scheduled activities</li>
-                    <li>Shows moving marker along the path</li>
-                    <li>Animates in chronological order</li>
-                    <li>Click &quot;Stop&quot; to pause the animation</li>
-                    <li>Use the progress slider to jump to different points</li>
+                    <li>{t("animationFeature1")}</li>
+                    <li>{t("animationFeature2")}</li>
+                    <li>{t("animationFeature3")}</li>
+                    <li>{t("animationFeature4")}</li>
+                    <li>{t("animationFeature5")}</li>
                   </Typography>
                 </Box>
                 {trip.activities && trip.activities.length > 0 && (
@@ -755,7 +758,7 @@ const TripDetailsPage = () => {
           <TextField
             autoFocus
             fullWidth
-            label="Day Name"
+            label={t("dayName")}
             value={renameDayDialog?.name || ""}
             onChange={(e) => setRenameDayDialog((prev) => (prev ? { ...prev, name: e.target.value } : null))}
             onKeyDown={(e) => {
@@ -769,7 +772,7 @@ const TripDetailsPage = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRenameDayDialog(null)}>Cancel</Button>
+          <Button onClick={() => setRenameDayDialog(null)}>{t("cancel")}</Button>
           <Button
             onClick={() => {
               if (renameDayDialog) {
@@ -779,7 +782,7 @@ const TripDetailsPage = () => {
             }}
             variant="contained"
           >
-            Save
+            {t("save")}
           </Button>
         </DialogActions>
       </Dialog>

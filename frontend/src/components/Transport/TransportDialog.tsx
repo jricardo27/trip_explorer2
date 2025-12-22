@@ -35,6 +35,7 @@ import { useState } from "react"
 import { transportApi } from "../../api/client"
 import { useExpenses } from "../../hooks/useExpenses"
 import { useTripMembers } from "../../hooks/useTripMembers"
+import { useLanguageStore } from "../../stores/languageStore"
 import { TransportMode } from "../../types"
 import type { TransportAlternative } from "../../types"
 import { ExpenseSplitInput, type SplitType, type ExpenseSplit } from "../ExpenseSplitInput"
@@ -81,6 +82,7 @@ export const TransportDialog = ({
 }: TransportDialogProps) => {
   const queryClient = useQueryClient()
   const { expenses } = useExpenses(tripId)
+  const { t } = useLanguageStore()
   const { members } = useTripMembers(tripId)
 
   const [newMode, setNewMode] = useState<TransportMode>(TransportMode.DRIVING)
@@ -194,7 +196,7 @@ export const TransportDialog = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Transport Options</DialogTitle>
+      <DialogTitle>{t("transportOptions")}</DialogTitle>
       <DialogContent>
         <List>
           {alternatives.map((alt) => (
@@ -202,17 +204,17 @@ export const TransportDialog = ({
               key={alt.id}
               secondaryAction={
                 <Box>
-                  <Tooltip title="Copy">
+                  <Tooltip title={t("copy")}>
                     <IconButton edge="end" onClick={() => handleCopy(alt)} sx={{ mr: 1 }}>
                       <CopyIcon />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Edit">
+                  <Tooltip title={t("edit")}>
                     <IconButton edge="end" onClick={() => handleEdit(alt)} sx={{ mr: 1 }}>
                       <DirectionsCar color="primary" /> {/* Reusing generic icon for edit indicating 'Configure' */}
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Delete">
+                  <Tooltip title={t("delete")}>
                     <IconButton edge="end" onClick={() => deleteMutation.mutate(alt.id)}>
                       <DeleteIcon />
                     </IconButton>
@@ -226,13 +228,13 @@ export const TransportDialog = ({
               <ListItemIcon>{getIcon(alt.transportMode)}</ListItemIcon>
               <ListItemText
                 primary={alt.name || alt.transportMode}
-                secondary={`${alt.durationMinutes} min • ${alt.cost ? `$${alt.cost}` : "Free"}`}
+                secondary={`${alt.durationMinutes} min • ${alt.cost ? `$${alt.cost}` : t("free")}`}
               />
             </ListItem>
           ))}
           {alternatives.length === 0 && !isAdding && (
             <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
-              No transport options added yet.
+              {t("noTransportOptions")}
             </Typography>
           )}
         </List>
@@ -243,21 +245,21 @@ export const TransportDialog = ({
               <Grid size={12}>
                 <TextField
                   select
-                  label="Mode"
+                  label={t("mode")}
                   fullWidth
                   value={newMode}
                   onChange={(e) => setNewMode(e.target.value as TransportMode)}
                 >
                   {Object.values(TransportMode).map((mode) => (
                     <MenuItem key={mode} value={mode}>
-                      {mode}
+                      {t(mode as any)}
                     </MenuItem>
                   ))}
                 </TextField>
               </Grid>
               <Grid size={6}>
                 <TextField
-                  label="Duration (min)"
+                  label={t("durationMin")}
                   type="number"
                   fullWidth
                   value={newDuration}
@@ -266,7 +268,7 @@ export const TransportDialog = ({
               </Grid>
               <Grid size={4}>
                 <TextField
-                  label="Cost"
+                  label={t("cost")}
                   type="number"
                   fullWidth
                   value={newCost}
@@ -293,13 +295,13 @@ export const TransportDialog = ({
               </Grid>
               <Grid size={12}>
                 <TextField
-                  label="Notes"
+                  label={t("notes")}
                   fullWidth
                   multiline
                   rows={2}
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
-                  placeholder="e.g. Booking reference, platform details..."
+                  placeholder={t("transportNotesPlaceholder")}
                 />
               </Grid>
               {newCost && (
@@ -318,13 +320,13 @@ export const TransportDialog = ({
                 </Grid>
               )}
               <Grid size={12} container justifyContent="flex-end" spacing={1}>
-                <Button onClick={resetForm}>Cancel</Button>
+                <Button onClick={resetForm}>{t("cancel")}</Button>
                 <Button
                   variant="contained"
                   onClick={handleAdd}
                   disabled={createMutation.isPending || updateMutation.isPending}
                 >
-                  {editingId ? "Save" : "Add"}
+                  {editingId ? t("save") : t("add")}
                 </Button>
               </Grid>
             </Grid>
@@ -339,12 +341,12 @@ export const TransportDialog = ({
               setIsAdding(true)
             }}
           >
-            Add Option
+            {t("addOption")}
           </Button>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t("close")}</Button>
       </DialogActions>
     </Dialog>
   )

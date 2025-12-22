@@ -22,6 +22,7 @@ import { useState, useEffect } from "react"
 
 import client from "../api/client"
 import { useShiftTrip } from "../hooks/useTrips"
+import { useLanguageStore } from "../stores/languageStore"
 import type { Trip } from "../types"
 
 interface TripSettingsDialogProps {
@@ -35,6 +36,7 @@ interface TripSettingsDialogProps {
 const COMMON_CURRENCIES = ["AUD", "USD", "EUR", "GBP", "JPY", "CAD", "NZD", "SGD", "CHF", "CNY"]
 
 export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }: TripSettingsDialogProps) => {
+  const { t } = useLanguageStore()
   const [name, setName] = useState(trip.name)
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs(trip.startDate))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs(trip.endDate))
@@ -131,7 +133,7 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          Trip Settings
+          {t("tripSettings")}
           {fullScreen && (
             <IconButton onClick={onClose} size="small">
               <CloseIcon />
@@ -141,17 +143,17 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
       </DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={3} pt={1}>
-          <TextField label="Trip Name" fullWidth value={name} onChange={(e) => setName(e.target.value)} />
+          <TextField label={t("tripName")} fullWidth value={name} onChange={(e) => setName(e.target.value)} />
 
           <Box display="flex" gap={2}>
             <DatePicker
-              label="Start Date"
+              label={t("startDate")}
               value={startDate}
               onChange={setStartDate}
               slotProps={{ textField: { fullWidth: true } }}
             />
             <DatePicker
-              label="End Date"
+              label={t("endDate")}
               value={endDate}
               onChange={setEndDate}
               slotProps={{ textField: { fullWidth: true } }}
@@ -160,7 +162,7 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
 
           <Box display="flex" gap={2}>
             <TextField
-              label="Budget"
+              label={t("budget")}
               type="number"
               fullWidth
               value={budget}
@@ -179,7 +181,7 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
               disableClearable
               value={defaultCurrency}
               onChange={(_, newValue) => setDefaultCurrency(newValue)}
-              renderInput={(params) => <TextField {...params} label="Default Currency" />}
+              renderInput={(params) => <TextField {...params} label={t("defaultCurrency")} />}
               sx={{ minWidth: 150 }}
             />
           </Box>
@@ -199,9 +201,9 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Trip Currencies"
-                placeholder="Add currency"
-                helperText="Currencies available for expenses"
+                label={t("tripCurrencies")}
+                placeholder={t("currencyPlaceholder")}
+                helperText={t("currencyHelperText")}
               />
             )}
           />
@@ -209,7 +211,7 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
           {currencies.filter((c) => c !== defaultCurrency).length > 0 && (
             <Box>
               <Typography variant="subtitle2" gutterBottom>
-                Exchange Rates (1 Foreign = ? {defaultCurrency})
+                {t("exchangeRates").replace("{defaultCurrency}", defaultCurrency)}
               </Typography>
               <Box display="flex" flexDirection="column" gap={2}>
                 {currencies
@@ -217,7 +219,9 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
                   .map((currency) => (
                     <TextField
                       key={currency}
-                      label={`1 ${currency} in ${defaultCurrency}`}
+                      label={t("oneCurrencyIn")
+                        .replace("{currency}", currency)
+                        .replace("{defaultCurrency}", defaultCurrency)}
                       type="number"
                       size="small"
                       fullWidth
@@ -236,19 +240,16 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
           )}
 
           <Box display="flex" gap={4}>
-            <Tooltip title="Mark this trip as completed to archive it from your active trips list" placement="top">
+            <Tooltip title={t("completedTooltip")} placement="top">
               <FormControlLabel
                 control={<Switch checked={isCompleted} onChange={(e) => setIsCompleted(e.target.checked)} />}
-                label="Completed (Archive)"
+                label={t("completed")}
               />
             </Tooltip>
-            <Tooltip
-              title="Make this trip visible to other users. Anyone with the link can view trip details, but cannot edit."
-              placement="top"
-            >
+            <Tooltip title={t("publicTooltip")} placement="top">
               <FormControlLabel
                 control={<Switch checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />}
-                label="Public Trip"
+                label={t("publicTrip")}
               />
             </Tooltip>
           </Box>
@@ -257,20 +258,20 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
             sx={{ mt: 1, p: 2, border: "1px solid", borderColor: "divider", borderRadius: 1, bgcolor: "action.hover" }}
           >
             <Typography variant="subtitle2" gutterBottom fontWeight="bold">
-              Shift Timeline
+              {t("shiftTimeline")}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Move all activities, days, and recorded expenses forward or backward by a specific number of days.
+              {t("shiftDescription")}
             </Typography>
             <Box display="flex" gap={2} alignItems="center">
               <TextField
                 type="number"
-                label="Days to Shift"
+                label={t("daysToShift")}
                 size="small"
                 value={shiftDays}
                 onChange={(e) => setShiftDays(e.target.value)}
                 sx={{ width: 120 }}
-                placeholder="e.g. 7 or -3"
+                placeholder={t("shiftPlaceholder")}
               />
               <Button
                 variant="outlined"
@@ -278,7 +279,7 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
                 onClick={handleShift}
                 disabled={!shiftDays || shiftDays === "0" || shiftTripMutation.isPending}
               >
-                {shiftTripMutation.isPending ? "Shifting..." : "Shift All Dates"}
+                {shiftTripMutation.isPending ? t("shifting") : t("shiftButton")}
               </Button>
             </Box>
           </Box>
@@ -293,18 +294,18 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
               const blob = new Blob([JSON.stringify(res.data.data, null, 2)], { type: "application/json" })
               saveAs(blob, `trip_${trip.name.replace(/\s+/g, "_")}_export.json`)
             } catch {
-              alert("Export failed")
+              alert(t("exportFailed"))
             }
           }}
         >
-          Export JSON
+          {t("exportJson")}
         </Button>
         <Box>
           <Button onClick={onClose} sx={{ mr: 1 }}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button onClick={handleSave} variant="contained" disabled={!name || !startDate || !endDate}>
-            Save Changes
+            {t("saveChanges")}
           </Button>
         </Box>
       </DialogActions>

@@ -29,6 +29,7 @@ import { useMemo, useState } from "react"
 import { Pie, Bar } from "react-chartjs-2"
 import * as XLSX from "xlsx"
 
+import { useLanguageStore } from "../stores/languageStore"
 import type { Activity, Expense, TripMember } from "../types"
 
 ChartJS.register(ArcElement, ChartTooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
@@ -48,6 +49,7 @@ export const ExpenseReports = ({
   defaultCurrency,
   exchangeRates = {},
 }: ExpenseReportsProps) => {
+  const { t } = useLanguageStore()
   // State
   const [viewMode, setViewMode] = useState<"charts" | "spreadsheet">("charts")
 
@@ -77,7 +79,7 @@ export const ExpenseReports = ({
       labels: Object.keys(totals),
       datasets: [
         {
-          label: `Expenses by Category (${defaultCurrency})`,
+          label: `${t("byCategory")} (${defaultCurrency})`,
           data: Object.values(totals),
           backgroundColor: [
             "#FF6384",
@@ -95,7 +97,7 @@ export const ExpenseReports = ({
         },
       ],
     }
-  }, [processedExpenses, defaultCurrency])
+  }, [processedExpenses, defaultCurrency, t])
 
   const memberData = useMemo(() => {
     const totals: Record<string, number> = {}
@@ -107,16 +109,19 @@ export const ExpenseReports = ({
       labels: Object.keys(totals),
       datasets: [
         {
-          label: `Amount Paid (${defaultCurrency})`,
+          label: `${t("byMember")} (${defaultCurrency})`,
           data: Object.values(totals),
           backgroundColor: "#36A2EB",
         },
       ],
     }
-  }, [processedExpenses, defaultCurrency])
+  }, [processedExpenses, defaultCurrency, t])
 
   const plannedVsSpentData = useMemo(() => {
     const categories = ["Accommodation", "Transport", "Attraction", "Food", "Other"]
+    // Note: Categories are hardcoded in English here for logic, but labels should be translated.
+    // However, chart labels come from keys.
+    // Ideally we translate the labels when displaying.
     const planned: Record<string, number> = {}
     const spent: Record<string, number> = {}
 
@@ -154,18 +159,18 @@ export const ExpenseReports = ({
       labels: categories,
       datasets: [
         {
-          label: "Planned (Est.)",
+          label: t("planned"),
           data: categories.map((c) => planned[c]),
           backgroundColor: "rgba(153, 102, 255, 0.5)",
         },
         {
-          label: "Spent (Actual)",
+          label: t("spent"),
           data: categories.map((c) => spent[c]),
           backgroundColor: "rgba(75, 192, 192, 0.5)",
         },
       ],
     }
-  }, [activities, processedExpenses, defaultCurrency, exchangeRates])
+  }, [activities, processedExpenses, defaultCurrency, exchangeRates, t])
 
   const handleExport = () => {
     const dataToExport = processedExpenses.map((e) => ({
@@ -195,21 +200,21 @@ export const ExpenseReports = ({
             variant={viewMode === "charts" ? "contained" : "outlined"}
             onClick={() => setViewMode("charts")}
           >
-            Charts
+            {t("charts")}
           </Button>
           <Button
             startIcon={<TableChart />}
             variant={viewMode === "spreadsheet" ? "contained" : "outlined"}
             onClick={() => setViewMode("spreadsheet")}
           >
-            Spreadsheet
+            {t("spreadsheet")}
           </Button>
         </ButtonGroup>
 
         <Box display="flex" gap={2}>
           {viewMode === "spreadsheet" && (
             <Button startIcon={<DownloadIcon />} onClick={handleExport} size="small" variant="outlined">
-              Export Excel
+              {t("exportExcel")}
             </Button>
           )}
         </Box>
@@ -219,7 +224,7 @@ export const ExpenseReports = ({
         <>
           {processedExpenses.length === 0 ? (
             <Typography align="center" color="text.secondary" mt={4}>
-              No expenses recorded yet.
+              {t("noExpensesYet")}
             </Typography>
           ) : (
             <Grid container spacing={3}>
@@ -227,7 +232,7 @@ export const ExpenseReports = ({
               <Grid item xs={12} md={6}>
                 <Paper sx={{ p: 2, height: 300, display: "flex", flexDirection: "column", alignItems: "center" }}>
                   <Typography variant="h6" gutterBottom>
-                    By Category ({defaultCurrency})
+                    {t("byCategory")} ({defaultCurrency})
                   </Typography>
                   <Box flexGrow={1} width="100%" position="relative">
                     <Pie
@@ -244,7 +249,7 @@ export const ExpenseReports = ({
               <Grid item xs={12} md={6}>
                 <Paper sx={{ p: 2, height: 300, display: "flex", flexDirection: "column", alignItems: "center" }}>
                   <Typography variant="h6" gutterBottom>
-                    By Member (Paid)
+                    {t("byMember")}
                   </Typography>
                   <Box flexGrow={1} width="100%" position="relative">
                     <Bar
@@ -261,7 +266,7 @@ export const ExpenseReports = ({
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: "flex", flexDirection: "column", alignItems: "center" }}>
                   <Typography variant="h6" gutterBottom>
-                    Planned vs Spent ({defaultCurrency})
+                    {t("plannedVsSpent")} ({defaultCurrency})
                   </Typography>
                   <Box sx={{ height: 350, width: "100%", position: "relative", mb: 4 }}>
                     <Bar
@@ -277,10 +282,10 @@ export const ExpenseReports = ({
                     <Table size="small">
                       <TableHead>
                         <TableRow>
-                          <TableCell>Category</TableCell>
-                          <TableCell align="right">Planned</TableCell>
-                          <TableCell align="right">Spent</TableCell>
-                          <TableCell align="right">Difference</TableCell>
+                          <TableCell>{t("category")}</TableCell>
+                          <TableCell align="right">{t("planned")}</TableCell>
+                          <TableCell align="right">{t("spent")}</TableCell>
+                          <TableCell align="right">{t("difference")}</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -318,13 +323,15 @@ export const ExpenseReports = ({
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Category</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell align="right">Conv. ({defaultCurrency})</TableCell>
-                <TableCell>Paid By</TableCell>
-                <TableCell>Notes</TableCell>
+                <TableCell>{t("date")}</TableCell>
+                <TableCell>{t("description")}</TableCell>
+                <TableCell>{t("category")}</TableCell>
+                <TableCell align="right">{t("amount")}</TableCell>
+                <TableCell align="right">
+                  {t("conv")} ({defaultCurrency})
+                </TableCell>
+                <TableCell>{t("paidBy")}</TableCell>
+                <TableCell>{t("notes")}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
