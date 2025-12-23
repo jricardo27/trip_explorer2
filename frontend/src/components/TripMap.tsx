@@ -59,6 +59,7 @@ interface TripMapProps {
   animations?: TripAnimation[]
   onSaveAnimation?: (animation: Partial<TripAnimation>) => Promise<void>
   onDeleteAnimation?: (id: string) => Promise<void>
+  canEdit?: boolean
 }
 
 const LIGHT_TILES = {
@@ -451,6 +452,7 @@ export const TripMap = (props: TripMapProps) => {
     animations = [],
     onSaveAnimation,
     onDeleteAnimation,
+    canEdit = true,
   } = props
   const theme = useTheme()
   const tiles = theme.palette.mode === "light" ? LIGHT_TILES : DARK_TILES
@@ -775,7 +777,14 @@ export const TripMap = (props: TripMapProps) => {
           style={{ height: "100%", width: "100%" }}
           scrollWheelZoom={true}
         >
-          <MapStateManager onMapMove={handleMapMove} onContextMenu={onCreateActivity || onMapContextMenu} />
+          <MapStateManager
+            onMapMove={handleMapMove}
+            onContextMenu={(latLng) => {
+              if (canEdit && (onCreateActivity || onMapContextMenu)) {
+                ;(onCreateActivity || onMapContextMenu)?.(latLng)
+              }
+            }}
+          />
           <MapFlyHandler location={props.activeFlyToLocation} />
           <TileLayer attribution={tiles.attribution} url={tiles.url} maxZoom={20} />
           <LayersControl position="topright">

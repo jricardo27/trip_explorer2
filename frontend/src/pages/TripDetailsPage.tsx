@@ -210,6 +210,7 @@ const TripDetailsPage = () => {
   }
 
   const handleDeleteActivity = async (id: string) => {
+    if (!canEdit) return
     if (window.confirm(t("areYouSureDeleteActivity"))) {
       await deleteActivity(id)
     }
@@ -660,6 +661,7 @@ const TripDetailsPage = () => {
                 animations={trip.animations}
                 onSaveAnimation={handleSaveAnimation}
                 onDeleteAnimation={handleDeleteAnimation}
+                canEdit={canEdit}
               />
             </Box>
 
@@ -757,6 +759,7 @@ const TripDetailsPage = () => {
         tripStartDate={trip.startDate}
         fullScreen={isMobile}
         initialCoordinates={prefilledCoordinates}
+        canEdit={canEdit}
       />
       <TripMembersDialog
         open={membersDialogOpen}

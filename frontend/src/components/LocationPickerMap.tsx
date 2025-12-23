@@ -23,12 +23,21 @@ interface LocationPickerMapProps {
   onSelect: (lat: number, lng: number) => void
   initialLat?: number
   initialLng?: number
+  readOnly?: boolean
 }
 
-const MapEventsHandler = ({ onMapClick }: { onMapClick: (lat: number, lng: number) => void }) => {
+const MapEventsHandler = ({
+  onMapClick,
+  readOnly,
+}: {
+  onMapClick: (lat: number, lng: number) => void
+  readOnly?: boolean
+}) => {
   useMapEvents({
     click: (e) => {
-      onMapClick(e.latlng.lat, e.latlng.lng)
+      if (!readOnly) {
+        onMapClick(e.latlng.lat, e.latlng.lng)
+      }
     },
   })
   return null
@@ -44,16 +53,30 @@ const MapViewHandler = ({ lat, lng }: { lat: number; lng: number }) => {
   return null
 }
 
-const LocationPickerMap = ({ open, onClose, onSelect, initialLat, initialLng }: LocationPickerMapProps) => {
+const LocationPickerMap = ({
+  open,
+  onClose,
+  onSelect,
+  initialLat,
+  initialLng,
+  readOnly = false,
+}: LocationPickerMapProps) => {
   const [position, setPosition] = useState<[number, number] | null>(
     initialLat && initialLng ? [initialLat, initialLng] : null,
   )
   const { t } = useLanguageStore()
 
+  // Reset position when open changes or initials change
+  useEffect(() => {
+    if (open) {
+      setPosition(initialLat && initialLng ? [initialLat, initialLng] : null)
+    }
+  }, [open, initialLat, initialLng])
+
   const defaultCenter: [number, number] = [-25.2744, 133.7751] // Australia center
 
   const handleConfirm = () => {
-    if (position) {
+    if (position && !readOnly) {
       onSelect(position[0], position[1])
       onClose()
     }
@@ -61,7 +84,7 @@ const LocationPickerMap = ({ open, onClose, onSelect, initialLat, initialLng }: 
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{t("selectLocation")}</DialogTitle>
+      <DialogTitle>{readOnly ? t("location") : t("selectLocation")}</DialogTitle>
       <DialogContent sx={{ p: 0, height: 500, display: "flex", flexDirection: "column" }}>
         <Box sx={{ flexGrow: 1, position: "relative" }}>
           <MapContainer
@@ -73,7 +96,7 @@ const LocationPickerMap = ({ open, onClose, onSelect, initialLat, initialLng }: 
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <MapEventsHandler onMapClick={(lat, lng) => setPosition([lat, lng])} />
+            <MapEventsHandler onMapClick={(lat, lng) => setPosition([lat, lng])} readOnly={readOnly} />
             {position && <Marker position={position} />}
             {position && <MapViewHandler lat={position[0]} lng={position[1]} />}
           </MapContainer>
@@ -87,10 +110,12 @@ const LocationPickerMap = ({ open, onClose, onSelect, initialLat, initialLng }: 
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t("cancel")}</Button>
-        <Button onClick={handleConfirm} variant="contained" disabled={!position}>
-          {t("confirmSelection")}
-        </Button>
+        <Button onClick={onClose}>{readOnly ? t("close") : t("cancel")}</Button>
+        {!readOnly && (
+          <Button onClick={handleConfirm} variant="contained" disabled={!position}>
+            {t("confirmSelection")}
+          </Button>
+        )}
       </DialogActions>
     </Dialog>
   )

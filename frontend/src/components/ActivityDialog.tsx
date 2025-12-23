@@ -37,6 +37,10 @@ import LocationPickerMap from "./LocationPickerMap"
 
 const DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+// ... (imports)
+
+// ... (existing code)
+
 interface ActivityDialogProps {
   open: boolean
   onClose: (event?: object, reason?: string) => void
@@ -52,6 +56,7 @@ interface ActivityDialogProps {
   tripDays?: TripDay[]
   fullScreen?: boolean
   initialCoordinates?: { lat: number; lng: number }
+  canEdit?: boolean // Added canEdit prop
 }
 
 const ActivityDialog = ({
@@ -67,6 +72,7 @@ const ActivityDialog = ({
   tripDays,
   fullScreen,
   initialCoordinates,
+  canEdit = true, // Default to true for backward compatibility
 }: ActivityDialogProps) => {
   const handleClose = (event: object, reason: string) => {
     if (reason === "backdropClick") return
@@ -89,6 +95,9 @@ const ActivityDialog = ({
   // New Fields
   const [priority, setPriority] = useState<string>("normal")
   const [isLocked, setIsLocked] = useState(false)
+  const [phone, setPhone] = useState("")
+  const [email, setEmail] = useState("")
+  const [website, setWebsite] = useState("")
 
   const [error, setError] = useState<string | null>(null)
   const [mapPickerOpen, setMapPickerOpen] = useState(false)
@@ -111,6 +120,11 @@ const ActivityDialog = ({
         setNotes(activity.notes || "")
         setAvailableDays(activity.availableDays || [])
         setSelectedMemberIds(activity.participants?.map((p) => p.memberId) || [])
+        setPriority(activity.priority || "normal")
+        setIsLocked(activity.isLocked || false)
+        setPhone(activity.phone || "")
+        setEmail(activity.email || "")
+        setWebsite(activity.website || "")
       } else {
         // Reset for create
         setName("")
@@ -143,13 +157,18 @@ const ActivityDialog = ({
         setNotes("")
         setAvailableDays([])
         setSelectedMemberIds(members.map((m) => m.id))
+        setPriority("normal")
+        setIsLocked(false)
+        setPhone("")
+        setEmail("")
+        setWebsite("")
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]) // members is external, we rely on open trigger. If members load later, we might miss it unless we add logic.
-  // Ideally members should be passed as prop or stable.
+  }, [open]) // members is external, we rely on open trigger.
 
   const handleToggleMember = (memberId: string) => {
+    if (!canEdit) return
     setSelectedMemberIds((prev) =>
       prev.includes(memberId) ? prev.filter((id) => id !== memberId) : [...prev, memberId],
     )
@@ -169,9 +188,6 @@ const ActivityDialog = ({
     }
 
     if (tripStart && tripEnd) {
-      // Use dayjs for boundary checks to ignore time components and handling timezones correctly
-      // We want to ensure the activity starts on or after the trip start DAY,
-      // and ends on or before the trip end DAY.
       const tripStartDay = dayjs(tripStart).startOf("day")
       const tripEndDay = dayjs(tripEnd).endOf("day")
 
@@ -194,6 +210,7 @@ const ActivityDialog = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!canEdit) return
     if (!validateDates()) return
 
     // Smart Day Assignment
@@ -202,8 +219,6 @@ const ActivityDialog = ({
     if (scheduledStart && tripDays) {
       const startDayjs = dayjs(scheduledStart)
       const matchingDay = tripDays.find((day) => {
-        // parsing day.date with dayjs ensures consistent handling
-        // using format('YYYY-MM-DD') avoids timezone issues during comparison
         const dayFormatted = dayjs(day.date).format("YYYY-MM-DD")
         const startFormatted = startDayjs.format("YYYY-MM-DD")
         return dayFormatted === startFormatted
@@ -213,7 +228,6 @@ const ActivityDialog = ({
       }
     }
 
-    // Validate that we have a trip day assigned
     if (!finalTripDayId) {
       setError(
         "Cannot create activity: The selected start date does not match any trip day. Please select a date within the trip period.",
@@ -223,9 +237,9 @@ const ActivityDialog = ({
 
     try {
       await onSubmit({
-        id: activity?.id, // Pass ID if editing
+        id: activity?.id,
         tripId,
-        tripDayId: finalTripDayId, // Use smart assigned day
+        tripDayId: finalTripDayId,
         name,
         activityType,
         scheduledStart: scheduledStart ? scheduledStart.toISOString() : undefined,
@@ -233,13 +247,16 @@ const ActivityDialog = ({
         estimatedCost: estimatedCost ? parseFloat(estimatedCost) : undefined,
         actualCost: actualCost ? parseFloat(actualCost) : undefined,
         isPaid,
+        isLocked,
         latitude: latitude ? parseFloat(latitude) : undefined,
         longitude: longitude ? parseFloat(longitude) : undefined,
         notes,
         availableDays,
         participantIds: selectedMemberIds,
         priority,
-        isLocked,
+        phone,
+        email,
+        website,
       })
     } catch (err: any) {
       console.error("Failed to save activity:", err)
@@ -250,10 +267,10 @@ const ActivityDialog = ({
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth fullScreen={fullScreen}>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth fullScreen={fullScreen}>
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          {activity ? t("editActivity") : t("addActivity")}
+          {activity ? (canEdit ? t("editActivity") : t("viewActivity")) : t("addActivity")}
           {fullScreen && (
             <IconButton onClick={() => onClose(undefined, "closeButton")} size="small">
               <CloseIcon />
@@ -277,10 +294,11 @@ const ActivityDialog = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  disabled={!canEdit}
                 />
               </Grid>
               <Grid size={{ xs: 6 }}>
-                <FormControl fullWidth>
+                <FormControl fullWidth disabled={!canEdit}>
                   <InputLabel>{t("type")}</InputLabel>
                   <Select
                     value={activityType}
@@ -296,7 +314,7 @@ const ActivityDialog = ({
                 </FormControl>
               </Grid>
               <Grid size={{ xs: 6 }}>
-                <FormControl fullWidth>
+                <FormControl fullWidth disabled={!canEdit}>
                   <InputLabel>{t("priority")}</InputLabel>
                   <Select value={priority} label={t("priority")} onChange={(e) => setPriority(e.target.value)}>
                     <MenuItem value="normal">{t("standard")}</MenuItem>
@@ -306,7 +324,7 @@ const ActivityDialog = ({
                 </FormControl>
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <FormControl fullWidth>
+                <FormControl fullWidth disabled={!canEdit}>
                   <InputLabel>{t("participants")}</InputLabel>
                   <Select
                     multiple
@@ -349,6 +367,7 @@ const ActivityDialog = ({
                   maxDate={tripEndDate ? dayjs(tripEndDate) : undefined}
                   onChange={(newValue: any) => setScheduledStart(newValue)}
                   slotProps={{ textField: { fullWidth: true } }}
+                  disabled={!canEdit}
                 />
               </Grid>
               <Grid size={{ xs: 6 }}>
@@ -363,6 +382,7 @@ const ActivityDialog = ({
                     }
                   }}
                   slotProps={{ textField: { fullWidth: true } }}
+                  disabled={!canEdit}
                 />
               </Grid>
               <Grid size={{ xs: 6 }}>
@@ -373,6 +393,7 @@ const ActivityDialog = ({
                   value={estimatedCost}
                   onChange={(e) => setEstimatedCost(e.target.value)}
                   InputProps={{ startAdornment: "$" }}
+                  disabled={!canEdit}
                 />
               </Grid>
               <Grid size={{ xs: 6 }}>
@@ -383,12 +404,43 @@ const ActivityDialog = ({
                   value={actualCost}
                   onChange={(e) => setActualCost(e.target.value)}
                   InputProps={{ startAdornment: "$" }}
+                  disabled={!canEdit}
                 />
               </Grid>
+
+              {/* Contact Info */}
+              <Grid size={{ xs: 4 }}>
+                <TextField
+                  fullWidth
+                  label={t("phone")}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  disabled={!canEdit}
+                />
+              </Grid>
+              <Grid size={{ xs: 4 }}>
+                <TextField
+                  fullWidth
+                  label={t("email")}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={!canEdit}
+                />
+              </Grid>
+              <Grid size={{ xs: 4 }}>
+                <TextField
+                  fullWidth
+                  label={t("website")}
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  disabled={!canEdit}
+                />
+              </Grid>
+
               <Grid size={{ xs: 12 }}>
                 <Box display="flex" alignItems="center" gap={3}>
                   <Box display="flex" alignItems="center">
-                    <Checkbox checked={isPaid} onChange={(e) => setIsPaid(e.target.checked)} />
+                    <Checkbox checked={isPaid} onChange={(e) => setIsPaid(e.target.checked)} disabled={!canEdit} />
                     <Typography variant="body2">{t("markAsPaid")}</Typography>
                   </Box>
                   <Box display="flex" alignItems="center">
@@ -397,6 +449,7 @@ const ActivityDialog = ({
                       onChange={(e) => setIsLocked(e.target.checked)}
                       icon={<LockOpen fontSize="small" />}
                       checkedIcon={<Lock fontSize="small" />}
+                      disabled={!canEdit}
                     />
                     <Typography variant="body2">{isLocked ? t("locked") : t("unlocked")}</Typography>
                   </Box>
@@ -410,6 +463,7 @@ const ActivityDialog = ({
                   value={latitude}
                   onChange={(e) => setLatitude(e.target.value)}
                   inputProps={{ step: "any" }}
+                  disabled={!canEdit}
                 />
               </Grid>
               <Grid size={{ xs: 5 }}>
@@ -420,6 +474,7 @@ const ActivityDialog = ({
                   value={longitude}
                   onChange={(e) => setLongitude(e.target.value)}
                   inputProps={{ step: "any" }}
+                  disabled={!canEdit}
                 />
               </Grid>
               <Grid size={{ xs: 2 }} sx={{ display: "flex", alignItems: "center" }}>
@@ -429,6 +484,7 @@ const ActivityDialog = ({
                   onClick={() => setMapPickerOpen(true)}
                   sx={{ height: 56 }}
                   title={t("selectFromMap")}
+                  disabled={!canEdit}
                 >
                   <MapIcon />
                 </Button>
@@ -441,11 +497,12 @@ const ActivityDialog = ({
                   rows={3}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
+                  disabled={!canEdit}
                 />
               </Grid>
 
               <Grid size={{ xs: 12 }}>
-                <FormControl fullWidth>
+                <FormControl fullWidth disabled={!canEdit}>
                   <InputLabel>{t("availableDays")}</InputLabel>
                   <Select
                     multiple
@@ -488,7 +545,7 @@ const ActivityDialog = ({
                       const labelId = `checkbox-list-secondary-label-${member.id}`
                       return (
                         <ListItem key={member.id} disablePadding>
-                          <ListItemButton onClick={() => handleToggleMember(member.id)} dense>
+                          <ListItemButton onClick={() => handleToggleMember(member.id)} dense disabled={!canEdit}>
                             <ListItemAvatar>
                               <Avatar sx={{ bgcolor: member.color, width: 32, height: 32, fontSize: "0.875rem" }}>
                                 {member.name.charAt(0)}
@@ -501,6 +558,7 @@ const ActivityDialog = ({
                               tabIndex={-1}
                               disableRipple
                               inputProps={{ "aria-labelledby": labelId }}
+                              disabled={!canEdit}
                             />
                           </ListItemButton>
                         </ListItem>
@@ -519,9 +577,11 @@ const ActivityDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={() => onClose(undefined, "cancelButton")}>{t("cancel")}</Button>
-        <Button type="submit" form="activity-form" variant="contained" disabled={isLoading}>
-          {isLoading ? t("saving") + "..." : activity ? t("saveChanges") : t("addActivity")}
-        </Button>
+        {canEdit && (
+          <Button type="submit" form="activity-form" variant="contained" disabled={isLoading}>
+            {isLoading ? t("saving") + "..." : activity ? t("saveChanges") : t("addActivity")}
+          </Button>
+        )}
       </DialogActions>
       <LocationPickerMap
         open={mapPickerOpen}
@@ -532,6 +592,7 @@ const ActivityDialog = ({
           setLatitude(lat.toString())
           setLongitude(lng.toString())
         }}
+        readOnly={!canEdit}
       />
     </Dialog>
   )

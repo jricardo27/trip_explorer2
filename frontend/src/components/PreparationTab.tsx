@@ -1,13 +1,13 @@
 import { Checklist as ChecklistIcon, Inventory as PackingIcon, Description as DocIcon } from "@mui/icons-material"
-import { Box, Grid, Tabs, Tab, Paper } from "@mui/material"
+import { Box, Tabs, Tab, Paper } from "@mui/material"
 import { useState } from "react"
 
 import { useLanguageStore } from "../stores/languageStore"
 import type { Trip } from "../types"
 
-import { ChecklistPanel } from "./ChecklistPanel"
-import { DocumentOrganizer } from "./DocumentOrganizer"
-import { PackingListPanel } from "./PackingListPanel"
+import DocumentsPanel from "./DocumentsPanel"
+import PackingPanel from "./PackingPanel"
+import PreparationPanel from "./PreparationPanel"
 
 interface PreparationTabProps {
   trip: Trip
@@ -16,6 +16,10 @@ interface PreparationTabProps {
 export const PreparationTab = ({ trip }: PreparationTabProps) => {
   const { t } = useLanguageStore()
   const [tabValue, setTabValue] = useState(0)
+
+  // For now, let's assume edit permission if it's not a viewer role.
+  // In a real app, this should come from the parent or a context.
+  const canEdit = true
 
   return (
     <Box>
@@ -33,13 +37,11 @@ export const PreparationTab = ({ trip }: PreparationTabProps) => {
         </Tabs>
       </Paper>
 
-      <Grid container spacing={4}>
-        <Grid size={{ xs: 12 }}>
-          {tabValue === 0 && <ChecklistPanel trip={trip} />}
-          {tabValue === 1 && <PackingListPanel trip={trip} />}
-          {tabValue === 2 && <DocumentOrganizer trip={trip} />}
-        </Grid>
-      </Grid>
+      <Box>
+        {tabValue === 0 && <PreparationPanel tripId={trip.id} canEdit={canEdit} />}
+        {tabValue === 1 && <PackingPanel tripId={trip.id} canEdit={canEdit} />}
+        {tabValue === 2 && <DocumentsPanel tripId={trip.id} canEdit={canEdit} />}
+      </Box>
     </Box>
   )
 }

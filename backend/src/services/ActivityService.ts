@@ -145,69 +145,78 @@ export class ActivityService {
     return activities
   }
 
-  async updateActivity(id: string, data: Prisma.ActivityUpdateInput): Promise<Activity> {
+  async updateActivity(id: string, data: Partial<Activity>) {
     const activity = await prisma.activity.findUnique({ where: { id } })
     if (!activity) throw new Error("Activity not found")
 
-    const updatedActivity = await prisma.activity.update({
+    // Fields that should sync across linked activities
+    const syncFields = [
+      "name",
+      "description",
+      "notes",
+      "activityType",
+      "location",
+      "address",
+      "city",
+      "country",
+      "latitude",
+      "longitude",
+      "url",
+      "phone",
+      "email",
+      "website",
+      "estimatedCost",
+      "currency",
+      "isLocked",
+      "activitySubtype",
+      "category",
+    ]
+
+    // Perform the update
+    const updated = await prisma.activity.update({
       where: { id },
-      data,
+      data: data as any,
+      include: { tripDay: true },
     })
 
-    // Propagate changes if soft linked
+    // If linked, propagate distinct fields to others
     if (activity.linkedGroupId) {
-      // Fields to sync (exclude ID, tripId, tripDayId, orderIndex, dates if we want them separate)
-      // Requirement says "modifications... are applied to all", so let's sync most fields.
-      const syncFields = [
-        "name",
-        "description",
-        "notes",
-        "address",
-        "city",
-        "country",
-        "countryCode",
-        "latitude",
-        "longitude",
-        "estimatedCost",
-        "currency",
-        "activityType",
-        "activitySubtype",
-        "category",
-      ]
+      const propData: any = {}
+      let hasPropUpdates = false
 
-      const syncData: any = {}
-      for (const field of syncFields) {
-        if (data[field as keyof typeof data] !== undefined) {
-          syncData[field] = data[field as keyof typeof data]
+      for (const key of Object.keys(data)) {
+        if (syncFields.includes(key)) {
+          propData[key] = data[key as keyof Activity]
+          hasPropUpdates = true
         }
       }
 
-      if (Object.keys(syncData).length > 0) {
+      if (hasPropUpdates) {
         await prisma.activity.updateMany({
           where: {
             linkedGroupId: activity.linkedGroupId,
-            id: { not: id },
+            id: { not: id }, // Skip self
           },
-          data: syncData,
+          data: propData,
         })
       }
     }
 
-    // Update highlights aggregations
-    const trip = await prisma.trip.findUnique({ where: { id: updatedActivity.tripId } })
+    // Update highlights aggs
+    const trip = await prisma.trip.findUnique({ where: { id: updated.tripId } })
     if (trip) {
       await highlightsService.updateAggregationsForActivity(trip.userId, {
-        tripId: updatedActivity.tripId,
-        city: updatedActivity.city,
-        country: updatedActivity.country,
-        countryCode: updatedActivity.countryCode,
-        latitude: updatedActivity.latitude,
-        longitude: updatedActivity.longitude,
-        scheduledStart: updatedActivity.scheduledStart,
+        tripId: updated.tripId,
+        city: updated.city,
+        country: updated.country,
+        countryCode: updated.countryCode,
+        latitude: updated.latitude,
+        longitude: updated.longitude,
+        scheduledStart: updated.scheduledStart,
       })
     }
 
-    return updatedActivity
+    return updated
   }
 
   async deleteActivity(id: string, userId: string): Promise<void> {
@@ -226,85 +235,76 @@ export class ActivityService {
     })
   }
 
-  async copyActivity(id: string, userId: string, userEmail?: string): Promise<any> {
-    // Get the original activity
-    const originalActivity = await prisma.activity.findUnique({
+  async copyActivity(id: string, targetDayId?: string, asLink: boolean = false): Promise<Activity> {
+    const source = await prisma.activity.findUnique({
       where: { id },
-      include: {
-        trip: {
-          include: {
-            members: {
-              where: {
-                OR: [{ userId }, { email: userEmail }],
-              },
-            },
-          },
+      include: { participants: true },
+    })
+    if (!source) throw new Error("Activity not found")
+
+    let linkedGroupId = source.linkedGroupId
+
+    if (asLink) {
+      // If linking and no group exists, create one
+      if (!linkedGroupId) {
+        linkedGroupId = randomUUID()
+        await prisma.activity.update({
+          where: { id: source.id },
+          data: { linkedGroupId },
+        })
+      }
+    } else {
+      // If not linking, ensure new is independent
+      linkedGroupId = null
+    }
+
+    // Target day
+    const tripDayId = targetDayId || source.tripDayId
+
+    // Order index
+    const lastActivity = await prisma.activity.findFirst({
+      where: { tripDayId },
+      orderBy: { orderIndex: "desc" },
+    })
+    const orderIndex = lastActivity ? lastActivity.orderIndex + 1 : 0
+
+    // Create copy
+    const copy = await prisma.activity.create({
+      data: {
+        tripId: source.tripId,
+        tripDayId,
+        activityType: source.activityType,
+        name: asLink ? source.name : `${source.name} (Copy)`,
+        description: source.description,
+        notes: source.notes,
+        scheduledStart: source.scheduledStart,
+        scheduledEnd: source.scheduledEnd,
+        durationMinutes: source.durationMinutes,
+        latitude: source.latitude,
+        longitude: source.longitude,
+        city: source.city,
+        country: source.country,
+        countryCode: source.countryCode,
+        estimatedCost: source.estimatedCost,
+        currency: source.currency,
+        isLocked: source.isLocked,
+        orderIndex,
+        linkedGroupId,
+        phone: source.phone,
+        email: source.email,
+        website: source.website,
+        availableDays: source.availableDays,
+        participants: {
+          create: source.participants.map((p) => ({ memberId: p.memberId })),
         },
       },
-    })
-
-    if (
-      !originalActivity ||
-      (originalActivity.trip.userId !== userId &&
-        !originalActivity.trip.members.some((m) => ["OWNER", "EDITOR"].includes(m.role)))
-    ) {
-      throw new Error("Activity not found or unauthorized")
-    }
-
-    let linkedGroupId = originalActivity.linkedGroupId
-    if (!linkedGroupId) {
-      // Generate unique group ID
-      linkedGroupId = randomUUID()
-      // Update original activity with new group ID
-      await prisma.activity.update({
-        where: { id },
-        data: { linkedGroupId },
-      })
-    }
-
-    // Create a copy with a new ID
-    const copiedActivity = await prisma.activity.create({
-      data: {
-        tripId: originalActivity.tripId,
-        tripDayId: originalActivity.tripDayId,
-        linkedGroupId: linkedGroupId,
-        name: originalActivity.name, // Soft copy: keep name the same (sync will handle it anyway)
-        description: originalActivity.description,
-        activityType: originalActivity.activityType,
-        activitySubtype: originalActivity.activitySubtype,
-        category: originalActivity.category,
-        scheduledStart: originalActivity.scheduledStart,
-        scheduledEnd: originalActivity.scheduledEnd,
-        durationMinutes: originalActivity.durationMinutes,
-        latitude: originalActivity.latitude,
-        longitude: originalActivity.longitude,
-        address: originalActivity.address,
-        city: originalActivity.city,
-        country: originalActivity.country,
-        countryCode: originalActivity.countryCode,
-        estimatedCost: originalActivity.estimatedCost,
-        currency: originalActivity.currency,
-        notes: originalActivity.notes,
-        availableDays: originalActivity.availableDays,
-        orderIndex: originalActivity.orderIndex + 1, // Place after original
+      include: {
+        tripDay: true,
+        participants: { include: { member: true } },
       },
     })
 
-    // Update highlights aggregations
-    const trip = await prisma.trip.findUnique({ where: { id: copiedActivity.tripId } })
-    if (trip) {
-      await highlightsService.updateAggregationsForActivity(trip.userId, {
-        tripId: copiedActivity.tripId,
-        city: copiedActivity.city,
-        country: copiedActivity.country,
-        countryCode: copiedActivity.countryCode,
-        latitude: copiedActivity.latitude,
-        longitude: copiedActivity.longitude,
-        scheduledStart: copiedActivity.scheduledStart,
-      })
-    }
-
-    return copiedActivity
+    return copy
   }
 
   async reorderActivities(
