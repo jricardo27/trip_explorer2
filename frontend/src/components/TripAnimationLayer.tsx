@@ -1,48 +1,65 @@
 import L from "leaflet"
 import React, { useEffect, useState, useRef, useMemo, useCallback } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
-import { MdLocationCity } from "react-icons/md"
+import {
+  MdHotel,
+  MdRestaurant,
+  MdCameraAlt,
+  MdDirectionsBus,
+  MdFlight,
+  MdDirectionsRun,
+  MdTour,
+  MdEvent,
+  MdPlace,
+  MdHelp,
+  MdDirectionsCar,
+} from "react-icons/md"
 import { Marker, Polyline, useMap, Tooltip as LeafletTooltip } from "react-leaflet"
 
-import { getTransportIconComponent, getTravelIcon } from "../constants/transportModes"
+import { getTransportIconComponent } from "../constants/transportModes"
 import type { Activity } from "../types"
 import { getGreatCirclePoint, getGreatCirclePath } from "../utils/geodesicUtils"
 
-interface AnimationConfig {
-  speed?: number
-  pauseOnArrival?: number
-  zoomLevel?: number
-  zoomPadding?: number
-  baseSpeedMultiplier?: number
-  slowdownStartThreshold?: number
-  slowdownIntensity?: number
-  minSegmentDuration?: number
-  maxSegmentDuration?: number
-  defaultTravelIcon?: string
-  showName?: boolean
-  showOnArrival?: boolean
-}
+// Animation phases
+const AnimationPhase = {
+  STOPPED: "STOPPED",
+  INITIAL_OVERVIEW_PAN: "INITIAL_OVERVIEW_PAN",
+  INITIAL_OVERVIEW_PAUSE: "INITIAL_OVERVIEW_PAUSE",
+  TRANSITION_TO_ACTIVITY: "TRANSITION_TO_ACTIVITY",
+  STAY_AT_ACTIVITY: "STAY_AT_ACTIVITY",
+  DEPARTURE_PAN: "DEPARTURE_PAN",
+  TRAVEL: "TRAVEL",
+  FINAL_OVERVIEW_PAN: "FINAL_OVERVIEW_PAN",
+  FINAL_OVERVIEW_PAUSE: "FINAL_OVERVIEW_PAUSE",
+} as const
+
+type AnimationPhaseType = (typeof AnimationPhase)[keyof typeof AnimationPhase]
 
 interface TripAnimationLayerProps {
   activities: Activity[]
   isPlaying: boolean
-  onProgressUpdate: (progress: number) => void
-  seekProgress: number | null // 0-100
   onAnimationComplete: () => void
-  config?: AnimationConfig
 }
 
-// Zoom phases
-const ZoomPhase = {
-  INITIAL: 1,
-  ZOOM_OUT_TO_BOTH: 2,
-  MAINTAIN: 3,
-  ZOOM_TO_DEST: 4,
-} as const
+const ACTIVITY_TYPE_ICONS: Record<string, { icon: React.ElementType; color: string }> = {
+  ACCOMMODATION: { icon: MdHotel, color: "#E91E63" },
+  RESTAURANT: { icon: MdRestaurant, color: "#FF9800" },
+  ATTRACTION: { icon: MdCameraAlt, color: "#9C27B0" },
+  TRANSPORT: { icon: MdDirectionsBus, color: "#2196F3" },
+  FLIGHT: { icon: MdFlight, color: "#03A9F4" },
+  ACTIVITY: { icon: MdDirectionsRun, color: "#4CAF50" },
+  TOUR: { icon: MdTour, color: "#8BC34A" },
+  EVENT: { icon: MdEvent, color: "#FFC107" },
+  LOCATION: { icon: MdPlace, color: "#795548" },
+  CUSTOM: { icon: MdHelp, color: "#607D8B" },
+}
 
-type ZoomPhaseType = (typeof ZoomPhase)[keyof typeof ZoomPhase]
+const getActivityVisuals = (activity: Activity) => {
+  const type = activity.activityType || "CUSTOM"
+  return ACTIVITY_TYPE_ICONS[type] || ACTIVITY_TYPE_ICONS.CUSTOM
+}
 
-// Helper to get coordinates from activity
+// Helper to get coordinates from an activity
 const getCoords = (activity: Activity): [number, number] | null => {
   if (activity.latitude && activity.longitude) {
     return [Number(activity.latitude), Number(activity.longitude)]
@@ -50,400 +67,355 @@ const getCoords = (activity: Activity): [number, number] | null => {
   return null
 }
 
-// Helper to calculate distance between two points
-const getDistance = (p1: [number, number], p2: [number, number]) => {
-  return L.latLng(p1).distanceTo(L.latLng(p2))
-}
-
 export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   activities,
   isPlaying,
-  onProgressUpdate,
-  seekProgress,
   onAnimationComplete,
-  config,
 }) => {
   const map = useMap()
+  const [phase, setPhase] = useState<AnimationPhaseType>(AnimationPhase.STOPPED)
+  const [currentActivityIndex, setCurrentActivityIndex] = useState(0)
+  const [travelProgress, setTravelProgress] = useState(0)
 
-  const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0)
-  const [segmentProgress, setSegmentProgress] = useState(0) // 0 to 1
-  const [isPaused, setIsPaused] = useState(false)
-  const [pauseStartTime, setPauseStartTime] = useState<number | null>(null)
-  const [zoomPhase, setZoomPhase] = useState<ZoomPhaseType>(ZoomPhase.INITIAL)
-  const [initialZoomComplete, setInitialZoomComplete] = useState(false)
-
-  const requestRef = useRef<number | null>(null)
+  // Refs for managing animation loop and timers
+  const animationFrameRef = useRef<number | null>(null)
+  const phaseTimeoutRef = useRef<any>(null)
   const previousTimeRef = useRef<number | undefined>(undefined)
+  const travelProgressRef = useRef<number>(0)
+  const phaseRef = useRef<AnimationPhaseType>(AnimationPhase.STOPPED)
 
-  // Filter activities with valid coordinates
+  // Keep phaseRef in sync
+  useEffect(() => {
+    phaseRef.current = phase
+  }, [phase])
+
+  // Filter activities that have valid coordinates
   const validActivities = useMemo(() => activities.filter((a) => getCoords(a) !== null), [activities])
   const coords = useMemo(() => validActivities.map((a) => getCoords(a)!), [validActivities])
 
-  // Calculate total distance for progress bar
-  const totalDistance = useMemo(() => {
-    let dist = 0
-    for (let i = 0; i < coords.length - 1; i++) {
-      dist += getDistance(coords[i], coords[i + 1])
-    }
-    return dist
-  }, [coords])
-
-  // Handle seeking
-  useEffect(() => {
-    if (seekProgress !== null) {
-      const targetDist = (seekProgress / 100) * totalDistance
-      let currentDist = 0
-      for (let i = 0; i < coords.length - 1; i++) {
-        const segDist = getDistance(coords[i], coords[i + 1])
-        if (currentDist + segDist >= targetDist) {
-          setTimeout(() => {
-            setCurrentSegmentIndex(i)
-            setSegmentProgress((targetDist - currentDist) / segDist)
-            setIsPaused(false)
-            setZoomPhase(ZoomPhase.MAINTAIN)
-          }, 0)
-          return
-        }
-        currentDist += segDist
-      }
-      setCurrentSegmentIndex(coords.length - 2)
-      setSegmentProgress(1)
-    }
-  }, [seekProgress, coords, totalDistance])
-
-  // Handle zoom based on phase
-  useEffect(() => {
-    if (!isPlaying || coords.length < 2 || currentSegmentIndex >= coords.length - 1) return
-
-    const origin = coords[currentSegmentIndex]
-    const destination = coords[currentSegmentIndex + 1]
-
-    const zoomLevel = config?.zoomLevel ?? 14
-    const zoomPadding = config?.zoomPadding ?? 100
-
-    switch (zoomPhase) {
-      case ZoomPhase.INITIAL:
-      case ZoomPhase.ZOOM_OUT_TO_BOTH: {
-        const bounds = L.latLngBounds([origin, destination])
-        map.fitBounds(bounds, { padding: [zoomPadding, zoomPadding], animate: true, duration: 2 })
-        break
-      }
-      case ZoomPhase.MAINTAIN: {
-        // No zoom change
-        break
-      }
-      case ZoomPhase.ZOOM_TO_DEST: {
-        if (segmentProgress >= 0.66 && segmentProgress < 0.67) {
-          map.flyTo(destination, zoomLevel, { animate: true, duration: 2 })
-        }
-        break
-      }
-    }
-  }, [zoomPhase, currentSegmentIndex, coords, map, isPlaying, segmentProgress, config])
-
-  // Animation Loop
-  // Animation Loop ref to avoid circular dependency
-  const animateRef = useRef<((time: number) => void) | null>(null)
-
-  const animate = useCallback(
-    (time: number) => {
-      if (previousTimeRef.current !== undefined) {
-        const deltaTime = time - previousTimeRef.current
-
-        // Handle pause on arrival
-        if (isPaused && pauseStartTime !== null) {
-          const pauseDuration = (config?.pauseOnArrival ?? 3) * 1000
-
-          if (time - pauseStartTime >= pauseDuration) {
-            setIsPaused(false)
-            setPauseStartTime(null)
-
-            if (currentSegmentIndex < coords.length - 2) {
-              setCurrentSegmentIndex((prev) => prev + 1)
-              setSegmentProgress(0)
-              setZoomPhase(ZoomPhase.ZOOM_OUT_TO_BOTH)
-            } else {
-              onAnimationComplete()
-              return
-            }
-          }
-        }
-
-        // Handle movement
-        if (!isPaused && initialZoomComplete && currentSegmentIndex < coords.length - 1) {
-          const baseSpeedMultiplier = config?.baseSpeedMultiplier ?? 500000
-          const slowdownStartThreshold = config?.slowdownStartThreshold ?? 0.8
-          const slowdownIntensity = config?.slowdownIntensity ?? 0.7
-          const minSegmentDuration = config?.minSegmentDuration ?? 3
-          const maxSegmentDuration = config?.maxSegmentDuration ?? 10
-          const itemSpeed = config?.speed ?? 1
-
-          const effectiveSpeed = baseSpeedMultiplier * itemSpeed
-          const p1 = coords[currentSegmentIndex]
-          const p2 = coords[currentSegmentIndex + 1]
-          const segmentDist = getDistance(p1, p2)
-
-          if (segmentDist > 0) {
-            const maxSpeedForMinTime = segmentDist / minSegmentDuration
-            const minSpeedForMaxTime = segmentDist / maxSegmentDuration
-
-            let currentSpeed = Math.min(effectiveSpeed, maxSpeedForMinTime)
-
-            // Apply slowdown
-            if (segmentProgress > slowdownStartThreshold) {
-              const slowdownRange = 1 - slowdownStartThreshold
-              const slowdownFactor =
-                1 - ((segmentProgress - slowdownStartThreshold) / slowdownRange) * slowdownIntensity
-              currentSpeed *= slowdownFactor
-            }
-
-            const constrainedSpeed = Math.max(currentSpeed, minSpeedForMaxTime)
-            const actualDistanceToTravel = (constrainedSpeed * deltaTime) / 1000
-            const progressIncrement = actualDistanceToTravel / segmentDist
-            const newProgress = segmentProgress + progressIncrement
-
-            // Phase transitions
-            if (newProgress < 0.33) {
-              if (zoomPhase === ZoomPhase.INITIAL) {
-                setZoomPhase(ZoomPhase.ZOOM_OUT_TO_BOTH)
-              }
-            } else if (newProgress >= 0.33 && newProgress < 0.66 && zoomPhase !== ZoomPhase.MAINTAIN) {
-              setZoomPhase(ZoomPhase.MAINTAIN)
-            } else if (newProgress >= 0.66 && zoomPhase !== ZoomPhase.ZOOM_TO_DEST) {
-              setZoomPhase(ZoomPhase.ZOOM_TO_DEST)
-            }
-
-            if (newProgress >= 1) {
-              setSegmentProgress(1)
-              setIsPaused(true)
-              setPauseStartTime(time)
-            } else {
-              setSegmentProgress(newProgress)
-            }
-          } else {
-            // Zero distance segment, skip
-            if (currentSegmentIndex < coords.length - 2) {
-              setCurrentSegmentIndex((prev) => prev + 1)
-              setSegmentProgress(0)
-              setZoomPhase(ZoomPhase.INITIAL)
-            }
-          }
-        }
-      }
-      previousTimeRef.current = time
-      if (animateRef.current) {
-        requestRef.current = requestAnimationFrame(animateRef.current)
-      }
-    },
-    [
-      coords,
-      currentSegmentIndex,
-      config,
-      initialZoomComplete,
-      isPaused,
-      onAnimationComplete,
-      pauseStartTime,
-      segmentProgress,
-      zoomPhase,
-    ],
-  )
-
-  useEffect(() => {
-    animateRef.current = animate
-  }, [animate])
-
-  useEffect(() => {
-    if (isPlaying && coords.length > 1) {
-      requestRef.current = requestAnimationFrame(animate)
-    } else {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current)
-      previousTimeRef.current = undefined
-    }
-    return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current)
-    }
-  }, [isPlaying, coords, animate])
-
-  // Calculate current position
-  const currentPosition = useMemo(() => {
-    if (coords.length < 2) return null
-    if (currentSegmentIndex >= coords.length - 1) return coords[coords.length - 1]
-
-    const p1 = coords[currentSegmentIndex]
-    const p2 = coords[currentSegmentIndex + 1]
-
-    return getGreatCirclePoint(p1, p2, segmentProgress)
-  }, [coords, currentSegmentIndex, segmentProgress])
-
-  // Generate path segments
-  const pathSegments = useMemo(() => {
-    if (coords.length < 2) return []
-    const segments: [number, number][][] = []
-
-    for (let i = 0; i < coords.length - 1; i++) {
-      segments.push(getGreatCirclePath(coords[i], coords[i + 1], 20))
-    }
-    return segments
-  }, [coords])
-
-  // Update global progress
-  useEffect(() => {
-    if (coords.length < 2) return
-
-    let distanceCovered = 0
-    for (let i = 0; i < currentSegmentIndex; i++) {
-      distanceCovered += getDistance(coords[i], coords[i + 1])
-    }
-
-    if (currentSegmentIndex < coords.length - 1) {
-      const currentSegDist = getDistance(coords[currentSegmentIndex], coords[currentSegmentIndex + 1])
-      distanceCovered += currentSegDist * segmentProgress
-    }
-
-    const totalProgress = totalDistance > 0 ? (distanceCovered / totalDistance) * 100 : 0
-    onProgressUpdate(totalProgress)
-  }, [currentSegmentIndex, segmentProgress, coords, totalDistance, onProgressUpdate])
-
-  // Initialize zoom
-  useEffect(() => {
-    if (isPlaying && currentSegmentIndex === 0 && segmentProgress === 0 && coords.length > 1) {
-      setInitialZoomComplete(false)
-      setZoomPhase(ZoomPhase.ZOOM_OUT_TO_BOTH)
-      setTimeout(() => {
-        setInitialZoomComplete(true)
-      }, 2000)
-    } else if (!isPlaying && currentSegmentIndex === 0 && segmentProgress === 0) {
-      setInitialZoomComplete(false)
-    }
-  }, [isPlaying, currentSegmentIndex, segmentProgress, coords])
-
-  // Determine moving icon
-  const movingIcon = useMemo(() => {
-    const defaultIcon = config?.defaultTravelIcon || "person"
-
-    if (currentSegmentIndex < validActivities.length - 1) {
-      const nextActivity = validActivities[currentSegmentIndex + 1]
-      // Check for transport mode in activity (if available)
-      const mode = (nextActivity as { transportMode?: string }).transportMode
-      const IconComp = getTransportIconComponent(mode)
-      if (IconComp) return IconComp({}) // Call as function to avoid creating component in render
-    }
-
-    const TravelIcon = getTravelIcon(defaultIcon)
-    return TravelIcon({}) // Call as function
-  }, [currentSegmentIndex, validActivities, config])
-
-  const divIcon = useMemo(() => {
-    const html = renderToStaticMarkup(
-      <div
-        style={{
-          color: "#1976d2",
-          fontSize: "24px",
-          background: "white",
-          borderRadius: "50%",
-          padding: "4px",
-          boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {movingIcon}
-      </div>,
-    )
-    return L.divIcon({
-      html: html,
-      className: "trip-animation-icon",
-      iconSize: [32, 32],
-      iconAnchor: [16, 16],
-    })
-  }, [movingIcon])
-
-  // Location marker icon
-  const locationIcon = useMemo(() => {
-    const html = renderToStaticMarkup(
-      <div
-        style={{
-          color: "#f44336",
-          fontSize: "24px",
-          background: "white",
-          borderRadius: "50%",
-          padding: "6px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
-        }}
-      >
-        <MdLocationCity />
-      </div>,
-    )
-    return L.divIcon({
-      html: html,
-      className: "location-icon",
-      iconSize: [36, 36],
-      iconAnchor: [18, 36],
-    })
+  // Cleanup timers and animation frames
+  const cleanup = useCallback(() => {
+    if (phaseTimeoutRef.current) clearTimeout(phaseTimeoutRef.current)
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+    previousTimeRef.current = undefined
   }, [])
 
-  if (coords.length < 2) return null
+  // Animation loop for the TRAVEL phase
+  const animateTravel = useCallback(
+    function animate(time: number) {
+      if (phaseRef.current !== AnimationPhase.TRAVEL) return
 
-  const showMovingMarker =
-    !isPaused && initialZoomComplete && (isPlaying || currentSegmentIndex > 0 || segmentProgress > 0)
+      if (previousTimeRef.current === undefined) {
+        previousTimeRef.current = time
+        animationFrameRef.current = requestAnimationFrame(animate)
+        return
+      }
+
+      const deltaTime = time - previousTimeRef.current
+      previousTimeRef.current = time
+
+      // Duration of travel based on distance
+      const p1 = coords[currentActivityIndex]
+      const p2 = coords[currentActivityIndex + 1]
+      if (!p1 || !p2) {
+        setPhase(AnimationPhase.FINAL_OVERVIEW_PAN)
+        return
+      }
+
+      const dist = map.distance(p1, p2)
+      // Speed check: dist / speed = time. Scale speed to be faster (e.g. 150m/ms)
+      const travelDuration = Math.max(1000, Math.min(4000, dist / 200))
+
+      const progressIncrement = deltaTime / travelDuration
+      const nextProgress = Math.min(1, travelProgressRef.current + progressIncrement)
+      travelProgressRef.current = nextProgress
+      setTravelProgress(nextProgress)
+
+      if (nextProgress < 1) {
+        animationFrameRef.current = requestAnimationFrame(animate)
+      } else {
+        // Leg complete - delay transition slightly to ensure progress: 1 is rendered
+        setTimeout(() => {
+          if (phaseRef.current === AnimationPhase.TRAVEL) {
+            setCurrentActivityIndex((prev) => prev + 1)
+            setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
+          }
+        }, 100)
+      }
+    },
+    [currentActivityIndex, coords, map],
+  )
+
+  // Start travel loop specifically when phase changes to TRAVEL
+  useEffect(() => {
+    if (phase === AnimationPhase.TRAVEL) {
+      travelProgressRef.current = 0
+      setTravelProgress(0)
+      previousTimeRef.current = performance.now()
+      animationFrameRef.current = requestAnimationFrame(animateTravel)
+      return () => {
+        if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [phase, animateTravel])
+
+  // Main state machine effect (without animateTravel dependency to avoid re-triggering loop during progress updates)
+  useEffect(() => {
+    // Stop and reset logic
+    if (!isPlaying) {
+      cleanup()
+      setPhase(AnimationPhase.STOPPED)
+      setCurrentActivityIndex(0)
+      setTravelProgress(0)
+      return
+    }
+
+    // Guard against running on empty coords
+    if (coords.length < 1) {
+      console.warn("TripAnimationLayer: No valid coordinates for animation.")
+      onAnimationComplete()
+      return
+    }
+
+    const executePhase = (currentPhase: AnimationPhaseType) => {
+      // Clear any existing timers when switching phases
+      if (phaseTimeoutRef.current) clearTimeout(phaseTimeoutRef.current)
+
+      console.log(`TripAnimationLayer: Entering phase ${currentPhase} (Index: ${currentActivityIndex})`)
+
+      switch (currentPhase) {
+        case AnimationPhase.INITIAL_OVERVIEW_PAN: {
+          const allBounds = L.latLngBounds(coords)
+          if (allBounds.isValid()) {
+            map.fitBounds(allBounds, { padding: [50, 50], duration: 1.5 })
+            map.once("moveend", () => setPhase(AnimationPhase.INITIAL_OVERVIEW_PAUSE))
+          } else {
+            setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
+          }
+          break
+        }
+
+        case AnimationPhase.INITIAL_OVERVIEW_PAUSE: {
+          phaseTimeoutRef.current = setTimeout(() => {
+            setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
+          }, 2000)
+          break
+        }
+
+        case AnimationPhase.TRANSITION_TO_ACTIVITY: {
+          const currentPos = coords[currentActivityIndex]
+          if (currentPos) {
+            map.flyTo(currentPos, 15, { duration: 1.5 })
+            map.once("moveend", () => setPhase(AnimationPhase.STAY_AT_ACTIVITY))
+          } else {
+            console.error(`TripAnimationLayer: No coords at index ${currentActivityIndex}`)
+            setPhase(AnimationPhase.STOPPED)
+            onAnimationComplete()
+          }
+          break
+        }
+
+        case AnimationPhase.STAY_AT_ACTIVITY: {
+          const isLastActivity = currentActivityIndex === coords.length - 1
+          const stayDuration = isLastActivity ? 3000 : 2000
+          phaseTimeoutRef.current = setTimeout(() => {
+            if (isLastActivity) {
+              setPhase(AnimationPhase.FINAL_OVERVIEW_PAN)
+            } else {
+              setPhase(AnimationPhase.DEPARTURE_PAN)
+            }
+          }, stayDuration)
+          break
+        }
+
+        case AnimationPhase.DEPARTURE_PAN: {
+          const departure = coords[currentActivityIndex]
+          const arrival = coords[currentActivityIndex + 1]
+          if (departure && arrival) {
+            const travelBounds = L.latLngBounds([departure, arrival])
+            map.fitBounds(travelBounds, { padding: [70, 70], duration: 1.2 })
+            map.once("moveend", () => setPhase(AnimationPhase.TRAVEL))
+          } else {
+            setPhase(AnimationPhase.FINAL_OVERVIEW_PAN)
+          }
+          break
+        }
+
+        case AnimationPhase.TRAVEL:
+          // Controlled by its own useEffect
+          break
+
+        case AnimationPhase.FINAL_OVERVIEW_PAN: {
+          const allBounds = L.latLngBounds(coords)
+          if (allBounds.isValid()) {
+            map.fitBounds(allBounds, { padding: [50, 50], duration: 1.5 })
+            map.once("moveend", () => setPhase(AnimationPhase.FINAL_OVERVIEW_PAUSE))
+          } else {
+            setPhase(AnimationPhase.STOPPED)
+            onAnimationComplete()
+          }
+          break
+        }
+
+        case AnimationPhase.FINAL_OVERVIEW_PAUSE: {
+          phaseTimeoutRef.current = setTimeout(() => {
+            setPhase(AnimationPhase.STOPPED)
+            onAnimationComplete()
+          }, 3000)
+          break
+        }
+
+        default:
+          break
+      }
+    }
+
+    executePhase(phase)
+
+    return cleanup
+  }, [phase, isPlaying, map, onAnimationComplete, coords, currentActivityIndex, cleanup])
+
+  // Effect to start the animation from a clean state
+  useEffect(() => {
+    if (isPlaying && phase === AnimationPhase.STOPPED) {
+      setCurrentActivityIndex(0)
+      setTravelProgress(0)
+      setPhase(AnimationPhase.INITIAL_OVERVIEW_PAN)
+    }
+  }, [isPlaying, phase])
+
+  // --- RENDER LOGIC ---
+
+  const renderTravelVisuals = () => {
+    const showLine =
+      phase === AnimationPhase.DEPARTURE_PAN ||
+      phase === AnimationPhase.TRAVEL ||
+      phase === AnimationPhase.STAY_AT_ACTIVITY ||
+      phase === AnimationPhase.TRANSITION_TO_ACTIVITY ||
+      phase === AnimationPhase.INITIAL_OVERVIEW_PAUSE // Show first leg early
+
+    const idx = currentActivityIndex
+    if (!showLine || idx >= coords.length - 1) return null
+
+    const origin = coords[idx]
+    const destination = coords[idx + 1]
+
+    const path = getGreatCirclePath(origin, destination)
+    const line = (
+      <Polyline
+        positions={path}
+        pathOptions={{
+          color: "#1976d2",
+          weight: 4,
+          dashArray: "10, 10",
+          opacity: 0.8,
+        }}
+      />
+    )
+
+    let movingMarker = null
+    if (phase === AnimationPhase.TRAVEL) {
+      const currentPos = getGreatCirclePoint(origin, destination, travelProgress)
+      if (currentPos) {
+        // Use transport icon for the moving marker
+        const destActivity = validActivities[idx + 1]
+        const transportMode = (destActivity as any).transportMode
+        const TransportIcon = getTransportIconComponent(transportMode) || MdDirectionsCar
+        const { color } = getActivityVisuals(destActivity)
+
+        const iconHtml = renderToStaticMarkup(
+          <div
+            style={{
+              color: color,
+              fontSize: "24px",
+              background: "white",
+              borderRadius: "50%",
+              padding: "4px",
+              boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: `2px solid ${color}`,
+            }}
+          >
+            <TransportIcon />
+          </div>,
+        )
+        const divIcon = L.divIcon({
+          html: iconHtml,
+          className: "trip-animation-icon",
+          iconSize: [36, 36],
+          iconAnchor: [18, 18],
+        })
+        movingMarker = <Marker position={currentPos} icon={divIcon} zIndexOffset={2000} />
+      }
+    }
+
+    return (
+      <>
+        {line}
+        {movingMarker}
+      </>
+    )
+  }
 
   return (
     <>
-      {/* Animated Path */}
-      {currentPosition && coords.length > 0 && initialZoomComplete && (
-        <Polyline
-          positions={[
-            ...pathSegments.slice(0, currentSegmentIndex).flat(),
-            ...getGreatCirclePath(coords[currentSegmentIndex], currentPosition, Math.ceil(20 * segmentProgress)),
-            currentPosition,
-          ]}
-          pathOptions={{ color: "#1976d2", weight: 4, opacity: 0.8 }}
-        />
-      )}
-
-      {/* Remaining path preview */}
-      {coords.length > currentSegmentIndex + 1 && currentPosition && (
-        <Polyline
-          positions={[
-            currentPosition,
-            ...getGreatCirclePath(
-              currentPosition,
-              coords[currentSegmentIndex + 1],
-              Math.ceil(20 * (1 - segmentProgress)),
-            ),
-            ...pathSegments.slice(currentSegmentIndex + 1).flat(),
-          ]}
-          pathOptions={{ color: "#1976d2", weight: 2, opacity: 0.3, dashArray: "5, 10" }}
-        />
-      )}
-
-      {/* Moving Marker */}
-      {currentPosition && showMovingMarker && <Marker position={currentPosition} icon={divIcon} zIndexOffset={2000} />}
-
-      {/* Static Location Markers */}
+      {/* All activity markers */}
       {validActivities.map((activity, index) => {
         const position = getCoords(activity)
         if (!position) return null
 
-        const hasArrived = index <= currentSegmentIndex + (segmentProgress > 0.9 ? 1 : 0)
-        const showName = config?.showName ?? true
-        const showOnArrival = config?.showOnArrival ?? true
-        const shouldShowLabel = showName || (showOnArrival && hasArrived)
+        const isCurrent = index === currentActivityIndex
+        const isNext = index === currentActivityIndex + 1
+
+        // Tooltip logic
+        let showTooltip = false
+        if (phase === AnimationPhase.TRANSITION_TO_ACTIVITY || phase === AnimationPhase.STAY_AT_ACTIVITY) {
+          if (isCurrent) showTooltip = true
+        } else if (phase === AnimationPhase.DEPARTURE_PAN || phase === AnimationPhase.TRAVEL) {
+          if (isCurrent || isNext) showTooltip = true
+        }
+
+        const { icon: IconComp, color } = getActivityVisuals(activity)
+        const markerIcon = L.divIcon({
+          html: renderToStaticMarkup(
+            <div
+              style={{
+                color: color,
+                fontSize: "20px",
+                background: "white",
+                borderRadius: "50%",
+                padding: "6px",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: `2px solid ${color}`,
+                transform: isCurrent ? "scale(1.2)" : "scale(1)",
+                transition: "transform 0.3s",
+              }}
+            >
+              <IconComp />
+            </div>,
+          ),
+          className: "location-icon",
+          iconSize: [36, 36],
+          iconAnchor: [18, 18],
+        })
 
         return (
-          <Marker key={activity.id} position={position} icon={locationIcon} zIndexOffset={500}>
-            {shouldShowLabel && (
-              <LeafletTooltip permanent direction="top" offset={[0, -30]}>
-                {activity.name}
+          <Marker key={activity.id} position={position} icon={markerIcon} zIndexOffset={isCurrent ? 1000 : 500}>
+            {showTooltip && (
+              <LeafletTooltip permanent direction="top" offset={[0, -18]}>
+                <strong>{activity.name}</strong>
               </LeafletTooltip>
             )}
           </Marker>
         )
       })}
+
+      {renderTravelVisuals()}
     </>
   )
 }
