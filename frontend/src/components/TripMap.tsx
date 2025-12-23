@@ -7,6 +7,7 @@ import {
   Close,
   Fullscreen,
   FullscreenExit,
+  Info as InfoIcon,
 } from "@mui/icons-material"
 import {
   Box,
@@ -25,6 +26,7 @@ import {
   TextField,
   Button,
   CircularProgress,
+  Tooltip,
 } from "@mui/material"
 import L from "leaflet"
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
@@ -346,9 +348,14 @@ const AnimationSettingsSidebar = ({
       <Divider sx={{ mb: 3 }} />
 
       <Box mb={3}>
+        <Box display="flex" alignItems="center" gap={0.5} mb={1}>
+          <Typography variant="subtitle2">{t("animationName") || "Nombre de la Animación"}</Typography>
+          <Tooltip title={t("animationNameTooltip")}>
+            <InfoIcon sx={{ fontSize: 16, color: "text.secondary", cursor: "help" }} />
+          </Tooltip>
+        </Box>
         <TextField
           fullWidth
-          label={t("animationName") || "Nombre de la Animación"}
           variant="outlined"
           size="small"
           value={settings.name}
@@ -357,9 +364,12 @@ const AnimationSettingsSidebar = ({
       </Box>
 
       <Box mb={3}>
-        <Typography gutterBottom variant="subtitle2">
-          {t("transitionDuration") || "Duración de Transición (s)"}
-        </Typography>
+        <Box display="flex" alignItems="center" gap={0.5} mb={1}>
+          <Typography variant="subtitle2">{t("transitionDuration") || "Duración de Transición (s)"}</Typography>
+          <Tooltip title={t("transitionDurationTooltip")}>
+            <InfoIcon sx={{ fontSize: 16, color: "text.secondary", cursor: "help" }} />
+          </Tooltip>
+        </Box>
         <Slider
           value={settings.transitionDuration}
           min={0.5}
@@ -371,9 +381,12 @@ const AnimationSettingsSidebar = ({
       </Box>
 
       <Box mb={3}>
-        <Typography gutterBottom variant="subtitle2">
-          {t("stayDuration") || "Tiempo en Actividad (s)"}
-        </Typography>
+        <Box display="flex" alignItems="center" gap={0.5} mb={1}>
+          <Typography variant="subtitle2">{t("stayDuration") || "Tiempo en Actividad (s)"}</Typography>
+          <Tooltip title={t("stayDurationTooltip")}>
+            <InfoIcon sx={{ fontSize: 16, color: "text.secondary", cursor: "help" }} />
+          </Tooltip>
+        </Box>
         <Slider
           value={settings.stayDuration}
           min={0.5}
@@ -385,9 +398,12 @@ const AnimationSettingsSidebar = ({
       </Box>
 
       <Box mb={4}>
-        <Typography gutterBottom variant="subtitle2">
-          {t("travelSpeed") || "Velocidad de Viaje"}
-        </Typography>
+        <Box display="flex" alignItems="center" gap={0.5} mb={1}>
+          <Typography variant="subtitle2">{t("travelSpeed") || "Velocidad de Viaje"}</Typography>
+          <Tooltip title={t("travelSpeedTooltip")}>
+            <InfoIcon sx={{ fontSize: 16, color: "text.secondary", cursor: "help" }} />
+          </Tooltip>
+        </Box>
         <Slider
           value={settings.speedFactor}
           min={50}

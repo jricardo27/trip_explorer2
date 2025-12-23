@@ -269,6 +269,10 @@ export const translations = {
     animationFeature4: 'Click "Stop" to pause the animation',
     animationFeature5: "Use the progress slider to jump to different points",
     areYouSureDeleteAnimation: "Are you sure you want to delete this animation?",
+    animationNameTooltip: "Displayed at the top of the map during fullscreen playback.",
+    transitionDurationTooltip: "How long it takes to 'fly' to an activity.",
+    stayDurationTooltip: "How long the view stays at an activity before moving.",
+    travelSpeedTooltip: "The speed of movement along the path between activities.",
 
     // Confirmation
     areYouSureDeleteActivity: "Are you sure you want to delete this activity?",
@@ -643,6 +647,10 @@ export const translations = {
     animationFeature4: 'Haz clic en "Detener" para pausar la animación',
     animationFeature5: "Usa el control deslizante de progreso para saltar a diferentes puntos",
     areYouSureDeleteAnimation: "¿Estás seguro de que deseas eliminar esta animación?",
+    animationNameTooltip: "Se muestra en la parte superior del mapa durante la reproducción a pantalla completa.",
+    transitionDurationTooltip: "Cuánto tiempo tarda en 'volar' hacia una actividad.",
+    stayDurationTooltip: "Cuánto tiempo permanece la vista en una actividad antes de moverse.",
+    travelSpeedTooltip: "La velocidad de movimiento a lo largo del camino entre actividades.",
 
     // Confirmation
     areYouSureDeleteActivity: "¿Estás seguro de que deseas eliminar esta actividad?",
