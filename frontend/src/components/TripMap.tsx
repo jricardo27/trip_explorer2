@@ -22,6 +22,9 @@ import {
   Slider,
   LinearProgress,
   Divider,
+  TextField,
+  Button,
+  CircularProgress,
 } from "@mui/material"
 import L from "leaflet"
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
@@ -34,7 +37,7 @@ import "leaflet/dist/leaflet.css"
 
 import { MARKER_MANIFEST } from "../data/markerManifest"
 import { useLanguageStore } from "../stores/languageStore"
-import type { Activity } from "../types"
+import type { Activity, TripAnimation } from "../types"
 
 import { BaseLayers } from "./Map/BaseLayers"
 import PopupContent from "./PopupContent"
@@ -50,6 +53,10 @@ interface TripMapProps {
   activeFlyToLocation?: { lat: number; lng: number } | null
   hideAnimationControl?: boolean
   viewMode?: string
+  title?: string
+  animations?: TripAnimation[]
+  onSaveAnimation?: (animation: Partial<TripAnimation>) => Promise<void>
+  onDeleteAnimation?: (id: string) => Promise<void>
 }
 
 const LIGHT_TILES = {
@@ -182,7 +189,7 @@ const AnimationController = ({
   isFullScreen,
   onToggleFullScreen,
   progress,
-  t,
+  onOpenSettings,
 }: {
   isPlaying: boolean
   onPlayPause: () => void
@@ -191,6 +198,7 @@ const AnimationController = ({
   onToggleFullScreen: () => void
   progress: number
   t: (key: any) => string
+  onOpenSettings?: () => void
 }) => (
   <Paper
     elevation={4}
@@ -203,43 +211,31 @@ const AnimationController = ({
       p: 1.5,
       borderRadius: 2,
       display: "flex",
-      flexDirection: "column",
-      gap: 1,
-      minWidth: isFullScreen ? 400 : "fit-content",
-      bgcolor: "background.paper",
-      boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
+      alignItems: "center",
+      gap: 1.5,
+      minWidth: isFullScreen ? 350 : 280,
+      bgcolor: "rgba(255,255,255,0.9)",
+      backdropFilter: "blur(8px)",
+      pointerEvents: "auto",
     }}
   >
-    <Box display="flex" alignItems="center" gap={1}>
-      <Typography variant="subtitle2" sx={{ fontWeight: "bold", mr: 1, whiteSpace: "nowrap" }}>
-        {t("tripAnimation")}
-      </Typography>
-      <IconButton
-        size="small"
-        onClick={onPlayPause}
-        color="primary"
-        sx={{ bgcolor: "primary.light", color: "white", "&:hover": { bgcolor: "primary.main" } }}
-      >
-        {isPlaying ? <Pause /> : <PlayArrow />}
+    <IconButton onClick={onPlayPause} color="primary" size="small">
+      {isPlaying ? <Pause /> : <PlayArrow />}
+    </IconButton>
+    <IconButton onClick={onReset} size="small">
+      <Stop />
+    </IconButton>
+    {!isFullScreen && (
+      <IconButton size="small" onClick={onOpenSettings}>
+        <SettingsIcon />
       </IconButton>
-      <IconButton size="small" onClick={onReset} sx={{ bgcolor: "grey.200" }}>
-        <Stop />
-      </IconButton>
-      <Box sx={{ flexGrow: 1 }} />
-      <IconButton size="small" onClick={onToggleFullScreen} color="primary">
-        {isFullScreen ? <FullscreenExit /> : <Fullscreen />}
-      </IconButton>
-      {isFullScreen && (
-        <IconButton size="small" onClick={onToggleFullScreen} sx={{ color: "error.main" }}>
-          <Close />
-        </IconButton>
-      )}
-    </Box>
-    <Box sx={{ width: "100%", mt: 0.5 }}>
+    )}
+    <Box sx={{ flexGrow: 1, px: 1, display: "flex", alignItems: "center" }}>
       <LinearProgress
         variant="determinate"
         value={progress}
         sx={{
+          flexGrow: 1,
           height: 6,
           borderRadius: 3,
           bgcolor: "grey.200",
@@ -249,6 +245,14 @@ const AnimationController = ({
         }}
       />
     </Box>
+    <IconButton size="small" onClick={onToggleFullScreen}>
+      {isFullScreen ? <FullscreenExit /> : <Fullscreen />}
+    </IconButton>
+    {isFullScreen && (
+      <IconButton size="small" onClick={onToggleFullScreen} sx={{ color: "error.main" }}>
+        <Close />
+      </IconButton>
+    )}
   </Paper>
 )
 
@@ -258,13 +262,24 @@ const AnimationSettingsSidebar = ({
   isOpen,
   onToggle,
   t,
+  animations = [],
+  onSave,
+  onDelete,
+  onSelectAnimation,
+  currentAnimationId,
+  isSaving = false,
 }: {
-  settings: { transitionDuration: number; stayDuration: number; speedFactor: number }
-  days?: Array<{ id: string; name?: string; dayIndex: number }>
-  onChange: (key: string, value: number) => void
+  settings: { name: string; transitionDuration: number; stayDuration: number; speedFactor: number }
+  onChange: (key: string, value: any) => void
   isOpen: boolean
   onToggle: () => void
   t: (key: any) => string
+  animations?: TripAnimation[]
+  onSave: () => void
+  onDelete: () => void
+  onSelectAnimation: (id: string) => void
+  currentAnimationId?: string
+  isSaving?: boolean
 }) => (
   <>
     <IconButton
@@ -281,16 +296,67 @@ const AnimationSettingsSidebar = ({
     >
       <SettingsIcon />
     </IconButton>
-    <Drawer anchor="right" open={isOpen} onClose={onToggle} PaperProps={{ sx: { width: 280, p: 3 } }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+
+    <Drawer
+      anchor="right"
+      open={isOpen}
+      onClose={onToggle}
+      PaperProps={{
+        sx: { width: 320, p: 3 },
+      }}
+    >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h6">{t("animationSettings") || "Ajustes de Animación"}</Typography>
         <IconButton onClick={onToggle} size="small">
           <Close />
         </IconButton>
       </Box>
+
+      {animations.length > 0 && (
+        <Box mb={3}>
+          <Typography gutterBottom variant="subtitle2">
+            {t("savedAnimations") || "Animaciones Guardadas"}
+          </Typography>
+          <Select
+            fullWidth
+            size="small"
+            value={currentAnimationId || ""}
+            onChange={(e) => onSelectAnimation(e.target.value)}
+            displayEmpty
+          >
+            <MenuItem value="" disabled>
+              {t("selectAnimation") || "Seleccionar..."}
+            </MenuItem>
+            {animations.map((anim) => (
+              <MenuItem key={anim.id} value={anim.id}>
+                {anim.name}
+              </MenuItem>
+            ))}
+            <MenuItem
+              value="new"
+              sx={{ fontStyle: "italic", color: "primary.main" }}
+              onClick={() => onSelectAnimation("new")}
+            >
+              + {t("createNew") || "Crear Nueva"}
+            </MenuItem>
+          </Select>
+        </Box>
+      )}
+
       <Divider sx={{ mb: 3 }} />
 
-      <Box mb={4}>
+      <Box mb={3}>
+        <TextField
+          fullWidth
+          label={t("animationName") || "Nombre de la Animación"}
+          variant="outlined"
+          size="small"
+          value={settings.name}
+          onChange={(e) => onChange("name", e.target.value)}
+        />
+      </Box>
+
+      <Box mb={3}>
         <Typography gutterBottom variant="subtitle2">
           {t("transitionDuration") || "Duración de Transición (s)"}
         </Typography>
@@ -304,9 +370,9 @@ const AnimationSettingsSidebar = ({
         />
       </Box>
 
-      <Box mb={4}>
+      <Box mb={3}>
         <Typography gutterBottom variant="subtitle2">
-          {t("stayDuration") || "Duración de Estancia (s)"}
+          {t("stayDuration") || "Tiempo en Actividad (s)"}
         </Typography>
         <Slider
           value={settings.stayDuration}
@@ -331,6 +397,23 @@ const AnimationSettingsSidebar = ({
           valueLabelDisplay="auto"
         />
       </Box>
+
+      <Box sx={{ display: "flex", gap: 1, mt: "auto" }}>
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={onSave}
+          disabled={isSaving || !settings.name}
+          startIcon={isSaving ? <CircularProgress size={20} /> : null}
+        >
+          {t("save") || "Guardar"}
+        </Button>
+        {currentAnimationId && (
+          <Button fullWidth variant="outlined" color="error" onClick={onDelete}>
+            {t("delete") || "Borrar"}
+          </Button>
+        )}
+      </Box>
     </Drawer>
   </>
 )
@@ -348,6 +431,10 @@ export const TripMap = (props: TripMapProps) => {
     onCreateActivity,
     hideAnimationControl = false,
     viewMode,
+    title,
+    animations = [],
+    onSaveAnimation,
+    onDeleteAnimation,
   } = props
   const theme = useTheme()
   const tiles = theme.palette.mode === "light" ? LIGHT_TILES : DARK_TILES
@@ -371,10 +458,17 @@ export const TripMap = (props: TripMapProps) => {
   const [animationProgress, setAnimationProgress] = useState(0)
 
   const [animationSettings, setAnimationSettings] = useState({
+    name: "",
     transitionDuration: 1.5,
     stayDuration: 2.0,
     speedFactor: 200,
   })
+
+  const [currentAnimationId, setCurrentAnimationId] = useState<string | undefined>(undefined)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const [controlsVisible, setControlsVisible] = useState(true)
+  const hideControlsTimerRef = useRef<any>(null)
 
   // Sync fullscreen state with browser events
   useEffect(() => {
@@ -384,6 +478,97 @@ export const TripMap = (props: TripMapProps) => {
     document.addEventListener("fullscreenchange", handleFullscreenChange)
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
   }, [])
+
+  // Handle controls visibility in fullscreen
+  useEffect(() => {
+    if (!isFullScreen) {
+      setControlsVisible(true)
+      if (hideControlsTimerRef.current) clearTimeout(hideControlsTimerRef.current)
+      return
+    }
+
+    const resetTimer = () => {
+      setControlsVisible(true)
+      if (hideControlsTimerRef.current) clearTimeout(hideControlsTimerRef.current)
+      hideControlsTimerRef.current = setTimeout(() => {
+        setControlsVisible(false)
+      }, 3000)
+    }
+
+    const container = containerRef.current
+    if (container) {
+      container.addEventListener("mousemove", resetTimer)
+      container.addEventListener("mousedown", resetTimer)
+      container.addEventListener("touchstart", resetTimer)
+    }
+
+    resetTimer()
+
+    return () => {
+      if (container) {
+        container.removeEventListener("mousemove", resetTimer)
+        container.removeEventListener("mousedown", resetTimer)
+        container.removeEventListener("touchstart", resetTimer)
+      }
+      if (hideControlsTimerRef.current) clearTimeout(hideControlsTimerRef.current)
+    }
+  }, [isFullScreen])
+
+  // Handle loading an animation when selecting it
+  const handleSelectAnimation = useCallback(
+    (id: string) => {
+      if (id === "new") {
+        setCurrentAnimationId(undefined)
+        setAnimationSettings({
+          name: "",
+          transitionDuration: 1.5,
+          stayDuration: 2.0,
+          speedFactor: 200,
+        })
+        return
+      }
+
+      const anim = animations.find((a) => a.id === id)
+      if (anim) {
+        setCurrentAnimationId(anim.id)
+        setAnimationSettings({
+          name: anim.name,
+          transitionDuration: anim.settings.transitionDuration || 1.5,
+          stayDuration: anim.settings.stayDuration || 2.0,
+          speedFactor: anim.settings.speedFactor || 200,
+        })
+      }
+    },
+    [animations],
+  )
+
+  const handleSave = async () => {
+    if (!onSaveAnimation || !animationSettings.name) return
+    setIsSaving(true)
+    try {
+      const data = {
+        id: currentAnimationId,
+        name: animationSettings.name,
+        settings: {
+          transitionDuration: animationSettings.transitionDuration,
+          stayDuration: animationSettings.stayDuration,
+          speedFactor: animationSettings.speedFactor,
+        },
+        steps: sortedActivities?.map((a) => ({ activityId: a.id })),
+      }
+      await onSaveAnimation(data as any)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!onDeleteAnimation || !currentAnimationId) return
+    if (window.confirm(t("areYouSureDeleteAnimation") || "¿Borrar esta animación?")) {
+      await onDeleteAnimation(currentAnimationId)
+      handleSelectAnimation("new")
+    }
+  }
 
   const handleToggleFullScreen = useCallback(() => {
     if (!containerRef.current) return
@@ -486,8 +671,37 @@ export const TripMap = (props: TripMapProps) => {
         display: "flex",
         flexDirection: "column",
         bgcolor: "background.paper",
+        // Hide Leaflet controls in fullscreen
+        "& .leaflet-control-zoom, & .leaflet-control-layers": {
+          display: isFullScreen ? "none" : "block",
+        },
       }}
     >
+      {isFullScreen && title && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 20,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 2000,
+            bgcolor: "rgba(0,0,0,0.6)",
+            color: "white",
+            px: 4,
+            py: 1.5,
+            borderRadius: 4,
+            backdropFilter: "blur(8px)",
+            pointerEvents: "none",
+            transition: "opacity 0.5s",
+            opacity: controlsVisible ? 1 : 0,
+          }}
+        >
+          <Typography variant="h5" sx={{ fontWeight: "bold", letterSpacing: "0.5px" }}>
+            {animationSettings.name || title}
+          </Typography>
+        </Box>
+      )}
+
       {!hideAnimationControl && viewMode === "animation" && sortedActivities && sortedActivities.length > 0 && (
         <Box
           sx={{
@@ -500,6 +714,8 @@ export const TripMap = (props: TripMapProps) => {
             justifyContent: "center",
             width: "auto",
             pointerEvents: "none",
+            transition: "opacity 0.5s",
+            opacity: isFullScreen && !controlsVisible ? 0 : 1,
           }}
         >
           <Box sx={{ pointerEvents: "auto" }}>
@@ -514,18 +730,25 @@ export const TripMap = (props: TripMapProps) => {
               onToggleFullScreen={handleToggleFullScreen}
               progress={animationProgress}
               t={t}
+              onOpenSettings={() => setShowSettings(true)}
             />
           </Box>
         </Box>
       )}
 
-      {viewMode === "animation" && !isPlaying && !isFullScreen && (
+      {viewMode === "animation" && (
         <AnimationSettingsSidebar
           settings={animationSettings}
           onChange={(key, val) => setAnimationSettings((prev) => ({ ...prev, [key]: val }))}
           isOpen={showSettings}
           onToggle={() => setShowSettings(!showSettings)}
           t={t}
+          animations={animations}
+          onSave={handleSave}
+          onDelete={handleDelete}
+          onSelectAnimation={handleSelectAnimation}
+          currentAnimationId={currentAnimationId}
+          isSaving={isSaving}
         />
       )}
 

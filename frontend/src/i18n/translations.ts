@@ -268,6 +268,7 @@ export const translations = {
     animationFeature3: "Animates in chronological order",
     animationFeature4: 'Click "Stop" to pause the animation',
     animationFeature5: "Use the progress slider to jump to different points",
+    areYouSureDeleteAnimation: "Are you sure you want to delete this animation?",
 
     // Confirmation
     areYouSureDeleteActivity: "Are you sure you want to delete this activity?",
@@ -641,6 +642,7 @@ export const translations = {
     animationFeature3: "Anima en orden cronológico",
     animationFeature4: 'Haz clic en "Detener" para pausar la animación',
     animationFeature5: "Usa el control deslizante de progreso para saltar a diferentes puntos",
+    areYouSureDeleteAnimation: "¿Estás seguro de que deseas eliminar esta animación?",
 
     // Confirmation
     areYouSureDeleteActivity: "¿Estás seguro de que deseas eliminar esta actividad?",

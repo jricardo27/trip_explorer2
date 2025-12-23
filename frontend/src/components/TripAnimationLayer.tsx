@@ -99,6 +99,8 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   const travelProgressRef = useRef<number>(0)
   const phaseRef = useRef<AnimationPhaseType>(AnimationPhase.STOPPED)
   const legIndexRef = useRef<number>(-1)
+  const legDurationRef = useRef<number>(2000)
+  const lastProgressRef = useRef<number>(0)
 
   // Keep phaseRef in sync
   useEffect(() => {
@@ -159,10 +161,12 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       cleanup()
       if (phase !== AnimationPhase.STOPPED) {
         console.log(`TripAnimationLayer: Stopping animation and resetting. Current phase: ${phase}`)
-        setPhase(AnimationPhase.STOPPED)
+        setTimeout(() => setPhase(AnimationPhase.STOPPED), 0)
       }
-      setCurrentActivityIndex(0)
-      setTravelProgress(0)
+      setTimeout(() => {
+        setCurrentActivityIndex(0)
+        setTravelProgress(0)
+      }, 0)
       return
     }
 
@@ -175,7 +179,11 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     switch (phase) {
       case AnimationPhase.STOPPED:
         // Already handled by start effect, but as backup:
-        setPhase(AnimationPhase.INITIAL_OVERVIEW_PAN)
+        setTimeout(() => {
+          setCurrentActivityIndex(0)
+          setTravelProgress(0)
+          setPhase(AnimationPhase.INITIAL_OVERVIEW_PAN)
+        }, 0)
         break
 
       case AnimationPhase.INITIAL_OVERVIEW_PAUSE:
@@ -246,7 +254,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
           map.once("moveend", handleMoveEnd)
           transitionTimeoutRef.current = setTimeout(handleMoveEnd, 1700)
         } else {
-          setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
+          setTimeout(() => setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY), 0)
         }
         break
       }
@@ -274,7 +282,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
           map.once("moveend", handleMoveEnd)
           transitionTimeoutRef.current = setTimeout(handleMoveEnd, 1400)
         } else {
-          setPhase(AnimationPhase.FINAL_OVERVIEW_PAN)
+          setTimeout(() => setPhase(AnimationPhase.FINAL_OVERVIEW_PAN), 0)
         }
         break
       }
@@ -282,10 +290,27 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       case AnimationPhase.TRAVEL: {
         // Only reset progress if we are starting a NEW leg
         if (legIndexRef.current !== currentActivityIndex) {
-          console.log(`TripAnimationLayer: Starting new leg animation for index: ${currentActivityIndex}`)
-          legIndexRef.current = currentActivityIndex
+          const p1 = coords[currentActivityIndex]
+          const p2 = coords[currentActivityIndex + 1]
+
+          if (p1 && p2) {
+            const dist = map.distance(p1, p2)
+            const duration = Math.max(1000, Math.min(4000, dist / (settings.speedFactor || 200)))
+            console.log(
+              `TripAnimationLayer: Starting new leg animation for index: ${currentActivityIndex}. Distance: ${Math.round(
+                dist,
+              )}m, Duration: ${Math.round(duration)}ms`,
+            )
+            legIndexRef.current = currentActivityIndex
+            legDurationRef.current = duration
+          } else {
+            setTimeout(() => setPhase(AnimationPhase.FINAL_OVERVIEW_PAN), 0)
+            return
+          }
+
           travelProgressRef.current = 0
-          setTravelProgress(0)
+          lastProgressRef.current = 0
+          setTimeout(() => setTravelProgress(0), 0)
           previousTimeRef.current = undefined
         }
 
@@ -312,13 +337,16 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
             return
           }
 
-          const dist = map.distance(p1, p2)
-          const travelDuration = Math.max(1000, Math.min(4000, dist / (settings.speedFactor || 200)))
+          const travelDuration = legDurationRef.current
           const progressIncrement = deltaTime / travelDuration
           const nextProgress = Math.min(1, travelProgressRef.current + progressIncrement)
 
-          travelProgressRef.current = nextProgress
-          setTravelProgress(nextProgress)
+          // Guard against backwards movement due to deltaTime fluctuations
+          if (nextProgress > lastProgressRef.current) {
+            travelProgressRef.current = nextProgress
+            lastProgressRef.current = nextProgress
+            setTravelProgress(nextProgress)
+          }
 
           if (nextProgress < 1) {
             animationFrameRef.current = requestAnimationFrame(animate)
@@ -367,15 +395,6 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     settings.speedFactor,
     onAnimationComplete,
   ])
-
-  // Effect to start the animation from a clean state
-  useEffect(() => {
-    if (isPlaying && phase === AnimationPhase.STOPPED) {
-      setCurrentActivityIndex(0)
-      setTravelProgress(0)
-      setPhase(AnimationPhase.INITIAL_OVERVIEW_PAN)
-    }
-  }, [isPlaying, phase])
 
   // --- RENDER LOGIC ---
 

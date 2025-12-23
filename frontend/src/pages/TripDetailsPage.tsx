@@ -109,6 +109,9 @@ const TripDetailsPage = () => {
     moveActivities,
     swapDays,
     updateDay,
+    createAnimation,
+    updateAnimation,
+    deleteAnimation,
   } = useTripDetails(tripId!)
 
   const currentUser = useAuthStore((state) => state.user)
@@ -339,6 +342,26 @@ const TripDetailsPage = () => {
     }
   }
 
+  const handleSaveAnimation = async (data: any) => {
+    try {
+      if (data.id) {
+        await updateAnimation(data.id, data)
+      } else {
+        await createAnimation(data)
+      }
+    } catch (error) {
+      console.error("Failed to save animation:", error)
+    }
+  }
+
+  const handleDeleteAnimation = async (id: string) => {
+    try {
+      await deleteAnimation(id)
+    } catch (error) {
+      console.error("Failed to delete animation:", error)
+    }
+  }
+
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -558,6 +581,10 @@ const TripDetailsPage = () => {
                         handleAddActivity(undefined, latLng)
                       }}
                       viewMode={viewMode}
+                      title={trip.name}
+                      animations={trip.animations}
+                      onSaveAnimation={handleSaveAnimation}
+                      onDeleteAnimation={handleDeleteAnimation}
                     />
                   </Box>
                 </Grid>
@@ -618,6 +645,10 @@ const TripDetailsPage = () => {
                 days={trip.days?.map((d) => ({ id: d.id, name: d.name, dayIndex: d.dayNumber - 1 }))}
                 hideAnimationControl={false}
                 viewMode={viewMode}
+                title={trip.name}
+                animations={trip.animations}
+                onSaveAnimation={handleSaveAnimation}
+                onDeleteAnimation={handleDeleteAnimation}
               />
             </Box>
 
