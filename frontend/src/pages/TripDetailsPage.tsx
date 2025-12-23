@@ -23,8 +23,8 @@ import {
   Print as PrintIcon,
   Book as JournalIcon,
   Movie as AnimationIcon,
-  Edit as EditIcon,
   Download as DownloadIcon,
+  AttachMoney,
 } from "@mui/icons-material"
 import {
   Box,
@@ -498,25 +498,39 @@ const TripDetailsPage = () => {
                                 {isCollapsed ? <ExpandMore /> : <ExpandLess />}
                               </IconButton>
                               <Typography variant="h6" color="primary">
-                                {day.name || `${t("day")} ${day.dayNumber}`}
+                                Day {day.dayNumber}: {day.name || dayjs(day.date).format("MMMM D, YYYY")}
                               </Typography>
-                              <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                                ({dayjs(day.date).format("MMM D")})
-                              </Typography>
+                            </Box>
+                            <Box display="flex" alignItems="center" gap={1}>
+                              {(() => {
+                                const dayCost = day.activities.reduce(
+                                  (sum, activity) => sum + (activity.estimatedCost || 0),
+                                  0,
+                                )
+                                const costColor =
+                                  dayCost === 0
+                                    ? "default"
+                                    : dayCost > 200
+                                      ? "error"
+                                      : dayCost > 100
+                                        ? "warning"
+                                        : "success"
+                                return dayCost > 0 ? (
+                                  <Chip
+                                    size="small"
+                                    icon={<AttachMoney />}
+                                    label={`$${dayCost.toFixed(0)}`}
+                                    color={costColor}
+                                    variant="outlined"
+                                  />
+                                ) : null
+                              })()}
                               {canEdit && (
-                                <IconButton
-                                  size="small"
-                                  onClick={() => setRenameDayDialog({ dayId: day.id, name: day.name || "" })}
-                                >
-                                  <EditIcon fontSize="small" />
+                                <IconButton size="small" onClick={() => handleAddActivity(day.id)}>
+                                  <AddIcon />
                                 </IconButton>
                               )}
                             </Box>
-                            {canEdit && (
-                              <IconButton size="small" onClick={() => handleAddActivity(day.id)}>
-                                <AddIcon />
-                              </IconButton>
-                            )}
                           </Box>
                           <Collapse in={!isCollapsed}>
                             <DroppableDay dayId={day.id}>
