@@ -13,6 +13,7 @@ import {
   Chip,
 } from "@mui/material"
 import { useState } from "react"
+import { useSearchParams } from "react-router-dom"
 
 import { HighlightsMap } from "../components/HighlightsMap"
 import { StatisticsCards } from "../components/StatisticsCards"
@@ -28,8 +29,11 @@ export const HighlightsPage = () => {
   const populateMutation = usePopulateActivityLocations()
   const [showSuccess, setShowSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState("")
-  const [filterView, setFilterView] = useState<FilterView>("countries")
-  const [selectedContextId, setSelectedContextId] = useState<string | null>(null)
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const filterView = (searchParams.get("view") as FilterView) || "countries"
+  const selectedContextId = searchParams.get("context")
+
   const [highlightedId, setHighlightedId] = useState<string | null>(null)
 
   const handleRecalculate = () => {
@@ -55,7 +59,11 @@ export const HighlightsPage = () => {
   }
 
   const handleItemClick = (id: string) => {
-    setSelectedContextId(id)
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      next.set("context", id)
+      return next
+    })
     setHighlightedId(id)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -66,8 +74,16 @@ export const HighlightsPage = () => {
   }
 
   const handleViewChange = (view: FilterView) => {
-    setFilterView(view)
-    setSelectedContextId(null)
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      if (view === "countries") {
+        next.delete("view")
+      } else {
+        next.set("view", view)
+      }
+      next.delete("context")
+      return next
+    })
     setHighlightedId(null)
   }
 

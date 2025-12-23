@@ -51,7 +51,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query"
 import dayjs from "dayjs"
 import React, { useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 
 import client from "../api/client"
 import ActivityDialog from "../components/ActivityDialog"
@@ -123,7 +123,10 @@ const TripDetailsPage = () => {
   const canEdit = userRole === "OWNER" || userRole === "EDITOR"
 
   // UI State
-  const [viewMode, setViewMode] = useState<"list" | "animation" | "timeline" | "prep" | "expenses" | "journal">("list")
+  // URL Search Params for View State
+  const [searchParams, setSearchParams] = useSearchParams()
+  const viewMode = (searchParams.get("view") as any) || "list"
+
   const [dialogOpen, setDialogOpen] = useState(false)
   const [membersDialogOpen, setMembersDialogOpen] = useState(false)
   const [expensesDialogOpen, setExpensesDialogOpen] = useState(false)
@@ -164,7 +167,15 @@ const TripDetailsPage = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
   const handleViewModeChange = (_: React.SyntheticEvent, newMode: any) => {
-    setViewMode(newMode)
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      if (newMode === "list") {
+        next.delete("view")
+      } else {
+        next.set("view", newMode)
+      }
+      return next
+    })
   }
 
   const toggleDayCollapse = (dayId: string) => {
