@@ -140,6 +140,11 @@ const TripDetailsPage = () => {
   const [renameDayDialog, setRenameDayDialog] = useState<{ dayId: string; name: string } | null>(null)
   const [prefilledCoordinates, setPrefilledCoordinates] = useState<{ lat: number; lng: number } | undefined>(undefined)
 
+  // Stable activities for map/animation to avoid re-renders
+  const activitiesWithCoords = React.useMemo(() => {
+    return trip?.activities || []
+  }, [trip?.activities])
+
   // Sensors for DND
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -552,6 +557,7 @@ const TripDetailsPage = () => {
                       onCreateActivity={(latLng) => {
                         handleAddActivity(undefined, latLng)
                       }}
+                      viewMode={viewMode}
                     />
                   </Box>
                 </Grid>
@@ -608,9 +614,10 @@ const TripDetailsPage = () => {
               }}
             >
               <TripMap
-                activities={trip.activities}
+                activities={activitiesWithCoords}
                 days={trip.days?.map((d) => ({ id: d.id, name: d.name, dayIndex: d.dayNumber - 1 }))}
                 hideAnimationControl={false}
+                viewMode={viewMode}
               />
             </Box>
 
@@ -680,7 +687,7 @@ const TripDetailsPage = () => {
                                 ).format("dddd")}. Available days: ${activity.availableDays.join(", ")}`}
                               >
                                 <Typography variant="caption" color="text.secondary" sx={{ ml: 4 }}>
-                                  {dayjs(activity.scheduledStart).format("MMM D, h:mm A")}
+                                  {dayjs(activity.scheduledStart || activity.tripDay?.date).format("MMM D, h:mm A")}
                                 </Typography>
                               </Tooltip>
                             )}

@@ -73,6 +73,7 @@ export class TripService {
         activities: {
           orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
           include: {
+            tripDay: true,
             participants: {
               include: {
                 member: true,

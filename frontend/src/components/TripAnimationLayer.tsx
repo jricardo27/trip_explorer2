@@ -39,6 +39,18 @@ interface TripAnimationLayerProps {
   activities: Activity[]
   isPlaying: boolean
   onAnimationComplete: () => void
+  onProgressUpdate?: (progress: number) => void
+  settings?: {
+    transitionDuration: number
+    stayDuration: number
+    speedFactor: number
+  }
+}
+
+const DEFAULT_SETTINGS = {
+  transitionDuration: 1.5,
+  stayDuration: 2.0,
+  speedFactor: 200,
 }
 
 const ACTIVITY_TYPE_ICONS: Record<string, { icon: React.ElementType; color: string }> = {
@@ -71,6 +83,8 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   activities,
   isPlaying,
   onAnimationComplete,
+  onProgressUpdate,
+  settings = DEFAULT_SETTINGS,
 }) => {
   const map = useMap()
   const [phase, setPhase] = useState<AnimationPhaseType>(AnimationPhase.STOPPED)
@@ -80,9 +94,11 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   // Refs for managing animation loop and timers
   const animationFrameRef = useRef<number | null>(null)
   const phaseTimeoutRef = useRef<any>(null)
+  const transitionTimeoutRef = useRef<any>(null)
   const previousTimeRef = useRef<number | undefined>(undefined)
   const travelProgressRef = useRef<number>(0)
   const phaseRef = useRef<AnimationPhaseType>(AnimationPhase.STOPPED)
+  const legIndexRef = useRef<number>(-1)
 
   // Keep phaseRef in sync
   useEffect(() => {
@@ -90,190 +106,267 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   }, [phase])
 
   // Filter activities that have valid coordinates
-  const validActivities = useMemo(() => activities.filter((a) => getCoords(a) !== null), [activities])
-  const coords = useMemo(() => validActivities.map((a) => getCoords(a)!), [validActivities])
+  const { validActivities, coords } = useMemo(() => {
+    const valid = activities.filter((a) => a.latitude && a.longitude)
+    const points = valid.map((a) => [Number(a.latitude), Number(a.longitude)] as [number, number])
+    return { validActivities: valid, coords: points }
+  }, [activities])
+
+  console.log(`TripAnimationLayer: validActivities length: ${validActivities.length}`)
+
+  // Calculate and report overall progress
+  useEffect(() => {
+    if (!onProgressUpdate || coords.length < 2) return
+
+    let overallProgress = 0
+    const totalLegs = coords.length - 1
+
+    if (phase === AnimationPhase.STOPPED) {
+      overallProgress = 0
+    } else if (phase === AnimationPhase.INITIAL_OVERVIEW_PAN || phase === AnimationPhase.INITIAL_OVERVIEW_PAUSE) {
+      overallProgress = 0
+    } else if (phase === AnimationPhase.FINAL_OVERVIEW_PAN || phase === AnimationPhase.FINAL_OVERVIEW_PAUSE) {
+      overallProgress = 1
+    } else {
+      // Scale current index and travel progress to 0-1
+      overallProgress = Math.min(1, (currentActivityIndex + travelProgress) / totalLegs)
+    }
+
+    onProgressUpdate(overallProgress * 100)
+  }, [currentActivityIndex, travelProgress, phase, coords.length, onProgressUpdate])
 
   // Cleanup timers and animation frames
   const cleanup = useCallback(() => {
-    if (phaseTimeoutRef.current) clearTimeout(phaseTimeoutRef.current)
-    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+    if (phaseTimeoutRef.current) {
+      clearTimeout(phaseTimeoutRef.current)
+      phaseTimeoutRef.current = null
+    }
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current)
+      transitionTimeoutRef.current = null
+    }
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
+    }
     previousTimeRef.current = undefined
+    legIndexRef.current = -1
   }, [])
 
-  // Animation loop for the TRAVEL phase
-  const animateTravel = useCallback(
-    function animate(time: number) {
-      if (phaseRef.current !== AnimationPhase.TRAVEL) return
-
-      if (previousTimeRef.current === undefined) {
-        previousTimeRef.current = time
-        animationFrameRef.current = requestAnimationFrame(animate)
-        return
-      }
-
-      const deltaTime = time - previousTimeRef.current
-      previousTimeRef.current = time
-
-      // Duration of travel based on distance
-      const p1 = coords[currentActivityIndex]
-      const p2 = coords[currentActivityIndex + 1]
-      if (!p1 || !p2) {
-        setPhase(AnimationPhase.FINAL_OVERVIEW_PAN)
-        return
-      }
-
-      const dist = map.distance(p1, p2)
-      // Speed check: dist / speed = time. Scale speed to be faster (e.g. 150m/ms)
-      const travelDuration = Math.max(1000, Math.min(4000, dist / 200))
-
-      const progressIncrement = deltaTime / travelDuration
-      const nextProgress = Math.min(1, travelProgressRef.current + progressIncrement)
-      travelProgressRef.current = nextProgress
-      setTravelProgress(nextProgress)
-
-      if (nextProgress < 1) {
-        animationFrameRef.current = requestAnimationFrame(animate)
-      } else {
-        // Leg complete - delay transition slightly to ensure progress: 1 is rendered
-        setTimeout(() => {
-          if (phaseRef.current === AnimationPhase.TRAVEL) {
-            setCurrentActivityIndex((prev) => prev + 1)
-            setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
-          }
-        }, 100)
-      }
-    },
-    [currentActivityIndex, coords, map],
-  )
-
-  // Start travel loop specifically when phase changes to TRAVEL
+  // Main state machine effect for phase transitions and timers
   useEffect(() => {
-    if (phase === AnimationPhase.TRAVEL) {
-      travelProgressRef.current = 0
-      setTravelProgress(0)
-      previousTimeRef.current = performance.now()
-      animationFrameRef.current = requestAnimationFrame(animateTravel)
-      return () => {
-        if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
-      }
-    }
-  }, [phase, animateTravel])
-
-  // Main state machine effect (without animateTravel dependency to avoid re-triggering loop during progress updates)
-  useEffect(() => {
-    // Stop and reset logic
     if (!isPlaying) {
       cleanup()
-      setPhase(AnimationPhase.STOPPED)
+      if (phase !== AnimationPhase.STOPPED) {
+        console.log(`TripAnimationLayer: Stopping animation and resetting. Current phase: ${phase}`)
+        setPhase(AnimationPhase.STOPPED)
+      }
       setCurrentActivityIndex(0)
       setTravelProgress(0)
       return
     }
 
-    // Guard against running on empty coords
-    if (coords.length < 1) {
-      console.warn("TripAnimationLayer: No valid coordinates for animation.")
+    if (validActivities.length < 1) {
       onAnimationComplete()
       return
     }
 
-    const executePhase = (currentPhase: AnimationPhaseType) => {
-      // Clear any existing timers when switching phases
-      if (phaseTimeoutRef.current) clearTimeout(phaseTimeoutRef.current)
+    // Phase transition logic
+    switch (phase) {
+      case AnimationPhase.STOPPED:
+        // Already handled by start effect, but as backup:
+        setPhase(AnimationPhase.INITIAL_OVERVIEW_PAN)
+        break
 
-      console.log(`TripAnimationLayer: Entering phase ${currentPhase} (Index: ${currentActivityIndex})`)
+      case AnimationPhase.INITIAL_OVERVIEW_PAUSE:
+        phaseTimeoutRef.current = setTimeout(() => {
+          setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
+        }, 2000)
+        break
 
-      switch (currentPhase) {
-        case AnimationPhase.INITIAL_OVERVIEW_PAN: {
-          const allBounds = L.latLngBounds(coords)
-          if (allBounds.isValid()) {
-            map.fitBounds(allBounds, { padding: [50, 50], duration: 1.5 })
-            map.once("moveend", () => setPhase(AnimationPhase.INITIAL_OVERVIEW_PAUSE))
-          } else {
-            setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
-          }
-          break
-        }
-
-        case AnimationPhase.INITIAL_OVERVIEW_PAUSE: {
-          phaseTimeoutRef.current = setTimeout(() => {
-            setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
-          }, 2000)
-          break
-        }
-
-        case AnimationPhase.TRANSITION_TO_ACTIVITY: {
-          const currentPos = coords[currentActivityIndex]
-          if (currentPos) {
-            map.flyTo(currentPos, 15, { duration: 1.5 })
-            map.once("moveend", () => setPhase(AnimationPhase.STAY_AT_ACTIVITY))
-          } else {
-            console.error(`TripAnimationLayer: No coords at index ${currentActivityIndex}`)
-            setPhase(AnimationPhase.STOPPED)
-            onAnimationComplete()
-          }
-          break
-        }
-
-        case AnimationPhase.STAY_AT_ACTIVITY: {
-          const isLastActivity = currentActivityIndex === coords.length - 1
-          const stayDuration = isLastActivity ? 3000 : 2000
-          phaseTimeoutRef.current = setTimeout(() => {
-            if (isLastActivity) {
-              setPhase(AnimationPhase.FINAL_OVERVIEW_PAN)
-            } else {
-              setPhase(AnimationPhase.DEPARTURE_PAN)
-            }
-          }, stayDuration)
-          break
-        }
-
-        case AnimationPhase.DEPARTURE_PAN: {
-          const departure = coords[currentActivityIndex]
-          const arrival = coords[currentActivityIndex + 1]
-          if (departure && arrival) {
-            const travelBounds = L.latLngBounds([departure, arrival])
-            map.fitBounds(travelBounds, { padding: [70, 70], duration: 1.2 })
-            map.once("moveend", () => setPhase(AnimationPhase.TRAVEL))
-          } else {
+      case AnimationPhase.STAY_AT_ACTIVITY: {
+        const isLastActivity = currentActivityIndex === coords.length - 1
+        const stayDuration = isLastActivity ? 3000 : settings.stayDuration * 1000
+        phaseTimeoutRef.current = setTimeout(() => {
+          if (isLastActivity) {
             setPhase(AnimationPhase.FINAL_OVERVIEW_PAN)
-          }
-          break
-        }
-
-        case AnimationPhase.TRAVEL:
-          // Controlled by its own useEffect
-          break
-
-        case AnimationPhase.FINAL_OVERVIEW_PAN: {
-          const allBounds = L.latLngBounds(coords)
-          if (allBounds.isValid()) {
-            map.fitBounds(allBounds, { padding: [50, 50], duration: 1.5 })
-            map.once("moveend", () => setPhase(AnimationPhase.FINAL_OVERVIEW_PAUSE))
           } else {
-            setPhase(AnimationPhase.STOPPED)
-            onAnimationComplete()
+            setPhase(AnimationPhase.DEPARTURE_PAN)
           }
-          break
-        }
+        }, stayDuration)
+        break
+      }
 
-        case AnimationPhase.FINAL_OVERVIEW_PAUSE: {
-          phaseTimeoutRef.current = setTimeout(() => {
-            setPhase(AnimationPhase.STOPPED)
-            onAnimationComplete()
-          }, 3000)
-          break
-        }
+      case AnimationPhase.FINAL_OVERVIEW_PAUSE:
+        phaseTimeoutRef.current = setTimeout(() => {
+          setPhase(AnimationPhase.STOPPED)
+          onAnimationComplete()
+        }, 3000)
+        break
 
-        default:
-          break
+      default:
+        // Other phases (PAN, TRAVEL) are handled by map/RAF effects
+        break
+    }
+
+    return cleanup
+  }, [
+    phase,
+    isPlaying,
+    onAnimationComplete,
+    validActivities.length,
+    coords.length,
+    currentActivityIndex,
+    cleanup,
+    settings.stayDuration,
+  ])
+
+  // Effect for Map Movements and Animation Loop
+  useEffect(() => {
+    if (!isPlaying) return
+
+    const clearTransitionTimeout = () => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current)
+        transitionTimeoutRef.current = null
       }
     }
 
-    executePhase(phase)
+    const onMoveEnd = (nextPhase: AnimationPhaseType) => {
+      clearTransitionTimeout()
+      setPhase(nextPhase)
+    }
 
-    return cleanup
-  }, [phase, isPlaying, map, onAnimationComplete, coords, currentActivityIndex, cleanup])
+    switch (phase) {
+      case AnimationPhase.INITIAL_OVERVIEW_PAN: {
+        const allBounds = L.latLngBounds(coords)
+        if (allBounds.isValid()) {
+          map.fitBounds(allBounds, { padding: [50, 50], duration: 1.5 })
+          const handleMoveEnd = () => onMoveEnd(AnimationPhase.INITIAL_OVERVIEW_PAUSE)
+          map.once("moveend", handleMoveEnd)
+          transitionTimeoutRef.current = setTimeout(handleMoveEnd, 1700)
+        } else {
+          setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
+        }
+        break
+      }
+
+      case AnimationPhase.TRANSITION_TO_ACTIVITY: {
+        const currentPos = coords[currentActivityIndex]
+        if (currentPos) {
+          map.flyTo(currentPos, 15, { duration: settings.transitionDuration })
+          const handleMoveEnd = () => onMoveEnd(AnimationPhase.STAY_AT_ACTIVITY)
+          map.once("moveend", handleMoveEnd)
+          transitionTimeoutRef.current = setTimeout(handleMoveEnd, settings.transitionDuration * 1000 + 200)
+        } else {
+          onAnimationComplete()
+        }
+        break
+      }
+
+      case AnimationPhase.DEPARTURE_PAN: {
+        const departure = coords[currentActivityIndex]
+        const arrival = coords[currentActivityIndex + 1]
+        if (departure && arrival) {
+          const travelBounds = L.latLngBounds([departure, arrival])
+          map.fitBounds(travelBounds, { padding: [70, 70], duration: 1.2 })
+          const handleMoveEnd = () => onMoveEnd(AnimationPhase.TRAVEL)
+          map.once("moveend", handleMoveEnd)
+          transitionTimeoutRef.current = setTimeout(handleMoveEnd, 1400)
+        } else {
+          setPhase(AnimationPhase.FINAL_OVERVIEW_PAN)
+        }
+        break
+      }
+
+      case AnimationPhase.TRAVEL: {
+        // Only reset progress if we are starting a NEW leg
+        if (legIndexRef.current !== currentActivityIndex) {
+          console.log(`TripAnimationLayer: Starting new leg animation for index: ${currentActivityIndex}`)
+          legIndexRef.current = currentActivityIndex
+          travelProgressRef.current = 0
+          setTravelProgress(0)
+          previousTimeRef.current = undefined
+        }
+
+        const animate = (time: number) => {
+          if (phaseRef.current !== AnimationPhase.TRAVEL) return
+
+          if (previousTimeRef.current === undefined) {
+            previousTimeRef.current = time
+            animationFrameRef.current = requestAnimationFrame(animate)
+            return
+          }
+
+          const deltaTime = time - previousTimeRef.current
+          previousTimeRef.current = time
+
+          if (deltaTime > 100) {
+            console.warn(`TripAnimationLayer: Large deltaTime detected: ${deltaTime}ms`)
+          }
+
+          const p1 = coords[currentActivityIndex]
+          const p2 = coords[currentActivityIndex + 1]
+          if (!p1 || !p2) {
+            setPhase(AnimationPhase.FINAL_OVERVIEW_PAN)
+            return
+          }
+
+          const dist = map.distance(p1, p2)
+          const travelDuration = Math.max(1000, Math.min(4000, dist / (settings.speedFactor || 200)))
+          const progressIncrement = deltaTime / travelDuration
+          const nextProgress = Math.min(1, travelProgressRef.current + progressIncrement)
+
+          travelProgressRef.current = nextProgress
+          setTravelProgress(nextProgress)
+
+          if (nextProgress < 1) {
+            animationFrameRef.current = requestAnimationFrame(animate)
+          } else {
+            console.log(
+              `TripAnimationLayer: Leg complete. Transitioning to next activity. Index: ${currentActivityIndex + 1}`,
+            )
+            setTimeout(() => {
+              if (phaseRef.current === AnimationPhase.TRAVEL) {
+                setCurrentActivityIndex((idx) => idx + 1)
+                setPhase(AnimationPhase.TRANSITION_TO_ACTIVITY)
+              }
+            }, 100)
+          }
+        }
+
+        animationFrameRef.current = requestAnimationFrame(animate)
+        return () => {
+          if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current)
+          clearTransitionTimeout()
+        }
+      }
+
+      case AnimationPhase.FINAL_OVERVIEW_PAN: {
+        const allBounds = L.latLngBounds(coords)
+        if (allBounds.isValid()) {
+          map.fitBounds(allBounds, { padding: [50, 50], duration: 1.5 })
+          const handleMoveEnd = () => onMoveEnd(AnimationPhase.FINAL_OVERVIEW_PAUSE)
+          map.once("moveend", handleMoveEnd)
+          transitionTimeoutRef.current = setTimeout(handleMoveEnd, 1700)
+        } else {
+          onAnimationComplete()
+        }
+        break
+      }
+    }
+
+    return clearTransitionTimeout
+  }, [
+    phase,
+    isPlaying,
+    map,
+    coords,
+    currentActivityIndex,
+    settings.transitionDuration,
+    settings.speedFactor,
+    onAnimationComplete,
+  ])
 
   // Effect to start the animation from a clean state
   useEffect(() => {

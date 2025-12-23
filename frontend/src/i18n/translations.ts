@@ -248,6 +248,11 @@ export const translations = {
     animationHelpText: "This will create an animation sequence including all current activities in order.",
     animationInstructions:
       'Use the "Play Trip" button on the map to animate your journey chronologically through all activities.',
+    tripAnimation: "Trip Animation",
+    animationSettings: "Animation Settings",
+    transitionDuration: "Transition Duration (s)",
+    stayDuration: "Stay Duration (s)",
+    travelSpeed: "Travel Speed",
     tripAnimations: "Trip Animations",
     createAnimation: "Create Animation",
     noAnimations: "No animations yet. Create one to visualize your trip!",
@@ -616,6 +621,11 @@ export const translations = {
     animationHelpText: "Esto creará una secuencia de animación incluyendo todas las actividades actuales en orden.",
     animationInstructions:
       'Usa el botón "Reproducir Viaje" en el mapa para animar tu viaje cronológicamente a través de todas las actividades.',
+    tripAnimation: "Animación del Viaje",
+    animationSettings: "Ajustes de Animación",
+    transitionDuration: "Duración de Transición (s)",
+    stayDuration: "Duración de Estancia (s)",
+    travelSpeed: "Velocidad de Viaje",
     tripAnimations: "Animaciones de Viaje",
     createAnimation: "Crear Animación",
     noAnimations: "Aún no hay animaciones. ¡Crea una para visualizar tu viaje!",
