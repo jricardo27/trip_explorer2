@@ -1,21 +1,16 @@
 import { PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { Box, CircularProgress, Alert, useMediaQuery, useTheme } from "@mui/material"
-import React, { useState } from "react"
-import { useParams, useSearchParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 
 import client from "../api/client"
 import ActivityDialog from "../components/ActivityDialog"
-import { ExpensesPanel } from "../components/ExpensesPanel"
-import { ItineraryView } from "../components/ItineraryView"
-import { JournalPanel } from "../components/JournalPanel"
-import { PreparationTab } from "../components/PreparationTab"
-import { TimelineCalendarView } from "../components/TimelineCalendarView"
+import { TripDetailsContent } from "../components/TripDetailsContent"
 import { TripDetailsHeader } from "../components/TripDetailsHeader"
 import { TripSettingsDialog } from "../components/TripSettingsDialog"
 import { useTripDetails } from "../hooks/useTripDetails"
+import { useTripDetailsUI } from "../hooks/useTripDetailsUI"
 import { useAuthStore } from "../stores/authStore"
 import { useLanguageStore } from "../stores/languageStore"
-import type { Activity } from "../types"
 
 const TripDetailsPage = () => {
   const { t } = useLanguageStore()
@@ -38,6 +33,28 @@ const TripDetailsPage = () => {
     updateScenario,
   } = useTripDetails(tripId!)
 
+  const {
+    viewMode,
+    handleViewModeChange,
+    dialogOpen,
+    setDialogOpen,
+    membersDialogOpen,
+    setMembersDialogOpen,
+    settingsDialogOpen,
+    setSettingsDialogOpen,
+    selectedDayId,
+    editingActivity,
+    collapsedDays,
+    toggleDayCollapse,
+    activeFlyToLocation,
+    setActiveFlyToLocation,
+    mapExpanded,
+    setMapExpanded,
+    initialCoordinates,
+    handleAddActivity,
+    handleEditActivity,
+  } = useTripDetailsUI()
+
   const currentUser = useAuthStore((state) => state.user)
   const isOwner = trip?.userId === currentUser?.id
   const userMember = trip?.members?.find(
@@ -46,25 +63,9 @@ const TripDetailsPage = () => {
   const userRole = isOwner ? "OWNER" : userMember?.role || "VIEWER"
   const canEdit = userRole === "OWNER" || userRole === "EDITOR"
 
-  // UI State
+  // UI Support
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
-
-  // URL Search Params for View State
-  const [searchParams, setSearchParams] = useSearchParams()
-  const viewMode = (searchParams.get("view") as any) || "list"
-
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [membersDialogOpen, setMembersDialogOpen] = useState(false)
-  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false)
-  const [selectedDayId, setSelectedDayId] = useState<string | undefined>(undefined)
-  const [editingActivity, setEditingActivity] = useState<Activity | undefined>(undefined)
-  const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set())
-  const [activeFlyToLocation, setActiveFlyToLocation] = useState<{ lat: number; lng: number; _ts?: number } | null>(
-    null,
-  )
-  const [mapExpanded, setMapExpanded] = useState(false)
-  const [initialCoordinates, setInitialCoordinates] = useState<{ lat: number; lng: number } | undefined>(undefined)
 
   // DnD Sensors
   const sensors = useSensors(
@@ -74,35 +75,6 @@ const TripDetailsPage = () => {
       },
     }),
   )
-
-  const handleViewModeChange = (_: React.SyntheticEvent, newMode: any) => {
-    setSearchParams({ view: newMode })
-  }
-
-  const toggleDayCollapse = (dayId: string) => {
-    setCollapsedDays((prev) => {
-      const next = new Set(prev)
-      if (next.has(dayId)) next.delete(dayId)
-      else next.add(dayId)
-      return next
-    })
-  }
-
-  const handleAddActivity = (dayId?: string, coordinates?: { lat: number; lng: number }) => {
-    setSelectedDayId(dayId)
-    setInitialCoordinates(coordinates)
-    setEditingActivity(undefined)
-    setDialogOpen(true)
-  }
-
-  const handleEditActivity = (activity: Activity) => {
-    setEditingActivity(activity)
-    setDialogOpen(true)
-  }
-
-  const handleTransportClick = (transport: any) => {
-    console.log("Transport clicked", transport)
-  }
 
   const handleDeleteActivity = (id: string) => {
     if (window.confirm(t("delete") || "Delete?")) {
@@ -124,7 +96,7 @@ const TripDetailsPage = () => {
   }
 
   const handleDragEnd = () => {
-    // Minimal DnD logic for now
+    // Minimal DnD logic
   }
 
   const handleExportKML = async () => {
@@ -210,73 +182,31 @@ const TripDetailsPage = () => {
         setMembersDialogOpen={setMembersDialogOpen}
       />
 
-      <Box sx={{ maxWidth: 1600, mx: "auto", px: { xs: 1, md: 2 } }}>
-        {viewMode === "list" && (
-          <ItineraryView
-            trip={trip}
-            sensors={sensors}
-            handleDragEnd={handleDragEnd}
-            collapsedDays={collapsedDays}
-            toggleDayCollapse={toggleDayCollapse}
-            canEdit={canEdit}
-            handleAddActivity={handleAddActivity}
-            handleEditActivity={handleEditActivity}
-            handleDeleteActivity={handleDeleteActivity}
-            handleCopyActivity={handleCopyActivity}
-            setActiveFlyToLocation={setActiveFlyToLocation}
-            activeFlyToLocation={activeFlyToLocation}
-            mapExpanded={mapExpanded}
-            setMapExpanded={setMapExpanded}
-            isMobile={isMobile}
-            viewMode={viewMode}
-            handleSaveAnimation={handleSaveAnimation}
-            handleDeleteAnimation={handleDeleteAnimation}
-          />
-        )}
-
-        {viewMode === "prep" && <PreparationTab trip={trip} />}
-
-        {viewMode === "expenses" && (
-          <Box mt={3} sx={{ minHeight: 600 }}>
-            <ExpensesPanel
-              tripId={trip.id}
-              trip={trip}
-              defaultCurrency={trip.defaultCurrency}
-              currencies={trip.currencies}
-              onEditActivity={handleEditActivity}
-            />
-          </Box>
-        )}
-
-        {viewMode === "timeline" && trip.days && (
-          <TimelineCalendarView
-            days={trip.days}
-            transport={trip.transport}
-            onActivityClick={handleEditActivity}
-            onTransportClick={handleTransportClick}
-            onActivityUpdate={(id, data) => updateActivity({ id, data })}
-            onActivityCopy={handleCopyActivity}
-            onDayOperation={handleDayOperation}
-            onScenarioChange={async (_dayId, scenarioId) => {
-              if (scenarioId) {
-                await selectScenario(scenarioId)
-              }
-            }}
-            onCreateScenario={async (dayId, name) => {
-              await createScenario({ tripDayId: dayId, name })
-            }}
-            onRenameScenario={async (dayId, scenarioId, newName) => {
-              await updateScenario({ tripDayId: dayId, scenarioId, data: { name: newName } })
-            }}
-          />
-        )}
-
-        {viewMode === "journal" && (
-          <Box mt={3}>
-            <JournalPanel tripId={trip.id} days={trip.days || []} />
-          </Box>
-        )}
-      </Box>
+      <TripDetailsContent
+        viewMode={viewMode}
+        trip={trip}
+        sensors={sensors}
+        handleDragEnd={handleDragEnd}
+        collapsedDays={collapsedDays}
+        toggleDayCollapse={toggleDayCollapse}
+        canEdit={canEdit}
+        handleAddActivity={handleAddActivity}
+        handleEditActivity={handleEditActivity}
+        handleDeleteActivity={handleDeleteActivity}
+        handleCopyActivity={handleCopyActivity}
+        setActiveFlyToLocation={setActiveFlyToLocation}
+        activeFlyToLocation={activeFlyToLocation}
+        mapExpanded={mapExpanded}
+        setMapExpanded={setMapExpanded}
+        isMobile={isMobile}
+        handleSaveAnimation={handleSaveAnimation}
+        handleDeleteAnimation={handleDeleteAnimation}
+        handleDayOperation={handleDayOperation}
+        updateActivity={updateActivity}
+        selectScenario={selectScenario}
+        createScenario={createScenario}
+        updateScenario={updateScenario}
+      />
 
       {/* Dialogs */}
       <ActivityDialog
@@ -300,7 +230,6 @@ const TripDetailsPage = () => {
         onUpdate={updateTrip}
       />
 
-      {/* Members dialog would go here if we had one extracted - passing setter for header button */}
       {membersDialogOpen && (
         <Alert
           severity="info"
