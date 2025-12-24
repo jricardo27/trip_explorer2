@@ -167,6 +167,7 @@ export const TimelineCalendarView = ({
   const MIN_ACTIVITY_HEIGHT = isMobile ? 40 : 20
   const DAY_COLUMN_WIDTH = isMobile ? 150 : 200
   const TIME_RULER_WIDTH = isMobile ? 50 : 60
+  const DAY_HEADER_HEIGHT = 145 // Matches minHeight in day header Paper component
 
   const hours = useMemo(() => Array.from({ length: 24 }, (_, i) => i), [])
   const [dragPreview, setDragPreview] = useState<{
@@ -213,7 +214,12 @@ export const TimelineCalendarView = ({
 
     const activity: Activity = JSON.parse(activityData)
     const rect = e.currentTarget.getBoundingClientRect()
-    const yOffset = e.clientY - rect.top - 60 // Subtract header height
+
+    // Calculate dynamic header height
+    const headerElement = document.querySelector(`[data-header-id="header-${day.id}"]`)
+    const headerHeight = headerElement ? headerElement.getBoundingClientRect().height : DAY_HEADER_HEIGHT
+
+    const yOffset = e.clientY - rect.top - headerHeight
     const minutesFromDayStart = Math.max(0, (yOffset / HOUR_HEIGHT) * 60)
 
     // Calculate new start time
@@ -238,7 +244,12 @@ export const TimelineCalendarView = ({
     e.dataTransfer.dropEffect = "move"
 
     const rect = e.currentTarget.getBoundingClientRect()
-    const yOffset = e.clientY - rect.top - 60
+
+    // Calculate dynamic header height
+    const headerElement = document.querySelector(`[data-header-id="header-${day.id}"]`)
+    const headerHeight = headerElement ? headerElement.getBoundingClientRect().height : DAY_HEADER_HEIGHT
+
+    const yOffset = e.clientY - rect.top - headerHeight
     const minutesFromDayStart = Math.max(0, (yOffset / HOUR_HEIGHT) * 60)
     const newStart = dayjs(day.date).startOf("day").add(minutesFromDayStart, "minute")
 
@@ -471,13 +482,13 @@ export const TimelineCalendarView = ({
       <Box
         sx={{
           display: "flex",
-          height: isMobile ? "calc(100vh - 200px)" : "calc(100vh - 250px)",
-          maxHeight: isMobile ? "calc(100vh - 200px)" : "calc(100vh - 250px)",
+          height: isMobile ? "calc(100vh - 200px)" : "calc(95vh - 250px)",
+          maxHeight: isMobile ? "calc(100vh - 200px)" : "calc(95vh - 250px)",
           overflow: "auto",
           position: "relative",
           "&::-webkit-scrollbar": {
-            height: isMobile ? 10 : 14,
-            width: isMobile ? 10 : 14,
+            height: isMobile ? 10 : 12,
+            width: isMobile ? 10 : 12,
           },
           "&::-webkit-scrollbar-track": {
             bgcolor: "grey.200",
@@ -524,6 +535,7 @@ export const TimelineCalendarView = ({
                 }}
               >
                 <Paper
+                  data-header-id={`header-${day.id}`}
                   elevation={day.scenarios?.some((s) => s.isSelected) ? 2 : 1}
                   sx={{
                     p: 1.5,
@@ -536,7 +548,7 @@ export const TimelineCalendarView = ({
                     display: "flex",
                     flexDirection: "column",
                     gap: 1,
-                    minHeight: 110, // Enforce consistent height
+                    minHeight: DAY_HEADER_HEIGHT, // Enforce consistent height
                   }}
                 >
                   {/* Day Name & Date */}
@@ -891,7 +903,7 @@ export const TimelineCalendarView = ({
           }}
         >
           {/* Header Spacer */}
-          <Box sx={{ height: 60, borderBottom: "2px solid #e0e0e0" }} />
+          <Box sx={{ height: DAY_HEADER_HEIGHT, borderBottom: "2px solid #e0e0e0" }} />
 
           {/* Hour Labels */}
           <Box sx={{ position: "relative", height: HOUR_HEIGHT * 24 }}>

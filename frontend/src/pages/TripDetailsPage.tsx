@@ -109,7 +109,7 @@ const TripDetailsPage = () => {
     moveActivities,
     swapDays,
     updateDay,
-    createAnimation, // Restored
+    createAnimation,
     updateAnimation,
     deleteAnimation,
     selectScenario,
@@ -458,6 +458,16 @@ const TripDetailsPage = () => {
             <Typography variant="h5" component="h1">
               {trip.name}
             </Typography>
+            <Chip
+              label={`${dayjs(trip.startDate).format("MMM D")} - ${dayjs(trip.endDate).format("MMM D, YYYY")}`}
+              variant="outlined"
+              size="small"
+              sx={{ ml: 1 }}
+            />
+            <Box display="flex" gap={1} flexShrink={0}>
+              {trip.destination && <Chip label={trip.destination} variant="outlined" size="small" />}
+              <Chip label={`${trip.days?.length || 0} ${t("days")}`} variant="outlined" size="small" />
+            </Box>
           </Box>
           <Box display="flex" gap={1}>
             <Button
@@ -487,25 +497,72 @@ const TripDetailsPage = () => {
           </Box>
         </Box>
 
-        <Box sx={{ mt: 2, display: "flex", gap: 1, overflowX: "auto", pb: 1 }}>
-          <Chip
-            label={`${dayjs(trip.startDate).format("MMM D")} - ${dayjs(trip.endDate).format("MMM D, YYYY")}`}
-            variant="outlined"
-          />
-          {trip.destination && <Chip label={trip.destination} variant="outlined" />}
-          <Chip label={`${trip.days?.length || 0} ${t("days")}`} variant="outlined" />
+        <Box
+          sx={{
+            mt: 2,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            overflowX: "auto",
+            pb: 1,
+            borderTop: 1,
+            borderColor: "divider",
+            pt: 1,
+          }}
+        >
+          <Box className="no-print">
+            <Tabs
+              value={viewMode}
+              onChange={handleViewModeChange}
+              centered
+              sx={{ minHeight: "32px", "& .MuiTab-root": { minHeight: "32px", py: 0 } }}
+            >
+              <Tab
+                icon={<ListIcon sx={{ fontSize: "1.1rem" }} />}
+                label={t("itinerary")}
+                iconPosition="start"
+                value="list"
+                sx={{ minHeight: "32px" }}
+              />
+              <Tab
+                icon={<PrepIcon sx={{ fontSize: "1.1rem" }} />}
+                label={t("preparation")}
+                iconPosition="start"
+                value="prep"
+                sx={{ minHeight: "32px" }}
+              />
+              <Tab
+                icon={<ExpenseIcon sx={{ fontSize: "1.1rem" }} />}
+                label={t("expenses")}
+                iconPosition="start"
+                value="expenses"
+                sx={{ minHeight: "32px" }}
+              />
+              <Tab
+                icon={<TimelineIcon sx={{ fontSize: "1.1rem" }} />}
+                label={t("timeline")}
+                iconPosition="start"
+                value="timeline"
+                sx={{ minHeight: "32px" }}
+              />
+              <Tab
+                icon={<JournalIcon sx={{ fontSize: "1.1rem" }} />}
+                label={t("journal")}
+                iconPosition="start"
+                value="journal"
+                sx={{ minHeight: "32px" }}
+              />
+              <Tab
+                icon={<AnimationIcon sx={{ fontSize: "1.1rem" }} />}
+                label={t("animation")}
+                iconPosition="start"
+                value="animation"
+                sx={{ minHeight: "32px" }}
+              />
+            </Tabs>
+          </Box>
         </Box>
       </Paper>
-      <Box className="no-print" sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-        <Tabs value={viewMode} onChange={handleViewModeChange} sx={{ bgcolor: "background.paper" }}>
-          <Tab icon={<ListIcon />} label={t("itinerary")} iconPosition="start" value="list" />
-          <Tab icon={<PrepIcon />} label={t("preparation")} iconPosition="start" value="prep" />
-          <Tab icon={<ExpenseIcon />} label={t("expenses")} iconPosition="start" value="expenses" />
-          <Tab icon={<TimelineIcon />} label={t("timeline")} iconPosition="start" value="timeline" />
-          <Tab icon={<JournalIcon />} label={t("journal")} iconPosition="start" value="journal" />
-          <Tab icon={<AnimationIcon />} label={t("animation")} iconPosition="start" value="animation" />
-        </Tabs>
-      </Box>
 
       <Box sx={{ maxWidth: 1600, mx: "auto", px: { xs: 1, md: 2 } }}>
         {viewMode === "list" && (
