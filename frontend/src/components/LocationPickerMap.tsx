@@ -66,13 +66,18 @@ const LocationPickerMap = ({
   )
   const { t } = useLanguageStore()
 
-  // Reset position when open changes or initials change
-  useEffect(() => {
-    if (open) {
-      const newPos: [number, number] | null = initialLat && initialLng ? [initialLat, initialLng] : null
-      setPosition(newPos)
-    }
-  }, [open, initialLat, initialLng])
+  // Mirror props to state (Derived State Pattern)
+  const [prevOpen, setPrevOpen] = useState(open)
+  const [prevLat, setPrevLat] = useState(initialLat)
+  const [prevLng, setPrevLng] = useState(initialLng)
+
+  if (open !== prevOpen || initialLat !== prevLat || initialLng !== prevLng) {
+    setPrevOpen(open)
+    setPrevLat(initialLat)
+    setPrevLng(initialLng)
+    const newPos: [number, number] | null = initialLat && initialLng ? [initialLat, initialLng] : null
+    setPosition(newPos)
+  }
 
   const defaultCenter: [number, number] = [-25.2744, 133.7751] // Australia center
 
