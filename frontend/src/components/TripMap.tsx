@@ -34,7 +34,7 @@ import { createRoot } from "react-dom/client"
 import { renderToStaticMarkup } from "react-dom/server"
 import { BsFuelPump } from "react-icons/bs"
 import { MdHotel, MdKayaking, MdLocalGasStation, MdWc, MdPark, MdPlace } from "react-icons/md"
-import { GeoJSON, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents, LayersControl } from "react-leaflet"
+import { GeoJSON, MapContainer, useMap, useMapEvents, LayersControl, TileLayer } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 
 import { MARKER_MANIFEST } from "../data/markerManifest"
@@ -648,14 +648,6 @@ export const TripMap = (props: TripMapProps) => {
     [activities, days],
   )
 
-  const filteredActivities = useMemo(
-    () =>
-      selectedDays.length > 0
-        ? activities?.filter((a) => a.tripDayId && selectedDays.includes(a.tripDayId))
-        : activities,
-    [activities, selectedDays],
-  )
-
   useEffect(() => {
     if (!isPlaying && selectedActivityId) {
       const activity = activities?.find((a) => a.id === selectedActivityId)
@@ -876,16 +868,7 @@ export const TripMap = (props: TripMapProps) => {
             </>
           )}
 
-          {!isPlaying &&
-            filteredActivities?.map(
-              (activity) =>
-                activity.latitude &&
-                activity.longitude && (
-                  <Marker key={activity.id} position={[activity.latitude, activity.longitude]}>
-                    <Popup>{activity.name}</Popup>
-                  </Marker>
-                ),
-            )}
+          {/* Default markers removed to avoid double-rendering with TripAnimationLayer */}
 
           {sortedActivities && sortedActivities.length > 0 && (
             <TripAnimationLayer

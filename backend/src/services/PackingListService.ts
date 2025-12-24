@@ -22,7 +22,7 @@ export class PackingListService {
   async listTripItems(tripId: string): Promise<TripPackingItem[]> {
     return prisma.tripPackingItem.findMany({
       where: { tripId },
-      orderBy: [{ category: "asc" }, { priority: "desc" }],
+      orderBy: [{ category: "asc" }, { priority: "desc" }, { createdAt: "asc" }],
     })
   }
 

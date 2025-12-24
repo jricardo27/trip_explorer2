@@ -58,7 +58,15 @@ export const useTripDetails = (tripId: string) => {
   })
 
   const reorderActivitiesMutation = useMutation({
-    mutationFn: async (updates: { activityId: string; orderIndex: number; tripDayId?: string }[]) => {
+    mutationFn: async (
+      updates: {
+        activityId: string
+        orderIndex: number
+        tripDayId?: string
+        scheduledStart?: string | null
+        scheduledEnd?: string | null
+      }[],
+    ) => {
       await client.post("/activities/reorder", { tripId, updates })
     },
     onSuccess: () => {
@@ -146,10 +154,51 @@ export const useTripDetails = (tripId: string) => {
   })
 
   // Day Rename/Notes (General Update)
+  // Day Rename/Notes (General Update)
   const updateDayMutation = useMutation({
     mutationFn: async ({ dayId, updates }: { dayId: string; updates: { name?: string; notes?: string } }) => {
       const response = await client.put(`/trips/${tripId}/days/${dayId}`, updates)
       return response.data.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
+  // Scenario Mutations
+  const createScenarioMutation = useMutation({
+    mutationFn: async ({ tripDayId, name, description }: { tripDayId: string; name: string; description?: string }) => {
+      const response = await client.post(`/scenarios/days/${tripDayId}/scenarios`, { name, description })
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
+  const selectScenarioMutation = useMutation({
+    mutationFn: async (scenarioId: string) => {
+      if (!scenarioId) return // Handle deselect if needed
+      const response = await client.post(`/scenarios/scenarios/${scenarioId}/select`)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
+  const updateScenarioMutation = useMutation({
+    mutationFn: async ({
+      tripDayId,
+      scenarioId,
+      data,
+    }: {
+      tripDayId: string
+      scenarioId: string
+      data: { name: string; description?: string }
+    }) => {
+      const response = await client.put(`/scenarios/days/${tripDayId}/scenarios/${scenarioId}`, data)
+      return response.data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
@@ -182,5 +231,8 @@ export const useTripDetails = (tripId: string) => {
     swapDays: swapDaysMutation.mutateAsync,
     moveDay: moveDayMutation.mutateAsync,
     updateDay: updateDayMutation.mutateAsync,
+    createScenario: createScenarioMutation.mutateAsync,
+    selectScenario: selectScenarioMutation.mutateAsync,
+    updateScenario: updateScenarioMutation.mutateAsync,
   }
 }

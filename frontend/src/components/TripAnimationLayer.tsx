@@ -14,7 +14,7 @@ import {
   MdHelp,
   MdDirectionsCar,
 } from "react-icons/md"
-import { Marker, Polyline, useMap, Tooltip as LeafletTooltip } from "react-leaflet"
+import { Marker, Polyline, useMap, Tooltip as LeafletTooltip, Popup } from "react-leaflet"
 
 import { getTransportIconComponent } from "../constants/transportModes"
 import type { Activity } from "../types"
@@ -523,6 +523,16 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
                 <strong>{activity.name}</strong>
               </LeafletTooltip>
             )}
+            <Popup>
+              <strong>{activity.name}</strong>
+              {activity.description && (
+                <div>
+                  <br />
+                  {activity.description.substring(0, 100)}
+                  {activity.description.length > 100 && "..."}
+                </div>
+              )}
+            </Popup>
           </Marker>
         )
       })}

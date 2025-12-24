@@ -22,7 +22,7 @@ export class ChecklistService {
   async listTripItems(tripId: string): Promise<TripChecklistItem[]> {
     return prisma.tripChecklistItem.findMany({
       where: { tripId },
-      orderBy: [{ category: "asc" }, { priority: "desc" }],
+      orderBy: [{ category: "asc" }, { priority: "desc" }, { createdAt: "asc" }],
     })
   }
 

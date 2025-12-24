@@ -214,6 +214,7 @@ export const translations = {
     noTime: "No time",
     flyToLocation: "Fly to location on map",
     copyActivity: "Copy this activity",
+    copyActivityAsLink: "Copy as Link (Synced)",
     notAvailableOn: "This activity is usually not available on",
 
     availableDaysLabel: "Available days",
@@ -307,6 +308,11 @@ export const translations = {
     availableDaysHint: "Usually available on these days",
     whoIsGoing: "Who is going?",
     noMembers: "No members in this trip",
+    phone: "Phone",
+    email: "Email",
+    website: "Website",
+    openingHours: "Opening Hours",
+    location: "Location",
     deleteActivity: "Delete Activity",
     activityDescription: "Description",
     selectLocation: "Select Location",
@@ -379,6 +385,13 @@ export const translations = {
     deletedSuccessfully: "Deleted successfully!",
     createdSuccessfully: "Created successfully!",
     updatedSuccessfully: "Updated successfully!",
+
+    // Scenarios
+    mainPlan: "Main Plan",
+    createAlternative: "Create Alternative",
+    renameScenario: "Rename Scenario",
+    scenarioName: "Scenario Name",
+    enterScenarioName: "Enter Scenario Name",
   },
   es: {
     // Navigation
@@ -595,7 +608,15 @@ export const translations = {
     noTime: "Sin hora",
     flyToLocation: "Volar a la ubicación en el mapa",
     copyActivity: "Copiar esta actividad",
+    copyActivityAsLink: "Copiar como Enlace (Sincronizado)",
     notAvailableOn: "Esta actividad generalmente no está disponible en",
+
+    // Scenarios
+    mainPlan: "Plan Principal",
+    createAlternative: "Crear Alternativa",
+    renameScenario: "Renombrar Escenario",
+    scenarioName: "Nombre del Escenario",
+    enterScenarioName: "Ingresar Nombre",
 
     availableDaysLabel: "Días disponibles",
 
@@ -668,7 +689,7 @@ export const translations = {
     viewActivity: "Ver Actividad",
     editActivity: "Editar Actividad",
     activityName: "Nombre de la Actividad",
-    type: "Tipo",
+    // type: "Tipo", // Removed duplicate
     priority: "Prioridad",
     standard: "Estándar",
     optional: "Opcional",
@@ -692,6 +713,7 @@ export const translations = {
     phone: "Teléfono",
     email: "Correo Electrónico",
     website: "Sitio Web",
+    openingHours: "Horario de Apertura",
     location: "Ubicación",
     deleteActivity: "Eliminar Actividad",
     activityDescription: "Descripción",

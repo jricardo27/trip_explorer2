@@ -7,6 +7,7 @@ import {
   DirectionsBoat,
   PedalBike,
   MoreVert,
+  Edit,
 } from "@mui/icons-material"
 import {
   Box,
@@ -44,7 +45,11 @@ interface TimelineCalendarViewProps {
     activityId: string,
     updates: { scheduledStart?: string; scheduledEnd?: string; tripDayId?: string },
   ) => void
+  onActivityCopy?: (activityId: string, asLink?: boolean) => void
   onDayOperation?: (type: "move_all" | "swap" | "rename", dayId: string, payload: any) => Promise<void>
+  onScenarioChange?: (dayId: string, scenarioId: string | null) => void
+  onCreateScenario?: (dayId: string, name: string) => void
+  onRenameScenario?: (dayId: string, scenarioId: string, newName: string) => void
 }
 
 // Responsive constants will be set inside component based on breakpoint
@@ -146,7 +151,11 @@ export const TimelineCalendarView = ({
   onActivityClick,
   onTransportClick,
   onActivityUpdate,
+  onActivityCopy,
   onDayOperation,
+  onScenarioChange,
+  onCreateScenario,
+  onRenameScenario,
 }: TimelineCalendarViewProps) => {
   // Responsive breakpoints
   const { t } = useLanguageStore()
@@ -172,6 +181,7 @@ export const TimelineCalendarView = ({
     mouseY: number
     dayId: string
     time: string
+    activityId?: string // Optional, if clicked on an activity
   } | null>(null)
   const [expandedActivityId, setExpandedActivityId] = useState<string | null>(null)
 
@@ -257,8 +267,9 @@ export const TimelineCalendarView = ({
     setDragPreview(null)
   }
 
-  const handleContextMenu = (e: React.MouseEvent, day: TripDay) => {
+  const handleContextMenu = (e: React.MouseEvent, day: TripDay, activityId?: string) => {
     e.preventDefault()
+    e.stopPropagation() // Prevent bubbling
     const rect = e.currentTarget.getBoundingClientRect()
     const yOffset = e.clientY - rect.top - 60
     const minutesFromDayStart = Math.max(0, (yOffset / HOUR_HEIGHT) * 60)
@@ -269,6 +280,7 @@ export const TimelineCalendarView = ({
       mouseY: e.clientY,
       dayId: day.id,
       time: time.toISOString(),
+      activityId,
     })
   }
 
@@ -289,6 +301,54 @@ export const TimelineCalendarView = ({
     }
     handleCloseContextMenu()
   }
+
+  const handleCopyActivity = (asLink: boolean) => {
+    if (contextMenu?.activityId && onActivityCopy) {
+      onActivityCopy(contextMenu.activityId, asLink)
+    }
+    handleCloseContextMenu()
+  }
+
+  // Scenario Dialog State
+  const [scenarioDialog, setScenarioDialog] = useState<{
+    open: boolean
+    mode: "create" | "rename"
+    dayId: string
+    scenarioId?: string
+    initialName?: string
+  }>({ open: false, mode: "create", dayId: "" })
+  const [scenarioNameInput, setScenarioNameInput] = useState("")
+
+  const handleOpenCreateScenario = (dayId: string) => {
+    setScenarioDialog({ open: true, mode: "create", dayId })
+    setScenarioNameInput("")
+  }
+
+  const handleOpenRenameScenario = (dayId: string, scenarioId: string, currentName: string) => {
+    setScenarioDialog({ open: true, mode: "rename", dayId, scenarioId, initialName: currentName })
+    setScenarioNameInput(currentName)
+  }
+
+  const handleScenarioDialogSubmit = () => {
+    const { mode, dayId, scenarioId } = scenarioDialog
+    if (!scenarioNameInput.trim()) return
+
+    if (mode === "create" && onCreateScenario) {
+      onCreateScenario(dayId, scenarioNameInput)
+    } else if (mode === "rename" && onRenameScenario && scenarioId) {
+      onRenameScenario(dayId, scenarioId, scenarioNameInput)
+    }
+    setScenarioDialog({ ...scenarioDialog, open: false })
+  }
+
+  // Scroll to hour on mount or update
+  // ... (keeping existing scroll logic implicit if not touching it, but I need a unique anchor)
+
+  // Let's use the END of a specific function or the START of Day Menu Logic variables.
+  // Viewing file showed Day Menu Logic starts around line 304 in previous views? No, based on context...
+  // I'll search for "const [dayMenuAnchor, setDayMenuAnchor]" to be safe.
+
+  // New Content:
 
   // Day Menu Logic
   const [dayMenuAnchor, setDayMenuAnchor] = useState<{ el: HTMLElement; dayId: string } | null>(null)
@@ -385,6 +445,29 @@ export const TimelineCalendarView = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Scenario Create/Rename Dialog */}
+      <Dialog open={scenarioDialog.open} onClose={() => setScenarioDialog({ ...scenarioDialog, open: false })}>
+        <DialogTitle>{scenarioDialog.mode === "create" ? t("createAlternative") : t("renameScenario")}</DialogTitle>
+        <DialogContent sx={{ minWidth: 300, pt: 2 }}>
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <TextField
+              autoFocus
+              label={t("scenarioName")}
+              value={scenarioNameInput}
+              onChange={(e) => setScenarioNameInput(e.target.value)}
+              fullWidth
+            />
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setScenarioDialog({ ...scenarioDialog, open: false })}>{t("cancel")}</Button>
+          <Button onClick={handleScenarioDialogSubmit} variant="contained">
+            {t("confirm")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Box
         sx={{
           display: "flex",
@@ -411,7 +494,12 @@ export const TimelineCalendarView = ({
         {/* Day Columns */}
         <Box sx={{ display: "flex", flexGrow: 1, position: "relative" }}>
           {days.map((day) => {
-            const dayActivities = (day.activities || []).filter((a) => a.scheduledStart)
+            // Determine which activities to show: Main Plan (scenarioId=null) or Selected Scenario
+            const activeScenario = day.scenarios?.find((s) => s.isSelected)
+            const allDayActivities = activeScenario ? activeScenario.activities || [] : day.activities || []
+
+            // Filter for timeline rendering (must have time)
+            const dayActivities = allDayActivities.filter((a) => a.scheduledStart)
             const lanes = calculateActivityLanes(dayActivities)
 
             return (
@@ -424,33 +512,120 @@ export const TimelineCalendarView = ({
                 sx={{
                   width: DAY_COLUMN_WIDTH,
                   minWidth: DAY_COLUMN_WIDTH,
-                  minHeight: HOUR_HEIGHT * 24 + 60, // 24 hours + header height
+                  minHeight: "100%", // Fill parent
+                  height: "max-content", // Allow growth
                   borderRight: "1px solid #e0e0e0",
                   position: "relative",
                   flexShrink: 0,
+                  bgcolor: day.scenarios?.some((s) => s.isSelected) ? "#f8faff" : "transparent", // Light blue tint for active scenario
+                  backgroundImage: day.scenarios?.some((s) => s.isSelected)
+                    ? "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(25, 118, 210, 0.03) 10px, rgba(25, 118, 210, 0.03) 20px)"
+                    : "none",
                 }}
               >
                 <Paper
+                  elevation={day.scenarios?.some((s) => s.isSelected) ? 2 : 1}
                   sx={{
-                    p: 1,
+                    p: 1.5,
                     position: "sticky",
                     top: 0,
                     zIndex: 10,
                     bgcolor: "background.paper",
-                    borderBottom: "2px solid #e0e0e0",
+                    borderBottom: "2px solid",
+                    borderBottomColor: day.scenarios?.some((s) => s.isSelected) ? "primary.main" : "#e0e0e0",
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    flexDirection: "column",
+                    gap: 1,
+                    minHeight: 110, // Enforce consistent height
                   }}
                 >
-                  <Box sx={{ flexGrow: 1, textAlign: "center" }}>
-                    <Typography variant="subtitle2" fontWeight="bold">
-                      {day.name || `Day ${day.dayNumber || (day.dayIndex !== undefined ? day.dayIndex + 1 : "?")}`}
+                  {/* Day Name & Date */}
+                  <Box sx={{ textAlign: "center" }}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {day.name || `Day ${day.dayIndex + 1}`}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {dayjs(day.date).format("MMM D")}
+                      {dayjs(day.date).format("MMM D, YYYY")}
                     </Typography>
                   </Box>
+                  <FormControl variant="standard" size="small" sx={{ minWidth: 120 }}>
+                    <Select
+                      value={day.scenarios?.find((s) => s.isSelected)?.id || "main"}
+                      displayEmpty
+                      onChange={(e) => {
+                        const val = e.target.value
+                        if (val === "create_new") {
+                          handleOpenCreateScenario(day.id)
+                        } else {
+                          onScenarioChange?.(day.id, val === "main" ? null : val)
+                        }
+                      }}
+                      inputProps={{ "aria-label": "Scenario" }}
+                      sx={{
+                        "& .MuiSelect-select": { py: 0, fontSize: "0.875rem", fontWeight: "bold" },
+                        // Conditional styling for the select text itself could go here
+                      }}
+                    >
+                      <MenuItem value="main">{t("mainPlan") || "Main Plan"}</MenuItem>
+                      {day.scenarios?.map((scenario) => (
+                        <MenuItem key={scenario.id} value={scenario.id}>
+                          {scenario.name}
+                        </MenuItem>
+                      ))}
+                      <MenuItem value="create_new" sx={{ fontStyle: "italic", borderTop: "1px solid #eee" }}>
+                        + {t("createAlternative") || "Create Alternative"}
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                  {/* Rename Button for active custom scenario */}
+                  {day.scenarios?.find((s) => s.isSelected) && (
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        const active = day.scenarios?.find((s) => s.isSelected)
+                        if (active) handleOpenRenameScenario(day.id, active.id, active.name)
+                      }}
+                      sx={{ opacity: 0.6, "&:hover": { opacity: 1 }, p: 0.5, ml: 1 }}
+                    >
+                      <Edit fontSize="inherit" sx={{ fontSize: "0.875rem" }} />
+                    </IconButton>
+                  )}
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    {dayjs(day.date).format("MMM D")}
+                  </Typography>
+                  {/* Cost Display */}
+                  <Typography variant="caption" sx={{ color: "success.main", fontWeight: "bold", fontSize: "0.7rem" }}>
+                    {(() => {
+                      // Calculate Activity Costs
+                      const activityCost = allDayActivities.reduce((sum, a) => {
+                        // Fix: Ensure we don't treat null as 0 if it's meant to be unset.
+                        const hasActual = a.actualCost !== null && a.actualCost !== undefined
+                        const cost = hasActual ? Number(a.actualCost) : Number(a.estimatedCost) || 0
+                        return sum + cost
+                      }, 0)
+
+                      // Calculate Transport Costs (Starting from this day)
+                      const transportCost = (transport || [])
+                        .filter((t) => {
+                          if (!t.isSelected) return false
+                          const fromActivity = dayActivities.find((a) => a.id === t.fromActivityId)
+                          return !!fromActivity // If source activity is on this day, count it
+                        })
+                        .reduce((sum, t) => {
+                          return sum + (Number(t.cost) || 0)
+                        }, 0)
+
+                      const total = activityCost + transportCost
+                      // Identify currency from first activity/transport or default
+                      const currency = dayActivities[0]?.currency || "AUD"
+
+                      return total > 0
+                        ? `${new Intl.NumberFormat("en-AU", { style: "currency", currency }).format(total)}`
+                        : ""
+                    })()}
+                  </Typography>
+                  {/* Cost Display Logic Should Go Here if not already present, or after the Rename Button */}
+
                   <IconButton
                     size="small"
                     onClick={(e) => handleDayMenuOpen(e, day.id)}
@@ -520,6 +695,7 @@ export const TimelineCalendarView = ({
                         onClick={() => {
                           onActivityClick?.(activity)
                         }}
+                        onContextMenu={(e) => handleContextMenu(e, day, activity.id)}
                         sx={{
                           position: "absolute",
                           top: `${top}px`,
@@ -749,9 +925,20 @@ export const TimelineCalendarView = ({
           anchorReference="anchorPosition"
           anchorPosition={contextMenu !== null ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}
         >
-          <MenuItem onClick={handleAddActivityFromContext}>
-            {t("addActivityAt")} {contextMenu && dayjs(contextMenu.time).format("HH:mm")}
-          </MenuItem>
+          {contextMenu?.activityId ? (
+            <>
+              <MenuItem key="copy" onClick={() => handleCopyActivity(false)}>
+                {t("copyActivity")}
+              </MenuItem>
+              <MenuItem key="copy-link" onClick={() => handleCopyActivity(true)}>
+                {t("copyActivityAsLink")}
+              </MenuItem>
+            </>
+          ) : (
+            <MenuItem onClick={handleAddActivityFromContext}>
+              {t("addActivityAt")} {contextMenu && dayjs(contextMenu.time).format("HH:mm")}
+            </MenuItem>
+          )}
         </Menu>
       </Box>
     </>

@@ -207,6 +207,7 @@ export interface Activity {
   isGroupActivity: boolean
   source?: string
   externalId?: string
+  linkedGroupId?: string
   tags: string[]
   availableDays: string[]
   tripDay?: TripDay

@@ -69,7 +69,8 @@ const LocationPickerMap = ({
   // Reset position when open changes or initials change
   useEffect(() => {
     if (open) {
-      setPosition(initialLat && initialLng ? [initialLat, initialLng] : null)
+      const newPos: [number, number] | null = initialLat && initialLng ? [initialLat, initialLng] : null
+      setPosition(newPos)
     }
   }, [open, initialLat, initialLng])
 

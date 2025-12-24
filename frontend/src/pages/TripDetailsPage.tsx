@@ -109,9 +109,12 @@ const TripDetailsPage = () => {
     moveActivities,
     swapDays,
     updateDay,
-    createAnimation,
+    createAnimation, // Restored
     updateAnimation,
     deleteAnimation,
+    selectScenario,
+    createScenario,
+    updateScenario,
   } = useTripDetails(tripId!)
 
   const currentUser = useAuthStore((state) => state.user)
@@ -196,8 +199,11 @@ const TripDetailsPage = () => {
   }
 
   const handleEditActivity = (activity: Activity) => {
-    setEditingActivity(activity)
-    setSelectedDayId(activity.tripDayId)
+    // Look up the activity in the current trip state to ensure we have the latest version
+    // (prevents issues where child components might pass a stale activity object)
+    const freshActivity = trip?.activities?.find((a) => a.id === activity.id) || activity
+    setEditingActivity(freshActivity)
+    setSelectedDayId(freshActivity.tripDayId)
     setDialogOpen(true)
   }
 
@@ -216,9 +222,9 @@ const TripDetailsPage = () => {
     }
   }
 
-  const handleCopyActivity = async (activity: Activity) => {
+  const handleCopyActivity = async (activityId: string, asLink?: boolean) => {
     try {
-      await client.post(`/activities/${activity.id}/copy`)
+      await client.post(`/activities/${activityId}/copy`, { asLink })
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
     } catch (error) {
       console.error("Failed to copy activity:", error)
@@ -264,7 +270,13 @@ const TripDetailsPage = () => {
       ? overActivities.length
       : overActivities.findIndex((a) => a.id === overId)
 
-    let updates: { activityId: string; orderIndex: number; tripDayId?: string }[] = []
+    let updates: {
+      activityId: string
+      orderIndex: number
+      tripDayId?: string
+      scheduledStart?: string | null
+      scheduledEnd?: string | null
+    }[] = []
 
     if (activeDay.id === overDay.id) {
       // Reorder within the same day
@@ -279,15 +291,29 @@ const TripDetailsPage = () => {
       overActivities.splice(overIndex, 0, movedActivity)
 
       // Get updates for both days
+      // Calculate date shift
+      const dayDiff = dayjs(overDay.date).startOf("day").diff(dayjs(activeDay.date).startOf("day"), "day")
+
       const activeUpdates = activeActivities.map((a, idx) => ({
         activityId: a.id,
         orderIndex: idx,
       }))
-      const overUpdates = overActivities.map((a, idx) => ({
-        activityId: a.id,
-        orderIndex: idx,
-        tripDayId: overDay.id,
-      }))
+      const overUpdates = overActivities.map((a, idx) => {
+        const update: any = {
+          activityId: a.id,
+          orderIndex: idx,
+          tripDayId: overDay.id,
+        }
+
+        // If this is the moved activity, shift its dates
+        if (a.id === activeId && a.scheduledStart && dayDiff !== 0) {
+          update.scheduledStart = dayjs(a.scheduledStart).add(dayDiff, "day").toISOString()
+          if (a.scheduledEnd) {
+            update.scheduledEnd = dayjs(a.scheduledEnd).add(dayDiff, "day").toISOString()
+          }
+        }
+        return update
+      })
       updates = [...activeUpdates, ...overUpdates]
     }
 
@@ -489,9 +515,12 @@ const TripDetailsPage = () => {
                 <Grid size={{ xs: 12, md: 7 }}>
                   {trip.days?.map((day) => {
                     const isCollapsed = collapsedDays.has(day.id)
+                    const activeScenario = day.scenarios?.find((s) => s.isSelected)
+                    const displayActivities = activeScenario ? activeScenario.activities || [] : day.activities
+
                     return (
                       <Box key={day.id} sx={{ mb: 3 }}>
-                        <Paper sx={{ p: 2 }}>
+                        <Paper sx={{ p: 2, bgcolor: activeScenario ? "#f8faff" : "background.paper" }}>
                           <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                             <Box display="flex" alignItems="center" gap={1}>
                               <IconButton size="small" onClick={() => toggleDayCollapse(day.id)}>
@@ -499,12 +528,21 @@ const TripDetailsPage = () => {
                               </IconButton>
                               <Typography variant="h6" color="primary">
                                 Day {day.dayNumber}: {day.name || dayjs(day.date).format("MMMM D, YYYY")}
+                                {activeScenario && (
+                                  <Chip
+                                    label={activeScenario.name}
+                                    size="small"
+                                    sx={{ ml: 1 }}
+                                    color="secondary"
+                                    variant="outlined"
+                                  />
+                                )}
                               </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" gap={1}>
                               {(() => {
-                                const dayCost = day.activities.reduce(
-                                  (sum, activity) => sum + (activity.estimatedCost || 0),
+                                const dayCost = displayActivities.reduce(
+                                  (sum, activity) => sum + (Number(activity.estimatedCost) || 0),
                                   0,
                                 )
                                 const costColor =
@@ -535,10 +573,10 @@ const TripDetailsPage = () => {
                           <Collapse in={!isCollapsed}>
                             <DroppableDay dayId={day.id}>
                               <SortableContext
-                                items={day.activities.map((a) => a.id)}
+                                items={displayActivities.map((a) => a.id)}
                                 strategy={verticalListSortingStrategy}
                               >
-                                {day.activities
+                                {displayActivities
                                   .slice()
                                   .sort((a, b) => {
                                     if (!a.scheduledStart || !b.scheduledStart) return 0
@@ -551,7 +589,7 @@ const TripDetailsPage = () => {
                                         canEdit={canEdit}
                                         onEdit={() => handleEditActivity(activity)}
                                         onDelete={() => handleDeleteActivity(activity.id)}
-                                        onCopy={() => handleCopyActivity(activity)}
+                                        onCopy={(act, asLink) => handleCopyActivity(act.id, asLink)}
                                         onFlyTo={(act) =>
                                           act.latitude &&
                                           act.longitude &&
@@ -640,7 +678,39 @@ const TripDetailsPage = () => {
             onActivityClick={handleEditActivity}
             onTransportClick={handleTransportClick}
             onActivityUpdate={(id, data) => updateActivity({ id, data })}
+            onActivityCopy={handleCopyActivity}
             onDayOperation={handleDayOperation}
+            onScenarioChange={async (dayId, scenarioId) => {
+              if (scenarioId) {
+                await selectScenario(scenarioId)
+              } else {
+                // Handle switching to main plan (which might be just deselecting all?
+                // The current backend selectScenario logic deselects others.
+                // If we want "Main Plan" (no scenario selected), we might need a deselect endpoint or logic.
+                // Assuming "Main Plan" just means no scenario is selected aka showing default activities?
+                // Actually the current TripService returns all activities anyway?
+                // Wait, if a scenario is selected, the UI should probably filtering?
+                // No, the TripService normally returns ALL activities.
+                // The `DayScenario` logic seems to be: Activities can belong to a scenario.
+                // If I select a "Main Plan", probably I want to see activities with `scenarioId: null`.
+                // If I select a Scenario, I want to see activities with `scenarioId: SCENARIO_ID`.
+                // Backend `selectScenario` sets `isSelected=true`.
+                // Frontend should probably rely on this field.
+                // But if I want to switch back to "Main Plan"?
+                // I need to deselect active scenario for that day.
+                // The current backend doesn't seem to have a "deselect all for day" endpoint easily exposed
+                // except maybe iterating?
+                // I'll assume for now switching to another scenario works. Switching to "Main Plan" (empty id)
+                // might need a new endpoint or careful handling.
+                // Let's implement a 'deselect' call if needed, or update the select endpoint to handle null?
+                // The `selectScenario` in backend requires an ID.
+                console.log("Switching to Main Plan not fully implemented in backend yet without ID")
+              }
+            }}
+            onCreateScenario={(dayId, name) => createScenario({ tripDayId: dayId, name })}
+            onRenameScenario={(dayId, scenarioId, newName) =>
+              updateScenario({ tripDayId: dayId, scenarioId, data: { name: newName } })
+            }
           />
         )}
 
@@ -773,6 +843,7 @@ const TripDetailsPage = () => {
         tripStartDate={trip.startDate}
         fullScreen={isMobile}
         initialCoordinates={prefilledCoordinates}
+        onCopy={handleCopyActivity}
         canEdit={canEdit}
       />
       <TripMembersDialog

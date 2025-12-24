@@ -165,6 +165,7 @@ export class ActivityService {
       "phone",
       "email",
       "website",
+      "openingHours",
       "estimatedCost",
       "currency",
       "isLocked",
@@ -309,7 +310,13 @@ export class ActivityService {
 
   async reorderActivities(
     tripId: string,
-    updates: { activityId: string; orderIndex: number; tripDayId?: string }[],
+    updates: {
+      activityId: string
+      orderIndex: number
+      tripDayId?: string
+      scheduledStart?: Date | string | null
+      scheduledEnd?: Date | string | null
+    }[],
   ): Promise<void> {
     await prisma.$transaction(
       updates.map((update) =>
@@ -318,6 +325,8 @@ export class ActivityService {
           data: {
             orderIndex: update.orderIndex,
             ...(update.tripDayId !== undefined && { tripDayId: update.tripDayId }),
+            ...(update.scheduledStart !== undefined && { scheduledStart: update.scheduledStart }),
+            ...(update.scheduledEnd !== undefined && { scheduledEnd: update.scheduledEnd }),
           },
         }),
       ),

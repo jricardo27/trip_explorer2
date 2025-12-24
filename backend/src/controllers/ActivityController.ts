@@ -128,10 +128,12 @@ class ActivityController {
 
   async copyActivity(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = (req as any).user.id
+      // const userId = (req as any).user.id // Unused in copyActivity now
       const { id } = req.params
 
-      const copiedActivity = await activityService.copyActivity(id, userId, (req as any).user.email)
+      const { targetDayId, asLink } = req.body
+
+      const copiedActivity = await activityService.copyActivity(id, targetDayId, asLink)
       res.status(201).json(copiedActivity)
     } catch (error: any) {
       if (error.message === "Activity not found or unauthorized") {

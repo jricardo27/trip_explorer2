@@ -13,6 +13,7 @@ import {
   FormControl,
   Box,
   Alert,
+  Menu, // Added import
   Checkbox,
   List,
   ListItem,
@@ -56,6 +57,7 @@ interface ActivityDialogProps {
   tripDays?: TripDay[]
   fullScreen?: boolean
   initialCoordinates?: { lat: number; lng: number }
+  onCopy?: (activityId: string, asLink?: boolean) => void
   canEdit?: boolean // Added canEdit prop
 }
 
@@ -72,6 +74,7 @@ const ActivityDialog = ({
   tripDays,
   fullScreen,
   initialCoordinates,
+  onCopy,
   canEdit = true, // Default to true for backward compatibility
 }: ActivityDialogProps) => {
   const handleClose = (event: object, reason: string) => {
@@ -98,6 +101,7 @@ const ActivityDialog = ({
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
   const [website, setWebsite] = useState("")
+  const [openingHours, setOpeningHours] = useState("")
 
   const [error, setError] = useState<string | null>(null)
   const [mapPickerOpen, setMapPickerOpen] = useState(false)
@@ -125,6 +129,7 @@ const ActivityDialog = ({
         setPhone(activity.phone || "")
         setEmail(activity.email || "")
         setWebsite(activity.website || "")
+        setOpeningHours(activity.openingHours ? JSON.stringify(activity.openingHours, null, 2) : "")
       } else {
         // Reset for create
         setName("")
@@ -162,10 +167,17 @@ const ActivityDialog = ({
         setPhone("")
         setEmail("")
         setWebsite("")
+        setOpeningHours("")
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]) // members is external, we rely on open trigger.
+
+  const [copyMenuAnchor, setCopyMenuAnchor] = useState<null | HTMLElement>(null)
+
+  // ... (rest of state and useEffect)
+
+  // ... (handlers)
 
   const handleToggleMember = (memberId: string) => {
     if (!canEdit) return
@@ -257,6 +269,15 @@ const ActivityDialog = ({
         phone,
         email,
         website,
+        openingHours: openingHours
+          ? (() => {
+              try {
+                return JSON.parse(openingHours)
+              } catch {
+                return openingHours
+              }
+            })()
+          : undefined,
       })
     } catch (err: any) {
       console.error("Failed to save activity:", err)
@@ -266,8 +287,21 @@ const ActivityDialog = ({
     }
   }
 
+  const handleDuplicateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setCopyMenuAnchor(event.currentTarget)
+  }
+
+  const handleCopyAction = (asLink: boolean) => {
+    if (activity && onCopy) {
+      onCopy(activity.id, asLink)
+      setCopyMenuAnchor(null)
+      onClose(undefined, "copy")
+    }
+  }
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth fullScreen={fullScreen}>
+      {/* ... (DialogTitle and DialogContent) ... */}
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           {activity ? (canEdit ? t("editActivity") : t("viewActivity")) : t("addActivity")}
@@ -280,6 +314,7 @@ const ActivityDialog = ({
       </DialogTitle>
       <DialogContent dividers>
         <form id="activity-form" onSubmit={handleSubmit}>
+          {/* ... (Form Content) ... */}
           <Box pt={2}>
             {error && (
               <Alert severity="error" sx={{ mb: 2 }}>
@@ -287,6 +322,7 @@ const ActivityDialog = ({
               </Alert>
             )}
             <Grid container spacing={2}>
+              {/* ... (Existing Grid Items) ... */}
               <Grid size={{ xs: 12 }}>
                 <TextField
                   fullWidth
@@ -313,6 +349,7 @@ const ActivityDialog = ({
                   </Select>
                 </FormControl>
               </Grid>
+              {/* ... (Rest of fields) ... */}
               <Grid size={{ xs: 6 }}>
                 <FormControl fullWidth disabled={!canEdit}>
                   <InputLabel>{t("priority")}</InputLabel>
@@ -434,6 +471,19 @@ const ActivityDialog = ({
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
                   disabled={!canEdit}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  fullWidth
+                  label={t("openingHours") + " (JSON)"}
+                  value={openingHours}
+                  onChange={(e) => setOpeningHours(e.target.value)}
+                  multiline
+                  rows={3}
+                  disabled={!canEdit}
+                  placeholder='{"monday": "9:00-17:00"}'
                 />
               </Grid>
 
@@ -575,13 +625,30 @@ const ActivityDialog = ({
           </Box>
         </form>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={() => onClose(undefined, "cancelButton")}>{t("cancel")}</Button>
-        {canEdit && (
-          <Button type="submit" form="activity-form" variant="contained" disabled={isLoading}>
-            {isLoading ? t("saving") + "..." : activity ? t("saveChanges") : t("addActivity")}
+      <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
+        <Box>
+          {activity && onCopy && (
+            <>
+              <Button onClick={handleDuplicateClick} color="inherit">
+                {t("duplicate")}
+              </Button>
+              <Menu anchorEl={copyMenuAnchor} open={Boolean(copyMenuAnchor)} onClose={() => setCopyMenuAnchor(null)}>
+                <MenuItem onClick={() => handleCopyAction(false)}>{t("copyActivity")}</MenuItem>
+                <MenuItem onClick={() => handleCopyAction(true)}>{t("copyActivityAsLink")}</MenuItem>
+              </Menu>
+            </>
+          )}
+        </Box>
+        <Box>
+          <Button onClick={() => onClose(undefined, "cancelButton")} sx={{ mr: 1 }}>
+            {t("cancel")}
           </Button>
-        )}
+          {canEdit && (
+            <Button type="submit" form="activity-form" variant="contained" disabled={isLoading}>
+              {isLoading ? t("saving") + "..." : activity ? t("saveChanges") : t("addActivity")}
+            </Button>
+          )}
+        </Box>
       </DialogActions>
       <LocationPickerMap
         open={mapPickerOpen}

@@ -9,9 +9,21 @@ import {
   Warning,
   Lock,
 } from "@mui/icons-material"
-import { Paper, Box, Typography, IconButton, Tooltip, Avatar, AvatarGroup } from "@mui/material"
+import {
+  Paper,
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  Avatar,
+  AvatarGroup,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material"
 import dayjs from "dayjs"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
 import { useLanguageStore } from "../stores/languageStore"
 import type { Activity } from "../types"
@@ -20,7 +32,7 @@ interface SortableActivityCardProps {
   activity: Activity
   onDelete: (id: string) => void
   onEdit: (activity: Activity) => void
-  onCopy?: (activity: Activity) => void
+  onCopy?: (activity: Activity, asLink?: boolean) => void
   isDeleting?: boolean
   onFlyTo?: (activity: Activity) => void
   canEdit?: boolean
@@ -40,6 +52,8 @@ export const SortableActivityCard = ({
     id: activity.id,
     disabled: activity.isLocked || !canEdit,
   })
+
+  const [copyMenuAnchor, setCopyMenuAnchor] = useState<null | HTMLElement>(null)
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -133,10 +147,42 @@ export const SortableActivityCard = ({
           {canEdit && (
             <>
               <Tooltip title={t("copyActivity")}>
-                <IconButton size="small" onClick={() => onCopy && onCopy(activity)} sx={{ mr: 0.5 }}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    if (onCopy) {
+                      setCopyMenuAnchor(e.currentTarget)
+                    }
+                  }}
+                  sx={{ mr: 0.5 }}
+                >
                   <ContentCopy fontSize="small" />
                 </IconButton>
               </Tooltip>
+              <Menu anchorEl={copyMenuAnchor} open={Boolean(copyMenuAnchor)} onClose={() => setCopyMenuAnchor(null)}>
+                <MenuItem
+                  onClick={() => {
+                    onCopy?.(activity, false)
+                    setCopyMenuAnchor(null)
+                  }}
+                >
+                  <ListItemIcon>
+                    <ContentCopy fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{t("copyActivity")}</ListItemText>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    onCopy?.(activity, true)
+                    setCopyMenuAnchor(null)
+                  }}
+                >
+                  <ListItemIcon>
+                    <ContentCopy fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>{t("copyActivityAsLink")}</ListItemText>
+                </MenuItem>
+              </Menu>
               <Tooltip title={t("editActivity")}>
                 <IconButton size="small" onClick={() => onEdit(activity)} sx={{ mr: 0.5 }}>
                   <EditIcon fontSize="small" />

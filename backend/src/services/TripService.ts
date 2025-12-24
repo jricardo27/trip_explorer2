@@ -59,12 +59,22 @@ export class TripService {
           orderBy: { dayIndex: "asc" },
           include: {
             activities: {
+              where: { scenario: null }, // Only include Main Plan activities
               orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
               include: {
                 participants: {
                   include: {
                     member: true,
                   },
+                },
+              },
+            },
+            scenarios: {
+              orderBy: { orderIndex: "asc" },
+              include: {
+                activities: {
+                  orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
+                  include: { participants: { include: { member: true } } },
                 },
               },
             },
