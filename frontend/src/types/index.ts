@@ -145,6 +145,19 @@ export interface TripDay {
   name?: string
   notes?: string
   activities: Activity[]
+  scenarios?: DayScenario[]
+}
+
+export interface DayScenario {
+  id: string
+  tripDayId: string
+  name: string
+  description?: string
+  isSelected: boolean
+  orderIndex: number
+  activities: Activity[]
+  createdAt: string
+  updatedAt: string
 }
 
 export interface Activity {

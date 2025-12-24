@@ -23,11 +23,11 @@ model User {
   googleId     String?  @unique @map("google_id")
   createdAt    DateTime @default(now()) @map("created_at")
 
-  trips          Trip[]
-  memberships    TripMember[]
-  travelStats    UserTravelStats?
-  countryVisits  UserCountryVisit[]
-  cityVisits     UserCityVisit[]
+  trips         Trip[]
+  memberships   TripMember[]
+  travelStats   UserTravelStats?
+  countryVisits UserCountryVisit[]
+  cityVisits    UserCityVisit[]
 
   @@map("users")
 }
@@ -44,21 +44,21 @@ model Trip {
   endDate         DateTime @map("end_date") @db.Date
   budget          Decimal? @db.Decimal(10, 2)
   defaultCurrency String?  @default("AUD") @map("default_currency") @db.Char(3)
-  currencies      String[] @default(["AUD"]) 
+  currencies      String[] @default(["AUD"])
   exchangeRates   Json?    @default("{}") @map("exchange_rates")
   timezone        String?  @default("Australia/Sydney")
   isCompleted     Boolean  @default(false) @map("is_completed")
   isPublic        Boolean  @default(false) @map("is_public")
 
-  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  days       TripDay[]
-  activities Activity[]
-  members    TripMember[]
-  expenses   Expense[]
-  budgets    Budget[]
-  photos     TripPhoto[]
-  transport  TransportAlternative[]
-  animations TripAnimation[]
+  user           User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  days           TripDay[]
+  activities     Activity[]
+  members        TripMember[]
+  expenses       Expense[]
+  budgets        Budget[]
+  photos         TripPhoto[]
+  transport      TransportAlternative[]
+  animations     TripAnimation[]
   checklistItems TripChecklistItem[]
   packingItems   TripPackingItem[]
   documents      TripDocument[]
@@ -80,11 +80,29 @@ model TripDay {
   name     String?
   notes    String?
 
-  trip       Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  trip       Trip          @relation(fields: [tripId], references: [id], onDelete: Cascade)
   activities Activity[]
+  scenarios  DayScenario[]
 
   @@unique([tripId, dayIndex])
   @@map("trip_days")
+}
+
+model DayScenario {
+  id          String  @id @default(uuid())
+  tripDayId   String  @map("trip_day_id")
+  name        String // e.g., "Main Plan", "Option B", "Beach Day"
+  description String?
+  isSelected  Boolean @default(false) @map("is_selected")
+  orderIndex  Int     @default(0) @map("order_index")
+
+  tripDay    TripDay    @relation(fields: [tripDayId], references: [id], onDelete: Cascade)
+  activities Activity[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("day_scenarios")
 }
 
 // ============================================
@@ -151,8 +169,8 @@ model Activity {
   website      String? @map("website")
   openingHours Json?   @map("opening_hours")
 
-  estimatedCost Decimal? @db.Decimal(10, 2) @map("estimated_cost")
-  actualCost    Decimal? @db.Decimal(10, 2) @map("actual_cost")
+  estimatedCost Decimal? @map("estimated_cost") @db.Decimal(10, 2)
+  actualCost    Decimal? @map("actual_cost") @db.Decimal(10, 2)
   currency      String?  @default("AUD") @db.Char(3)
   costCategory  String?  @map("cost_category")
   isPaid        Boolean  @default(false) @map("is_paid")
@@ -161,20 +179,22 @@ model Activity {
   useDefaultMembers Boolean @default(true) @map("use_default_members")
   isGroupActivity   Boolean @default(true) @map("is_group_activity")
 
-  source     String?  @default("manual")
-  externalId String?  @map("external_id")
-  tags       String[]
+  source        String?  @default("manual")
+  externalId    String?  @map("external_id")
+  tags          String[]
   availableDays String[] @map("available_days")
 
-  trip         Trip                   @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  tripDay      TripDay?               @relation(fields: [tripDayId], references: [id], onDelete: Cascade)
-  participants ActivityParticipant[]
-  expenses     Expense[]
-  photos       TripPhoto[]
-  transportFrom TransportAlternative[] @relation("FromActivity")
-  transportTo   TransportAlternative[] @relation("ToActivity")
+  trip           Trip                   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripDay        TripDay?               @relation(fields: [tripDayId], references: [id], onDelete: Cascade)
+  participants   ActivityParticipant[]
+  expenses       Expense[]
+  photos         TripPhoto[]
+  transportFrom  TransportAlternative[] @relation("FromActivity")
+  transportTo    TransportAlternative[] @relation("ToActivity")
   animationSteps TripAnimationStep[]
-  linkedGroupId  String?              @map("linked_group_id")
+  linkedGroupId  String?                @map("linked_group_id")
+  scenarioId     String?                @map("scenario_id")
+  scenario       DayScenario?           @relation(fields: [scenarioId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -251,13 +271,13 @@ enum MemberRole {
 }
 
 model TripMember {
-  id        String      @id @default(uuid())
-  tripId    String      @map("trip_id")
-  userId    String?     @map("user_id")
+  id        String     @id @default(uuid())
+  tripId    String     @map("trip_id")
+  userId    String?    @map("user_id")
   name      String
   email     String?
-  role      MemberRole  @default(VIEWER)
-  avatarUrl String?     @map("avatar_url")
+  role      MemberRole @default(VIEWER)
+  avatarUrl String?    @map("avatar_url")
   color     String?
 
   trip          Trip                  @relation(fields: [tripId], references: [id], onDelete: Cascade)
@@ -273,12 +293,12 @@ model TripMember {
 }
 
 model ActivityParticipant {
-  id         String   @id @default(uuid())
-  activityId String   @map("activity_id")
-  memberId   String   @map("member_id")
+  id         String @id @default(uuid())
+  activityId String @map("activity_id")
+  memberId   String @map("member_id")
 
-  activity  Activity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  member    TripMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  activity Activity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  member   TripMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -291,22 +311,22 @@ model ActivityParticipant {
 // ============================================
 
 model Expense {
-  id                     String   @id @default(uuid())
-  tripId                 String   @map("trip_id")
-  activityId             String?  @map("activity_id")
-  transportAlternativeId String?  @map("transport_alternative_id")
+  id                     String    @id @default(uuid())
+  tripId                 String    @map("trip_id")
+  activityId             String?   @map("activity_id")
+  transportAlternativeId String?   @map("transport_alternative_id")
   description            String
   category               String
   subcategory            String?
-  amount                 Decimal  @db.Decimal(10, 2)
-  currency               String   @default("AUD") @db.Char(3)
-  amountInTripCurrency   Decimal? @db.Decimal(10, 2) @map("amount_in_trip_currency")
-  exchangeRate           Decimal? @db.Decimal(10, 6) @map("exchange_rate")
-  exchangeRateDate       DateTime? @db.Date @map("exchange_rate_date")
+  amount                 Decimal   @db.Decimal(10, 2)
+  currency               String    @default("AUD") @db.Char(3)
+  amountInTripCurrency   Decimal?  @map("amount_in_trip_currency") @db.Decimal(10, 2)
+  exchangeRate           Decimal?  @map("exchange_rate") @db.Decimal(10, 6)
+  exchangeRateDate       DateTime? @map("exchange_rate_date") @db.Date
 
   paidById      String?   @map("paid_by_id")
   paymentMethod String?   @map("payment_method")
-  paymentDate   DateTime? @db.Date @map("payment_date")
+  paymentDate   DateTime? @map("payment_date") @db.Date
 
   isEstimated  Boolean @default(true) @map("is_estimated")
   isPaid       Boolean @default(false) @map("is_paid")
@@ -321,9 +341,9 @@ model Expense {
   tags  String[]
   notes String?
 
-  trip     Trip        @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  activity Activity?   @relation(fields: [activityId], references: [id], onDelete: SetNull)
-  paidBy   TripMember? @relation("PaidBy", fields: [paidById], references: [id])
+  trip     Trip           @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  activity Activity?      @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  paidBy   TripMember?    @relation("PaidBy", fields: [paidById], references: [id])
   splits   ExpenseSplit[]
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -333,12 +353,12 @@ model Expense {
 }
 
 model ExpenseSplit {
-  id         String   @id @default(uuid())
-  expenseId  String   @map("expense_id")
-  memberId   String   @map("member_id")
-  amount     Decimal  @db.Decimal(10, 2)
-  percentage Decimal? @db.Decimal(5, 2)
-  isPaid     Boolean  @default(false) @map("is_paid")
+  id         String    @id @default(uuid())
+  expenseId  String    @map("expense_id")
+  memberId   String    @map("member_id")
+  amount     Decimal   @db.Decimal(10, 2)
+  percentage Decimal?  @db.Decimal(5, 2)
+  isPaid     Boolean   @default(false) @map("is_paid")
   paidAt     DateTime? @map("paid_at")
 
   expense Expense    @relation(fields: [expenseId], references: [id], onDelete: Cascade)
@@ -356,7 +376,7 @@ model Budget {
   category                 String
   amount                   Decimal @db.Decimal(10, 2)
   currency                 String  @default("AUD") @db.Char(3)
-  spentAmount              Decimal @default(0) @db.Decimal(10, 2) @map("spent_amount")
+  spentAmount              Decimal @default(0) @map("spent_amount") @db.Decimal(10, 2)
   alertThresholdPercentage Int     @default(80) @map("alert_threshold_percentage")
   alertSent                Boolean @default(false) @map("alert_sent")
   notes                    String?
@@ -375,16 +395,16 @@ model Budget {
 // ============================================
 
 model TripPhoto {
-  id            String   @id @default(uuid())
-  tripId        String   @map("trip_id")
-  activityId    String?  @map("activity_id")
-  photoUrl      String   @map("photo_url")
-  thumbnailUrl  String?  @map("thumbnail_url")
+  id            String    @id @default(uuid())
+  tripId        String    @map("trip_id")
+  activityId    String?   @map("activity_id")
+  photoUrl      String    @map("photo_url")
+  thumbnailUrl  String?   @map("thumbnail_url")
   caption       String?
   takenAt       DateTime? @map("taken_at")
-  cloudProvider String?  @map("cloud_provider")
-  cloudPhotoId  String?  @map("cloud_photo_id")
-  uploadedById  String?  @map("uploaded_by_id")
+  cloudProvider String?   @map("cloud_provider")
+  cloudPhotoId  String?   @map("cloud_photo_id")
+  uploadedById  String?   @map("uploaded_by_id")
 
   trip     Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
   activity Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
@@ -399,53 +419,54 @@ model TripPhoto {
 // ============================================
 
 model TripAnimation {
-  id              String   @id @default(uuid())
-  tripId          String   @map("trip_id")
-  name            String
-  description     String?
-  
+  id          String  @id @default(uuid())
+  tripId      String  @map("trip_id")
+  name        String
+  description String?
+
   // Animation settings
-  settings        Json     @default("{}") // Store generic settings like speed, loop, etc.
-  
-  steps           TripAnimationStep[]
-  
-  trip            Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  settings Json @default("{}") // Store generic settings like speed, loop, etc.
+
+  steps TripAnimationStep[]
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("trip_animations")
 }
 
 model TripAnimationStep {
-  id              String   @id @default(uuid())
-  animationId     String   @map("animation_id")
-  activityId      String?  @map("activity_id") // Optional: could be a step simply moving to a location, but usually tied to activity
-  
-  orderIndex      Int      @map("order_index")
-  
-  // Per-step overrides/settings
-  isVisible       Boolean  @default(true) @map("is_visible")
-  customLabel     String?  @map("custom_label")
-  zoomLevel       Int?     @map("zoom_level")
-  
-  // For steps that are transitions between activities
-  transportMode   String?  @map("transport_mode")
-  
-  settings        Json     @default("{}") // Extra settings like "skip zoom in", "hide name" etc.
+  id          String  @id @default(uuid())
+  animationId String  @map("animation_id")
+  activityId  String? @map("activity_id") // Optional: could be a step simply moving to a location, but usually tied to activity
 
-  animation       TripAnimation @relation(fields: [animationId], references: [id], onDelete: Cascade)
-  activity        Activity?     @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  orderIndex Int @map("order_index")
+
+  // Per-step overrides/settings
+  isVisible   Boolean @default(true) @map("is_visible")
+  customLabel String? @map("custom_label")
+  zoomLevel   Int?    @map("zoom_level")
+
+  // For steps that are transitions between activities
+  transportMode String? @map("transport_mode")
+
+  settings Json @default("{}") // Extra settings like "skip zoom in", "hide name" etc.
+
+  animation TripAnimation @relation(fields: [animationId], references: [id], onDelete: Cascade)
+  activity  Activity?     @relation(fields: [activityId], references: [id], onDelete: Cascade)
 
   @@map("trip_animation_steps")
 }
+
 // ============================================
 // CHECKLISTS & PACKING LISTS
 // ============================================
 
 model ChecklistTemplate {
   id        String   @id @default(uuid())
-  category  String   // e.g., "Preparation", "Documents"
+  category  String // e.g., "Preparation", "Documents"
   task      String
   priority  Int      @default(0)
   createdAt DateTime @default(now()) @map("created_at")
@@ -454,13 +475,13 @@ model ChecklistTemplate {
 }
 
 model TripChecklistItem {
-  id        String   @id @default(uuid())
-  tripId    String   @map("trip_id")
-  task      String
-  isDone    Boolean  @default(false) @map("is_done")
-  category  String?
-  priority  Int      @default(0)
-  
+  id       String  @id @default(uuid())
+  tripId   String  @map("trip_id")
+  task     String
+  isDone   Boolean @default(false) @map("is_done")
+  category String?
+  priority Int     @default(0)
+
   trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -470,7 +491,7 @@ model TripChecklistItem {
 
 model PackingListTemplate {
   id        String   @id @default(uuid())
-  category  String   // e.g., "Clothing", "Electronics"
+  category  String // e.g., "Clothing", "Electronics"
   item      String
   priority  Int      @default(0)
   createdAt DateTime @default(now()) @map("created_at")
@@ -479,13 +500,13 @@ model PackingListTemplate {
 }
 
 model TripPackingItem {
-  id        String   @id @default(uuid())
-  tripId    String   @map("trip_id")
-  item      String
-  quantity  Int      @default(1)
-  isPacked  Boolean  @default(false) @map("is_packed")
-  category  String?
-  priority  Int      @default(0)
+  id       String  @id @default(uuid())
+  tripId   String  @map("trip_id")
+  item     String
+  quantity Int     @default(1)
+  isPacked Boolean @default(false) @map("is_packed")
+  category String?
+  priority Int     @default(0)
 
   trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now()) @map("created_at")
@@ -495,13 +516,13 @@ model TripPackingItem {
 }
 
 model TripDocument {
-  id        String   @id @default(uuid())
-  tripId    String   @map("trip_id")
-  title     String
-  url       String
-  notes     String?
-  category  String?  @default("General")
-  
+  id       String  @id @default(uuid())
+  tripId   String  @map("trip_id")
+  title    String
+  url      String
+  notes    String?
+  category String? @default("General")
+
   trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -514,14 +535,14 @@ model TripDocument {
 // ============================================
 
 model Country {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  code       String   @unique @db.Char(2) // ISO 3166-1 alpha-2
-  code3      String?  @unique @db.Char(3) // ISO 3166-1 alpha-3
-  continent  String?
-  region     String?
-  boundary   Json     // GeoJSON Polygon/MultiPolygon
-  centroid   Json?    // { lat, lng } for map centering
+  id        String  @id @default(uuid())
+  name      String  @unique
+  code      String  @unique @db.Char(2) // ISO 3166-1 alpha-2
+  code3     String? @unique @db.Char(3) // ISO 3166-1 alpha-3
+  continent String?
+  region    String?
+  boundary  Json // GeoJSON Polygon/MultiPolygon
+  centroid  Json? // { lat, lng } for map centering
 
   userVisits UserCountryVisit[]
   cities     City[]
@@ -539,7 +560,7 @@ model City {
   countryCode String  @db.Char(2)
   adminLevel  String? // State/Province
   population  Int?
-  boundary    Json?   // GeoJSON Polygon (optional, can use point)
+  boundary    Json? // GeoJSON Polygon (optional, can use point)
   latitude    Float
   longitude   Float
 
@@ -604,4 +625,3 @@ model UserCityVisit {
   @@index([userId])
   @@map("user_city_visits")
 }
-
