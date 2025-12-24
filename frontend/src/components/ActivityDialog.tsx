@@ -1,53 +1,34 @@
-import { Map as MapIcon, Close as CloseIcon, Lock, LockOpen } from "@mui/icons-material"
+import { Close as CloseIcon } from "@mui/icons-material"
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  TextField,
-  Grid,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
   Box,
   Alert,
-  Menu, // Added import
-  Checkbox,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Avatar,
-  Typography,
-  ListItemButton,
-  Chip,
   IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material"
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-import dayjs from "dayjs"
-import { useState, useEffect } from "react"
+import React, { useState } from "react"
 
-import { useTripMembers } from "../hooks/useTripMembers"
+import { useActivityForm } from "../hooks/useActivityForm"
 import { useLanguageStore } from "../stores/languageStore"
-import { ActivityType } from "../types"
 import type { Activity, TripDay } from "../types"
 
+import { ActivityBasicFields } from "./ActivityForm/ActivityBasicFields"
+import { ActivityCostFields } from "./ActivityForm/ActivityCostFields"
+import { ActivityDateTimeFields } from "./ActivityForm/ActivityDateTimeFields"
+import { ActivityDetailsFields } from "./ActivityForm/ActivityDetailsFields"
+import { ActivityLocationFields } from "./ActivityForm/ActivityLocationFields"
+import { ParticipantSelector } from "./ActivityForm/ParticipantSelector"
 import LocationPickerMap from "./LocationPickerMap"
-
-const DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-
-// ... (imports)
-
-// ... (existing code)
 
 interface ActivityDialogProps {
   open: boolean
   onClose: (event?: object, reason?: string) => void
-  onSubmit: (
-    data: Partial<Activity> & { tripId: string; tripDayId?: string; participantIds?: string[] },
-  ) => Promise<void>
+  onSubmit: (data: any) => Promise<void>
   isLoading: boolean
   tripId: string
   tripDayId?: string
@@ -57,8 +38,9 @@ interface ActivityDialogProps {
   tripDays?: TripDay[]
   fullScreen?: boolean
   initialCoordinates?: { lat: number; lng: number }
+  prefilledCoordinates?: { lat: number; lng: number }
   onCopy?: (activityId: string, asLink?: boolean) => void
-  canEdit?: boolean // Added canEdit prop
+  canEdit?: boolean
 }
 
 const ActivityDialog = ({
@@ -74,217 +56,27 @@ const ActivityDialog = ({
   tripDays,
   fullScreen,
   initialCoordinates,
+  prefilledCoordinates,
   onCopy,
-  canEdit = true, // Default to true for backward compatibility
+  canEdit = true,
 }: ActivityDialogProps) => {
+  const { t } = useLanguageStore()
+  const [copyMenuAnchor, setCopyMenuAnchor] = useState<null | HTMLElement>(null)
+
+  const form = useActivityForm({
+    open,
+    activity,
+    tripId,
+    tripDayId,
+    tripStartDate,
+    tripDays,
+    initialCoordinates: initialCoordinates || prefilledCoordinates,
+    onSubmit,
+  })
+
   const handleClose = (event: object, reason: string) => {
     if (reason === "backdropClick") return
     onClose(event, reason)
-  }
-  const { t } = useLanguageStore()
-  const [name, setName] = useState("")
-  const [activityType, setActivityType] = useState<ActivityType>(ActivityType.ATTRACTION)
-  const [scheduledStart, setScheduledStart] = useState<dayjs.Dayjs | null>(null)
-  const [scheduledEnd, setScheduledEnd] = useState<dayjs.Dayjs | null>(null)
-  const [estimatedCost, setEstimatedCost] = useState("")
-  const [actualCost, setActualCost] = useState("")
-  const [isPaid, setIsPaid] = useState(false)
-  const [latitude, setLatitude] = useState("")
-  const [longitude, setLongitude] = useState("")
-  const [notes, setNotes] = useState("")
-  const [availableDays, setAvailableDays] = useState<string[]>([])
-  const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
-
-  // New Fields
-  const [priority, setPriority] = useState<string>("normal")
-  const [isLocked, setIsLocked] = useState(false)
-  const [phone, setPhone] = useState("")
-  const [email, setEmail] = useState("")
-  const [website, setWebsite] = useState("")
-  const [openingHours, setOpeningHours] = useState("")
-
-  const [error, setError] = useState<string | null>(null)
-  const [mapPickerOpen, setMapPickerOpen] = useState(false)
-
-  const { members } = useTripMembers(tripId)
-
-  useEffect(() => {
-    if (open) {
-      setError(null) // Clear error on open
-      if (activity) {
-        setName(activity.name)
-        setActivityType(activity.activityType)
-        setScheduledStart(activity.scheduledStart ? dayjs(activity.scheduledStart) : null)
-        setScheduledEnd(activity.scheduledEnd ? dayjs(activity.scheduledEnd) : null)
-        setEstimatedCost(activity.estimatedCost?.toString() || "")
-        setActualCost(activity.actualCost?.toString() || "")
-        setIsPaid(activity.isPaid || false)
-        setLatitude(activity.latitude?.toString() || "")
-        setLongitude(activity.longitude?.toString() || "")
-        setNotes(activity.notes || "")
-        setAvailableDays(activity.availableDays || [])
-        setSelectedMemberIds(activity.participants?.map((p) => p.memberId) || [])
-        setPriority(activity.priority || "normal")
-        setIsLocked(activity.isLocked || false)
-        setPhone(activity.phone || "")
-        setEmail(activity.email || "")
-        setWebsite(activity.website || "")
-        setOpeningHours(activity.openingHours ? JSON.stringify(activity.openingHours, null, 2) : "")
-      } else {
-        // Reset for create
-        setName("")
-        setActivityType(ActivityType.ATTRACTION)
-
-        // Pre-set date if tripDayId is provided
-        let defaultStart = null
-        let defaultEnd = null
-
-        if (tripDayId && tripDays) {
-          const day = tripDays.find((d) => d.id === tripDayId)
-          if (day) {
-            // Default to 9:00 AM on the selected day
-            defaultStart = dayjs(day.date).hour(9).minute(0).second(0)
-            defaultEnd = defaultStart.add(1, "hour")
-          }
-        } else if (tripStartDate) {
-          // Default to 9:00 AM on the trip start date
-          defaultStart = dayjs(tripStartDate).hour(9).minute(0).second(0)
-          defaultEnd = defaultStart.add(1, "hour")
-        }
-
-        setScheduledStart(defaultStart)
-        setScheduledEnd(defaultEnd)
-        setEstimatedCost("")
-        setActualCost("")
-        setIsPaid(false)
-        setLatitude(initialCoordinates?.lat.toString() || "")
-        setLongitude(initialCoordinates?.lng.toString() || "")
-        setNotes("")
-        setAvailableDays([])
-        setSelectedMemberIds(members.map((m) => m.id))
-        setPriority("normal")
-        setIsLocked(false)
-        setPhone("")
-        setEmail("")
-        setWebsite("")
-        setOpeningHours("")
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]) // members is external, we rely on open trigger.
-
-  const [copyMenuAnchor, setCopyMenuAnchor] = useState<null | HTMLElement>(null)
-
-  // ... (rest of state and useEffect)
-
-  // ... (handlers)
-
-  const handleToggleMember = (memberId: string) => {
-    if (!canEdit) return
-    setSelectedMemberIds((prev) =>
-      prev.includes(memberId) ? prev.filter((id) => id !== memberId) : [...prev, memberId],
-    )
-  }
-
-  const validateDates = () => {
-    if (!scheduledStart && !scheduledEnd) return true
-
-    const start = scheduledStart ? scheduledStart.toDate() : null
-    const end = scheduledEnd ? scheduledEnd.toDate() : null
-    const tripStart = tripStartDate ? new Date(tripStartDate) : null
-    const tripEnd = tripEndDate ? new Date(tripEndDate) : null
-
-    if (start && end && end < start) {
-      setError(t("endDateBeforeStart"))
-      return false
-    }
-
-    if (tripStart && tripEnd) {
-      const tripStartDay = dayjs(tripStart).startOf("day")
-      const tripEndDay = dayjs(tripEnd).endOf("day")
-
-      const activityStart = dayjs(start)
-      const activityEnd = dayjs(end)
-
-      if (start && (activityStart.isBefore(tripStartDay) || activityStart.isAfter(tripEndDay))) {
-        setError(`${t("dateOutsideTripRange")} (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`)
-        return false
-      }
-      if (end && (activityEnd.isBefore(tripStartDay) || activityEnd.isAfter(tripEndDay))) {
-        setError(`End date must be within trip dates (${tripStartDay.format("L")} - ${tripEndDay.format("L")})`)
-        return false
-      }
-    }
-
-    setError(null)
-    return true
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!canEdit) return
-    if (!validateDates()) return
-
-    // Smart Day Assignment
-    let finalTripDayId = activity?.tripDayId || tripDayId
-
-    if (scheduledStart && tripDays) {
-      const startDayjs = dayjs(scheduledStart)
-      const matchingDay = tripDays.find((day) => {
-        const dayFormatted = dayjs(day.date).format("YYYY-MM-DD")
-        const startFormatted = startDayjs.format("YYYY-MM-DD")
-        return dayFormatted === startFormatted
-      })
-      if (matchingDay) {
-        finalTripDayId = matchingDay.id
-      }
-    }
-
-    if (!finalTripDayId) {
-      setError(
-        "Cannot create activity: The selected start date does not match any trip day. Please select a date within the trip period.",
-      )
-      return
-    }
-
-    try {
-      await onSubmit({
-        id: activity?.id,
-        tripId,
-        tripDayId: finalTripDayId,
-        name,
-        activityType,
-        scheduledStart: scheduledStart ? scheduledStart.toISOString() : undefined,
-        scheduledEnd: scheduledEnd ? scheduledEnd.toISOString() : undefined,
-        estimatedCost: estimatedCost ? parseFloat(estimatedCost) : undefined,
-        actualCost: actualCost ? parseFloat(actualCost) : undefined,
-        isPaid,
-        isLocked,
-        latitude: latitude ? parseFloat(latitude) : undefined,
-        longitude: longitude ? parseFloat(longitude) : undefined,
-        notes,
-        availableDays,
-        participantIds: selectedMemberIds,
-        priority,
-        phone,
-        email,
-        website,
-        openingHours: openingHours
-          ? (() => {
-              try {
-                return JSON.parse(openingHours)
-              } catch {
-                return openingHours
-              }
-            })()
-          : undefined,
-      })
-    } catch (err: any) {
-      console.error("Failed to save activity:", err)
-      const errorMessage =
-        err.response?.data?.error?.message || err.response?.data?.error || err.message || t("failedToSave")
-      setError(typeof errorMessage === "object" ? JSON.stringify(errorMessage) : errorMessage)
-    }
   }
 
   const handleDuplicateClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -301,7 +93,6 @@ const ActivityDialog = ({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth fullScreen={fullScreen}>
-      {/* ... (DialogTitle and DialogContent) ... */}
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           {activity ? (canEdit ? t("editActivity") : t("viewActivity")) : t("addActivity")}
@@ -313,315 +104,73 @@ const ActivityDialog = ({
         </Box>
       </DialogTitle>
       <DialogContent dividers>
-        <form id="activity-form" onSubmit={handleSubmit}>
-          {/* ... (Form Content) ... */}
+        <form id="activity-form" onSubmit={form.handleFormSubmit}>
           <Box pt={2}>
-            {error && (
+            {form.error && (
               <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
+                {form.error}
               </Alert>
             )}
-            <Grid container spacing={2}>
-              {/* ... (Existing Grid Items) ... */}
-              <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  label={t("activityName")}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  disabled={!canEdit}
-                />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <FormControl fullWidth disabled={!canEdit}>
-                  <InputLabel>{t("type")}</InputLabel>
-                  <Select
-                    value={activityType}
-                    label={t("type")}
-                    onChange={(e) => setActivityType(e.target.value as ActivityType)}
-                  >
-                    {Object.values(ActivityType).map((type) => (
-                      <MenuItem key={type} value={type}>
-                        {t(type as any)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              {/* ... (Rest of fields) ... */}
-              <Grid size={{ xs: 6 }}>
-                <FormControl fullWidth disabled={!canEdit}>
-                  <InputLabel>{t("priority")}</InputLabel>
-                  <Select value={priority} label={t("priority")} onChange={(e) => setPriority(e.target.value)}>
-                    <MenuItem value="normal">{t("standard")}</MenuItem>
-                    <MenuItem value="optional">{t("optional")}</MenuItem>
-                    <MenuItem value="mandatory">{t("mandatory")}</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <FormControl fullWidth disabled={!canEdit}>
-                  <InputLabel>{t("participants")}</InputLabel>
-                  <Select
-                    multiple
-                    value={selectedMemberIds}
-                    label={t("participants")}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      setSelectedMemberIds(typeof val === "string" ? val.split(",") : val)
-                    }}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {selected.map((value) => {
-                          const member = members.find((m) => m.id === value)
-                          return (
-                            <Chip
-                              key={value}
-                              label={member?.name || "Unknown"}
-                              size="small"
-                              avatar={member?.avatarUrl ? <Avatar src={member.avatarUrl} /> : undefined}
-                            />
-                          )
-                        })}
-                      </Box>
-                    )}
-                  >
-                    {members.map((member) => (
-                      <MenuItem key={member.id} value={member.id}>
-                        <Checkbox checked={selectedMemberIds.indexOf(member.id) > -1} />
-                        <ListItemText primary={member.name} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <DateTimePicker
-                  label={t("startTime")}
-                  value={scheduledStart}
-                  minDate={tripStartDate ? dayjs(tripStartDate) : undefined}
-                  maxDate={tripEndDate ? dayjs(tripEndDate) : undefined}
-                  onChange={(newValue: any) => setScheduledStart(newValue)}
-                  slotProps={{ textField: { fullWidth: true } }}
-                  disabled={!canEdit}
-                />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <DateTimePicker
-                  label={t("endTime")}
-                  value={scheduledEnd}
-                  minDate={tripStartDate ? dayjs(tripStartDate) : undefined}
-                  maxDate={tripEndDate ? dayjs(tripEndDate) : undefined}
-                  onChange={(newValue: any) => {
-                    if (newValue) {
-                      setScheduledEnd(newValue)
-                    }
-                  }}
-                  slotProps={{ textField: { fullWidth: true } }}
-                  disabled={!canEdit}
-                />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <TextField
-                  fullWidth
-                  label={t("estimatedCost")}
-                  type="number"
-                  value={estimatedCost}
-                  onChange={(e) => setEstimatedCost(e.target.value)}
-                  InputProps={{ startAdornment: "$" }}
-                  disabled={!canEdit}
-                />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <TextField
-                  fullWidth
-                  label={t("actualCost")}
-                  type="number"
-                  value={actualCost}
-                  onChange={(e) => setActualCost(e.target.value)}
-                  InputProps={{ startAdornment: "$" }}
-                  disabled={!canEdit}
-                />
-              </Grid>
-
-              {/* Contact Info */}
-              <Grid size={{ xs: 4 }}>
-                <TextField
-                  fullWidth
-                  label={t("phone")}
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  disabled={!canEdit}
-                />
-              </Grid>
-              <Grid size={{ xs: 4 }}>
-                <TextField
-                  fullWidth
-                  label={t("email")}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={!canEdit}
-                />
-              </Grid>
-              <Grid size={{ xs: 4 }}>
-                <TextField
-                  fullWidth
-                  label={t("website")}
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                  disabled={!canEdit}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  label={t("openingHours") + " (JSON)"}
-                  value={openingHours}
-                  onChange={(e) => setOpeningHours(e.target.value)}
-                  multiline
-                  rows={3}
-                  disabled={!canEdit}
-                  placeholder='{"monday": "9:00-17:00"}'
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12 }}>
-                <Box display="flex" alignItems="center" gap={3}>
-                  <Box display="flex" alignItems="center">
-                    <Checkbox checked={isPaid} onChange={(e) => setIsPaid(e.target.checked)} disabled={!canEdit} />
-                    <Typography variant="body2">{t("markAsPaid")}</Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center">
-                    <Checkbox
-                      checked={isLocked}
-                      onChange={(e) => setIsLocked(e.target.checked)}
-                      icon={<LockOpen fontSize="small" />}
-                      checkedIcon={<Lock fontSize="small" />}
-                      disabled={!canEdit}
-                    />
-                    <Typography variant="body2">{isLocked ? t("locked") : t("unlocked")}</Typography>
-                  </Box>
-                </Box>
-              </Grid>
-              <Grid size={{ xs: 5 }}>
-                <TextField
-                  fullWidth
-                  label={t("latitude")}
-                  type="number"
-                  value={latitude}
-                  onChange={(e) => setLatitude(e.target.value)}
-                  inputProps={{ step: "any" }}
-                  disabled={!canEdit}
-                />
-              </Grid>
-              <Grid size={{ xs: 5 }}>
-                <TextField
-                  fullWidth
-                  label={t("longitude")}
-                  type="number"
-                  value={longitude}
-                  onChange={(e) => setLongitude(e.target.value)}
-                  inputProps={{ step: "any" }}
-                  disabled={!canEdit}
-                />
-              </Grid>
-              <Grid size={{ xs: 2 }} sx={{ display: "flex", alignItems: "center" }}>
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  onClick={() => setMapPickerOpen(true)}
-                  sx={{ height: 56 }}
-                  title={t("selectFromMap")}
-                  disabled={!canEdit}
-                >
-                  <MapIcon />
-                </Button>
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  label={t("activityNotes")}
-                  multiline
-                  rows={3}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  disabled={!canEdit}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12 }}>
-                <FormControl fullWidth disabled={!canEdit}>
-                  <InputLabel>{t("availableDays")}</InputLabel>
-                  <Select
-                    multiple
-                    value={availableDays}
-                    label={t("availableDays")}
-                    onChange={(e) =>
-                      setAvailableDays(typeof e.target.value === "string" ? e.target.value.split(",") : e.target.value)
-                    }
-                    renderValue={(selected) => (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {selected.map((value) => (
-                          <Chip key={value} label={value} size="small" />
-                        ))}
-                      </Box>
-                    )}
-                  >
-                    {DAYS_OF_WEEK.map((day) => (
-                      <MenuItem key={day} value={day}>
-                        <Checkbox checked={availableDays.indexOf(day) > -1} />
-                        <ListItemText primary={t(day.toLowerCase() as any) || day} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                    {t("availableDaysHint")}
-                  </Typography>
-                </FormControl>
-              </Grid>
-
-              <Grid size={{ xs: 12 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  {t("whoIsGoing")}
-                </Typography>
-                {members.length > 0 ? (
-                  <List
-                    dense
-                    sx={{ width: "100%", bgcolor: "background.paper", border: "1px solid #e0e0e0", borderRadius: 1 }}
-                  >
-                    {members.map((member) => {
-                      const labelId = `checkbox-list-secondary-label-${member.id}`
-                      return (
-                        <ListItem key={member.id} disablePadding>
-                          <ListItemButton onClick={() => handleToggleMember(member.id)} dense disabled={!canEdit}>
-                            <ListItemAvatar>
-                              <Avatar sx={{ bgcolor: member.color, width: 32, height: 32, fontSize: "0.875rem" }}>
-                                {member.name.charAt(0)}
-                              </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText id={labelId} primary={member.name} />
-                            <Checkbox
-                              edge="end"
-                              checked={selectedMemberIds.indexOf(member.id) !== -1}
-                              tabIndex={-1}
-                              disableRipple
-                              inputProps={{ "aria-labelledby": labelId }}
-                              disabled={!canEdit}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                      )
-                    })}
-                  </List>
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    {t("noMembers")}
-                  </Typography>
-                )}
-              </Grid>
-            </Grid>
+            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 2 }}>
+              <ActivityBasicFields
+                name={form.name}
+                setName={form.setName}
+                activityType={form.activityType}
+                setActivityType={form.setActivityType}
+                priority={form.priority}
+                setPriority={form.setPriority}
+                canEdit={canEdit}
+              />
+              <ActivityDateTimeFields
+                scheduledStart={form.scheduledStart}
+                setScheduledStart={form.setScheduledStart}
+                scheduledEnd={form.scheduledEnd}
+                setScheduledEnd={form.setScheduledEnd}
+                availableDays={form.availableDays}
+                setAvailableDays={form.setAvailableDays}
+                tripStartDate={tripStartDate}
+                tripEndDate={tripEndDate}
+                canEdit={canEdit}
+              />
+              <ActivityCostFields
+                estimatedCost={form.estimatedCost}
+                setEstimatedCost={form.setEstimatedCost}
+                actualCost={form.actualCost}
+                setActualCost={form.setActualCost}
+                isPaid={form.isPaid}
+                setIsPaid={form.setIsPaid}
+                isLocked={form.isLocked}
+                setIsLocked={form.setIsLocked}
+                canEdit={canEdit}
+              />
+              <ActivityDetailsFields
+                notes={form.notes}
+                setNotes={form.setNotes}
+                phone={form.phone}
+                setPhone={form.setPhone}
+                email={form.email}
+                setEmail={form.setEmail}
+                website={form.website}
+                setWebsite={form.setWebsite}
+                openingHours={form.openingHours}
+                setOpeningHours={form.setOpeningHours}
+                canEdit={canEdit}
+              />
+              <ActivityLocationFields
+                latitude={form.latitude}
+                setLatitude={form.setLatitude}
+                longitude={form.longitude}
+                setLongitude={form.setLongitude}
+                setMapPickerOpen={form.setMapPickerOpen}
+                canEdit={canEdit}
+              />
+              <ParticipantSelector
+                members={form.members}
+                selectedMemberIds={form.selectedMemberIds}
+                handleToggleMember={form.handleToggleMember}
+                canEdit={canEdit}
+              />
+            </Box>
           </Box>
         </form>
       </DialogContent>
@@ -651,13 +200,13 @@ const ActivityDialog = ({
         </Box>
       </DialogActions>
       <LocationPickerMap
-        open={mapPickerOpen}
-        onClose={() => setMapPickerOpen(false)}
-        initialLat={latitude ? parseFloat(latitude) : undefined}
-        initialLng={longitude ? parseFloat(longitude) : undefined}
+        open={form.mapPickerOpen}
+        onClose={() => form.setMapPickerOpen(false)}
+        initialLat={form.latitude ? parseFloat(form.latitude) : undefined}
+        initialLng={form.longitude ? parseFloat(form.longitude) : undefined}
         onSelect={(lat, lng) => {
-          setLatitude(lat.toString())
-          setLongitude(lng.toString())
+          form.setLatitude(lat.toString())
+          form.setLongitude(lng.toString())
         }}
         readOnly={!canEdit}
       />
