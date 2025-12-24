@@ -27,17 +27,17 @@ ADD CONSTRAINT "activities_scenario_id_fkey" FOREIGN KEY ("scenario_id") REFEREN
 DO $$
 DECLARE
     day_record RECORD;
-    scenario_id TEXT;
+    new_scenario_id TEXT;
 BEGIN
     FOR day_record IN SELECT id FROM trip_days LOOP
         -- Create default scenario for this day
         INSERT INTO day_scenarios (id, trip_day_id, name, is_selected, order_index, created_at, updated_at)
         VALUES (gen_random_uuid(), day_record.id, 'Main Plan', true, 0, NOW(), NOW())
-        RETURNING id INTO scenario_id;
+        RETURNING id INTO new_scenario_id;
         
         -- Link all existing activities for this day to the default scenario
         UPDATE activities 
-        SET scenario_id = scenario_id
+        SET scenario_id = new_scenario_id
         WHERE trip_day_id = day_record.id;
     END LOOP;
 END $$;

@@ -1,12 +1,12 @@
 import { Router } from "express"
 
-import { authenticate } from "../middleware/auth"
+import { authenticateToken } from "../middleware/auth"
 import dayScenarioService from "../services/DayScenarioService"
 
 const router = Router()
 
 // Get all scenarios for a day
-router.get("/days/:dayId/scenarios", authenticate, async (req, res, next) => {
+router.get("/days/:dayId/scenarios", authenticateToken, async (req, res, next) => {
   try {
     const scenarios = await dayScenarioService.getScenariosByDay(req.params.dayId)
     res.json(scenarios)
@@ -16,7 +16,7 @@ router.get("/days/:dayId/scenarios", authenticate, async (req, res, next) => {
 })
 
 // Create a new scenario
-router.post("/days/:dayId/scenarios", authenticate, async (req, res, next) => {
+router.post("/days/:dayId/scenarios", authenticateToken, async (req, res, next) => {
   try {
     const { name, description } = req.body
     const scenario = await dayScenarioService.createScenario({
@@ -31,7 +31,7 @@ router.post("/days/:dayId/scenarios", authenticate, async (req, res, next) => {
 })
 
 // Duplicate a scenario
-router.post("/scenarios/:id/duplicate", authenticate, async (req, res, next) => {
+router.post("/scenarios/:id/duplicate", authenticateToken, async (req, res, next) => {
   try {
     const { name } = req.body
     const scenario = await dayScenarioService.duplicateScenario(req.params.id, name)
@@ -42,7 +42,7 @@ router.post("/scenarios/:id/duplicate", authenticate, async (req, res, next) => 
 })
 
 // Select a scenario as the main plan
-router.post("/scenarios/:id/select", authenticate, async (req, res, next) => {
+router.post("/scenarios/:id/select", authenticateToken, async (req, res, next) => {
   try {
     const scenario = await dayScenarioService.selectScenario(req.params.id)
     res.json(scenario)
@@ -52,7 +52,7 @@ router.post("/scenarios/:id/select", authenticate, async (req, res, next) => {
 })
 
 // Update a scenario
-router.patch("/scenarios/:id", authenticate, async (req, res, next) => {
+router.patch("/scenarios/:id", authenticateToken, async (req, res, next) => {
   try {
     const { name, description } = req.body
     const scenario = await dayScenarioService.updateScenario(req.params.id, { name, description })
@@ -63,7 +63,7 @@ router.patch("/scenarios/:id", authenticate, async (req, res, next) => {
 })
 
 // Delete a scenario
-router.delete("/scenarios/:id", authenticate, async (req, res, next) => {
+router.delete("/scenarios/:id", authenticateToken, async (req, res, next) => {
   try {
     await dayScenarioService.deleteScenario(req.params.id)
     res.status(204).send()
@@ -73,7 +73,7 @@ router.delete("/scenarios/:id", authenticate, async (req, res, next) => {
 })
 
 // Reorder scenarios
-router.post("/days/:dayId/scenarios/reorder", authenticate, async (req, res, next) => {
+router.post("/days/:dayId/scenarios/reorder", authenticateToken, async (req, res, next) => {
   try {
     const { updates } = req.body
     await dayScenarioService.reorderScenarios(req.params.dayId, updates)

@@ -693,7 +693,6 @@ export const translations = {
     email: "Correo Electrónico",
     website: "Sitio Web",
     location: "Ubicación",
-    close: "Cerrar",
     deleteActivity: "Eliminar Actividad",
     activityDescription: "Descripción",
     selectLocation: "Seleccionar Ubicación",
