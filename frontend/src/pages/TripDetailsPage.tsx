@@ -737,7 +737,7 @@ const TripDetailsPage = () => {
             onActivityUpdate={(id, data) => updateActivity({ id, data })}
             onActivityCopy={handleCopyActivity}
             onDayOperation={handleDayOperation}
-            onScenarioChange={async (dayId, scenarioId) => {
+            onScenarioChange={async (_dayId, scenarioId) => {
               if (scenarioId) {
                 await selectScenario(scenarioId)
               } else {
