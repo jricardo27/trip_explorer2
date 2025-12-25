@@ -83,5 +83,9 @@ ssh $SSH_OPTS "$REMOTE_TARGET" "rm -rf $REMOTE_PATH/backend/dist $REMOTE_PATH/fr
 rm -rf "$STAGING_DIR"
 rm "$ARCHIVE_NAME"
 
-echo "--- Build & Push Complete ---"
-echo "Now run './scripts/deploy-bare.sh' on your VM to install dependencies and restart."
+echo "--- Executing Deploy Script on VM ---"
+# We do NOT pass --build because we just pushed the pre-built artifacts.
+# The deploy script will still install dependencies and run migrations.
+ssh $SSH_OPTS "$REMOTE_TARGET" "cd $REMOTE_PATH && chmod +x scripts/deploy-bare.sh && ./scripts/deploy-bare.sh"
+
+echo "--- Build & Push & Deploy Complete ---"

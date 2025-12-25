@@ -26,6 +26,8 @@ interface TripMapProps {
   viewMode?: string
   title?: string
   animations?: TripAnimation[]
+  selectedAnimationId?: string
+  onSelectAnimation?: (id: string) => void
   onSaveAnimation?: (animation: Partial<TripAnimation>) => Promise<void>
   onDeleteAnimation?: (id: string) => Promise<void>
   canEdit?: boolean
@@ -42,6 +44,8 @@ export const TripMap = (props: TripMapProps) => {
     viewMode,
     title,
     animations = [],
+    selectedAnimationId,
+    onSelectAnimation,
     onSaveAnimation,
     onDeleteAnimation,
     canEdit = true,
@@ -67,6 +71,7 @@ export const TripMap = (props: TripMapProps) => {
 
   const animation = useMapAnimation({
     animations,
+    selectedAnimationId,
     onSaveAnimation,
     onDeleteAnimation,
   })
@@ -78,30 +83,47 @@ export const TripMap = (props: TripMapProps) => {
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
   }, [])
 
-  // Controls visibility in fullscreen
+  // Ensure controls are visible when exiting fullscreen
   useEffect(() => {
     if (!isFullScreen) {
-      if (!controlsVisible) setControlsVisible(true)
-      return
+      const timer = setTimeout(() => setControlsVisible(true), 0)
+      return () => clearTimeout(timer)
     }
+  }, [isFullScreen])
+
+  // Controls auto-hide visibility in fullscreen
+  useEffect(() => {
+    if (!isFullScreen) return
+
     const resetTimer = () => {
       setControlsVisible(true)
       if (hideControlsTimerRef.current) clearTimeout(hideControlsTimerRef.current)
-      hideControlsTimerRef.current = setTimeout(() => setControlsVisible(false), 3000)
+      hideControlsTimerRef.current = setTimeout(() => {
+        if (isFullScreen && animation.isPlaying) {
+          setControlsVisible(false)
+        }
+      }, 3000)
     }
+
     const container = containerRef.current
     if (container) {
       container.addEventListener("mousemove", resetTimer)
       container.addEventListener("mousedown", resetTimer)
     }
-    resetTimer()
+
+    // Only show controls on mount if NOT playing (to avoid fade-in when starting)
+    if (!animation.isPlaying) {
+      resetTimer()
+    }
+
     return () => {
+      if (hideControlsTimerRef.current) clearTimeout(hideControlsTimerRef.current)
       if (container) {
         container.removeEventListener("mousemove", resetTimer)
         container.removeEventListener("mousedown", resetTimer)
       }
     }
-  }, [isFullScreen, controlsVisible])
+  }, [isFullScreen, animation.isPlaying])
 
   const handleToggleFullScreen = useCallback(() => {
     if (!containerRef.current) return
@@ -111,6 +133,82 @@ export const TripMap = (props: TripMapProps) => {
       document.exitFullscreen()
     }
   }, [])
+
+  const sortedActivities = useMemo(() => {
+    // If in animation mode and an animation is selected, only show activities from that animation
+    if (viewMode === "animation" && animation.currentAnimation?.steps) {
+      const animationActivityIds = new Set(
+        animation.currentAnimation.steps.map((step) => step.activityId).filter(Boolean),
+      )
+      return (activities || [])
+        .filter((a) => a.latitude && a.longitude && animationActivityIds.has(a.id))
+        .sort((a, b) => {
+          // Sort by the order in animation steps
+          const indexA = animation.currentAnimation!.steps.findIndex((s) => s.activityId === a.id)
+          const indexB = animation.currentAnimation!.steps.findIndex((s) => s.activityId === b.id)
+          return indexA - indexB
+        })
+    }
+
+    // Otherwise, show all activities sorted by time
+    return (activities || [])
+      .filter((a) => a.latitude && a.longitude)
+      .sort((a, b) => {
+        const timeA = a.scheduledStart ? new Date(a.scheduledStart).getTime() : 0
+        const timeB = b.scheduledStart ? new Date(b.scheduledStart).getTime() : 0
+        return timeA - timeB
+      })
+  }, [activities, viewMode, animation.currentAnimation])
+
+  const handlePlayPauseWithDelay = useCallback(() => {
+    // If starting play in fullscreen, hide immediately then delay the start
+    if (!animation.isPlaying && isFullScreen) {
+      setControlsVisible(false)
+      setTimeout(() => {
+        animation.setIsPlaying(true)
+      }, 500) // Match the 0.5s transition in AnimationController
+    } else {
+      animation.handlePlayPause()
+    }
+  }, [animation, isFullScreen])
+
+  const handleResetWithView = useCallback(() => {
+    animation.handleReset()
+
+    // If in fullscreen, reset the map view to show all activities
+    if (isFullScreen && sortedActivities.length > 0) {
+      const lats = sortedActivities.map((a) => a.latitude).filter(Boolean) as number[]
+      const lngs = sortedActivities.map((a) => a.longitude).filter(Boolean) as number[]
+
+      if (lats.length > 0 && lngs.length > 0) {
+        const minLat = Math.min(...lats)
+        const maxLat = Math.max(...lats)
+        const minLng = Math.min(...lngs)
+        const maxLng = Math.max(...lngs)
+
+        const centerLat = (minLat + maxLat) / 2
+        const centerLng = (minLng + maxLng) / 2
+
+        // Calculate appropriate zoom level based on bounds
+        // This is a simple heuristic; you might want to refine it
+        const latDiff = maxLat - minLat
+        const lngDiff = maxLng - minLng
+        const maxDiff = Math.max(latDiff, lngDiff)
+
+        let zoom = 10
+        if (maxDiff < 0.01) zoom = 15
+        else if (maxDiff < 0.05) zoom = 13
+        else if (maxDiff < 0.1) zoom = 12
+        else if (maxDiff < 0.5) zoom = 10
+        else if (maxDiff < 1) zoom = 9
+        else if (maxDiff < 5) zoom = 7
+        else if (maxDiff < 10) zoom = 6
+        else zoom = 5
+
+        setMapState({ center: [centerLat, centerLng], zoom })
+      }
+    }
+  }, [animation, isFullScreen, sortedActivities])
 
   const handleMapMove = useCallback((center: [number, number], zoom: number) => {
     setMapState({ center, zoom })
@@ -128,21 +226,11 @@ export const TripMap = (props: TripMapProps) => {
       if (activity?.latitude && activity?.longitude) {
         const currentCenter = mapState.center
         if (currentCenter[0] !== activity.latitude || currentCenter[1] !== activity.longitude) {
-          setMapState({ center: [activity.latitude, activity.longitude], zoom: 14 })
+          setTimeout(() => setMapState({ center: [activity.latitude, activity.longitude], zoom: 14 }), 0)
         }
       }
     }
   }, [selectedActivityId, activities, animation.isPlaying, mapState.center])
-
-  const sortedActivities = useMemo(() => {
-    return (activities || [])
-      .filter((a) => a.latitude && a.longitude)
-      .sort((a, b) => {
-        const timeA = a.scheduledStart ? new Date(a.scheduledStart).getTime() : 0
-        const timeB = b.scheduledStart ? new Date(b.scheduledStart).getTime() : 0
-        return timeA - timeB
-      })
-  }, [activities])
 
   return (
     <Paper
@@ -160,6 +248,7 @@ export const TripMap = (props: TripMapProps) => {
         display: "flex",
         flexDirection: "column",
         bgcolor: "background.paper",
+        cursor: isFullScreen && !controlsVisible ? "none" : "auto",
         "& .leaflet-control-zoom, & .leaflet-control-layers": {
           display: isFullScreen ? "none" : "block",
         },
@@ -191,29 +280,17 @@ export const TripMap = (props: TripMapProps) => {
       )}
 
       {!hideAnimationControl && viewMode === "animation" && sortedActivities.length > 0 && (
-        <Box
-          sx={{
-            zIndex: 1001,
-            position: "absolute",
-            bottom: isFullScreen ? 30 : 20,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "auto",
-            transition: "opacity 0.5s",
-            opacity: isFullScreen && !controlsVisible ? 0 : 1,
-          }}
-        >
-          <AnimationController
-            isPlaying={animation.isPlaying}
-            onPlayPause={animation.handlePlayPause}
-            onReset={animation.handleReset}
-            isFullScreen={isFullScreen}
-            onToggleFullScreen={handleToggleFullScreen}
-            progress={animation.progress}
-            t={t}
-            onOpenSettings={() => setShowSettings(true)}
-          />
-        </Box>
+        <AnimationController
+          isPlaying={animation.isPlaying}
+          onPlayPause={handlePlayPauseWithDelay}
+          onReset={handleResetWithView}
+          isFullScreen={isFullScreen}
+          onToggleFullScreen={handleToggleFullScreen}
+          progress={animation.progress}
+          t={t}
+          onOpenSettings={() => setShowSettings(true)}
+          visible={controlsVisible}
+        />
       )}
 
       {viewMode === "animation" && (
@@ -231,9 +308,10 @@ export const TripMap = (props: TripMapProps) => {
           animations={animations}
           onSave={() => animation.handleSave(animation.settings.name || "")}
           onDelete={animation.handleDelete}
-          onSelectAnimation={(id) => animation.setCurrentAnimationId(id)}
-          currentAnimationId={animation.currentAnimationId}
+          onSelectAnimation={onSelectAnimation}
+          currentAnimationId={selectedAnimationId}
           isSaving={animation.isSaving}
+          visible={!isFullScreen && controlsVisible}
         />
       )}
 
@@ -263,6 +341,7 @@ export const TripMap = (props: TripMapProps) => {
 
           {viewMode === "animation" && sortedActivities.length > 0 && (
             <TripAnimationLayer
+              key={animation.resetKey}
               activities={sortedActivities}
               isPlaying={animation.isPlaying}
               onAnimationComplete={() => {

@@ -1,22 +1,26 @@
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 
 import type { TripAnimation } from "../types"
 
 interface UseMapAnimationProps {
   animations?: TripAnimation[]
+  selectedAnimationId?: string
   onSaveAnimation?: (animation: Partial<TripAnimation>) => Promise<void>
   onDeleteAnimation?: (id: string) => Promise<void>
 }
 
-export const useMapAnimation = ({ animations = [], onSaveAnimation, onDeleteAnimation }: UseMapAnimationProps) => {
+export const useMapAnimation = ({
+  animations = [],
+  selectedAnimationId,
+  onSaveAnimation,
+  onDeleteAnimation,
+}: UseMapAnimationProps) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [currentAnimationId, setCurrentAnimationId] = useState<string | undefined>(
-    animations.length > 0 ? animations[0].id : undefined,
-  )
   const [isSaving, setIsSaving] = useState(false)
+  const [resetKey, setResetKey] = useState(0)
 
-  const currentAnimation = animations.find((a) => a.id === currentAnimationId)
+  const currentAnimation = animations.find((a) => a.id === selectedAnimationId)
 
   const [settings, setSettings] = useState({
     name: currentAnimation?.name || "",
@@ -46,48 +50,22 @@ export const useMapAnimation = ({ animations = [], onSaveAnimation, onDeleteAnim
     }
   }, [currentAnimation])
 
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  const resetTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current)
-      timerRef.current = null
-    }
-  }, [])
-
-  useEffect(() => {
-    if (isPlaying) {
-      const step = (settings.speedFactor / 1000) * 0.1 // Adjusted based on speedFactor
-      timerRef.current = setInterval(() => {
-        setProgress((prev) => {
-          const next = prev + step
-          if (next >= 1) {
-            if (settings.loop) return 0
-            setIsPlaying(false)
-            resetTimer()
-            return 1
-          }
-          return next
-        })
-      }, 50)
-    } else {
-      resetTimer()
-    }
-    return () => resetTimer()
-  }, [isPlaying, settings.speedFactor, settings.loop, resetTimer])
+  // Note: Progress is now controlled by TripAnimationLayer via onProgressUpdate callback
+  // No need for independent timer here
 
   const handlePlayPause = () => setIsPlaying(!isPlaying)
   const handleReset = () => {
     setIsPlaying(false)
     setProgress(0)
+    setResetKey((prev) => prev + 1)
   }
 
   const handleSave = async (name: string) => {
-    if (!onSaveAnimation) return
+    if (!onSaveAnimation || !selectedAnimationId) return
     setIsSaving(true)
     try {
       await onSaveAnimation({
-        id: currentAnimationId,
+        id: selectedAnimationId,
         name,
         settings: {
           transitionDuration: settings.transitionDuration,
@@ -106,11 +84,10 @@ export const useMapAnimation = ({ animations = [], onSaveAnimation, onDeleteAnim
   }
 
   const handleDelete = async () => {
-    if (!onDeleteAnimation || !currentAnimationId) return
+    if (!onDeleteAnimation || !selectedAnimationId) return
     if (!window.confirm("Are you sure you want to delete this animation?")) return
     try {
-      await onDeleteAnimation(currentAnimationId)
-      setCurrentAnimationId(animations.length > 0 ? animations[0].id : undefined)
+      await onDeleteAnimation(selectedAnimationId)
     } catch (err) {
       console.error("Failed to delete animation", err)
     }
@@ -123,13 +100,12 @@ export const useMapAnimation = ({ animations = [], onSaveAnimation, onDeleteAnim
     setProgress,
     settings,
     setSettings,
-    currentAnimationId,
-    setCurrentAnimationId,
     currentAnimation,
     isSaving,
     handlePlayPause,
     handleReset,
     handleSave,
     handleDelete,
+    resetKey,
   }
 }

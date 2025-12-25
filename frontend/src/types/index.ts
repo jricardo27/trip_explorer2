@@ -100,16 +100,8 @@ export interface Trip {
   updatedAt: string
 }
 
-export interface TripAnimation {
-  id: string
-  tripId: string
-  name: string
-  description?: string
-  settings: any
-  steps: TripAnimationStep[]
-  createdAt: string
-  updatedAt: string
-}
+import type { TripAnimation, TripAnimationStep } from "./animation"
+export type { TripAnimation, TripAnimationStep }
 
 export interface TripMember {
   id: string
@@ -121,19 +113,6 @@ export interface TripMember {
   avatarUrl?: string
   color?: string
   createdAt: string
-}
-
-export interface TripAnimationStep {
-  id: string
-  animationId: string
-  activityId?: string
-  orderIndex: number
-  isVisible: boolean
-  customLabel?: string
-  zoomLevel?: number
-  transportMode?: string
-  settings: any
-  activity?: Activity
 }
 
 export interface TripDay {

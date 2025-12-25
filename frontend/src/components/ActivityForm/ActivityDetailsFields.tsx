@@ -33,7 +33,7 @@ export const ActivityDetailsFields = ({
 
   return (
     <>
-      <Grid size={{ xs: 4 }}>
+      <Grid size={{ xs: 6 }}>
         <TextField
           fullWidth
           label={t("phone")}
@@ -42,7 +42,7 @@ export const ActivityDetailsFields = ({
           disabled={!canEdit}
         />
       </Grid>
-      <Grid size={{ xs: 4 }}>
+      <Grid size={{ xs: 6 }}>
         <TextField
           fullWidth
           label={t("email")}
@@ -51,7 +51,7 @@ export const ActivityDetailsFields = ({
           disabled={!canEdit}
         />
       </Grid>
-      <Grid size={{ xs: 4 }}>
+      <Grid size={{ xs: 12 }}>
         <TextField
           fullWidth
           label={t("website")}

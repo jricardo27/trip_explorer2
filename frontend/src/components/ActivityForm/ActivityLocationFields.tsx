@@ -24,7 +24,7 @@ export const ActivityLocationFields = ({
 
   return (
     <>
-      <Grid size={{ xs: 5 }}>
+      <Grid size={{ xs: 6 }}>
         <TextField
           fullWidth
           label={t("latitude")}
@@ -35,7 +35,7 @@ export const ActivityLocationFields = ({
           disabled={!canEdit}
         />
       </Grid>
-      <Grid size={{ xs: 5 }}>
+      <Grid size={{ xs: 6 }}>
         <TextField
           fullWidth
           label={t("longitude")}
@@ -46,7 +46,7 @@ export const ActivityLocationFields = ({
           disabled={!canEdit}
         />
       </Grid>
-      <Grid size={{ xs: 2 }} sx={{ display: "flex", alignItems: "center" }}>
+      <Grid size={{ xs: 12 }}>
         <Button
           variant="outlined"
           fullWidth

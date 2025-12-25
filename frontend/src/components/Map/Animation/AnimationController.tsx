@@ -10,6 +10,7 @@ interface AnimationControllerProps {
   progress: number
   t: (key: any) => string
   onOpenSettings?: () => void
+  visible?: boolean
 }
 
 export const AnimationController = ({
@@ -21,17 +22,21 @@ export const AnimationController = ({
   progress,
   t,
   onOpenSettings,
+  visible = true,
 }: AnimationControllerProps) => {
   return (
     <Box
       sx={{
         position: "absolute",
-        bottom: 24,
+        bottom: isFullScreen ? 30 : 24,
         left: "50%",
         transform: "translateX(-50%)",
-        zIndex: 1000,
+        zIndex: 1001,
         width: "90%",
         maxWidth: 600,
+        opacity: visible ? 1 : 0,
+        transition: "opacity 0.5s ease-in-out",
+        pointerEvents: visible ? "auto" : "none",
       }}
     >
       <Paper
@@ -82,11 +87,13 @@ export const AnimationController = ({
             />
           </Box>
 
-          <Tooltip title={t("settings")}>
-            <IconButton onClick={onOpenSettings}>
-              <SettingsIcon />
-            </IconButton>
-          </Tooltip>
+          {!isFullScreen && (
+            <Tooltip title={t("settings")}>
+              <IconButton onClick={onOpenSettings}>
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+          )}
 
           <Tooltip title={isFullScreen ? t("exitFullscreen") : t("fullscreen")}>
             <IconButton onClick={onToggleFullScreen}>{isFullScreen ? <FullscreenExit /> : <Fullscreen />}</IconButton>

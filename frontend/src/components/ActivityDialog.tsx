@@ -10,6 +10,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Grid,
 } from "@mui/material"
 import React, { useState } from "react"
 
@@ -111,7 +112,7 @@ const ActivityDialog = ({
                 {form.error}
               </Alert>
             )}
-            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 2 }}>
+            <Grid container spacing={2} columns={12}>
               <ActivityBasicFields
                 name={form.name}
                 setName={form.setName}
@@ -170,7 +171,7 @@ const ActivityDialog = ({
                 handleToggleMember={form.handleToggleMember}
                 canEdit={canEdit}
               />
-            </Box>
+            </Grid>
           </Box>
         </form>
       </DialogContent>

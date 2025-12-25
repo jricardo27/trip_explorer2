@@ -101,6 +101,25 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   const legIndexRef = useRef<number>(-1)
   const legDurationRef = useRef<number>(2000)
   const lastProgressRef = useRef<number>(0)
+  const lastUiUpdateProgressRef = useRef<number>(0)
+  const lastReportedProgressRef = useRef<number>(0)
+  const movingMarkerRef = useRef<L.Marker>(null)
+
+  // Stable refs for callbacks
+  const onAnimationCompleteRef = useRef(onAnimationComplete)
+  const onProgressUpdateRef = useRef(onProgressUpdate)
+
+  useEffect(() => {
+    onAnimationCompleteRef.current = onAnimationComplete
+    onProgressUpdateRef.current = onProgressUpdate
+  }, [onAnimationComplete, onProgressUpdate])
+
+  // Helper to update marker position imperatively
+  const updateMarkerPosition = useCallback((pos: [number, number]) => {
+    if (movingMarkerRef.current) {
+      movingMarkerRef.current.setLatLng(pos)
+    }
+  }, [])
 
   // Keep phaseRef in sync
   useEffect(() => {
@@ -118,7 +137,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
 
   // Calculate and report overall progress
   useEffect(() => {
-    if (!onProgressUpdate || coords.length < 2) return
+    if (!onProgressUpdateRef.current || coords.length < 2) return
 
     let overallProgress = 0
     const totalLegs = coords.length - 1
@@ -131,11 +150,39 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       overallProgress = 1
     } else {
       // Scale current index and travel progress to 0-1
-      overallProgress = Math.min(1, (currentActivityIndex + travelProgress) / totalLegs)
+      const rawProgress = (currentActivityIndex + travelProgress) / totalLegs
+
+      // Ensure progress is monotonic (never goes backwards for the UI)
+      // We allow it to go to 0 only if we are truly stopped/reset (handled by parent passing new key)
+      // But if we are just moving leg to leg, it should increase.
+
+      // However, if we loop or reset, we might want it to go back.
+      // But for the reported issue, let's clamp it to be >= lastUiUpdateProgress
+
+      // Wait, if travelProgress resets to 0 (new leg), currentActivityIndex has increased by 1.
+      // (idx + 0) / N > (idx-1 + 1) / N ?  No, they are equal.
+      // So transition should be smooth.
+
+      // If user reported 43% -> 29%, it means (idx + p) dropped significantly.
+      // This implies idx might have been unstable or p went to 0 BEFORE idx incremented.
+
+      // Let's use max(rawProgress, lastUiUpdateProgressRef.current)
+      // UNLESS rawProgress is very small (restart).
+
+      let newProgress = rawProgress
+      if (Math.abs(rawProgress - lastReportedProgressRef.current) < 0.2) {
+        // If close, ensure monotonicity
+        newProgress = Math.max(rawProgress, lastReportedProgressRef.current)
+      } else {
+        // Large jump (e.g. restart or seek), allow it.
+      }
+
+      overallProgress = Math.min(1, newProgress)
     }
 
-    onProgressUpdate(overallProgress * 100)
-  }, [currentActivityIndex, travelProgress, phase, coords.length, onProgressUpdate])
+    lastReportedProgressRef.current = overallProgress
+    onProgressUpdateRef.current(overallProgress * 100)
+  }, [currentActivityIndex, travelProgress, phase, coords.length])
 
   // Cleanup timers and animation frames
   const cleanup = useCallback(() => {
@@ -159,19 +206,15 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   useEffect(() => {
     if (!isPlaying) {
       cleanup()
-      if (phase !== AnimationPhase.STOPPED) {
-        console.log(`TripAnimationLayer: Stopping animation and resetting. Current phase: ${phase}`)
-        setTimeout(() => setPhase(AnimationPhase.STOPPED), 0)
-      }
-      setTimeout(() => {
-        setCurrentActivityIndex(0)
-        setTravelProgress(0)
-      }, 0)
+      // Do NOT reset phase or progress here. This allows "Pausing".
+      // The parent component (TripMap/useMapAnimation) handles "Stop/Reset"
+      // by unmounting and remounting this component with a key, or we will rely on
+      // explicit reset props if needed. But for now, unmounting/key change is the cleanest "Stop".
       return
     }
 
     if (validActivities.length < 1) {
-      onAnimationComplete()
+      onAnimationCompleteRef.current()
       return
     }
 
@@ -208,7 +251,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
       case AnimationPhase.FINAL_OVERVIEW_PAUSE:
         phaseTimeoutRef.current = setTimeout(() => {
           setPhase(AnimationPhase.STOPPED)
-          onAnimationComplete()
+          onAnimationCompleteRef.current()
         }, 3000)
         break
 
@@ -218,16 +261,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     }
 
     return cleanup
-  }, [
-    phase,
-    isPlaying,
-    onAnimationComplete,
-    validActivities.length,
-    coords.length,
-    currentActivityIndex,
-    cleanup,
-    settings.stayDuration,
-  ])
+  }, [phase, isPlaying, validActivities.length, coords.length, currentActivityIndex, cleanup, settings.stayDuration])
 
   // Effect for Map Movements and Animation Loop
   useEffect(() => {
@@ -267,7 +301,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
           map.once("moveend", handleMoveEnd)
           transitionTimeoutRef.current = setTimeout(handleMoveEnd, settings.transitionDuration * 1000 + 200)
         } else {
-          onAnimationComplete()
+          onAnimationCompleteRef.current()
         }
         break
       }
@@ -312,6 +346,9 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
           lastProgressRef.current = 0
           setTimeout(() => setTravelProgress(0), 0)
           previousTimeRef.current = undefined
+
+          // Initial marker position update
+          if (p1) updateMarkerPosition(p1)
         }
 
         const animate = (time: number) => {
@@ -345,7 +382,24 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
           if (nextProgress > lastProgressRef.current) {
             travelProgressRef.current = nextProgress
             lastProgressRef.current = nextProgress
-            setTravelProgress(nextProgress)
+
+            // IMPERATIVE UPDATE: Update Marker Position directly
+            const currentPos = getGreatCirclePoint(p1, p2, nextProgress)
+            if (currentPos && movingMarkerRef.current) {
+              movingMarkerRef.current.setLatLng(currentPos)
+            }
+
+            // THROTTLED STATE UPDATE: Only update React state every ~100ms or 10% change to avoid re-renders
+            // This is just for the progress bar
+            // Use a ref to track the last UI update to avoid dependency on state (which would be stale in the closure)
+            if (
+              Math.abs(nextProgress - lastUiUpdateProgressRef.current) > 0.05 ||
+              nextProgress >= 1 ||
+              nextProgress <= 0
+            ) {
+              setTravelProgress(nextProgress)
+              lastUiUpdateProgressRef.current = nextProgress
+            }
           }
 
           if (nextProgress < 1) {
@@ -354,6 +408,10 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
             console.log(
               `TripAnimationLayer: Leg complete. Transitioning to next activity. Index: ${currentActivityIndex + 1}`,
             )
+            // Ensure final position is set
+            updateMarkerPosition(p2)
+            setTravelProgress(1)
+
             setTimeout(() => {
               if (phaseRef.current === AnimationPhase.TRAVEL) {
                 setCurrentActivityIndex((idx) => idx + 1)
@@ -378,7 +436,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
           map.once("moveend", handleMoveEnd)
           transitionTimeoutRef.current = setTimeout(handleMoveEnd, 1700)
         } else {
-          onAnimationComplete()
+          onAnimationCompleteRef.current()
         }
         break
       }
@@ -393,7 +451,9 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     currentActivityIndex,
     settings.transitionDuration,
     settings.speedFactor,
-    onAnimationComplete,
+    updateMarkerPosition,
+    // Note: Removed travelProgress from dependencies to avoid re-running effect on throttled updates
+    // But we need to use ref for travelProgress anyway
   ])
 
   // --- RENDER LOGIC ---
@@ -426,41 +486,48 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     )
 
     let movingMarker = null
+    // Always render the marker when in TRAVEL phase, but position it initially
+    // The animation loop will update it imperatively
     if (phase === AnimationPhase.TRAVEL) {
-      const currentPos = getGreatCirclePoint(origin, destination, travelProgress)
-      if (currentPos) {
-        // Use transport icon for the moving marker
-        const destActivity = validActivities[idx + 1]
-        const transportMode = (destActivity as any).transportMode
-        const TransportIcon = getTransportIconComponent(transportMode) || MdDirectionsCar
-        const { color } = getActivityVisuals(destActivity)
+      // Initial position for the render cycle.
+      // Note: During animation, React won't re-render this unless travelProgress state changes (throttled).
+      // Using travelProgressRef or calculating it might be needed for the *initial* mount of the marker.
+      // Actually, we can just use the last known good position from the throttled state or start.
 
-        const iconHtml = renderToStaticMarkup(
-          <div
-            style={{
-              color: color,
-              fontSize: "24px",
-              background: "white",
-              borderRadius: "50%",
-              padding: "4px",
-              boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: `2px solid ${color}`,
-            }}
-          >
-            <TransportIcon />
-          </div>,
-        )
-        const divIcon = L.divIcon({
-          html: iconHtml,
-          className: "trip-animation-icon",
-          iconSize: [36, 36],
-          iconAnchor: [18, 18],
-        })
-        movingMarker = <Marker position={currentPos} icon={divIcon} zIndexOffset={2000} />
-      }
+      const currentPos = getGreatCirclePoint(origin, destination, travelProgress)
+      // Use transport icon for the moving marker
+      const destActivity = validActivities[idx + 1]
+      const transportMode = (destActivity as any).transportMode
+      const TransportIcon = getTransportIconComponent(transportMode) || MdDirectionsCar
+      const { color } = getActivityVisuals(destActivity)
+
+      const iconHtml = renderToStaticMarkup(
+        <div
+          style={{
+            color: color,
+            fontSize: "24px",
+            background: "white",
+            borderRadius: "50%",
+            padding: "4px",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.3)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: `2px solid ${color}`,
+          }}
+        >
+          <TransportIcon />
+        </div>,
+      )
+      const divIcon = L.divIcon({
+        html: iconHtml,
+        className: "trip-animation-icon",
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+      })
+
+      // IMPORTANT: ref={movingMarkerRef} to allow imperative updates
+      movingMarker = <Marker ref={movingMarkerRef} position={currentPos} icon={divIcon} zIndexOffset={2000} />
     }
 
     return (

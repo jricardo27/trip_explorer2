@@ -30,9 +30,10 @@ interface AnimationSettingsSidebarProps {
   animations?: TripAnimation[]
   onSave: () => void
   onDelete: () => void
-  onSelectAnimation: (id: string) => void
+  onSelectAnimation?: (id: string) => void
   currentAnimationId?: string
   isSaving?: boolean
+  visible?: boolean
 }
 
 export const AnimationSettingsSidebar = ({
@@ -47,6 +48,7 @@ export const AnimationSettingsSidebar = ({
   onSelectAnimation,
   currentAnimationId,
   isSaving = false,
+  visible = true,
 }: AnimationSettingsSidebarProps) => (
   <>
     <IconButton
@@ -59,6 +61,10 @@ export const AnimationSettingsSidebar = ({
         bgcolor: "white",
         boxShadow: 2,
         "&:hover": { bgcolor: "grey.100" },
+        opacity: visible ? 1 : 0,
+        transition: "opacity 0.5s ease-in-out",
+        pointerEvents: visible ? "auto" : "none",
+        visibility: visible ? "visible" : "hidden",
       }}
     >
       <SettingsIcon />
@@ -88,7 +94,7 @@ export const AnimationSettingsSidebar = ({
             fullWidth
             size="small"
             value={currentAnimationId || ""}
-            onChange={(e) => onSelectAnimation(e.target.value)}
+            onChange={(e) => onSelectAnimation?.(e.target.value)}
             displayEmpty
           >
             <MenuItem value="" disabled>
@@ -102,7 +108,7 @@ export const AnimationSettingsSidebar = ({
             <MenuItem
               value="new"
               sx={{ fontStyle: "italic", color: "primary.main" }}
-              onClick={() => onSelectAnimation("new")}
+              onClick={() => onSelectAnimation?.("new")}
             >
               + {t("createNew") || "Crear Nueva"}
             </MenuItem>

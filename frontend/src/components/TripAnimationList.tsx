@@ -1,4 +1,4 @@
-import { PlayArrow, Edit, Delete, Add } from "@mui/icons-material"
+import { Edit, Delete, Add } from "@mui/icons-material"
 import {
   Box,
   Paper,
@@ -6,7 +6,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   Chip,
   Dialog,
@@ -23,7 +22,8 @@ import type { TripAnimation } from "../types"
 
 interface TripAnimationListProps {
   animations: TripAnimation[]
-  onPlay: (animation: TripAnimation) => void
+  selectedAnimationId?: string
+  onSelect: (id: string) => void
   onEdit: (animation: TripAnimation) => void
   onDelete: (id: string) => void
   onCreate: () => void
@@ -32,7 +32,8 @@ interface TripAnimationListProps {
 
 export const TripAnimationList: React.FC<TripAnimationListProps> = ({
   animations,
-  onPlay,
+  selectedAnimationId,
+  onSelect,
   onEdit,
   onDelete,
   onCreate,
@@ -78,15 +79,48 @@ export const TripAnimationList: React.FC<TripAnimationListProps> = ({
           {animations.map((animation) => (
             <ListItem
               key={animation.id}
+              onClick={() => onSelect(animation.id)}
               sx={{
                 border: 1,
-                borderColor: "divider",
+                borderColor: selectedAnimationId === animation.id ? "primary.main" : "divider",
                 borderRadius: 1,
                 mb: 1,
+                cursor: "pointer",
+                bgcolor: selectedAnimationId === animation.id ? "action.selected" : "transparent",
                 "&:hover": {
                   bgcolor: "action.hover",
                 },
               }}
+              secondaryAction={
+                <Box display="flex" gap={0.5}>
+                  <Tooltip title={t("editAnimation")}>
+                    <IconButton
+                      edge="end"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEdit(animation)
+                      }}
+                      size="small"
+                    >
+                      <Edit fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t("deleteAnimation")}>
+                    <IconButton
+                      edge="end"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteClick(animation)
+                      }}
+                      color="error"
+                      size="small"
+                      disabled={isDeleting}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              }
             >
               <ListItemText
                 primary={
@@ -108,31 +142,6 @@ export const TripAnimationList: React.FC<TripAnimationListProps> = ({
                   </Box>
                 }
               />
-              <ListItemSecondaryAction>
-                <Box display="flex" gap={0.5}>
-                  <Tooltip title={t("playAnimation")}>
-                    <IconButton edge="end" onClick={() => onPlay(animation)} color="primary" size="small">
-                      <PlayArrow />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t("editAnimation")}>
-                    <IconButton edge="end" onClick={() => onEdit(animation)} size="small">
-                      <Edit fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t("deleteAnimation")}>
-                    <IconButton
-                      edge="end"
-                      onClick={() => handleDeleteClick(animation)}
-                      color="error"
-                      size="small"
-                      disabled={isDeleting}
-                    >
-                      <Delete fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
