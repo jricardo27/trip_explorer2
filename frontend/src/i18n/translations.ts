@@ -215,6 +215,8 @@ export const translations = {
     flyToLocation: "Fly to location on map",
     copyActivity: "Copy this activity",
     copyActivityAsLink: "Copy as Link (Synced)",
+    copyAsLink: "Copy as Link (Synced)",
+    addActivityHere: "Add Activity Here",
     notAvailableOn: "This activity is usually not available on",
 
     availableDaysLabel: "Available days",
@@ -399,6 +401,7 @@ export const translations = {
     renameScenario: "Rename Scenario",
     scenarioName: "Scenario Name",
     enterScenarioName: "Enter Scenario Name",
+    compareScenarios: "Compare Scenarios",
   },
   es: {
     // Navigation
@@ -616,6 +619,8 @@ export const translations = {
     flyToLocation: "Volar a la ubicación en el mapa",
     copyActivity: "Copiar esta actividad",
     copyActivityAsLink: "Copiar como Enlace (Sincronizado)",
+    copyAsLink: "Copiar como Enlace (Sincronizado)",
+    addActivityHere: "Agregar Actividad Aquí",
     notAvailableOn: "Esta actividad generalmente no está disponible en",
 
     // Scenarios
@@ -624,6 +629,7 @@ export const translations = {
     renameScenario: "Renombrar Escenario",
     scenarioName: "Nombre del Escenario",
     enterScenarioName: "Ingresar Nombre",
+    compareScenarios: "Comparar Escenarios",
 
     availableDaysLabel: "Días disponibles",
 

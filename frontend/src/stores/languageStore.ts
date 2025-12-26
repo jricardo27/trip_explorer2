@@ -17,7 +17,13 @@ export const useLanguageStore = create<LanguageState>()(
       setLanguage: (language: Language) => set({ language }),
       t: (key: TranslationKey) => {
         const { language } = get()
-        return translations[language][key] || key
+        const translation = translations[language][key]
+        if (!translation) {
+          console.warn(`[LanguageStore] Missing translation for key: "${key}" in language: "${language}"`)
+          // In development, show the key clearly to identify missing translations
+          return `[${key}]`
+        }
+        return translation
       },
     }),
     {

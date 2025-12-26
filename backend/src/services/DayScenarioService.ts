@@ -158,6 +158,13 @@ export class DayScenarioService {
     })
   }
 
+  async deselectAllScenarios(tripDayId: string): Promise<void> {
+    await prisma.dayScenario.updateMany({
+      where: { tripDayId },
+      data: { isSelected: false },
+    })
+  }
+
   async updateScenario(
     scenarioId: string,
     data: {

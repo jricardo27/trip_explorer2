@@ -79,6 +79,13 @@ export const TimelineCalendarView = ({
   const [targetDayId, setTargetDayId] = useState("")
   const [newName, setNewName] = useState("")
 
+  // Comparison Mode State
+  const [comparisonDayId, setComparisonDayId] = useState<string | null>(null)
+
+  const handleToggleComparison = (dayId: string) => {
+    setComparisonDayId((current) => (current === dayId ? null : dayId))
+  }
+
   const handleActivityDragStart = (e: React.DragEvent, activity: Activity) => {
     if (activity.isLocked) {
       e.preventDefault()
@@ -334,6 +341,8 @@ export const TimelineCalendarView = ({
               handleOpenRenameScenario={handleOpenRenameScenario}
               handleDayMenuOpen={handleDayMenuOpen}
               dragPreview={dragPreview ? { ...dragPreview, top: dragPreview.yPosition } : null}
+              isComparisonMode={comparisonDayId === day.id}
+              onToggleComparison={handleToggleComparison}
             />
           ))}
         </Box>

@@ -31,7 +31,18 @@ export const updateTripSchema = z.object({
 export const createActivitySchema = z.object({
   tripId: z.string().uuid(),
   tripDayId: z.string().uuid(), // Required - activities must be assigned to a trip day
-  activityType: z.enum(["ACCOMMODATION", "RESTAURANT", "ATTRACTION", "TRANSPORT", "CUSTOM"]),
+  activityType: z.enum([
+    "ACCOMMODATION",
+    "RESTAURANT",
+    "ATTRACTION",
+    "TRANSPORT",
+    "FLIGHT",
+    "ACTIVITY",
+    "TOUR",
+    "EVENT",
+    "LOCATION",
+    "CUSTOM",
+  ]),
   name: z.string().min(1).max(255),
   description: z.string().optional(),
   notes: z.string().optional(),
@@ -51,7 +62,20 @@ export const createActivitySchema = z.object({
 
 export const updateActivitySchema = z.object({
   tripDayId: z.string().uuid().optional(),
-  activityType: z.enum(["ACCOMMODATION", "RESTAURANT", "ATTRACTION", "TRANSPORT", "CUSTOM"]).optional(),
+  activityType: z
+    .enum([
+      "ACCOMMODATION",
+      "RESTAURANT",
+      "ATTRACTION",
+      "TRANSPORT",
+      "FLIGHT",
+      "ACTIVITY",
+      "TOUR",
+      "EVENT",
+      "LOCATION",
+      "CUSTOM",
+    ])
+    .optional(),
   name: z.string().min(1).max(255).optional(),
   description: z.string().optional(),
   notes: z.string().optional(),

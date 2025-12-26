@@ -1,5 +1,5 @@
-import { Edit } from "@mui/icons-material"
-import { Box, Paper, Typography, FormControl, Select, MenuItem, IconButton } from "@mui/material"
+import { Edit, CompareArrows } from "@mui/icons-material"
+import { Box, Paper, Typography, FormControl, Select, MenuItem, IconButton, Tooltip } from "@mui/material"
 import dayjs from "dayjs"
 
 import { useLanguageStore } from "../../stores/languageStore"
@@ -12,6 +12,8 @@ interface TimelineDayHeaderProps {
   onOpenRenameScenario: (dayId: string, scenarioId: string, currentName: string) => void
   totalCost: number
   dayHeaderHeight: number
+  isComparisonMode: boolean
+  onToggleComparison: (dayId: string) => void
 }
 
 export const TimelineDayHeader = ({
@@ -21,6 +23,8 @@ export const TimelineDayHeader = ({
   onOpenRenameScenario,
   totalCost,
   dayHeaderHeight,
+  isComparisonMode,
+  onToggleComparison,
 }: TimelineDayHeaderProps) => {
   const { t } = useLanguageStore()
 
@@ -55,6 +59,17 @@ export const TimelineDayHeader = ({
       </Box>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Tooltip title={t("compareScenarios") || "Compare Scenarios"}>
+          <IconButton
+            size="small"
+            onClick={() => onToggleComparison(day.id)}
+            color={isComparisonMode ? "primary" : "default"}
+            disabled={!day.scenarios || day.scenarios.length === 0}
+          >
+            <CompareArrows />
+          </IconButton>
+        </Tooltip>
+
         <FormControl variant="standard" size="small" sx={{ minWidth: 120, flexGrow: 1 }}>
           <Select
             value={selectedScenario?.id || "main"}

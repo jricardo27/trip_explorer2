@@ -34,7 +34,7 @@ interface TripDetailsContentProps {
   handleDeleteAnimation: (id: string) => Promise<void>
   handleDayOperation: (type: "move_all" | "swap" | "rename", dayId: string, payload: any) => Promise<void>
   updateActivity: (params: { id: string; data: any }) => Promise<any>
-  selectScenario: (scenarioId: string) => Promise<any>
+  selectScenario: (params: { scenarioId: string | null; tripDayId: string }) => Promise<any>
   createScenario: (params: { tripDayId: string; name: string }) => Promise<any>
   updateScenario: (params: { tripDayId: string; scenarioId: string; data: { name: string } }) => Promise<any>
   onTransportClick?: (transport: any) => void
@@ -136,10 +136,8 @@ export const TripDetailsContent = ({
           onActivityUpdate={(id, data) => updateActivity({ id, data })}
           onActivityCopy={handleCopyActivity}
           onDayOperation={handleDayOperation}
-          onScenarioChange={async (_dayId, scenarioId) => {
-            if (scenarioId) {
-              await selectScenario(scenarioId)
-            }
+          onScenarioChange={async (dayId: string, scenarioId: string | null) => {
+            await selectScenario({ scenarioId, tripDayId: dayId })
           }}
           onCreateScenario={async (dayId, name) => {
             await createScenario({ tripDayId: dayId, name })

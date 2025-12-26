@@ -177,8 +177,11 @@ export const useTripDetails = (tripId: string) => {
   })
 
   const selectScenarioMutation = useMutation({
-    mutationFn: async (scenarioId: string) => {
-      if (!scenarioId) return // Handle deselect if needed
+    mutationFn: async ({ scenarioId, tripDayId }: { scenarioId: string | null; tripDayId: string }) => {
+      if (!scenarioId) {
+        await client.post(`/scenarios/days/${tripDayId}/scenarios/deselect-all`)
+        return
+      }
       const response = await client.post(`/scenarios/scenarios/${scenarioId}/select`)
       return response.data
     },

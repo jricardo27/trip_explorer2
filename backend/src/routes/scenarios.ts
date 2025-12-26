@@ -51,6 +51,16 @@ router.post("/scenarios/:id/select", authenticateToken, async (req, res, next) =
   }
 })
 
+// Deselect all scenarios for a day (back to main plan)
+router.post("/days/:dayId/scenarios/deselect-all", authenticateToken, async (req, res, next) => {
+  try {
+    await dayScenarioService.deselectAllScenarios(req.params.dayId)
+    res.status(204).send()
+  } catch (error) {
+    next(error)
+  }
+})
+
 // Update a scenario
 router.patch("/scenarios/:id", authenticateToken, async (req, res, next) => {
   try {

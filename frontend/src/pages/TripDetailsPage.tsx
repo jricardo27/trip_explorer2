@@ -98,10 +98,11 @@ const TripDetailsPage = () => {
   }
 
   const handleSubmitActivity = async (data: any) => {
-    if (editingActivity) {
+    const tripDayId = editingActivity?.tripDayId || selectedDayId
+    if (editingActivity && editingActivity.id) {
       await updateActivity({ id: editingActivity.id, data })
     } else {
-      await createActivity({ ...data, tripId: tripId!, tripDayId: selectedDayId })
+      await createActivity({ ...data, tripId: tripId!, tripDayId })
     }
     setDialogOpen(false)
   }
