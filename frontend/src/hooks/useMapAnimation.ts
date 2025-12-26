@@ -32,6 +32,8 @@ export const useMapAnimation = ({
     showMarkers: currentAnimation?.settings?.showMarkers ?? true,
     showLines: currentAnimation?.settings?.showLines ?? true,
     interpolation: currentAnimation?.settings?.interpolation || "linear",
+    titleDisplayMode: currentAnimation?.settings?.titleDisplayMode || "duration",
+    titleDisplayDuration: currentAnimation?.settings?.titleDisplayDuration || 5,
   })
 
   useEffect(() => {
@@ -46,6 +48,8 @@ export const useMapAnimation = ({
         showMarkers: currentAnimation.settings?.showMarkers ?? true,
         showLines: currentAnimation.settings?.showLines ?? true,
         interpolation: currentAnimation.settings?.interpolation || "linear",
+        titleDisplayMode: currentAnimation.settings?.titleDisplayMode || "duration",
+        titleDisplayDuration: currentAnimation.settings?.titleDisplayDuration || 5,
       })
     }
   }, [currentAnimation])
@@ -76,6 +80,8 @@ export const useMapAnimation = ({
           showMarkers: settings.showMarkers,
           showLines: settings.showLines,
           interpolation: settings.interpolation,
+          titleDisplayMode: settings.titleDisplayMode,
+          titleDisplayDuration: settings.titleDisplayDuration,
         },
       })
     } finally {

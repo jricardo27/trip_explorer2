@@ -276,6 +276,13 @@ export const translations = {
     transitionDurationTooltip: "How long it takes to 'fly' to an activity.",
     stayDurationTooltip: "How long the view stays at an activity before moving.",
     travelSpeedTooltip: "The speed of movement along the path between activities.",
+    animationProgress: "Animation Progress",
+    titleDisplay: "Title Display",
+    titleDisplayTooltip: "Controls how the animation name is displayed during playback",
+    titleHide: "Hide",
+    titleDuration: "Show for duration",
+    titleAlways: "Always visible",
+    titleDurationSeconds: "Duration (seconds)",
 
     // Confirmation
     areYouSureDeleteActivity: "Are you sure you want to delete this activity?",
@@ -677,6 +684,13 @@ export const translations = {
     transitionDurationTooltip: "Cuánto tiempo tarda en 'volar' hacia una actividad.",
     stayDurationTooltip: "Cuánto tiempo permanece la vista en una actividad antes de moverse.",
     travelSpeedTooltip: "La velocidad de movimiento a lo largo del camino entre actividades.",
+    animationProgress: "Progreso de Animación",
+    titleDisplay: "Mostrar Título",
+    titleDisplayTooltip: "Controla cómo se muestra el nombre de la animación durante la reproducción",
+    titleHide: "Ocultar",
+    titleDuration: "Mostrar por duración",
+    titleAlways: "Siempre visible",
+    titleDurationSeconds: "Duración (segundos)",
 
     // Confirmation
     areYouSureDeleteActivity: "¿Estás seguro de que deseas eliminar esta actividad?",

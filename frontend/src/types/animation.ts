@@ -1,3 +1,16 @@
+export interface AnimationSettings {
+  transitionDuration?: number
+  stayDuration?: number
+  speedFactor?: number
+  speed?: number
+  loop?: boolean
+  showMarkers?: boolean
+  showLines?: boolean
+  interpolation?: "linear" | "smooth"
+  titleDisplayMode?: "hide" | "duration" | "always"
+  titleDisplayDuration?: number // in seconds, default 5
+}
+
 export type TripAnimation = {
   id: string
   tripId: string

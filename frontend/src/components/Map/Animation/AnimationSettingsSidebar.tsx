@@ -12,6 +12,9 @@ import {
   Tooltip,
   Select,
   MenuItem,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from "@mui/material"
 
 import type { TripAnimation } from "../../../types"
@@ -22,6 +25,8 @@ interface AnimationSettingsSidebarProps {
     transitionDuration: number
     stayDuration: number
     speedFactor: number
+    titleDisplayMode?: "hide" | "duration" | "always"
+    titleDisplayDuration?: number
   }
   onChange: (key: string, value: any) => void
   isOpen: boolean
@@ -183,6 +188,48 @@ export const AnimationSettingsSidebar = ({
           onChange={(_, val) => onChange("speedFactor", val as number)}
           valueLabelDisplay="auto"
         />
+      </Box>
+
+      <Divider sx={{ my: 3 }} />
+
+      <Box mb={3}>
+        <Box display="flex" alignItems="center" gap={0.5} mb={1}>
+          <Typography variant="subtitle2">{t("titleDisplay") || "Mostrar Título"}</Typography>
+          <Tooltip title={t("titleDisplayTooltip") || "Controla cómo se muestra el nombre de la animación"}>
+            <InfoIcon sx={{ fontSize: 16, color: "text.secondary", cursor: "help" }} />
+          </Tooltip>
+        </Box>
+        <RadioGroup
+          value={settings.titleDisplayMode || "duration"}
+          onChange={(e) => onChange("titleDisplayMode", e.target.value)}
+        >
+          <FormControlLabel value="hide" control={<Radio size="small" />} label={t("titleHide") || "Ocultar"} />
+          <FormControlLabel
+            value="duration"
+            control={<Radio size="small" />}
+            label={t("titleDuration") || "Mostrar por tiempo"}
+          />
+          <FormControlLabel
+            value="always"
+            control={<Radio size="small" />}
+            label={t("titleAlways") || "Siempre visible"}
+          />
+        </RadioGroup>
+
+        {(settings.titleDisplayMode === "duration" || !settings.titleDisplayMode) && (
+          <Box mt={2}>
+            <TextField
+              fullWidth
+              type="number"
+              size="small"
+              label={t("titleDurationSeconds") || "Duración (segundos)"}
+              value={settings.titleDisplayDuration || 5}
+              onChange={(e) => onChange("titleDisplayDuration", parseFloat(e.target.value) || 5)}
+              inputProps={{ min: 1, max: 60, step: 0.5 }}
+              helperText="1-60 segundos"
+            />
+          </Box>
+        )}
       </Box>
 
       <Box sx={{ display: "flex", gap: 1, mt: "auto" }}>

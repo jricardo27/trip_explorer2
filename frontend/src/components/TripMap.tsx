@@ -67,7 +67,9 @@ export const TripMap = (props: TripMapProps) => {
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [controlsVisible, setControlsVisible] = useState(true)
+  const [titleVisible, setTitleVisible] = useState(false)
   const hideControlsTimerRef = useRef<any>(null)
+  const hideTitleTimerRef = useRef<any>(null)
 
   const animation = useMapAnimation({
     animations,
@@ -124,6 +126,49 @@ export const TripMap = (props: TripMapProps) => {
       }
     }
   }, [isFullScreen, animation.isPlaying])
+
+  // Title visibility control based on settings
+  useEffect(() => {
+    const mode = animation.settings.titleDisplayMode || "duration"
+    const duration = (animation.settings.titleDisplayDuration || 5) * 1000 // Convert to ms
+
+    // Clear any existing timer
+    if (hideTitleTimerRef.current) {
+      clearTimeout(hideTitleTimerRef.current)
+      hideTitleTimerRef.current = null
+    }
+
+    if (!animation.isPlaying || !animation.currentAnimation) {
+      const timer = setTimeout(() => setTitleVisible(false), 0)
+      return () => clearTimeout(timer)
+    }
+
+    // Handle different display modes
+    if (mode === "hide") {
+      const timer = setTimeout(() => setTitleVisible(false), 0)
+      return () => clearTimeout(timer)
+    } else if (mode === "always") {
+      const timer = setTimeout(() => setTitleVisible(true), 0)
+      return () => clearTimeout(timer)
+    } else if (mode === "duration") {
+      const showTimer = setTimeout(() => setTitleVisible(true), 0)
+      hideTitleTimerRef.current = setTimeout(() => {
+        setTitleVisible(false)
+      }, duration)
+
+      return () => {
+        clearTimeout(showTimer)
+        if (hideTitleTimerRef.current) {
+          clearTimeout(hideTitleTimerRef.current)
+        }
+      }
+    }
+  }, [
+    animation.isPlaying,
+    animation.currentAnimation,
+    animation.settings.titleDisplayMode,
+    animation.settings.titleDisplayDuration,
+  ])
 
   const handleToggleFullScreen = useCallback(() => {
     if (!containerRef.current) return
@@ -270,7 +315,7 @@ export const TripMap = (props: TripMapProps) => {
             backdropFilter: "blur(8px)",
             pointerEvents: "none",
             transition: "opacity 0.5s",
-            opacity: controlsVisible ? 1 : 0,
+            opacity: titleVisible ? 1 : 0,
           }}
         >
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
@@ -300,6 +345,8 @@ export const TripMap = (props: TripMapProps) => {
             transitionDuration: animation.settings.transitionDuration || 1.5,
             stayDuration: animation.settings.stayDuration || 2.0,
             speedFactor: animation.settings.speedFactor || 200,
+            titleDisplayMode: animation.settings.titleDisplayMode || "duration",
+            titleDisplayDuration: animation.settings.titleDisplayDuration || 5,
           }}
           onChange={(key, val) => animation.setSettings((prev: any) => ({ ...prev, [key]: val }))}
           isOpen={showSettings}
