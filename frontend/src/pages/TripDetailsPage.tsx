@@ -1,9 +1,11 @@
 import { PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { Box, CircularProgress, Alert, useMediaQuery, useTheme } from "@mui/material"
+import { useState } from "react"
 import { useParams } from "react-router-dom"
 
 import client from "../api/client"
 import ActivityDialog from "../components/ActivityDialog"
+import { TransportDialog } from "../components/Transport/TransportDialog"
 import { TripDetailsContent } from "../components/TripDetailsContent"
 import { TripDetailsHeader } from "../components/TripDetailsHeader"
 import { TripSettingsDialog } from "../components/TripSettingsDialog"
@@ -62,6 +64,15 @@ const TripDetailsPage = () => {
   )
   const userRole = isOwner ? "OWNER" : userMember?.role || "VIEWER"
   const canEdit = userRole === "OWNER" || userRole === "EDITOR"
+
+  // Transport Dialog State
+  const [transportDialogOpen, setTransportDialogOpen] = useState(false)
+  const [selectedTransport, setSelectedTransport] = useState<any>(null)
+
+  const handleTransportClick = (transport: any) => {
+    setSelectedTransport(transport)
+    setTransportDialogOpen(true)
+  }
 
   // UI Support
   const theme = useTheme()
@@ -206,6 +217,7 @@ const TripDetailsPage = () => {
         selectScenario={selectScenario}
         createScenario={createScenario}
         updateScenario={updateScenario}
+        onTransportClick={handleTransportClick}
       />
 
       {/* Dialogs */}
@@ -229,6 +241,23 @@ const TripDetailsPage = () => {
         trip={trip}
         onUpdate={updateTrip}
       />
+
+      {selectedTransport && (
+        <TransportDialog
+          open={transportDialogOpen}
+          onClose={() => setTransportDialogOpen(false)}
+          tripId={tripId!}
+          fromActivityId={selectedTransport.fromActivityId}
+          toActivityId={selectedTransport.toActivityId}
+          alternatives={
+            trip.transport?.filter(
+              (t) =>
+                t.fromActivityId === selectedTransport.fromActivityId &&
+                t.toActivityId === selectedTransport.toActivityId,
+            ) || []
+          }
+        />
+      )}
 
       {membersDialogOpen && (
         <Alert

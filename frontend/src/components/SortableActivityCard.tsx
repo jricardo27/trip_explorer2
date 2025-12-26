@@ -111,6 +111,18 @@ export const SortableActivityCard = ({
         </Typography>
         <Typography variant="caption" display="block">
           {activity.scheduledStart ? dayjs(activity.scheduledStart).format("h:mm A") : t("noTime")}
+          {activity.scheduledStart && activity.scheduledEnd && (
+            <>
+              {" • "}
+              {dayjs(activity.scheduledEnd).diff(dayjs(activity.scheduledStart), "minute")} min
+            </>
+          )}
+          {(Number(activity.estimatedCost) > 0 || Number(activity.actualCost) > 0) && (
+            <>
+              {" • "}
+              {activity.currency}${Number(activity.actualCost || activity.estimatedCost).toFixed(0)}
+            </>
+          )}
         </Typography>
       </Box>
       <Box display="flex" alignItems="center">

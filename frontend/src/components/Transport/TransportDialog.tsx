@@ -9,6 +9,7 @@ import {
   DirectionsBoat,
   PedalBike,
   HelpOutline,
+  Edit as EditIcon,
 } from "@mui/icons-material"
 import {
   Dialog,
@@ -211,7 +212,7 @@ export const TransportDialog = ({
                   </Tooltip>
                   <Tooltip title={t("edit")}>
                     <IconButton edge="end" onClick={() => handleEdit(alt)} sx={{ mr: 1 }}>
-                      <DirectionsCar color="primary" /> {/* Reusing generic icon for edit indicating 'Configure' */}
+                      <EditIcon color="primary" />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title={t("delete")}>

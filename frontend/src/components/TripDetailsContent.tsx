@@ -37,6 +37,7 @@ interface TripDetailsContentProps {
   selectScenario: (scenarioId: string) => Promise<any>
   createScenario: (params: { tripDayId: string; name: string }) => Promise<any>
   updateScenario: (params: { tripDayId: string; scenarioId: string; data: { name: string } }) => Promise<any>
+  onTransportClick?: (transport: any) => void
 }
 
 export const TripDetailsContent = ({
@@ -63,6 +64,7 @@ export const TripDetailsContent = ({
   selectScenario,
   createScenario,
   updateScenario,
+  onTransportClick,
 }: TripDetailsContentProps) => {
   const [animationDialogOpen, setAnimationDialogOpen] = useState(false)
   const [selectedAnimation, setSelectedAnimation] = useState<any>(null)
@@ -130,7 +132,7 @@ export const TripDetailsContent = ({
           days={trip.days}
           transport={trip.transport}
           onActivityClick={handleEditActivity}
-          onTransportClick={(transport) => console.log("Transport clicked", transport)}
+          onTransportClick={onTransportClick}
           onActivityUpdate={(id, data) => updateActivity({ id, data })}
           onActivityCopy={handleCopyActivity}
           onDayOperation={handleDayOperation}

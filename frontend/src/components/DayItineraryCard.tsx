@@ -1,6 +1,6 @@
 import { useDroppable } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { ExpandMore, ExpandLess, Add as AddIcon, AttachMoney } from "@mui/icons-material"
+import { ExpandMore, ExpandLess, Add as AddIcon } from "@mui/icons-material"
 import { Box, Typography, Paper, Chip, IconButton, Collapse } from "@mui/material"
 import dayjs from "dayjs"
 
@@ -58,7 +58,20 @@ export const DayItineraryCard = ({
   const activeScenario = day.scenarios?.find((s) => s.isSelected)
   const displayActivities = activeScenario ? activeScenario.activities || [] : day.activities || []
 
-  const dayCost = displayActivities.reduce((sum, activity) => sum + (Number(activity.estimatedCost) || 0), 0)
+  const activitiesCost = displayActivities.reduce((sum, activity) => sum + (Number(activity.estimatedCost) || 0), 0)
+
+  const transportCost = (trip.transport || [])
+    .filter((t) => {
+      if (!t.isSelected) return false
+      // Find transport segments that belong to this day (between activities of this day)
+      const fromActivity = displayActivities.find((a) => a.id === t.fromActivityId)
+      return !!fromActivity
+    })
+    .reduce((sum, t) => sum + (Number(t.cost) || 0), 0)
+
+  // console.log(`Day ${day.dayNumber} Cost Debug:`, { activitiesCost, transportCost, transportCount: trip.transport?.length })
+
+  const dayCost = activitiesCost + transportCost
 
   const costColor = dayCost === 0 ? "default" : dayCost > 200 ? "error" : dayCost > 100 ? "warning" : "success"
 
@@ -81,8 +94,8 @@ export const DayItineraryCard = ({
             {dayCost > 0 && (
               <Chip
                 size="small"
-                icon={<AttachMoney />}
-                label={`$${dayCost.toFixed(0)}`}
+                label={`$${dayCost.toFixed(0)} (A: $${activitiesCost} T: $${transportCost})`}
+                title={`Activities: $${activitiesCost}, Transport: $${transportCost}`}
                 color={costColor}
                 variant="outlined"
               />
