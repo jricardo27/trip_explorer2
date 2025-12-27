@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, Paper } from "@mui/material"
+import { Box, Typography, useTheme, Paper, FormControlLabel, Checkbox } from "@mui/material"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
@@ -145,7 +145,6 @@ export const TripMap = (props: TripMapProps) => {
     canEdit = true,
     onActivityClick,
     transport = [],
-    showRoutes = false,
   } = props
 
   const theme = useTheme()
@@ -163,6 +162,10 @@ export const TripMap = (props: TripMapProps) => {
 
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [localShowRoutes, setLocalShowRoutes] = useState(() => {
+    const saved = localStorage.getItem("mapShowRoutes")
+    return saved !== null ? JSON.parse(saved) : (props.showRoutes ?? true)
+  })
   const [controlsVisible, setControlsVisible] = useState(true)
   const [titleVisible, setTitleVisible] = useState(false)
   const hideControlsTimerRef = useRef<any>(null)
@@ -358,6 +361,10 @@ export const TripMap = (props: TripMapProps) => {
   }, [])
 
   useEffect(() => {
+    localStorage.setItem("mapShowRoutes", JSON.stringify(localShowRoutes))
+  }, [localShowRoutes])
+
+  useEffect(() => {
     localStorage.setItem("activeBaseLayer", activeBaseLayer)
   }, [activeBaseLayer])
 
@@ -435,6 +442,35 @@ export const TripMap = (props: TripMapProps) => {
         />
       )}
 
+      {/* Map Controls (Always visible or auto-hide with other controls) */}
+      {viewMode === "map" && controlsVisible && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: isFullScreen ? 20 : 70,
+            right: 10,
+            zIndex: 1000,
+            bgcolor: "background.paper",
+            p: 1,
+            borderRadius: 1,
+            boxShadow: 2,
+            opacity: 0.9,
+            "&:hover": { opacity: 1 },
+          }}
+        >
+          <FormControlLabel
+            control={
+              <Checkbox size="small" checked={localShowRoutes} onChange={(e) => setLocalShowRoutes(e.target.checked)} />
+            }
+            label={
+              <Typography variant="body2" sx={{ fontWeight: "medium" }}>
+                {t("showRoutes") || "Show Routes"}
+              </Typography>
+            }
+          />
+        </Box>
+      )}
+
       {viewMode === "animation" && (
         <AnimationSettingsSidebar
           settings={{
@@ -484,7 +520,7 @@ export const TripMap = (props: TripMapProps) => {
           </LayersControl>
 
           {/* Render Transport Routes */}
-          {showRoutes &&
+          {localShowRoutes &&
             transport
               .filter((t) => t.waypoints) // Only show if they have waypoints
               .filter((t) => t.isSelected) // Only show selected

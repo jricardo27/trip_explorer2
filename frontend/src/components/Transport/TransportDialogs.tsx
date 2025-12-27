@@ -468,13 +468,20 @@ export const TransportSelectionDialog = ({
 }: TransportSelectionDialogProps) => {
   const { t } = useLanguageStore()
   const queryClient = useQueryClient()
+  const [initialSelectedId, setInitialSelectedId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (open) {
+      const currentSelected = alternatives.find((a) => a.isSelected)
+      setInitialSelectedId(currentSelected?.id || null)
+    }
+  }, [open, alternatives])
 
   const selectMutation = useMutation({
     mutationFn: transportApi.select,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
       queryClient.invalidateQueries({ queryKey: ["public-trip"] })
-      // Don't close dialog - let user see selection and close manually
     },
   })
 
@@ -483,7 +490,6 @@ export const TransportSelectionDialog = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
       queryClient.invalidateQueries({ queryKey: ["public-trip"] })
-      // Don't close dialog - let user see deselection and close manually
     },
   })
 
@@ -495,6 +501,18 @@ export const TransportSelectionDialog = ({
     },
   })
 
+  const handleClose = () => {
+    const currentSelected = alternatives.find((a) => a.isSelected)
+    if (currentSelected?.id !== initialSelectedId) {
+      if (initialSelectedId) {
+        selectMutation.mutate(initialSelectedId)
+      } else {
+        deselectAllMutation.mutate()
+      }
+    }
+    onClose()
+  }
+
   const handleEdit = (alt: TransportAlternative) => {
     onEdit(alt)
   }
@@ -505,7 +523,7 @@ export const TransportSelectionDialog = ({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           {t("chooseTransport")}
@@ -564,7 +582,10 @@ export const TransportSelectionDialog = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t("close")}</Button>
+        <Button onClick={handleClose}>{t("cancel")}</Button>
+        <Button onClick={onClose} variant="contained">
+          {t("confirm")}
+        </Button>
       </DialogActions>
     </Dialog>
   )

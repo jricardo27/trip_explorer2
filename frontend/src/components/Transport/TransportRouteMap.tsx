@@ -3,8 +3,8 @@ import { Box } from "@mui/material"
 import L from "leaflet"
 import markerIcon from "leaflet/dist/images/marker-icon.png"
 import markerShadow from "leaflet/dist/images/marker-shadow.png"
-import { useEffect } from "react"
-import { MapContainer, TileLayer, Polyline, Marker, Tooltip, useMap } from "react-leaflet"
+import { useEffect, Fragment } from "react"
+import { MapContainer, TileLayer, Polyline, Marker, Tooltip, useMap, CircleMarker } from "react-leaflet"
 
 import type { TransportAlternative, Activity } from "../../types"
 import { TransportMode } from "../../types"
@@ -180,48 +180,70 @@ export const TransportRouteMap = ({
             }
           }
 
-          // 3. Render all segments for this alternative
-          return segments.map((points, segIdx) => (
-            <Polyline
-              key={`${alt.id}-seg-${segIdx}`}
-              positions={points}
-              pathOptions={{
-                color: color,
-                weight: isSelected ? 6 : 4,
-                opacity: isSelected ? 1 : 0.5,
-                dashArray: getDashArray(alt.transportMode),
-                lineCap: "round",
-                lineJoin: "round",
-              }}
-              eventHandlers={{
-                click: () => onSelectAlternative(alt.id),
-              }}
-            >
-              {segIdx === 0 && (
-                <Tooltip permanent={isSelected} direction="center" opacity={0.9} sticky={true}>
-                  <div
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: isSelected ? "bold" : "normal",
-                      color: isSelected ? color : "inherit",
-                      backgroundColor: "white",
-                      padding: "2px 4px",
-                      borderRadius: "4px",
-                      border: isSelected ? `1px solid ${color}` : "none",
-                    }}
-                  >
-                    {alt.name || alt.transportMode}
-                    {isSelected && (
-                      <>
-                        <br />
-                        {alt.durationMinutes} min
-                      </>
-                    )}
-                  </div>
-                </Tooltip>
-              )}
-            </Polyline>
-          ))
+          // 3. Render all segments and waypoints for this alternative
+          return (
+            <Fragment key={alt.id}>
+              {segments.map((points, segIdx) => (
+                <Polyline
+                  key={`${alt.id}-seg-${segIdx}`}
+                  positions={points}
+                  pathOptions={{
+                    color: color,
+                    weight: isSelected ? 6 : 4,
+                    opacity: isSelected ? 1 : 0.5,
+                    dashArray: getDashArray(alt.transportMode),
+                    lineCap: "round",
+                    lineJoin: "round",
+                  }}
+                  eventHandlers={{
+                    click: () => onSelectAlternative(alt.id),
+                  }}
+                >
+                  {segIdx === 0 && (
+                    <Tooltip permanent={isSelected} direction="center" opacity={0.9} sticky={true}>
+                      <div
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: isSelected ? "bold" : "normal",
+                          color: isSelected ? color : "inherit",
+                          backgroundColor: "white",
+                          padding: "2px 4px",
+                          borderRadius: "4px",
+                          border: isSelected ? `1px solid ${color}` : "none",
+                        }}
+                      >
+                        {alt.name || alt.transportMode}
+                        {isSelected && (
+                          <>
+                            <br />
+                            {alt.durationMinutes} min
+                          </>
+                        )}
+                      </div>
+                    </Tooltip>
+                  )}
+                </Polyline>
+              ))}
+              {/* Render waypoints at segment junctions */}
+              {segments.length > 1 &&
+                segments.slice(0, -1).map((segment, segIdx) => {
+                  const waypoint = segment[segment.length - 1] // End of the segment
+                  return (
+                    <CircleMarker
+                      key={`${alt.id}-waypoint-${segIdx}`}
+                      center={waypoint}
+                      radius={isSelected ? 5 : 3}
+                      pathOptions={{
+                        color: isSelected ? "black" : color,
+                        weight: 1,
+                        fillColor: color,
+                        fillOpacity: isSelected ? 1 : 0.7,
+                      }}
+                    />
+                  )
+                })}
+            </Fragment>
+          )
         })}
       </MapContainer>
     </Box>
