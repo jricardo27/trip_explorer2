@@ -84,6 +84,7 @@ export interface Trip {
   status?: string
   isCompleted: boolean
   isPublic: boolean
+  publicToken?: string
   days?: TripDay[]
   activities?: Activity[]
   members?: TripMember[]
@@ -165,6 +166,7 @@ export interface Activity {
   status: ActivityStatus
   priority?: string
   isLocked?: boolean
+  isPrivate?: boolean
   orderIndex?: number
   participants?: ActivityParticipant[]
   bookingReference?: string

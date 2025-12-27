@@ -19,6 +19,7 @@ interface TimelineActivityCardProps {
   onExpand: (id: string | null) => void
   onClick: (activity: Activity) => void
   onContextMenu: (e: React.MouseEvent, activityId: string) => void
+  isConflicting?: boolean
   theme: any // Using any for theme to avoid complex MUI theme typing if not strictly needed
 }
 
@@ -36,6 +37,7 @@ export const TimelineActivityCard = ({
   onExpand,
   onClick,
   onContextMenu,
+  isConflicting,
   theme,
 }: TimelineActivityCardProps) => {
   if (!activity.scheduledStart) return null
@@ -74,32 +76,50 @@ export const TimelineActivityCard = ({
         minHeight: isMobile ? 44 : 20,
         p: isMobile ? 0.4 : 0.5,
         cursor: "pointer",
-        bgcolor: "primary.light",
-        background: hasNoEndTime
+        bgcolor: isConflicting ? "#ffebee" : "primary.light",
+        background: isConflicting
           ? `repeating-linear-gradient(
+            45deg,
+            #ffebee,
+            #ffebee 10px,
+            #ffcdd2 10px,
+            #ffcdd2 20px
+          )`
+          : hasNoEndTime
+            ? `repeating-linear-gradient(
             45deg,
             ${theme.palette.primary.light},
             ${theme.palette.primary.light} 10px,
             ${theme.palette.primary.main} 10px,
             ${theme.palette.primary.main} 20px
           )`
-          : "primary.light",
-        color: "primary.contrastText",
+            : "primary.light",
+        color: isConflicting ? "error.main" : "primary.contrastText",
+        border: isConflicting ? "1px solid" : "none",
+        borderColor: "error.main",
         overflow: "hidden",
         opacity: isDragging ? 0.3 : 1,
         zIndex: isExpanded ? 100 : 1,
         boxShadow: isExpanded ? 6 : 1,
         "&:hover": {
-          bgcolor: "primary.main",
-          background: hasNoEndTime
+          bgcolor: isConflicting ? "#fce4ec" : "primary.main",
+          background: isConflicting
             ? `repeating-linear-gradient(
+              45deg,
+              #fce4ec,
+              #fce4ec 10px,
+              #f8bbd0 10px,
+              #f8bbd0 20px
+            )`
+            : hasNoEndTime
+              ? `repeating-linear-gradient(
               45deg,
               ${theme.palette.primary.main},
               ${theme.palette.primary.main} 10px,
               ${theme.palette.primary.dark} 10px,
               ${theme.palette.primary.dark} 20px
             )`
-            : "primary.main",
+              : "primary.main",
           zIndex: isExpanded ? 101 : 5,
           transform: isMobile ? "none" : "scale(1.02)",
           boxShadow: isExpanded ? 8 : 3,

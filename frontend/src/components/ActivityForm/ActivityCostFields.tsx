@@ -1,5 +1,5 @@
 import { Lock, LockOpen } from "@mui/icons-material"
-import { Grid, TextField, Box, Checkbox, Typography } from "@mui/material"
+import { Grid, TextField, Box, Checkbox, Typography, MenuItem } from "@mui/material"
 
 import { useLanguageStore } from "../../stores/languageStore"
 
@@ -8,11 +8,15 @@ interface ActivityCostFieldsProps {
   setEstimatedCost: (cost: string) => void
   actualCost: string
   setActualCost: (cost: string) => void
+  currency: string
+  setCurrency: (currency: string) => void
+  currencies?: string[]
   isPaid: boolean
   setIsPaid: (paid: boolean) => void
   isLocked: boolean
   setIsLocked: (locked: boolean) => void
   canEdit: boolean
+  hideCosts?: boolean
 }
 
 export const ActivityCostFields = ({
@@ -20,13 +24,19 @@ export const ActivityCostFields = ({
   setEstimatedCost,
   actualCost,
   setActualCost,
+  currency,
+  setCurrency,
+  currencies = ["AUD"],
   isPaid,
   setIsPaid,
   isLocked,
   setIsLocked,
   canEdit,
+  hideCosts = false,
 }: ActivityCostFieldsProps) => {
   const { t } = useLanguageStore()
+
+  if (hideCosts) return null
 
   return (
     <>
@@ -37,7 +47,25 @@ export const ActivityCostFields = ({
           type="number"
           value={estimatedCost}
           onChange={(e) => setEstimatedCost(e.target.value)}
-          InputProps={{ startAdornment: "$" }}
+          InputProps={{
+            startAdornment: (
+              <TextField
+                select
+                variant="standard"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                InputProps={{ disableUnderline: true }}
+                sx={{ width: 60, mr: 1 }}
+                disabled={!canEdit}
+              >
+                {currencies.map((curr) => (
+                  <MenuItem key={curr} value={curr}>
+                    {curr}
+                  </MenuItem>
+                ))}
+              </TextField>
+            ),
+          }}
           disabled={!canEdit}
         />
       </Grid>
@@ -48,7 +76,13 @@ export const ActivityCostFields = ({
           type="number"
           value={actualCost}
           onChange={(e) => setActualCost(e.target.value)}
-          InputProps={{ startAdornment: "$" }}
+          InputProps={{
+            startAdornment: (
+              <Typography color="text.secondary" sx={{ mr: 1, fontSize: "0.9rem" }}>
+                {currency}
+              </Typography>
+            ),
+          }}
           disabled={!canEdit}
         />
       </Grid>

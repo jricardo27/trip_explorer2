@@ -26,6 +26,7 @@ export class ActivityService {
     currency?: string
     participantIds?: string[]
     availableDays?: string[]
+    isPrivate?: boolean
   }): Promise<Activity> {
     // Calculate next order index
     let orderIndex = 0
@@ -56,6 +57,7 @@ export class ActivityService {
         estimatedCost: data.estimatedCost,
         currency: data.currency || "AUD",
         orderIndex,
+        isPrivate: data.isPrivate || false,
         availableDays: data.availableDays || [],
         participants: data.participantIds
           ? {
@@ -171,6 +173,7 @@ export class ActivityService {
       "isLocked",
       "activitySubtype",
       "category",
+      "isPrivate",
     ]
 
     // Perform the update

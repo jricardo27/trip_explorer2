@@ -18,7 +18,7 @@ import {
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs, { Dayjs } from "dayjs"
 import { saveAs } from "file-saver"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 import client from "../api/client"
 import { useShiftTrip } from "../hooks/useTrips"
@@ -30,12 +30,20 @@ interface TripSettingsDialogProps {
   onClose: () => void
   trip: Trip
   onUpdate: (data: Partial<Trip>) => Promise<unknown>
+  isUpdating?: boolean
   fullScreen?: boolean
 }
 
 const COMMON_CURRENCIES = ["AUD", "USD", "EUR", "GBP", "JPY", "CAD", "NZD", "SGD", "CHF", "CNY"]
 
-export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }: TripSettingsDialogProps) => {
+export const TripSettingsDialog = ({
+  open,
+  onClose,
+  trip,
+  onUpdate,
+  isUpdating = false,
+  fullScreen,
+}: TripSettingsDialogProps) => {
   const { t } = useLanguageStore()
   const [name, setName] = useState(trip.name)
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs(trip.startDate))
@@ -51,21 +59,25 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
   const [shiftDays, setShiftDays] = useState("")
   const shiftTripMutation = useShiftTrip()
 
+  // Track previous open state to only reset when dialog opens (not on every render)
+  const prevOpenRef = useRef(open)
+
   useEffect(() => {
-    if (open) {
-      setTimeout(() => {
-        setName(trip.name)
-        setStartDate(dayjs(trip.startDate))
-        setEndDate(dayjs(trip.endDate))
-        setBudget(trip.budget?.toString() || "")
-        setDefaultCurrency(trip.defaultCurrency || "AUD")
-        setCurrencies(trip.currencies || ["AUD"])
-        setExchangeRates(trip.exchangeRates || {})
-        setIsCompleted(trip.isCompleted || false)
-        setIsPublic(trip.isPublic || false)
-      }, 0)
+    // Only reset form state when dialog transitions from closed to open
+    if (open && !prevOpenRef.current) {
+      setName(trip.name)
+      setStartDate(dayjs(trip.startDate))
+      setEndDate(dayjs(trip.endDate))
+      setBudget(trip.budget?.toString() || "")
+      setDefaultCurrency(trip.defaultCurrency || "AUD")
+      setCurrencies(trip.currencies || ["AUD"])
+      setExchangeRates(trip.exchangeRates || {})
+      setIsCompleted(trip.isCompleted || false)
+      setIsPublic(trip.isPublic || false)
     }
-  }, [open, trip])
+    prevOpenRef.current = open
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   const handleSave = async () => {
     // Aggressively ensure all exchange rates are finite positive numbers before sending to backend
@@ -233,6 +245,10 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
                           [currency]: isNaN(val) ? 1 : val,
                         })
                       }}
+                      inputProps={{
+                        step: "any",
+                        min: 0,
+                      }}
                     />
                   ))}
               </Box>
@@ -253,6 +269,28 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
               />
             </Tooltip>
           </Box>
+
+          {isPublic && trip.publicToken && (
+            <Box sx={{ p: 2, bgcolor: "info.light", borderRadius: 1, color: "info.contrastText" }}>
+              <Typography variant="subtitle2" fontWeight="bold">
+                {t("publicSharingLink") || "Shareable Timeline Link"}:
+              </Typography>
+              <Typography variant="body2" sx={{ wordBreak: "break-all", mt: 0.5 }}>
+                {`${window.location.origin}/public/trip/${trip.publicToken}`}
+              </Typography>
+              <Button
+                size="small"
+                variant="contained"
+                sx={{ mt: 1, bgcolor: "white", color: "info.main", "&:hover": { bgcolor: "#eee" } }}
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/public/trip/${trip.publicToken}`)
+                  alert(t("linkCopied") || "Link copied to clipboard!")
+                }}
+              >
+                {t("copyLink") || "Copy Link"}
+              </Button>
+            </Box>
+          )}
 
           <Box
             sx={{ mt: 1, p: 2, border: "1px solid", borderColor: "divider", borderRadius: 1, bgcolor: "action.hover" }}
@@ -304,8 +342,8 @@ export const TripSettingsDialog = ({ open, onClose, trip, onUpdate, fullScreen }
           <Button onClick={onClose} sx={{ mr: 1 }}>
             {t("cancel")}
           </Button>
-          <Button onClick={handleSave} variant="contained" disabled={!name || !startDate || !endDate}>
-            {t("saveChanges")}
+          <Button onClick={handleSave} variant="contained" disabled={!name || !startDate || !endDate || isUpdating}>
+            {isUpdating ? t("saving") : t("saveChanges")}
           </Button>
         </Box>
       </DialogActions>

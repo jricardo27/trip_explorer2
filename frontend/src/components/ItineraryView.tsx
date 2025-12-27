@@ -28,6 +28,8 @@ interface ItineraryViewProps {
   viewMode: string
   handleSaveAnimation: (data: any) => Promise<void>
   handleDeleteAnimation: (id: string) => Promise<void>
+  exchangeRates: Record<string, number>
+  isPublic?: boolean
 }
 
 export const ItineraryView = ({
@@ -49,6 +51,8 @@ export const ItineraryView = ({
   viewMode,
   handleSaveAnimation,
   handleDeleteAnimation,
+  exchangeRates,
+  isPublic = false,
 }: ItineraryViewProps) => {
   const { t } = useLanguageStore()
 
@@ -76,6 +80,8 @@ export const ItineraryView = ({
                     _ts: Date.now(),
                   })
                 }
+                exchangeRates={exchangeRates}
+                isPublic={isPublic}
               />
             ))}
           </Grid>

@@ -10,11 +10,19 @@ import {
   InputLabel,
   Select,
   TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+  Box,
 } from "@mui/material"
 import dayjs from "dayjs"
 
 import { useLanguageStore } from "../../stores/languageStore"
 import type { TripDay } from "../../types"
+import type { DayCostResult } from "../../utils/costUtils"
 
 interface DayOperationDialogProps {
   open: boolean
@@ -214,9 +222,58 @@ export const DayOptionsMenu = ({ anchorEl, open, onClose, onOperation }: DayOpti
           onOperation("rename")
           onClose()
         }}
-      >
-        {t("renameDay" as any)}
-      </MenuItem>
+      ></MenuItem>
     </Menu>
+  )
+}
+
+interface CostBreakdownDialogProps {
+  open: boolean
+  onClose: () => void
+  costResult: DayCostResult
+  baseCurrency: string
+}
+
+export const CostBreakdownDialog = ({ open, onClose, costResult, baseCurrency }: CostBreakdownDialogProps) => {
+  const { t } = useLanguageStore()
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+      <DialogTitle>{t("costBreakdown" as any) || "Cost Breakdown"}</DialogTitle>
+      <DialogContent>
+        <Table size="small" sx={{ mt: 1 }}>
+          <TableHead>
+            <TableRow>
+              <TableCell>{t("currency" as any)}</TableCell>
+              <TableCell align="right">{t("amount" as any)}</TableCell>
+              <TableCell align="right">{baseCurrency}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {Object.entries(costResult.breakdown).map(([currency, data]) => (
+              <TableRow key={currency}>
+                <TableCell>{currency}</TableCell>
+                <TableCell align="right">{data.total.toFixed(2)}</TableCell>
+                <TableCell align="right">{data.convertedTotal.toFixed(2)}</TableCell>
+              </TableRow>
+            ))}
+            <TableRow sx={{ "& td": { fontWeight: "bold", bgcolor: "action.hover" } }}>
+              <TableCell colSpan={2}>{t("total" as any)}</TableCell>
+              <TableCell align="right">{costResult.total.toFixed(2)}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+        {Object.keys(costResult.breakdown).length === 0 && (
+          <Box sx={{ py: 3, textAlign: "center" }}>
+            <Typography variant="body2" color="text.secondary">
+              {t("noCostsFound" as any) || "No costs found for this day."}
+            </Typography>
+          </Box>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t("close") || "Close"}</Button>
+      </DialogActions>
+    </Dialog>
   )
 }

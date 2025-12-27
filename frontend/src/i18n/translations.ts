@@ -112,12 +112,24 @@ export const translations = {
     exchangeRates: "Exchange Rates (1 Foreign = ? {defaultCurrency})",
     completed: "Completed (Archive)",
     publicTrip: "Public Trip",
+    publicTimeline: "Public Timeline",
+    publicTimelineTooltip: "Allow anyone with the link to view the timeline",
+    publicSharingLink: "Shareable Timeline Link",
+    linkCopied: "Link copied to clipboard!",
+    copyLink: "Copy Link",
+    failedToLoadPublicTrip:
+      "Failed to load public trip. The link might be expired, invalid, or the trip is no longer public.",
+    calendar: "Calendar",
+    poweredBy: "Powered by Trip Explorer",
     shiftTimeline: "Shift Timeline",
     shiftDescription:
       "Move all activities, days, and recorded expenses forward or backward by a specific number of days.",
     daysToShift: "Days to Shift",
     shifting: "Shifting...",
     shiftButton: "Shift All Dates",
+    total: "Total",
+    costBreakdown: "Cost Breakdown",
+    noCostsFound: "No costs found for this day.",
 
     // Trip View Modes
     tripPreparation: "Trip Preparation",
@@ -298,6 +310,7 @@ export const translations = {
     editActivity: "Edit Activity",
     activityName: "Activity Name",
     priority: "Priority",
+    privateActivity: "Private Activity",
     standard: "Standard",
     optional: "Optional",
     mandatory: "Mandatory",
@@ -516,12 +529,24 @@ export const translations = {
     exchangeRates: "Tasas de Cambio (1 Extranjera = ? {defaultCurrency})",
     completed: "Completado (Archivar)",
     publicTrip: "Viaje Público",
+    publicTimeline: "Línea de Tiempo Pública",
+    publicTimelineTooltip: "Permite que cualquier persona con el enlace vea la línea de tiempo",
+    publicSharingLink: "Enlace para Compartir Línea de Tiempo",
+    linkCopied: "¡Enlace copiado al portapapeles!",
+    copyLink: "Copiar Enlace",
+    failedToLoadPublicTrip:
+      "Error al cargar el viaje público. El enlace podría estar caducado, ser inválido o el viaje ya no es público.",
+    calendar: "Calendario",
+    poweredBy: "Desarrollado por Trip Explorer",
     shiftTimeline: "Desplazar Línea de Tiempo",
     shiftDescription:
       "Mueve todas las actividades, días y gastos registrados hacia adelante o hacia atrás un número específico de días.",
     daysToShift: "Días a Desplazar",
     shifting: "Desplazando...",
     shiftButton: "Desplazar Todas las Fechas",
+    total: "Total",
+    costBreakdown: "Desglose de Costos",
+    noCostsFound: "No se encontraron costos para este día.",
 
     // Trip View Modes
     tripPreparation: "Preparación del Viaje",

@@ -1,4 +1,4 @@
-import { Grid, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
+import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, FormControlLabel, Switch } from "@mui/material"
 
 import { useLanguageStore } from "../../stores/languageStore"
 import { ActivityType } from "../../types"
@@ -11,6 +11,8 @@ interface ActivityBasicFieldsProps {
   priority: string
   setPriority: (priority: string) => void
   canEdit: boolean
+  isPrivate: boolean
+  setIsPrivate: (isPrivate: boolean) => void
 }
 
 export const ActivityBasicFields = ({
@@ -21,6 +23,8 @@ export const ActivityBasicFields = ({
   priority,
   setPriority,
   canEdit,
+  isPrivate,
+  setIsPrivate,
 }: ActivityBasicFieldsProps) => {
   const { t } = useLanguageStore()
 
@@ -62,6 +66,16 @@ export const ActivityBasicFields = ({
           </Select>
         </FormControl>
       </Grid>
+      {canEdit && (
+        <Grid size={{ xs: 12 }}>
+          <FormControlLabel
+            control={
+              <Switch checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} disabled={!canEdit} />
+            }
+            label={t("privateActivity") || "Private Activity (Hidden from public view)"}
+          />
+        </Grid>
+      )}
     </>
   )
 }

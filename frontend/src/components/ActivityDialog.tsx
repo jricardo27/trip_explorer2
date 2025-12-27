@@ -42,6 +42,9 @@ interface ActivityDialogProps {
   prefilledCoordinates?: { lat: number; lng: number }
   onCopy?: (activityId: string, asLink?: boolean) => void
   canEdit?: boolean
+  currencies?: string[]
+  defaultCurrency?: string
+  hideCosts?: boolean
 }
 
 const ActivityDialog = ({
@@ -60,6 +63,9 @@ const ActivityDialog = ({
   prefilledCoordinates,
   onCopy,
   canEdit = true,
+  currencies = ["AUD"],
+  defaultCurrency = "AUD",
+  hideCosts = false,
 }: ActivityDialogProps) => {
   const { t } = useLanguageStore()
   const [copyMenuAnchor, setCopyMenuAnchor] = useState<null | HTMLElement>(null)
@@ -73,6 +79,7 @@ const ActivityDialog = ({
     tripDays,
     initialCoordinates: initialCoordinates || prefilledCoordinates,
     onSubmit,
+    defaultCurrency,
   })
 
   const handleClose = (event: object, reason: string) => {
@@ -121,6 +128,8 @@ const ActivityDialog = ({
                 priority={form.priority}
                 setPriority={form.setPriority}
                 canEdit={canEdit}
+                isPrivate={form.isPrivate}
+                setIsPrivate={form.setIsPrivate}
               />
               <ActivityDateTimeFields
                 scheduledStart={form.scheduledStart}
@@ -138,11 +147,15 @@ const ActivityDialog = ({
                 setEstimatedCost={form.setEstimatedCost}
                 actualCost={form.actualCost}
                 setActualCost={form.setActualCost}
+                currency={form.currency}
+                setCurrency={form.setCurrency}
+                currencies={currencies}
                 isPaid={form.isPaid}
                 setIsPaid={form.setIsPaid}
                 isLocked={form.isLocked}
                 setIsLocked={form.setIsLocked}
                 canEdit={canEdit}
+                hideCosts={hideCosts}
               />
               <ActivityDetailsFields
                 notes={form.notes}

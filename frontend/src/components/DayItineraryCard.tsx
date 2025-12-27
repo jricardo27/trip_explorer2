@@ -3,12 +3,14 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { ExpandMore, ExpandLess, Add as AddIcon } from "@mui/icons-material"
 import { Box, Typography, Paper, Chip, IconButton, Collapse } from "@mui/material"
 import dayjs from "dayjs"
+import { useState } from "react"
 
 import type { Activity, TripDay, Trip } from "../types"
+import { calculateDayCost } from "../utils/costUtils"
 
 import { SortableActivityCard } from "./SortableActivityCard"
+import { CostBreakdownDialog } from "./Timeline/TimelineDialogs"
 import { TransportSegment } from "./Transport/TransportSegment"
-
 interface DayItineraryCardProps {
   day: TripDay
   trip: Trip
@@ -20,6 +22,8 @@ interface DayItineraryCardProps {
   onDeleteActivity: (id: string) => void
   onCopyActivity: (activityId: string, asLink?: boolean) => void
   onFlyTo: (lat: number, lng: number) => void
+  exchangeRates: Record<string, number>
+  isPublic?: boolean
 }
 
 const DroppableDay = ({ dayId, children }: { dayId: string; children: React.ReactNode }) => {
@@ -54,24 +58,30 @@ export const DayItineraryCard = ({
   onDeleteActivity,
   onCopyActivity,
   onFlyTo,
+  exchangeRates,
+  isPublic = false,
 }: DayItineraryCardProps) => {
+  const [showCostBreakdown, setShowCostBreakdown] = useState(false)
   const activeScenario = day.scenarios?.find((s) => s.isSelected)
   const displayActivities = activeScenario ? activeScenario.activities || [] : day.activities || []
 
-  const activitiesCost = displayActivities.reduce((sum, activity) => sum + (Number(activity.estimatedCost) || 0), 0)
+  // Sort activities for consistent transport pairing
+  const sortedActivities = [...displayActivities].sort((a, b) => {
+    if (!a.scheduledStart || !b.scheduledStart) return 0
+    return new Date(a.scheduledStart).getTime() - new Date(b.scheduledStart).getTime()
+  })
 
-  const transportCost = (trip.transport || [])
-    .filter((t) => {
-      if (!t.isSelected) return false
-      // Find transport segments that belong to this day (between activities of this day)
-      const fromActivity = displayActivities.find((a) => a.id === t.fromActivityId)
-      return !!fromActivity
+  // Correctly identify transport segments for THIS day's sequence
+  const dayTransport = (trip.transport || []).filter((t) => {
+    return sortedActivities.some((activity, index) => {
+      if (index >= sortedActivities.length - 1) return false
+      return t.fromActivityId === activity.id && t.toActivityId === sortedActivities[index + 1].id
     })
-    .reduce((sum, t) => sum + (Number(t.cost) || 0), 0)
+  })
 
-  // console.log(`Day ${day.dayNumber} Cost Debug:`, { activitiesCost, transportCost, transportCount: trip.transport?.length })
-
-  const dayCost = activitiesCost + transportCost
+  const baseCurrency = trip.baseCurrency || trip.defaultCurrency || "USD"
+  const costResult = calculateDayCost(displayActivities, dayTransport, exchangeRates || {}, baseCurrency)
+  const dayCost = costResult.total
 
   const costColor = dayCost === 0 ? "default" : dayCost > 200 ? "error" : dayCost > 100 ? "warning" : "success"
 
@@ -91,13 +101,17 @@ export const DayItineraryCard = ({
             </Typography>
           </Box>
           <Box display="flex" alignItems="center" gap={1}>
-            {dayCost > 0 && (
+            {dayCost > 0 && !isPublic && (
               <Chip
                 size="small"
-                label={`$${dayCost.toFixed(0)} (A: $${activitiesCost} T: $${transportCost})`}
-                title={`Activities: $${activitiesCost}, Transport: $${transportCost}`}
+                label={new Intl.NumberFormat("es-ES", {
+                  style: "currency",
+                  currency: baseCurrency,
+                }).format(dayCost)}
                 color={costColor}
                 variant="outlined"
+                onClick={() => setShowCostBreakdown(true)}
+                sx={{ cursor: "pointer" }}
               />
             )}
             {canEdit && (
@@ -110,41 +124,41 @@ export const DayItineraryCard = ({
         <Collapse in={!isCollapsed}>
           <DroppableDay dayId={day.id}>
             <SortableContext items={displayActivities.map((a) => a.id)} strategy={verticalListSortingStrategy}>
-              {displayActivities
-                .slice()
-                .sort((a, b) => {
-                  if (!a.scheduledStart || !b.scheduledStart) return 0
-                  return new Date(a.scheduledStart).getTime() - new Date(b.scheduledStart).getTime()
-                })
-                .map((activity, index, sortedActivities) => (
-                  <Box key={activity.id}>
-                    <SortableActivityCard
-                      activity={activity}
-                      canEdit={canEdit}
-                      onEdit={() => onEditActivity(activity)}
-                      onDelete={() => onDeleteActivity(activity.id)}
-                      onCopy={(act, asLink) => onCopyActivity(act.id, asLink)}
-                      onFlyTo={(act) => act.latitude && act.longitude && onFlyTo(act.latitude, act.longitude)}
+              {sortedActivities.map((activity, index) => (
+                <Box key={activity.id}>
+                  <SortableActivityCard
+                    activity={activity}
+                    canEdit={canEdit}
+                    onEdit={() => onEditActivity(activity)}
+                    onDelete={() => onDeleteActivity(activity.id)}
+                    onCopy={(act, asLink) => onCopyActivity(act.id, asLink)}
+                    onFlyTo={(act) => act.latitude && act.longitude && onFlyTo(act.latitude, act.longitude)}
+                  />
+                  {index < sortedActivities.length - 1 && (
+                    <TransportSegment
+                      tripId={trip.id}
+                      fromActivityId={activity.id}
+                      toActivityId={sortedActivities[index + 1].id}
+                      alternatives={
+                        trip.transport?.filter(
+                          (t) => t.fromActivityId === activity.id && t.toActivityId === sortedActivities[index + 1].id,
+                        ) || []
+                      }
                     />
-                    {index < sortedActivities.length - 1 && (
-                      <TransportSegment
-                        tripId={trip.id}
-                        fromActivityId={activity.id}
-                        toActivityId={sortedActivities[index + 1].id}
-                        alternatives={
-                          trip.transport?.filter(
-                            (t) =>
-                              t.fromActivityId === activity.id && t.toActivityId === sortedActivities[index + 1].id,
-                          ) || []
-                        }
-                      />
-                    )}
-                  </Box>
-                ))}
+                  )}
+                </Box>
+              ))}
             </SortableContext>
           </DroppableDay>
         </Collapse>
       </Paper>
+
+      <CostBreakdownDialog
+        open={showCostBreakdown}
+        onClose={() => setShowCostBreakdown(false)}
+        costResult={costResult}
+        baseCurrency={baseCurrency}
+      />
     </Box>
   )
 }

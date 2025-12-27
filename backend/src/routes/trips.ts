@@ -11,7 +11,32 @@ import { createTripSchema, updateTripSchema } from "../utils/validation"
 
 const router = Router()
 
-// Protect all routes
+// GET /api/trips/public/:token - Get public trip details
+router.get("/public/:token", async (req: Request, res: Response) => {
+  try {
+    console.log(`[DEBUG] Received public trip request for token: ${req.params.token}`)
+    const trip = await tripService.getTripByPublicToken(req.params.token)
+    if (!trip) {
+      return res.status(404).json({
+        error: {
+          code: "NOT_FOUND",
+          message: "Trip not found or not public",
+        },
+      })
+    }
+    res.json({ data: trip })
+  } catch (error: any) {
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to fetch public trip",
+        details: error.message,
+      },
+    })
+  }
+})
+
+// Protect all other routes
 router.use(authenticateToken)
 
 // Expenses sub-route or direct controller usage

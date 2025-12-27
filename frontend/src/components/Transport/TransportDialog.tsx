@@ -48,6 +48,8 @@ interface TransportDialogProps {
   fromActivityId: string
   toActivityId: string
   alternatives: TransportAlternative[]
+  currencies?: string[]
+  canEdit?: boolean
 }
 
 const getIcon = (mode: TransportMode) => {
@@ -80,6 +82,8 @@ export const TransportDialog = ({
   fromActivityId,
   toActivityId,
   alternatives,
+  currencies = ["AUD"],
+  canEdit = true,
 }: TransportDialogProps) => {
   const queryClient = useQueryClient()
   const { expenses } = useExpenses(tripId)
@@ -89,7 +93,7 @@ export const TransportDialog = ({
   const [newMode, setNewMode] = useState<TransportMode>(TransportMode.DRIVING)
   const [newDuration, setNewDuration] = useState<string>("")
   const [newCost, setNewCost] = useState<string>("")
-  const [newCurrency, setNewCurrency] = useState("AUD")
+  const [newCurrency, setNewCurrency] = useState(currencies[0] || "AUD")
   const [newNotes, setNewNotes] = useState("")
   const [splits, setSplits] = useState<ExpenseSplit[]>([])
   const [splitType, setSplitType] = useState<SplitType>("equal")
@@ -152,6 +156,7 @@ export const TransportDialog = ({
     setEditingId(null)
     setNewDuration("")
     setNewCost("")
+    setNewCurrency(currencies[0] || "AUD")
     setNewNotes("")
     setSplits([])
     setSplitType("equal")
@@ -161,7 +166,7 @@ export const TransportDialog = ({
     setNewMode(alt.transportMode)
     setNewDuration(alt.durationMinutes.toString())
     setNewCost(alt.cost?.toString() || "")
-    setNewCurrency(alt.currency || "AUD")
+    setNewCurrency(alt.currency || currencies[0] || "AUD")
     setNewNotes(alt.notes || "")
     setSplits([]) // Don't copy splits
     setIsAdding(true)
@@ -172,7 +177,7 @@ export const TransportDialog = ({
     setNewMode(alt.transportMode)
     setNewDuration(alt.durationMinutes.toString())
     setNewCost(alt.cost?.toString() || "")
-    setNewCurrency(alt.currency || "AUD")
+    setNewCurrency(alt.currency || currencies[0] || "AUD")
     setNewNotes(alt.notes || "")
 
     // Find associated expense
@@ -204,23 +209,25 @@ export const TransportDialog = ({
             <ListItem
               key={alt.id}
               secondaryAction={
-                <Box>
-                  <Tooltip title={t("copy")}>
-                    <IconButton edge="end" onClick={() => handleCopy(alt)} sx={{ mr: 1 }}>
-                      <CopyIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t("edit")}>
-                    <IconButton edge="end" onClick={() => handleEdit(alt)} sx={{ mr: 1 }}>
-                      <EditIcon color="primary" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t("delete")}>
-                    <IconButton edge="end" onClick={() => deleteMutation.mutate(alt.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
+                canEdit ? (
+                  <Box>
+                    <Tooltip title={t("copy")}>
+                      <IconButton edge="end" onClick={() => handleCopy(alt)} sx={{ mr: 1 }}>
+                        <CopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t("edit")}>
+                      <IconButton edge="end" onClick={() => handleEdit(alt)} sx={{ mr: 1 }}>
+                        <EditIcon color="primary" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t("delete")}>
+                      <IconButton edge="end" onClick={() => deleteMutation.mutate(alt.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                ) : undefined
               }
             >
               <ListItemIcon onClick={() => selectMutation.mutate(alt.id)} style={{ cursor: "pointer" }}>
@@ -229,7 +236,21 @@ export const TransportDialog = ({
               <ListItemIcon>{getIcon(alt.transportMode)}</ListItemIcon>
               <ListItemText
                 primary={alt.name || alt.transportMode}
-                secondary={`${alt.durationMinutes} min • ${alt.cost ? `$${alt.cost}` : t("free")}`}
+                secondary={
+                  canEdit ? (
+                    `${alt.durationMinutes} min • ${alt.cost ? `${alt.cost} ${alt.currency || "AUD"}` : t("free")}`
+                  ) : (
+                    <span>
+                      {`${alt.durationMinutes} min`}
+                      {alt.notes && (
+                        <>
+                          <br />
+                          <span style={{ fontStyle: "italic", color: "#666" }}>{alt.notes}</span>
+                        </>
+                      )}
+                    </span>
+                  )
+                }
               />
             </ListItem>
           ))}
@@ -240,7 +261,7 @@ export const TransportDialog = ({
           )}
         </List>
 
-        {isAdding ? (
+        {isAdding && canEdit ? (
           <Box sx={{ mt: 2, p: 2, border: "1px solid #eee", borderRadius: 1 }}>
             <Grid container spacing={2}>
               <Grid size={12}>
@@ -284,7 +305,7 @@ export const TransportDialog = ({
                         InputProps={{ disableUnderline: true }}
                         sx={{ width: 60, mr: 1 }}
                       >
-                        {["AUD", "USD", "EUR", "GBP", "JPY", "CAD", "NZD"].map((curr) => (
+                        {currencies.map((curr) => (
                           <MenuItem key={curr} value={curr}>
                             {curr}
                           </MenuItem>
@@ -333,17 +354,20 @@ export const TransportDialog = ({
             </Grid>
           </Box>
         ) : (
-          <Button
-            fullWidth
-            variant="outlined"
-            sx={{ mt: 1 }}
-            onClick={() => {
-              resetForm()
-              setIsAdding(true)
-            }}
-          >
-            {t("addOption")}
-          </Button>
+          !isAdding &&
+          canEdit && (
+            <Button
+              fullWidth
+              variant="outlined"
+              sx={{ mt: 1 }}
+              onClick={() => {
+                resetForm()
+                setIsAdding(true)
+              }}
+            >
+              {t("addOption")}
+            </Button>
+          )
         )}
       </DialogContent>
       <DialogActions>

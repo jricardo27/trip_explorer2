@@ -1,0 +1,10 @@
+
+ RUN  v4.0.16 /Users/ricardoperez/pcode/trip_explorer/frontend
+
+ ✓ src/components/__tests__/DayItineraryCard.test.tsx (3 tests) 141ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  23:17:24
+   Duration  2.46s (transform 102ms, setup 39ms, import 2.01s, tests 141ms, environment 211ms)
+

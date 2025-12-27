@@ -5,6 +5,7 @@ import { useState } from "react"
 import type { Trip, Activity } from "../types"
 
 import AnimationConfigDialog from "./AnimationConfigDialog"
+import { CalendarView } from "./CalendarView"
 import { ExpensesPanel } from "./ExpensesPanel"
 import { ItineraryView } from "./ItineraryView"
 import { JournalPanel } from "./JournalPanel"
@@ -110,6 +111,7 @@ export const TripDetailsContent = ({
           viewMode={viewMode}
           handleSaveAnimation={handleSaveAnimation}
           handleDeleteAnimation={handleDeleteAnimation}
+          exchangeRates={trip.exchangeRates || {}}
         />
       )}
 
@@ -145,9 +147,12 @@ export const TripDetailsContent = ({
           onRenameScenario={async (dayId, scenarioId, newName) => {
             await updateScenario({ tripDayId: dayId, scenarioId, data: { name: newName } })
           }}
+          exchangeRates={trip.exchangeRates}
+          baseCurrency={trip.baseCurrency || trip.defaultCurrency}
         />
       )}
 
+      {viewMode === "calendar" && trip.days && <CalendarView days={trip.days} />}
       {viewMode === "journal" && (
         <Box mt={3}>
           <JournalPanel tripId={trip.id} days={trip.days || []} />
@@ -185,7 +190,7 @@ export const TripDetailsContent = ({
                             return (
                               <ListItem key={step.id}>
                                 <ListItemText
-                                  primary={`${index + 1}. ${step.customLabel || activity?.name || "Unknown Activity"}`}
+                                  primary={`${index + 1}. ${step.customLabel || activity?.name || "Unknown Activity"} `}
                                   secondary={activity?.address || ""}
                                 />
                               </ListItem>

@@ -1,7 +1,8 @@
 import { Box, Typography, useTheme, Paper } from "@mui/material"
+import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
-import { MapContainer, LayersControl, TileLayer } from "react-leaflet"
+import { MapContainer, LayersControl, TileLayer, useMap } from "react-leaflet"
 
 import { useMapAnimation } from "../hooks/useMapAnimation"
 import { useLanguageStore } from "../stores/languageStore"
@@ -12,7 +13,44 @@ import { AnimationSettingsSidebar } from "./Map/Animation/AnimationSettingsSideb
 import { BaseLayers } from "./Map/BaseLayers"
 import { MapFlyHandler, MapStateManager } from "./Map/MapEventHandlers"
 import { LIGHT_TILES, DARK_TILES } from "./Map/MapUtils"
+import { TripMarkers } from "./Map/TripMarkers"
 import { TripAnimationLayer } from "./TripAnimationLayer"
+
+// Component to auto-fit map bounds to activities
+const MapAutoFitter = ({ activities, viewMode }: { activities: Activity[]; viewMode?: string }) => {
+  const map = useMap()
+  const hasFittedRef = useRef(false)
+  const activitiesRef = useRef(activities)
+
+  useEffect(() => {
+    // Check if activities effectively changed
+    const prevIds = activitiesRef.current.map((a) => a.id).join(",")
+    const currentIds = activities.map((a) => a.id).join(",")
+
+    if (prevIds !== currentIds) {
+      hasFittedRef.current = false
+      activitiesRef.current = activities
+    }
+  }, [activities])
+
+  useEffect(() => {
+    if (viewMode === "animation") return
+    if (hasFittedRef.current && activities.length > 0) return
+
+    const validActivities = activities.filter((a) => a.latitude && a.longitude)
+    if (validActivities.length === 0) return
+
+    const coords = validActivities.map((a) => [Number(a.latitude), Number(a.longitude)] as [number, number])
+    const bounds = L.latLngBounds(coords)
+
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 6 })
+      hasFittedRef.current = true
+    }
+  }, [activities, map, viewMode])
+
+  return null
+}
 
 interface TripMapProps {
   activities?: Activity[]
@@ -31,6 +69,7 @@ interface TripMapProps {
   onSaveAnimation?: (animation: Partial<TripAnimation>) => Promise<void>
   onDeleteAnimation?: (id: string) => Promise<void>
   canEdit?: boolean
+  onActivityClick?: (activity: Activity) => void
 }
 
 export const TripMap = (props: TripMapProps) => {
@@ -49,6 +88,7 @@ export const TripMap = (props: TripMapProps) => {
     onSaveAnimation,
     onDeleteAnimation,
     canEdit = true,
+    onActivityClick,
   } = props
 
   const theme = useTheme()
@@ -402,6 +442,12 @@ export const TripMap = (props: TripMapProps) => {
                 speedFactor: animation.settings.speedFactor || 200,
               }}
             />
+          )}
+
+          <MapAutoFitter activities={sortedActivities} viewMode={viewMode} />
+
+          {viewMode !== "animation" && sortedActivities.length > 0 && (
+            <TripMarkers activities={sortedActivities} onActivityClick={onActivityClick} />
           )}
         </MapContainer>
       </Box>

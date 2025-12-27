@@ -110,6 +110,11 @@ export const tripApi = {
     return response.data.data
   },
 
+  getPublic: async (token: string): Promise<Trip> => {
+    const response = await apiClient.get<ApiResponse<Trip>>(`/trips/public/${token}`)
+    return response.data.data
+  },
+
   updateCategories: async (
     tripId: string,
     data: { checklistCategories?: string[]; packingCategories?: string[] },

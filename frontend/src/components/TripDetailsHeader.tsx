@@ -10,6 +10,7 @@ import {
   Book as JournalIcon,
   Movie as AnimationIcon,
   Download as DownloadIcon,
+  CalendarMonth as CalendarIcon,
 } from "@mui/icons-material"
 import { Box, Typography, Paper, Button, IconButton, Tabs, Tab, Chip } from "@mui/material"
 import dayjs from "dayjs"
@@ -148,6 +149,13 @@ export const TripDetailsHeader = ({
               label={t("timeline")}
               iconPosition="start"
               value="timeline"
+              sx={{ minHeight: "32px" }}
+            />
+            <Tab
+              icon={<CalendarIcon sx={{ fontSize: "1.1rem" }} />}
+              label={t("calendar" as any) || "Calendar"}
+              iconPosition="start"
+              value="calendar"
               sx={{ minHeight: "32px" }}
             />
             <Tab

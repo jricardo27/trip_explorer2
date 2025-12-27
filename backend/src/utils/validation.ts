@@ -58,6 +58,7 @@ export const createActivitySchema = z.object({
   currency: z.string().length(3).optional(),
   participantIds: z.array(z.string().uuid()).optional(),
   availableDays: z.array(z.string()).optional(),
+  isPrivate: z.boolean().optional(),
 })
 
 export const updateActivitySchema = z.object({
@@ -93,6 +94,7 @@ export const updateActivitySchema = z.object({
   isPaid: z.boolean().optional(),
   participantIds: z.array(z.string().uuid()).optional(),
   availableDays: z.array(z.string()).optional(),
+  isPrivate: z.boolean().optional(),
 })
 
 export const createExpenseSchema = z.object({

@@ -64,7 +64,8 @@ export const TransportSegment = ({ tripId, fromActivityId, toActivityId, alterna
             startIcon={getIcon(displayAlt.transportMode)}
             sx={{ textTransform: "none", color: "text.secondary", fontSize: "0.875rem" }}
           >
-            {displayAlt.durationMinutes} min • {displayAlt.cost ? `$${displayAlt.cost}` : "Free"}
+            {displayAlt.durationMinutes} min •{" "}
+            {displayAlt.cost ? `${displayAlt.cost} ${displayAlt.currency || "USD"}` : "Free"}
           </Button>
         ) : alternatives.length > 0 ? (
           <Button

@@ -23,7 +23,32 @@ export const useTripDetails = (tripId: string) => {
       const response = await client.put<ApiResponse<Trip>>(`/trips/${tripId}`, data)
       return response.data.data
     },
+    onMutate: async (newData) => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: ["trips", tripId] })
+
+      // Snapshot the previous value
+      const previousTrip = queryClient.getQueryData<Trip>(["trips", tripId])
+
+      // Optimistically update to the new value
+      if (previousTrip) {
+        queryClient.setQueryData<Trip>(["trips", tripId], {
+          ...previousTrip,
+          ...newData,
+        })
+      }
+
+      // Return context with previous value for rollback
+      return { previousTrip }
+    },
+    onError: (_err, _newData, context) => {
+      // Rollback to previous value on error
+      if (context?.previousTrip) {
+        queryClient.setQueryData(["trips", tripId], context.previousTrip)
+      }
+    },
     onSuccess: () => {
+      // Refetch to ensure we have the latest server data
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
     },
   })

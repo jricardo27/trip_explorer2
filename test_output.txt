@@ -1,0 +1,19 @@
+
+ RUN  v3.1.4 /Users/ricardoperez/pcode/trip_explorer
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  frontend/src/components/__tests__/DayItineraryCard.test.tsx [ frontend/src/components/__tests__/DayItineraryCard.test.tsx ]
+Error: Cannot find module '/Users/ricardoperez/pcode/trip_explorer/src/test/setup.ts'
+Caused by: Error: Failed to load url /Users/ricardoperez/pcode/trip_explorer/src/test/setup.ts (resolved id: /Users/ricardoperez/pcode/trip_explorer/src/test/setup.ts). Does the file exist?
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/dep-Bn81Esdm.js:35725:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  23:14:12
+   Duration  601ms (transform 12ms, setup 0ms, collect 0ms, tests 0ms, environment 325ms, prepare 42ms)
+

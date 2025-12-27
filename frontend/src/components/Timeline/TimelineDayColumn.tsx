@@ -1,8 +1,10 @@
 import { MoreVert } from "@mui/icons-material"
 import { Box, IconButton, Typography } from "@mui/material"
+import dayjs from "dayjs"
 
 import { useLanguageStore } from "../../stores/languageStore"
 import type { Activity, TripDay, TransportAlternative } from "../../types"
+import { calculateDayCost } from "../../utils/costUtils"
 
 import { TimelineActivityCard } from "./TimelineActivityCard"
 import { TimelineDayHeader } from "./TimelineDayHeader"
@@ -38,6 +40,9 @@ interface TimelineDayColumnProps {
   dragPreview: { dayId: string; top: number; duration: number } | null
   isComparisonMode: boolean
   onToggleComparison: (dayId: string) => void
+  isPublic?: boolean
+  exchangeRates: Record<string, number>
+  baseCurrency: string
 }
 
 export const TimelineDayColumn = ({
@@ -68,6 +73,9 @@ export const TimelineDayColumn = ({
   dragPreview,
   isComparisonMode,
   onToggleComparison,
+  isPublic = false,
+  exchangeRates,
+  baseCurrency,
 }: TimelineDayColumnProps) => {
   const { t } = useLanguageStore()
   const activeScenario = day.scenarios?.find((s) => s.isSelected)
@@ -75,22 +83,51 @@ export const TimelineDayColumn = ({
 
   const lanes = calculateActivityLanes(dayActivities)
 
-  // Calculate Cost
-  const activityCost = dayActivities.reduce((sum, a) => {
-    const hasActual = a.actualCost !== null && a.actualCost !== undefined
-    const cost = hasActual ? Number(a.actualCost) : Number(a.estimatedCost) || 0
-    return sum + cost
-  }, 0)
+  // Correctly identify transport segments for THIS day's sequence to avoid duplication in headers
+  const sortedDayActivities = [...dayActivities].sort((a, b) => {
+    if (!a.scheduledStart || !b.scheduledStart) return 0
+    return new Date(a.scheduledStart).getTime() - new Date(b.scheduledStart).getTime()
+  })
 
-  const transportCost = (transport || [])
-    .filter((t) => {
-      if (!t.isSelected) return false
-      const fromActivity = dayActivities.find((a) => a.id === t.fromActivityId)
-      return !!fromActivity
+  const dayTransport = (transport || []).filter((t) => {
+    return sortedDayActivities.some((activity, index) => {
+      if (index >= sortedDayActivities.length - 1) return false
+      return t.fromActivityId === activity.id && t.toActivityId === sortedDayActivities[index + 1].id
     })
-    .reduce((sum, t) => sum + (Number(t.cost) || 0), 0)
+  })
 
-  const totalCost = activityCost + transportCost
+  const costResult = calculateDayCost(dayActivities, dayTransport, exchangeRates, baseCurrency)
+
+  // Conflict detection: overlapping activities with shared members (or any if no members/everyone)
+  const conflictingActivityIds = new Set<string>()
+  sortedDayActivities.forEach((activity, i) => {
+    for (let j = 0; j < i; j++) {
+      const prev = sortedDayActivities[j]
+      if (!activity.scheduledStart || !prev.scheduledStart) continue
+
+      // Check overlap
+      const start = dayjs(activity.scheduledStart)
+      const prevStart = dayjs(prev.scheduledStart)
+      const prevEnd = dayjs(prev.scheduledEnd || prevStart.endOf("day"))
+
+      const overlaps = start.isBefore(prevEnd) && prevStart.isBefore(dayjs(activity.scheduledEnd || start.endOf("day")))
+
+      if (overlaps) {
+        // Check shared members
+        const membersA = activity.participants?.map((p) => p.memberId) || []
+        const membersB = prev.participants?.map((p) => p.memberId) || []
+
+        const hasSharedMembers =
+          (membersA.length === 0 && membersB.length === 0) || // If no members specified, assume same for both
+          membersA.some((m) => membersB.includes(m))
+
+        if (hasSharedMembers) {
+          conflictingActivityIds.add(activity.id)
+          break
+        }
+      }
+    }
+  })
 
   return (
     <Box
@@ -123,10 +160,12 @@ export const TimelineDayColumn = ({
         onScenarioChange={onScenarioChange}
         onOpenCreateScenario={handleOpenCreateScenario}
         onOpenRenameScenario={handleOpenRenameScenario}
-        totalCost={totalCost}
+        costResult={costResult}
+        baseCurrency={baseCurrency}
         dayHeaderHeight={dayHeaderHeight}
         isComparisonMode={isComparisonMode}
         onToggleComparison={onToggleComparison}
+        isPublic={isPublic}
       />
 
       <IconButton
@@ -210,6 +249,7 @@ export const TimelineDayColumn = ({
                         isMobile={isMobile}
                         isDragging={activity.id === draggedActivityId}
                         isExpanded={activity.id === expandedActivityId}
+                        isConflicting={conflictingActivityIds.has(activity.id)}
                         onDragStart={handleActivityDragStart}
                         onDragEnd={handleActivityDragEnd}
                         onExpand={setExpandedActivityId}
@@ -237,6 +277,7 @@ export const TimelineDayColumn = ({
                   isMobile={isMobile}
                   isDragging={activity.id === draggedActivityId}
                   isExpanded={activity.id === expandedActivityId}
+                  isConflicting={conflictingActivityIds.has(activity.id)}
                   onDragStart={handleActivityDragStart}
                   onDragEnd={handleActivityDragEnd}
                   onExpand={setExpandedActivityId}

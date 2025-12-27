@@ -16,6 +16,7 @@ interface UseActivityFormProps {
   initialCoordinates?: { lat: number; lng: number }
   onSubmit: (data: any) => Promise<void>
   onClose: (event?: object, reason?: string) => void
+  defaultCurrency?: string
 }
 
 export const useActivityForm = ({
@@ -27,6 +28,7 @@ export const useActivityForm = ({
   tripDays,
   initialCoordinates,
   onSubmit,
+  defaultCurrency = "AUD",
 }: Omit<UseActivityFormProps, "onClose">) => {
   const { t } = useLanguageStore()
   const { members } = useTripMembers(tripId)
@@ -37,6 +39,7 @@ export const useActivityForm = ({
   const [scheduledEnd, setScheduledEnd] = useState<dayjs.Dayjs | null>(null)
   const [estimatedCost, setEstimatedCost] = useState("")
   const [actualCost, setActualCost] = useState("")
+  const [currency, setCurrency] = useState(defaultCurrency)
   const [isPaid, setIsPaid] = useState(false)
   const [latitude, setLatitude] = useState("")
   const [longitude, setLongitude] = useState("")
@@ -45,72 +48,85 @@ export const useActivityForm = ({
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([])
   const [priority, setPriority] = useState<string>("normal")
   const [isLocked, setIsLocked] = useState(false)
+  const [isPrivate, setIsPrivate] = useState(false)
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
   const [website, setWebsite] = useState("")
   const [openingHours, setOpeningHours] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [mapPickerOpen, setMapPickerOpen] = useState(false)
-
   useEffect(() => {
-    if (open) {
-      setError(null)
-      if (activity) {
-        setName(activity.name)
-        setActivityType(activity.activityType)
-        setScheduledStart(activity.scheduledStart ? dayjs(activity.scheduledStart) : null)
-        setScheduledEnd(activity.scheduledEnd ? dayjs(activity.scheduledEnd) : null)
-        setEstimatedCost(activity.estimatedCost?.toString() || "")
-        setActualCost(activity.actualCost?.toString() || "")
-        setIsPaid(activity.isPaid || false)
-        setLatitude(activity.latitude?.toString() || "")
-        setLongitude(activity.longitude?.toString() || "")
-        setNotes(activity.notes || "")
-        setAvailableDays(activity.availableDays || [])
-        setSelectedMemberIds(activity.participants?.map((p) => p.memberId) || [])
-        setPriority(activity.priority || "normal")
-        setIsLocked(activity.isLocked || false)
-        setPhone(activity.phone || "")
-        setEmail(activity.email || "")
-        setWebsite(activity.website || "")
-        setOpeningHours(activity.openingHours ? JSON.stringify(activity.openingHours, null, 2) : "")
-      } else {
-        setName("")
-        setActivityType(ActivityTypeEnum.ATTRACTION)
+    if (!open) return
 
-        let defaultStart = null
-        let defaultEnd = null
+    setError(null)
+    if (activity) {
+      setName(activity.name)
+      setActivityType(activity.activityType)
+      setScheduledStart(activity.scheduledStart ? dayjs(activity.scheduledStart) : null)
+      setScheduledEnd(activity.scheduledEnd ? dayjs(activity.scheduledEnd) : null)
+      setEstimatedCost(activity.estimatedCost?.toString() || "")
+      setActualCost(activity.actualCost?.toString() || "")
+      setCurrency(activity.currency || defaultCurrency)
+      setIsPaid(activity.isPaid || false)
+      setLatitude(activity.latitude?.toString() || "")
+      setLongitude(activity.longitude?.toString() || "")
+      setNotes(activity.notes || "")
+      setAvailableDays(activity.availableDays || [])
+      setSelectedMemberIds(activity.participants?.map((p) => p.memberId) || [])
+      setPriority(activity.priority || "normal")
+      setIsLocked(activity.isLocked || false)
+      setIsPrivate(activity.isPrivate || false)
+      setPhone(activity.phone || "")
+      setEmail(activity.email || "")
+      setWebsite(activity.website || "")
+      setOpeningHours(activity.openingHours ? JSON.stringify(activity.openingHours, null, 2) : "")
+    } else {
+      setName("")
+      setActivityType(ActivityTypeEnum.ATTRACTION)
+      let defaultStart = null
+      let defaultEnd = null
 
-        if (tripDayId && tripDays) {
-          const day = tripDays.find((d) => d.id === tripDayId)
-          if (day) {
-            defaultStart = dayjs(day.date).hour(9).minute(0).second(0)
-            defaultEnd = defaultStart.add(1, "hour")
-          }
-        } else if (tripStartDate) {
-          defaultStart = dayjs(tripStartDate).hour(9).minute(0).second(0)
+      if (tripDayId && tripDays) {
+        const day = tripDays.find((d) => d.id === tripDayId)
+        if (day) {
+          defaultStart = dayjs(day.date).hour(9).minute(0).second(0)
           defaultEnd = defaultStart.add(1, "hour")
         }
-
-        setScheduledStart(defaultStart)
-        setScheduledEnd(defaultEnd)
-        setEstimatedCost("")
-        setActualCost("")
-        setIsPaid(false)
-        setLatitude(initialCoordinates?.lat.toString() || "")
-        setLongitude(initialCoordinates?.lng.toString() || "")
-        setNotes("")
-        setAvailableDays([])
-        setSelectedMemberIds(members.map((m) => m.id))
-        setPriority("normal")
-        setIsLocked(false)
-        setPhone("")
-        setEmail("")
-        setWebsite("")
-        setOpeningHours("")
+      } else if (tripStartDate) {
+        defaultStart = dayjs(tripStartDate).hour(9).minute(0).second(0)
+        defaultEnd = defaultStart.add(1, "hour")
       }
+
+      setScheduledStart(defaultStart)
+      setScheduledEnd(defaultEnd)
+      setEstimatedCost("")
+      setActualCost("")
+      setCurrency(defaultCurrency)
+      setIsPaid(false)
+      setLatitude(initialCoordinates?.lat.toString() || "")
+      setLongitude(initialCoordinates?.lng.toString() || "")
+      setNotes("")
+      setAvailableDays([])
+      setSelectedMemberIds(members.map((m) => m.id))
+      setPriority("normal")
+      setIsLocked(false)
+      setIsPrivate(false)
+      setPhone("")
+      setEmail("")
+      setWebsite("")
+      setOpeningHours("")
     }
-  }, [open, activity, tripDayId, tripDays, tripStartDate, initialCoordinates, members])
+  }, [
+    open,
+    activity,
+    tripDayId,
+    tripDays,
+    tripStartDate,
+    initialCoordinates?.lat,
+    initialCoordinates?.lng,
+    defaultCurrency,
+    members,
+  ]) // Only re-initialize when meaningful props change
 
   const validateDates = (start: dayjs.Dayjs | null, end: dayjs.Dayjs | null) => {
     if (!start && !end) return true
@@ -154,8 +170,10 @@ export const useActivityForm = ({
         scheduledEnd: scheduledEnd?.toISOString(),
         estimatedCost: estimatedCost ? parseFloat(estimatedCost) : undefined,
         actualCost: actualCost ? parseFloat(actualCost) : undefined,
+        currency,
         isPaid,
         isLocked,
+        isPrivate,
         latitude: latitude ? parseFloat(latitude) : undefined,
         longitude: longitude ? parseFloat(longitude) : undefined,
         notes,
@@ -185,6 +203,8 @@ export const useActivityForm = ({
     setEstimatedCost,
     actualCost,
     setActualCost,
+    currency,
+    setCurrency,
     isPaid,
     setIsPaid,
     latitude,
@@ -201,6 +221,8 @@ export const useActivityForm = ({
     setPriority,
     isLocked,
     setIsLocked,
+    isPrivate,
+    setIsPrivate,
     phone,
     setPhone,
     email,

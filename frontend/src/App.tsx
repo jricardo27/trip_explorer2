@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Layout from "./components/Layout"
 import { HighlightsPage } from "./pages/HighlightsPage"
 import LoginPage from "./pages/LoginPage"
+import PublicTripView from "./pages/PublicTripView"
 import SettingsPage from "./pages/SettingsPage"
 import SignupPage from "./pages/SignupPage"
 import TripDetailsPage from "./pages/TripDetailsPage"
@@ -62,6 +63,7 @@ const App = () => {
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
+                <Route path="/public/trip/:token" element={<PublicTripView />} />
                 <Route
                   element={
                     <ProtectedRoute>

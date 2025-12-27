@@ -8,6 +8,7 @@ import ActivityDialog from "../components/ActivityDialog"
 import { TransportDialog } from "../components/Transport/TransportDialog"
 import { TripDetailsContent } from "../components/TripDetailsContent"
 import { TripDetailsHeader } from "../components/TripDetailsHeader"
+import { TripMembersDialog } from "../components/TripMembersDialog"
 import { TripSettingsDialog } from "../components/TripSettingsDialog"
 import { useTripDetails } from "../hooks/useTripDetails"
 import { useTripDetailsUI } from "../hooks/useTripDetailsUI"
@@ -25,6 +26,7 @@ const TripDetailsPage = () => {
     updateActivity,
     deleteActivity,
     updateTrip,
+    isUpdatingTrip,
     swapDays,
     updateDay,
     createAnimation,
@@ -234,6 +236,8 @@ const TripDetailsPage = () => {
         tripStartDate={trip.startDate}
         tripEndDate={trip.endDate}
         tripDays={trip.days}
+        currencies={trip.currencies}
+        defaultCurrency={trip.defaultCurrency}
       />
 
       <TripSettingsDialog
@@ -241,6 +245,7 @@ const TripDetailsPage = () => {
         onClose={() => setSettingsDialogOpen(false)}
         trip={trip}
         onUpdate={updateTrip}
+        isUpdating={isUpdatingTrip}
       />
 
       {selectedTransport && (
@@ -257,17 +262,17 @@ const TripDetailsPage = () => {
                 t.toActivityId === selectedTransport.toActivityId,
             ) || []
           }
+          currencies={trip.currencies}
         />
       )}
 
-      {membersDialogOpen && (
-        <Alert
-          severity="info"
+      {membersDialogOpen && trip && (
+        <TripMembersDialog
+          open={membersDialogOpen}
           onClose={() => setMembersDialogOpen(false)}
-          sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1000 }}
-        >
-          Members Dialog Placeholder
-        </Alert>
+          trip={trip}
+          fullScreen={isMobile}
+        />
       )}
     </Box>
   )

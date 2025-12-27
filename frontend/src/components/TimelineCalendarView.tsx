@@ -22,6 +22,9 @@ interface TimelineCalendarViewProps {
   onScenarioChange?: (dayId: string, scenarioId: string | null) => void
   onCreateScenario?: (dayId: string, name: string) => void
   onRenameScenario?: (dayId: string, scenarioId: string, newName: string) => void
+  exchangeRates?: Record<string, number>
+  baseCurrency?: string
+  isPublic?: boolean
 }
 
 export const TimelineCalendarView = ({
@@ -35,6 +38,9 @@ export const TimelineCalendarView = ({
   onScenarioChange,
   onCreateScenario,
   onRenameScenario,
+  exchangeRates = {},
+  baseCurrency = "USD",
+  isPublic = false,
 }: TimelineCalendarViewProps) => {
   // Responsive breakpoints
   const theme = useTheme()
@@ -343,6 +349,9 @@ export const TimelineCalendarView = ({
               dragPreview={dragPreview ? { ...dragPreview, top: dragPreview.yPosition } : null}
               isComparisonMode={comparisonDayId === day.id}
               onToggleComparison={handleToggleComparison}
+              exchangeRates={exchangeRates}
+              baseCurrency={baseCurrency}
+              isPublic={isPublic}
             />
           ))}
         </Box>

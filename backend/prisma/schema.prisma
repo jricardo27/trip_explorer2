@@ -49,6 +49,7 @@ model Trip {
   timezone        String?  @default("Australia/Sydney")
   isCompleted     Boolean  @default(false) @map("is_completed")
   isPublic        Boolean  @default(false) @map("is_public")
+  publicToken      String? @unique @map("public_token")
 
   user           User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   days           TripDay[]
@@ -156,6 +157,7 @@ model Activity {
   status          ActivityStatus @default(PLANNED)
   priority        String?        @default("normal") // 'normal', 'optional', 'mandatory'
   isLocked        Boolean        @default(false) @map("is_locked")
+  isPrivate       Boolean        @default(false) @map("is_private")
   orderIndex      Int            @default(0) @map("order_index")
 
   bookingReference   String?   @map("booking_reference")

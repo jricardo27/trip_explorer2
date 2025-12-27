@@ -1,3 +1,5 @@
+import crypto from "crypto"
+
 import { Trip, Prisma } from "@prisma/client"
 import dayjs from "dayjs"
 
@@ -174,18 +176,77 @@ export class TripService {
       packingCategories: string[]
     }>,
   ): Promise<Trip> {
+    const updateData: any = { ...data }
+
+    if (data.isPublic) {
+      const currentTrip = await prisma.trip.findUnique({ where: { id } })
+      if (currentTrip && !currentTrip.publicToken) {
+        updateData.publicToken = crypto.randomBytes(16).toString("hex")
+      }
+    }
+
     const trip = await prisma.trip.update({
       where: {
         id,
         userId,
       },
-      data,
+      data: updateData,
       include: {
         days: true,
       },
     })
 
     return trip
+  }
+
+  async getTripByPublicToken(token: string): Promise<Trip | null> {
+    console.log(`[DEBUG] TripService querying for token: ${token}`)
+    try {
+      const trip = await prisma.trip.findFirst({
+        where: { publicToken: token, isPublic: true },
+        include: {
+          days: {
+            orderBy: { dayIndex: "asc" },
+            include: {
+              activities: {
+                where: { scenario: null },
+                orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
+              },
+              scenarios: {
+                orderBy: { orderIndex: "asc" },
+                include: {
+                  activities: {
+                    orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
+                  },
+                },
+              },
+            },
+          },
+          transport: true,
+        },
+      })
+
+      console.log("[DEBUG] TripService result:", trip ? `Found trip ${trip.id}` : "null")
+
+      if (trip) {
+        // Filter out private activities in memory
+        if (trip.days) {
+          trip.days.forEach((day) => {
+            if (day.activities) day.activities = day.activities.filter((a: any) => !a.isPrivate)
+            if (day.scenarios) {
+              day.scenarios.forEach((scenario) => {
+                if (scenario.activities) scenario.activities = scenario.activities.filter((a: any) => !a.isPrivate)
+              })
+            }
+          })
+        }
+      }
+
+      return trip
+    } catch (error) {
+      console.error("[DEBUG] TripService query ERROR:", error)
+      throw error // Re-throw so the controller handles it (or returns 500)
+    }
   }
 
   async deleteTrip(id: string, userId: string): Promise<void> {
