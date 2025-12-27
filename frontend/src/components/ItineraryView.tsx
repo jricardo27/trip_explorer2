@@ -176,6 +176,7 @@ export const ItineraryView = ({
                 onDeleteAnimation={handleDeleteAnimation}
                 transport={trip.transport}
                 showRoutes={showRoutes}
+                mapExpanded={mapExpanded}
               />
             </Box>
           </Grid>

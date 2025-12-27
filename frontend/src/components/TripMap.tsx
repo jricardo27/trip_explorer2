@@ -105,6 +105,20 @@ const MapAutoFitter = ({ activities, viewMode }: { activities: Activity[]; viewM
   return null
 }
 
+const MapResizeHandler = ({ expanded }: { expanded?: boolean }) => {
+  const map = useMap()
+
+  useEffect(() => {
+    // Small delay to ensure container finish transitions
+    const timer = setTimeout(() => {
+      map.invalidateSize()
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [expanded, map])
+
+  return null
+}
+
 interface TripMapProps {
   activities?: Activity[]
   selectedActivityId?: string
@@ -125,6 +139,7 @@ interface TripMapProps {
   onActivityClick?: (activity: Activity) => void
   transport?: TransportAlternative[]
   showRoutes?: boolean
+  mapExpanded?: boolean
 }
 
 export const TripMap = (props: TripMapProps) => {
@@ -145,6 +160,7 @@ export const TripMap = (props: TripMapProps) => {
     canEdit = true,
     onActivityClick,
     transport = [],
+    mapExpanded,
   } = props
 
   const theme = useTheme()
@@ -599,6 +615,7 @@ export const TripMap = (props: TripMapProps) => {
           )}
 
           <MapAutoFitter activities={sortedActivities} viewMode={viewMode} />
+          <MapResizeHandler expanded={mapExpanded} />
 
           {viewMode !== "animation" && sortedActivities.length > 0 && (
             <TripMarkers activities={sortedActivities} onActivityClick={onActivityClick} />
