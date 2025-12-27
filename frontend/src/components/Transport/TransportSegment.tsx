@@ -238,6 +238,8 @@ export const TransportSegment = ({
         onDelete={() => {
           // Handled by local mutation in dialog
         }}
+        fromActivity={fromActivity}
+        toActivity={toActivity}
       />
 
       {fromActivity && toActivity && (

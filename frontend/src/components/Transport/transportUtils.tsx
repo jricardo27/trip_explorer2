@@ -51,3 +51,25 @@ export const formatDuration = (minutes: number, t: any) => {
 
   return parts.join(" ")
 }
+
+export const getTransportModeColor = (mode: TransportMode): string => {
+  switch (mode) {
+    case TransportMode.DRIVING:
+      return "#1976d2" // Blue
+    case TransportMode.WALKING:
+      return "#2e7d32" // Green
+    case TransportMode.CYCLING:
+      return "#ed6c02" // Orange
+    case TransportMode.TRANSIT:
+    case TransportMode.BUS:
+      return "#9c27b0" // Purple
+    case TransportMode.TRAIN:
+      return "#d32f2f" // Red
+    case TransportMode.FLIGHT:
+      return "#0288d1" // Light Blue
+    case TransportMode.FERRY:
+      return "#00796b" // Teal
+    default:
+      return "#757575" // Grey
+  }
+}

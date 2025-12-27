@@ -26,10 +26,10 @@ import { transportApi } from "../../api/client"
 import { useExpenses } from "../../hooks/useExpenses"
 import { useTripMembers } from "../../hooks/useTripMembers"
 import { useLanguageStore } from "../../stores/languageStore"
-import { TransportMode } from "../../types"
-import type { TransportAlternative } from "../../types"
+import { TransportMode, type Activity, TransportAlternative } from "../../types"
 import { ExpenseSplitInput, type SplitType, type ExpenseSplit } from "../ExpenseSplitInput"
 
+import { TransportRouteMap } from "./TransportRouteMap"
 import { getTransportIcon } from "./transportUtils"
 
 // 1. NON-EDITABLE VIEW DIALOG
@@ -267,7 +267,7 @@ export const TransportEditDialog = ({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>{alternative ? t("editTransport") : t("addTransport")}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -451,6 +451,8 @@ interface TransportSelectionDialogProps {
   alternatives: TransportAlternative[]
   onEdit: (alt: TransportAlternative) => void
   onDelete: (id: string) => void
+  fromActivity?: Activity
+  toActivity?: Activity
 }
 
 export const TransportSelectionDialog = ({
@@ -461,6 +463,8 @@ export const TransportSelectionDialog = ({
   toActivityId,
   alternatives,
   onEdit,
+  fromActivity,
+  toActivity,
 }: TransportSelectionDialogProps) => {
   const { t } = useLanguageStore()
   const queryClient = useQueryClient()
@@ -470,7 +474,7 @@ export const TransportSelectionDialog = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
       queryClient.invalidateQueries({ queryKey: ["public-trip"] })
-      onClose()
+      // Don't close dialog - let user see selection and close manually
     },
   })
 
@@ -479,7 +483,7 @@ export const TransportSelectionDialog = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
       queryClient.invalidateQueries({ queryKey: ["public-trip"] })
-      onClose()
+      // Don't close dialog - let user see deselection and close manually
     },
   })
 
@@ -501,7 +505,7 @@ export const TransportSelectionDialog = ({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           {t("chooseTransport")}
@@ -512,36 +516,52 @@ export const TransportSelectionDialog = ({
           )}
         </Box>
       </DialogTitle>
-      <DialogContent>
-        <List>
-          {alternatives.map((alt) => (
-            <Box key={alt.id} sx={{ mb: 1, border: "1px solid #eee", borderRadius: 1 }}>
-              <Box display="flex" alignItems="center" p={1}>
-                <Radio checked={alt.isSelected} onChange={() => selectMutation.mutate(alt.id)} />
-                <ListItemIcon sx={{ minWidth: 40 }}>{getTransportIcon(alt.transportMode)}</ListItemIcon>
-                <ListItemText primary={alt.name || alt.transportMode} secondary={`${alt.durationMinutes} min`} />
-                <Box sx={{ display: "flex", gap: 0.5 }}>
-                  <IconButton size="small" onClick={() => handleEdit(alt)}>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={(e) => handleDelete(e, alt.id)}
-                    disabled={deleteMutation.isPending}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
+      <DialogContent sx={{ p: 0, display: "flex", height: 500 }}>
+        {/* Left side: List of alternatives */}
+        <Box sx={{ width: fromActivity && toActivity ? "50%" : "100%", overflowY: "auto", p: 2 }}>
+          <List>
+            {alternatives.map((alt) => (
+              <Box key={alt.id} sx={{ mb: 1, border: "1px solid #eee", borderRadius: 1 }}>
+                <Box display="flex" alignItems="center" p={1}>
+                  <Radio checked={alt.isSelected} onChange={() => selectMutation.mutate(alt.id)} />
+                  <ListItemIcon sx={{ minWidth: 40 }}>{getTransportIcon(alt.transportMode)}</ListItemIcon>
+                  <ListItemText primary={alt.name || alt.transportMode} secondary={`${alt.durationMinutes} min`} />
+                  <Box sx={{ display: "flex", gap: 0.5 }}>
+                    <IconButton size="small" onClick={() => handleEdit(alt)}>
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={(e) => handleDelete(e, alt.id)}
+                      disabled={deleteMutation.isPending}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          ))}
-          {alternatives.length === 0 && (
-            <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
-              {t("noTransportOptions")}
-            </Typography>
-          )}
-        </List>
+            ))}
+            {alternatives.length === 0 && (
+              <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
+                {t("noTransportOptions")}
+              </Typography>
+            )}
+          </List>
+        </Box>
+
+        {/* Right side: Map */}
+        {fromActivity && toActivity && (
+          <Box sx={{ width: "50%", borderLeft: "1px solid #eee" }}>
+            <TransportRouteMap
+              alternatives={alternatives}
+              selectedId={alternatives.find((a) => a.isSelected)?.id || null}
+              onSelectAlternative={(id) => selectMutation.mutate(id)}
+              fromActivity={fromActivity}
+              toActivity={toActivity}
+            />
+          </Box>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t("close")}</Button>
