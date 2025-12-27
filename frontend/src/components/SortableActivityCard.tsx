@@ -110,6 +110,12 @@ export const SortableActivityCard = ({
           {activity.name}
         </Typography>
         <Typography variant="caption" display="block">
+          {(activity.city || activity.address) && (
+            <>
+              {activity.city || activity.address}
+              {" • "}
+            </>
+          )}
           {activity.scheduledStart ? dayjs(activity.scheduledStart).format("h:mm A") : t("noTime")}
           {activity.scheduledStart && activity.scheduledEnd && (
             <>
