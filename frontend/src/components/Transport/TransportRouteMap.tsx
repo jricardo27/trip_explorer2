@@ -9,7 +9,7 @@ import { MapContainer, TileLayer, Polyline, Marker, Tooltip, useMap } from "reac
 import type { TransportAlternative, Activity } from "../../types"
 import { TransportMode } from "../../types"
 
-import { getTransportModeColor } from "./transportUtils"
+import { getTransportModeColor, decodePolyline } from "./transportUtils"
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -78,9 +78,14 @@ export const TransportRouteMap = ({
           const isSelected = alt.id === selectedId
           const color = getTransportModeColor(alt.transportMode)
 
-          // Calculate offset for each route so they don't overlap
-          // Offset perpendicular to the line direction
-          if (fromActivity.latitude && fromActivity.longitude && toActivity.latitude && toActivity.longitude) {
+          // Get waypoints if available
+          let positions: [number, number][] = []
+          const hasWaypoints = alt.waypoints && alt.waypoints.overview
+
+          if (hasWaypoints) {
+            positions = decodePolyline(alt.waypoints.overview)
+          } else if (fromActivity.latitude && fromActivity.longitude && toActivity.latitude && toActivity.longitude) {
+            // Fallback: Calculate offset for each route so they don't overlap
             const offsetDistance = 0.002 // degrees (roughly 200m at equator)
             const totalAlts = alternatives.length
             const offsetIndex = index - (totalAlts - 1) / 2 // Center the offsets
@@ -92,9 +97,13 @@ export const TransportRouteMap = ({
             const perpX = (-dy / length) * offsetDistance * offsetIndex
             const perpY = (dx / length) * offsetDistance * offsetIndex
 
-            const startPos: [number, number] = [fromActivity.latitude + perpY, fromActivity.longitude + perpX]
-            const endPos: [number, number] = [toActivity.latitude + perpY, toActivity.longitude + perpX]
+            positions = [
+              [fromActivity.latitude + perpY, fromActivity.longitude + perpX],
+              [toActivity.latitude + perpY, toActivity.longitude + perpX],
+            ]
+          }
 
+          if (positions.length > 0) {
             // Different dash patterns for different modes
             const getDashArray = (mode: TransportMode) => {
               switch (mode) {
@@ -116,7 +125,7 @@ export const TransportRouteMap = ({
             return (
               <Polyline
                 key={alt.id}
-                positions={[startPos, endPos]}
+                positions={positions}
                 pathOptions={{
                   color: color,
                   weight: isSelected ? 6 : 3,
