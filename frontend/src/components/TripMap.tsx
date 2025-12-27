@@ -166,6 +166,9 @@ export const TripMap = (props: TripMapProps) => {
     const saved = localStorage.getItem("mapShowRoutes")
     return saved !== null ? JSON.parse(saved) : (props.showRoutes ?? true)
   })
+
+  const effectiveShowRoutes = props.showRoutes !== undefined ? props.showRoutes : localShowRoutes
+
   const [controlsVisible, setControlsVisible] = useState(true)
   const [titleVisible, setTitleVisible] = useState(false)
   const hideControlsTimerRef = useRef<any>(null)
@@ -460,7 +463,11 @@ export const TripMap = (props: TripMapProps) => {
         >
           <FormControlLabel
             control={
-              <Checkbox size="small" checked={localShowRoutes} onChange={(e) => setLocalShowRoutes(e.target.checked)} />
+              <Checkbox
+                size="small"
+                checked={effectiveShowRoutes}
+                onChange={(e) => setLocalShowRoutes(e.target.checked)}
+              />
             }
             label={
               <Typography variant="body2" sx={{ fontWeight: "medium" }}>
@@ -520,7 +527,7 @@ export const TripMap = (props: TripMapProps) => {
           </LayersControl>
 
           {/* Render Transport Routes */}
-          {localShowRoutes &&
+          {effectiveShowRoutes &&
             transport
               .filter((t) => t.waypoints) // Only show if they have waypoints
               .filter((t) => t.isSelected) // Only show selected
