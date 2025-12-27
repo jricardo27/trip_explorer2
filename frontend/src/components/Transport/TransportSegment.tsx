@@ -162,7 +162,7 @@ export const TransportSegment = ({
                 "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
               }}
             >
-              {optionsCount} options available (Choose)
+              {optionsCount} {t("optionsAvailable")} ({t("chooseTransport")})
             </Button>
             {canFetch && (
               <Tooltip title="Fetch more options">
