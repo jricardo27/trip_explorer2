@@ -74,3 +74,22 @@ export const getGreatCirclePath = (
   path.push(end)
   return path
 }
+/**
+ * Calculates the great-circle distance between two points in meters using Haversine formula
+ * @param start Start coordinates [lat, lng]
+ * @param end End coordinates [lat, lng]
+ * @returns Distance in meters
+ */
+export const getDistance = (start: [number, number], end: [number, number]): number => {
+  const R = 6371e3 // Earth radius in meters
+  const lat1 = toRad(start[0])
+  const lat2 = toRad(end[0])
+  const dLat = toRad(end[0] - start[0])
+  const dLon = toRad(end[1] - start[1])
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+  return R * c
+}

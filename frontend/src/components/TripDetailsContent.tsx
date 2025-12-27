@@ -153,6 +153,27 @@ export const TripDetailsContent = ({
       )}
 
       {viewMode === "calendar" && trip.days && <CalendarView days={trip.days} />}
+
+      {viewMode === "map" && (
+        <Box sx={{ height: "calc(100vh - 200px)", mt: 2 }}>
+          <TripMap
+            activities={trip.activities}
+            days={trip.days?.map((d) => ({
+              id: d.id,
+              name: d.name,
+              dayIndex: (d as any).dayNumber ? (d as any).dayNumber - 1 : 0,
+            }))}
+            viewMode="map"
+            title={trip.name}
+            canEdit={canEdit}
+            transport={trip.transport}
+            activeFlyToLocation={activeFlyToLocation}
+            onActivityClick={handleEditActivity}
+            onCreateActivity={(latLng) => handleAddActivity(undefined, latLng)}
+          />
+        </Box>
+      )}
+
       {viewMode === "journal" && (
         <Box mt={3}>
           <JournalPanel tripId={trip.id} days={trip.days || []} />
@@ -219,6 +240,7 @@ export const TripDetailsContent = ({
                 onSaveAnimation={handleSaveAnimation}
                 onDeleteAnimation={handleDeleteAnimation}
                 canEdit={canEdit}
+                transport={trip.transport}
               />
             </Box>
           </Grid>

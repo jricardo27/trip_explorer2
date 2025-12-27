@@ -1,100 +1,254 @@
-import {
-  Add,
-  DirectionsCar,
-  DirectionsBus,
-  DirectionsWalk,
-  Train,
-  Flight,
-  DirectionsBoat,
-  PedalBike,
-  HelpOutline,
-} from "@mui/icons-material"
-import { Box, Button } from "@mui/material"
+import { Add, Edit as EditIcon, HelpOutline, SwapHoriz, Clear, AutoFixHigh as AutoFetchIcon } from "@mui/icons-material"
+import { Box, Button, IconButton, Tooltip, Typography, CircularProgress } from "@mui/material"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
-import { TransportMode } from "../../types"
-import type { TransportAlternative } from "../../types"
+import { transportApi } from "../../api/client"
+import { useTripDetails } from "../../hooks/useTripDetails"
+import { useLanguageStore } from "../../stores/languageStore"
+import type { TransportAlternative, Activity } from "../../types"
 
-import { TransportDialog } from "./TransportDialog"
+import { FetchTransportOptionsDialog } from "./FetchTransportOptionsDialog"
+import { TransportViewDialog, TransportEditDialog, TransportSelectionDialog } from "./TransportDialogs"
+import { getTransportIcon, getModeLabel, formatDuration } from "./transportUtils"
 
 interface TransportSegmentProps {
   tripId: string
   fromActivityId: string
   toActivityId: string
+  fromActivity?: Activity
+  toActivity?: Activity
   alternatives: TransportAlternative[]
+  currencies?: string[]
 }
 
-const getIcon = (mode: TransportMode) => {
-  switch (mode) {
-    case TransportMode.DRIVING:
-      return <DirectionsCar fontSize="small" />
-    case TransportMode.WALKING:
-      return <DirectionsWalk fontSize="small" />
-    case TransportMode.CYCLING:
-      return <PedalBike fontSize="small" />
-    case TransportMode.TRANSIT:
-      return <DirectionsBus fontSize="small" />
-    case TransportMode.BUS:
-      return <DirectionsBus fontSize="small" />
-    case TransportMode.TRAIN:
-      return <Train fontSize="small" />
-    case TransportMode.FLIGHT:
-      return <Flight fontSize="small" />
-    case TransportMode.FERRY:
-      return <DirectionsBoat fontSize="small" />
-    default:
-      return <HelpOutline fontSize="small" />
+export const TransportSegment = ({
+  tripId,
+  fromActivityId,
+  toActivityId,
+  fromActivity,
+  toActivity,
+  alternatives,
+  currencies = ["AUD"],
+}: TransportSegmentProps) => {
+  const queryClient = useQueryClient()
+  const { t } = useLanguageStore()
+  const { fetchSegmentTransport, isFetchingTransport } = useTripDetails(tripId)
+
+  const [viewOpen, setViewOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [selectOpen, setSelectOpen] = useState(false)
+  const [fetchOpen, setFetchOpen] = useState(false)
+  const [editingAlt, setEditingAlt] = useState<TransportAlternative | undefined>(undefined)
+
+  const deselectAllMutation = useMutation({
+    mutationFn: () => transportApi.deselectAll(tripId, fromActivityId, toActivityId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+      queryClient.invalidateQueries({ queryKey: ["public-trip"] })
+    },
+  })
+
+  const displayAlt = alternatives.find((a: TransportAlternative) => a.isSelected)
+  const optionsCount = alternatives.length
+
+  const handleOpenDetails = () => setViewOpen(true)
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setEditingAlt(displayAlt)
+    setEditOpen(true)
   }
-}
+  const handleSwap = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectOpen(true)
+  }
+  const handleAdd = () => {
+    setEditingAlt(undefined)
+    setEditOpen(true)
+  }
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    deselectAllMutation.mutate()
+  }
 
-export const TransportSegment = ({ tripId, fromActivityId, toActivityId, alternatives }: TransportSegmentProps) => {
-  const [open, setOpen] = useState(false)
-  // Actually, if none selected, we might show "X options" or just the first one.
-  // Ideally backend ensures one is selected? Or explicit "isSelected".
+  const handleOpenFetch = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setFetchOpen(true)
+  }
 
-  const displayAlt = alternatives.find((a) => a.isSelected)
+  const handleDoFetch = async (options: { modes: string[]; departureTime?: number }) => {
+    await fetchSegmentTransport({
+      fromActivityId,
+      toActivityId,
+      options,
+    })
+    setFetchOpen(false)
+    setSelectOpen(true) // Open selection after fetch to show options
+  }
+
+  // Check if we have coordinates to enable fetch
+  const canFetch = fromActivity?.latitude && fromActivity?.longitude && toActivity?.latitude && toActivity?.longitude
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "center", my: 1 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", my: 1, gap: 0.5 }}>
         {displayAlt ? (
-          <Button
-            variant="text"
-            onClick={() => setOpen(true)}
-            startIcon={getIcon(displayAlt.transportMode)}
-            sx={{ textTransform: "none", color: "text.secondary", fontSize: "0.875rem" }}
-          >
-            {displayAlt.durationMinutes} min •{" "}
-            {displayAlt.cost ? `${displayAlt.cost} ${displayAlt.currency || "USD"}` : "Free"}
-          </Button>
-        ) : alternatives.length > 0 ? (
-          <Button
-            variant="text"
-            onClick={() => setOpen(true)}
-            sx={{ textTransform: "none", color: "text.secondary", fontSize: "0.875rem" }}
-          >
-            {alternatives.length} options available
-          </Button>
+          <>
+            <Button
+              variant="text"
+              onClick={handleOpenDetails}
+              startIcon={getTransportIcon(displayAlt.transportMode)}
+              sx={{
+                textTransform: "none",
+                color: "text.secondary",
+                fontSize: "0.875rem",
+                py: 0.5,
+                "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
+              }}
+            >
+              <Typography variant="body2" color="text.secondary" fontWeight="medium" sx={{ mr: 1 }}>
+                {getModeLabel(displayAlt.transportMode)}:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {formatDuration(displayAlt.durationMinutes, t)} •{" "}
+                {displayAlt.cost ? `${displayAlt.cost} ${displayAlt.currency || "USD"}` : t("free")}
+              </Typography>
+            </Button>
+            <Box sx={{ display: "flex", opacity: 0.6, "&:hover": { opacity: 1 }, alignItems: "center" }}>
+              <Tooltip title="Edit transport details">
+                <IconButton size="small" onClick={handleEdit} sx={{ color: "text.secondary" }}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Choose a different transport">
+                <IconButton size="small" onClick={handleSwap} sx={{ color: "text.secondary" }}>
+                  <SwapHoriz fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              {canFetch && (
+                <Tooltip title="Auto-fetch options (Traffic aware)">
+                  <IconButton
+                    size="small"
+                    onClick={handleOpenFetch}
+                    sx={{ color: "primary.main" }}
+                    disabled={isFetchingTransport}
+                  >
+                    {isFetchingTransport ? <CircularProgress size={16} /> : <AutoFetchIcon fontSize="small" />}
+                  </IconButton>
+                </Tooltip>
+              )}
+              <Tooltip title="Clear transport selection">
+                <IconButton
+                  size="small"
+                  onClick={handleClear}
+                  sx={{ color: "text.secondary" }}
+                  disabled={deselectAllMutation.isPending}
+                >
+                  <Clear fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </>
+        ) : optionsCount > 0 ? (
+          <Box display="flex" alignItems="center" gap={1}>
+            <Button
+              variant="text"
+              onClick={() => setSelectOpen(true)}
+              startIcon={<HelpOutline fontSize="small" />}
+              sx={{
+                textTransform: "none",
+                color: "text.secondary",
+                fontSize: "0.875rem",
+                "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
+              }}
+            >
+              {optionsCount} options available (Choose)
+            </Button>
+            {canFetch && (
+              <Tooltip title="Fetch more options">
+                <IconButton
+                  size="small"
+                  onClick={handleOpenFetch}
+                  sx={{ color: "primary.main" }}
+                  disabled={isFetchingTransport}
+                >
+                  {isFetchingTransport ? <CircularProgress size={16} /> : <AutoFetchIcon fontSize="small" />}
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
         ) : (
-          <Button
-            size="small"
-            onClick={() => setOpen(true)}
-            startIcon={<Add />}
-            sx={{ textTransform: "none", color: "primary.main", opacity: 0.7, "&:hover": { opacity: 1 } }}
-          >
-            Add Transport
-          </Button>
+          <Box display="flex" alignItems="center" gap={1}>
+            <Button
+              size="small"
+              onClick={handleAdd}
+              startIcon={<Add />}
+              sx={{
+                textTransform: "none",
+                color: "primary.main",
+                opacity: 0.7,
+                "&:hover": { opacity: 1, backgroundColor: "rgba(25, 118, 210, 0.04)" },
+              }}
+            >
+              Add Transport
+            </Button>
+            {canFetch && (
+              <Tooltip title="Auto-fetch options (Traffic aware)">
+                <IconButton
+                  size="small"
+                  onClick={handleOpenFetch}
+                  sx={{ color: "primary.main" }}
+                  disabled={isFetchingTransport}
+                >
+                  {isFetchingTransport ? <CircularProgress size={16} /> : <AutoFetchIcon fontSize="small" />}
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
         )}
       </Box>
 
-      <TransportDialog
-        open={open}
-        onClose={() => setOpen(false)}
+      {displayAlt && (
+        <TransportViewDialog open={viewOpen} onClose={() => setViewOpen(false)} alternative={displayAlt} />
+      )}
+
+      <TransportEditDialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        tripId={tripId}
+        fromActivityId={fromActivityId}
+        toActivityId={toActivityId}
+        alternative={editingAlt}
+        currencies={currencies}
+      />
+
+      <TransportSelectionDialog
+        open={selectOpen}
+        onClose={() => setSelectOpen(false)}
         tripId={tripId}
         fromActivityId={fromActivityId}
         toActivityId={toActivityId}
         alternatives={alternatives}
+        onEdit={(alt) => {
+          setEditingAlt(alt)
+          setSelectOpen(false)
+          setEditOpen(true)
+        }}
+        onDelete={() => {
+          // Handled by local mutation in dialog
+        }}
       />
+
+      {fromActivity && toActivity && (
+        <FetchTransportOptionsDialog
+          open={fetchOpen}
+          onClose={() => setFetchOpen(false)}
+          fromActivity={fromActivity}
+          toActivity={toActivity}
+          onFetch={handleDoFetch}
+          isFetching={isFetchingTransport}
+        />
+      )}
     </>
   )
 }

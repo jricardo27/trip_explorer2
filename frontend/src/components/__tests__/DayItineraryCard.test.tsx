@@ -103,6 +103,7 @@ describe("DayItineraryCard", () => {
     onDeleteActivity: vi.fn(),
     onCopyActivity: vi.fn(),
     onFlyTo: vi.fn(),
+    exchangeRates: {},
   }
 
   it("calculates total cost including activities and transport", () => {

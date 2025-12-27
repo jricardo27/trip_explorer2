@@ -1,20 +1,29 @@
 import { Box, CircularProgress, Alert, Typography, Tabs, Tab, Container, Paper } from "@mui/material"
 import { useQuery } from "@tanstack/react-query"
-import { useState, useMemo } from "react"
-import { useParams } from "react-router-dom"
+import { useState, useMemo, useEffect } from "react"
+import { useSearchParams, useParams } from "react-router-dom"
 
 import { tripApi } from "../api/client"
 import ActivityDialog from "../components/ActivityDialog"
 import { CalendarView } from "../components/CalendarView"
 import { TimelineCalendarView } from "../components/TimelineCalendarView"
-import { TransportDialog } from "../components/Transport/TransportDialog"
+import { TransportSelectionDialog } from "../components/Transport/TransportDialogs"
 import { TripMap } from "../components/TripMap"
 import { useLanguageStore } from "../stores/languageStore"
 
 const PublicTripView = () => {
   const { token } = useParams<{ token: string }>()
-  const { t } = useLanguageStore()
+  const [searchParams] = useSearchParams()
+  const { t, setLanguage } = useLanguageStore()
   const [viewMode, setViewMode] = useState("timeline")
+
+  // Allow setting language via query param
+  useEffect(() => {
+    const lang = searchParams.get("lang") || searchParams.get("lng")
+    if (lang === "es" || lang === "en") {
+      setLanguage(lang as any)
+    }
+  }, [searchParams, setLanguage])
 
   const {
     data: trip,
@@ -72,7 +81,10 @@ const PublicTripView = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <Paper elevation={1} sx={{ py: 3, mb: 3, borderRadius: 0 }}>
+      <Paper
+        elevation={1}
+        sx={{ py: 3, mb: 3, borderRadius: 0, position: "sticky", top: 0, zIndex: 1100, bgcolor: "background.paper" }}
+      >
         <Container maxWidth="xl">
           <Box sx={{ textAlign: "center" }}>
             <Typography variant="h3" fontWeight="bold" gutterBottom color="primary">
@@ -89,7 +101,7 @@ const PublicTripView = () => {
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 4 }}>
           <Tabs
             value={viewMode}
-            onChange={(_, val) => setViewMode(val)}
+            onChange={(_: React.SyntheticEvent, val: string) => setViewMode(val)}
             centered
             indicatorColor="primary"
             textColor="primary"
@@ -120,6 +132,8 @@ const PublicTripView = () => {
               onActivityClick={handleActivityClick}
               viewMode="map"
               hideAnimationControl={true}
+              transport={trip.transport || []}
+              showRoutes={true}
             />
           )}
         </Box>
@@ -142,7 +156,7 @@ const PublicTripView = () => {
       />
 
       {selectedTransport && (
-        <TransportDialog
+        <TransportSelectionDialog
           open={transportDialogOpen}
           onClose={() => setTransportDialogOpen(false)}
           tripId={trip.id}
@@ -155,8 +169,8 @@ const PublicTripView = () => {
                 t.toActivityId === selectedTransport.toActivityId,
             ) || []
           }
-          currencies={trip.currencies}
-          canEdit={false}
+          onEdit={() => {}}
+          onDelete={() => {}}
         />
       )}
 

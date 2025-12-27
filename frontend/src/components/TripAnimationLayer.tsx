@@ -17,7 +17,7 @@ import {
 import { Marker, Polyline, useMap, Tooltip as LeafletTooltip, Popup } from "react-leaflet"
 
 import { getTransportIconComponent } from "../constants/transportModes"
-import type { Activity } from "../types"
+import type { Activity, TransportAlternative } from "../types"
 import { getGreatCirclePoint, getGreatCirclePath } from "../utils/geodesicUtils"
 
 // Animation phases
@@ -45,6 +45,84 @@ interface TripAnimationLayerProps {
     stayDuration: number
     speedFactor: number
   }
+  transport?: TransportAlternative[]
+}
+
+// Helper to decode Google Polyline
+function decodePolyline(encoded: string) {
+  if (!encoded) return []
+  const poly = []
+  let index = 0
+  const len = encoded.length
+  let lat = 0,
+    lng = 0
+
+  while (index < len) {
+    let b,
+      shift = 0,
+      result = 0
+    do {
+      b = encoded.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+    const dlat = result & 1 ? ~(result >> 1) : result >> 1
+    lat += dlat
+
+    shift = 0
+    result = 0
+    do {
+      b = encoded.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+    const dlng = result & 1 ? ~(result >> 1) : result >> 1
+    lng += dlng
+
+    poly.push([lat / 1e5, lng / 1e5] as [number, number])
+  }
+  return poly
+}
+
+const getModeColor = (mode: string) => {
+  switch (mode) {
+    case "DRIVING":
+      return "#1976d2" // Blue
+    case "WALKING":
+      return "#4caf50" // Green
+    case "TRANSIT":
+      return "#ff9800" // Orange
+    case "CYCLING":
+      return "#9c27b0" // Purple
+    case "FLIGHT":
+      return "#f44336" // Red
+    default:
+      return "#757575" // Grey
+  }
+}
+
+// Helper to interpolate points along a given path
+/**
+ * @param path Array of [lat, lng] coordinates
+ * @param progress 0 to 1
+ */
+function getPointOnPath(path: [number, number][], progress: number): [number, number] {
+  if (path.length === 0) return [0, 0]
+  if (path.length === 1) return path[0]
+  if (progress <= 0) return path[0]
+  if (progress >= 1) return path[path.length - 1]
+
+  const totalSegments = path.length - 1
+  const segmentProgress = progress * totalSegments
+  const index = Math.floor(segmentProgress)
+  const fraction = segmentProgress - index
+
+  const p1 = path[index]
+  const p2 = path[index + 1]
+
+  if (!p1 || !p2) return path[0]
+
+  return [p1[0] + (p2[0] - p1[0]) * fraction, p1[1] + (p2[1] - p1[1]) * fraction]
 }
 
 const DEFAULT_SETTINGS = {
@@ -85,6 +163,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
   onAnimationComplete,
   onProgressUpdate,
   settings = DEFAULT_SETTINGS,
+  transport = [],
 }) => {
   const map = useMap()
   const [phase, setPhase] = useState<AnimationPhaseType>(AnimationPhase.STOPPED)
@@ -132,8 +211,6 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     const points = valid.map((a) => [Number(a.latitude), Number(a.longitude)] as [number, number])
     return { validActivities: valid, coords: points }
   }, [activities])
-
-  console.log(`TripAnimationLayer: validActivities length: ${validActivities.length}`)
 
   // Calculate and report overall progress
   useEffect(() => {
@@ -384,7 +461,22 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
             lastProgressRef.current = nextProgress
 
             // IMPERATIVE UPDATE: Update Marker Position directly
-            const currentPos = getGreatCirclePoint(p1, p2, nextProgress)
+            const fromAct = validActivities[currentActivityIndex]
+            const toAct = validActivities[currentActivityIndex + 1]
+            const activeTransport =
+              transport.find((t) => t.isSelected && t.fromActivityId === fromAct?.id && t.toActivityId === toAct?.id) ||
+              transport.find((t) => t.fromActivityId === fromAct?.id && t.toActivityId === toAct?.id && t.waypoints)
+
+            let currentPos: [number, number]
+            if (activeTransport?.waypoints) {
+              const waypoints = activeTransport.waypoints as any
+              const encoded = typeof waypoints === "string" ? waypoints : waypoints.overview
+              const path = decodePolyline(encoded)
+              currentPos = getPointOnPath(path, nextProgress)
+            } else {
+              currentPos = getGreatCirclePoint(p1, p2, nextProgress)
+            }
+
             if (currentPos && movingMarkerRef.current) {
               movingMarkerRef.current.setLatLng(currentPos)
             }
@@ -452,19 +544,14 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     settings.transitionDuration,
     settings.speedFactor,
     updateMarkerPosition,
-    // Note: Removed travelProgress from dependencies to avoid re-running effect on throttled updates
-    // But we need to use ref for travelProgress anyway
+    transport,
+    validActivities,
   ])
 
   // --- RENDER LOGIC ---
 
   const renderTravelVisuals = () => {
-    const showLine =
-      phase === AnimationPhase.DEPARTURE_PAN ||
-      phase === AnimationPhase.TRAVEL ||
-      phase === AnimationPhase.STAY_AT_ACTIVITY ||
-      phase === AnimationPhase.TRANSITION_TO_ACTIVITY ||
-      phase === AnimationPhase.INITIAL_OVERVIEW_PAUSE // Show first leg early
+    const showLine = phase === AnimationPhase.TRAVEL
 
     const idx = currentActivityIndex
     if (!showLine || idx >= coords.length - 1) return null
@@ -472,29 +559,73 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
     const origin = coords[idx]
     const destination = coords[idx + 1]
 
-    const path = getGreatCirclePath(origin, destination)
-    const line = (
-      <Polyline
-        positions={path}
-        pathOptions={{
-          color: "#1976d2",
+    const fromAct = validActivities[idx]
+    const toAct = validActivities[idx + 1]
+    const activeTransport =
+      transport.find((t) => t.isSelected && t.fromActivityId === fromAct?.id && t.toActivityId === toAct?.id) ||
+      transport.find((t) => t.fromActivityId === fromAct?.id && t.toActivityId === toAct?.id && t.waypoints)
+
+    let paths: { positions: [number, number][]; color: string; weight: number; dashArray?: string }[] = []
+
+    if (activeTransport?.waypoints) {
+      const waypoints = activeTransport.waypoints as any
+      if (waypoints.segments && Array.isArray(waypoints.segments)) {
+        paths = waypoints.segments.map((segment: any) => {
+          const isTransit = segment.mode === "TRANSIT"
+          const transitColor = segment.transit?.color ? `#${segment.transit.color}` : undefined
+          return {
+            positions: decodePolyline(segment.polyline),
+            color: transitColor || getModeColor(segment.mode),
+            weight: isTransit ? 6 : 4,
+            dashArray: segment.mode === "WALKING" ? "1, 8" : undefined,
+          }
+        })
+      } else {
+        const encoded = typeof waypoints === "string" ? waypoints : waypoints.overview
+        paths = [
+          {
+            positions: decodePolyline(encoded),
+            color: getModeColor(activeTransport.transportMode),
+            weight: 4,
+            dashArray: "10, 10",
+          },
+        ]
+      }
+    } else {
+      paths = [
+        {
+          positions: getGreatCirclePath(origin, destination),
+          color: "#999",
           weight: 4,
           dashArray: "10, 10",
+        },
+      ]
+    }
+
+    const lines = paths.map((p, i) => (
+      <Polyline
+        key={`anim-leg-${idx}-${i}`}
+        positions={p.positions}
+        pathOptions={{
+          color: p.color,
+          weight: p.weight,
+          dashArray: p.dashArray,
           opacity: 0.8,
+          lineCap: "round",
         }}
       />
-    )
+    ))
 
     let movingMarker = null
-    // Always render the marker when in TRAVEL phase, but position it initially
-    // The animation loop will update it imperatively
     if (phase === AnimationPhase.TRAVEL) {
-      // Initial position for the render cycle.
-      // Note: During animation, React won't re-render this unless travelProgress state changes (throttled).
-      // Using travelProgressRef or calculating it might be needed for the *initial* mount of the marker.
-      // Actually, we can just use the last known good position from the throttled state or start.
-
-      const currentPos = getGreatCirclePoint(origin, destination, travelProgress)
+      let currentPos: [number, number]
+      if (activeTransport?.waypoints) {
+        const waypoints = activeTransport.waypoints as any
+        const encoded = typeof waypoints === "string" ? waypoints : waypoints.overview
+        currentPos = getPointOnPath(decodePolyline(encoded), travelProgress)
+      } else {
+        currentPos = getGreatCirclePoint(origin, destination, travelProgress)
+      }
       // Use transport icon for the moving marker
       const destActivity = validActivities[idx + 1]
       const transportMode = (destActivity as any).transportMode
@@ -532,7 +663,7 @@ export const TripAnimationLayer: React.FC<TripAnimationLayerProps> = ({
 
     return (
       <>
-        {line}
+        {lines}
         {movingMarker}
       </>
     )

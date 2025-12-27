@@ -5,16 +5,15 @@ import * as ExpenseController from "../controllers/ExpenseController"
 import { authenticateToken } from "../middleware/auth"
 import { validate } from "../middleware/errorHandler"
 import { checkTripPermission } from "../middleware/permission"
+import transportService from "../services/TransportService"
 import tripMemberService from "../services/TripMemberService"
 import tripService from "../services/TripService"
 import { createTripSchema, updateTripSchema } from "../utils/validation"
 
 const router = Router()
 
-// GET /api/trips/public/:token - Get public trip details
 router.get("/public/:token", async (req: Request, res: Response) => {
   try {
-    console.log(`[DEBUG] Received public trip request for token: ${req.params.token}`)
     const trip = await tripService.getTripByPublicToken(req.params.token)
     if (!trip) {
       return res.status(404).json({
@@ -38,6 +37,23 @@ router.get("/public/:token", async (req: Request, res: Response) => {
 
 // Protect all other routes
 router.use(authenticateToken)
+
+// POST /api/trips/:id/transport/autofill - Auto-fill transport between activities
+router.post("/:id/transport/autofill", checkTripPermission("EDITOR"), async (req: Request, res: Response) => {
+  try {
+    await transportService.autoFillTripTransport(req.params.id, (req as any).user.id)
+    res.json({ success: true, message: "Transport options populated" })
+  } catch (error: any) {
+    console.error("Auto-fill transport error:", error)
+    res.status(500).json({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to auto-fill transport",
+        details: error.message,
+      },
+    })
+  }
+})
 
 // Expenses sub-route or direct controller usage
 router.get("/:tripId/expenses", ExpenseController.getExpenses)

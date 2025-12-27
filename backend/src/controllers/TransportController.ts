@@ -103,6 +103,38 @@ class TransportController {
       next(error)
     }
   }
+
+  async deselectAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { tripId, fromActivityId, toActivityId } = req.body
+
+      if (!tripId || !fromActivityId || !toActivityId) {
+        return res.status(400).json({ error: "tripId, fromActivityId, and toActivityId are required" })
+      }
+
+      await transportService.deselectAll(tripId, fromActivityId, toActivityId)
+      res.status(204).send()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async fetchSegmentTransport(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { tripId, fromActivityId, toActivityId, options } = req.body
+
+      if (!tripId || !fromActivityId || !toActivityId) {
+        return res.status(400).json({ error: "tripId, fromActivityId, and toActivityId are required" })
+      }
+
+      // Permission checked by middleware (checkTripPermission("EDITOR"))
+
+      const results = await transportService.fetchSegmentTransport(tripId, fromActivityId, toActivityId, options || {})
+      res.json(results)
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 export default new TransportController()

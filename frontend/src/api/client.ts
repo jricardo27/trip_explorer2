@@ -201,6 +201,20 @@ export const transportApi = {
     const response = await apiClient.put<ApiResponse<TransportAlternative>>(`/transport/${id}/select`, {})
     return response.data.data
   },
+
+  deselectAll: async (tripId: string, fromActivityId: string, toActivityId: string): Promise<void> => {
+    await apiClient.put("/transport/deselect-all", { tripId, fromActivityId, toActivityId })
+  },
+
+  fetchSegment: async (data: {
+    tripId: string
+    fromActivityId: string
+    toActivityId: string
+    options?: any
+  }): Promise<TransportAlternative[]> => {
+    const response = await apiClient.post<ApiResponse<TransportAlternative[]>>("/transport/fetch-segment", data)
+    return response.data.data
+  },
 }
 
 // Checklist API

@@ -90,6 +90,7 @@ export const TimelineDayColumn = ({
   })
 
   const dayTransport = (transport || []).filter((t) => {
+    if (!t.isSelected) return false
     return sortedDayActivities.some((activity, index) => {
       if (index >= sortedDayActivities.length - 1) return false
       return t.fromActivityId === activity.id && t.toActivityId === sortedDayActivities[index + 1].id

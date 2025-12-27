@@ -1,11 +1,12 @@
 import { PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
-import { Box, CircularProgress, Alert, useMediaQuery, useTheme } from "@mui/material"
+import { Box, CircularProgress, Alert, Snackbar, useMediaQuery, useTheme } from "@mui/material"
 import { useState } from "react"
 import { useParams } from "react-router-dom"
 
 import client from "../api/client"
 import ActivityDialog from "../components/ActivityDialog"
-import { TransportDialog } from "../components/Transport/TransportDialog"
+import { ConfirmDialog } from "../components/ConfirmDialog"
+import { TransportSelectionDialog } from "../components/Transport/TransportDialogs"
 import { TripDetailsContent } from "../components/TripDetailsContent"
 import { TripDetailsHeader } from "../components/TripDetailsHeader"
 import { TripMembersDialog } from "../components/TripMembersDialog"
@@ -67,7 +68,7 @@ const TripDetailsPage = () => {
   const userRole = isOwner ? "OWNER" : userMember?.role || "VIEWER"
   const canEdit = userRole === "OWNER" || userRole === "EDITOR"
 
-  // Transport Dialog State
+  // Transport Dialog State - Used by Timeline/Calendar views
   const [transportDialogOpen, setTransportDialogOpen] = useState(false)
   const [selectedTransport, setSelectedTransport] = useState<any>(null)
 
@@ -75,6 +76,33 @@ const TripDetailsPage = () => {
     setSelectedTransport(transport)
     setTransportDialogOpen(true)
   }
+
+  // Confirmation Dialog State
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean
+    title: string
+    content: string
+    onConfirm: () => void
+    isDestructive?: boolean
+  }>({
+    open: false,
+    title: "",
+    content: "",
+    onConfirm: () => {},
+  })
+
+  // Snackbar State
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    severity: "success" | "error" | "info" | "warning"
+  }>({
+    open: false,
+    message: "",
+    severity: "info",
+  })
+
+  const handleCloseSnackbar = () => setSnackbar((prev) => ({ ...prev, open: false }))
 
   // UI Support
   const theme = useTheme()
@@ -90,9 +118,13 @@ const TripDetailsPage = () => {
   )
 
   const handleDeleteActivity = (id: string) => {
-    if (window.confirm(t("delete") || "Delete?")) {
-      deleteActivity(id)
-    }
+    setConfirmDialog({
+      open: true,
+      title: t("deleteActivity") || "Delete Activity",
+      content: t("confirmDeleteActivity") || "Are you sure you want to delete this activity?",
+      isDestructive: true,
+      onConfirm: () => deleteActivity(id),
+    })
   }
 
   const handleCopyActivity = (activityId: string, asLink?: boolean) => {
@@ -104,13 +136,51 @@ const TripDetailsPage = () => {
     if (editingActivity && editingActivity.id) {
       await updateActivity({ id: editingActivity.id, data })
     } else {
-      await createActivity({ ...data, tripId: tripId!, tripDayId })
+      // Use data.tripDayId from the form if available (calculated from date), fallback to context day
+      await createActivity({ ...data, tripId: tripId!, tripDayId: data.tripDayId || tripDayId })
     }
     setDialogOpen(false)
   }
 
-  const handleDragEnd = () => {
-    // Minimal DnD logic
+  const handleDragEnd = async (event: any) => {
+    const { active, over } = event
+
+    if (!over || !active) return
+
+    const activityId = active.id
+    let targetDayId = over.id
+
+    // Find the activity being dragged
+    const activity = trip?.activities?.find((a) => a.id === activityId)
+    if (!activity) return
+
+    // If 'over' is an activity, find its day
+    if (!trip?.days?.some((d) => d.id === targetDayId)) {
+      const overActivity = trip?.activities?.find((a) => a.id === targetDayId)
+      if (overActivity) {
+        targetDayId = overActivity.tripDayId
+      } else {
+        return // Unknown target
+      }
+    }
+
+    // If dropped on the same day, do nothing
+    if (activity.tripDayId === targetDayId) return
+
+    // Update the activity's tripDayId
+    try {
+      await updateActivity({
+        id: activityId,
+        data: { tripDayId: targetDayId },
+      })
+    } catch (error) {
+      console.error("Failed to move activity:", error)
+      setSnackbar({
+        open: true,
+        message: "Failed to move activity",
+        severity: "error",
+      })
+    }
   }
 
   const handleExportKML = async () => {
@@ -127,6 +197,11 @@ const TripDetailsPage = () => {
       link.remove()
     } catch (e) {
       console.error("Export failed", e)
+      setSnackbar({
+        open: true,
+        message: "Failed to export KML",
+        severity: "error",
+      })
     }
   }
 
@@ -147,9 +222,13 @@ const TripDetailsPage = () => {
   }
 
   const handleDeleteAnimation = async (id: string) => {
-    if (window.confirm(t("delete") || "Delete?")) {
-      await deleteAnimation(id)
-    }
+    setConfirmDialog({
+      open: true,
+      title: t("deleteAnimation") || "Delete Animation",
+      content: "Are you sure you want to delete this animation?",
+      isDestructive: true,
+      onConfirm: () => deleteAnimation(id),
+    })
   }
 
   if (isLoading) {
@@ -229,6 +308,7 @@ const TripDetailsPage = () => {
         onClose={() => setDialogOpen(false)}
         onSubmit={handleSubmitActivity}
         activity={editingActivity}
+        tripDayId={selectedDayId}
         initialCoordinates={initialCoordinates}
         canEdit={canEdit}
         tripId={tripId!}
@@ -249,7 +329,7 @@ const TripDetailsPage = () => {
       />
 
       {selectedTransport && (
-        <TransportDialog
+        <TransportSelectionDialog
           open={transportDialogOpen}
           onClose={() => setTransportDialogOpen(false)}
           tripId={tripId!}
@@ -262,7 +342,11 @@ const TripDetailsPage = () => {
                 t.toActivityId === selectedTransport.toActivityId,
             ) || []
           }
-          currencies={trip.currencies}
+          onEdit={() => {
+            // In the page-level dialog, handle edit similarly or just reopen Selection
+            // For now, let's keep it simple
+          }}
+          onDelete={() => {}}
         />
       )}
 
@@ -274,6 +358,28 @@ const TripDetailsPage = () => {
           fullScreen={isMobile}
         />
       )}
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        open={confirmDialog.open}
+        title={confirmDialog.title}
+        content={confirmDialog.content}
+        onConfirm={confirmDialog.onConfirm}
+        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+        isDestructive={confirmDialog.isDestructive}
+      />
+
+      {/* Snackbar Notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

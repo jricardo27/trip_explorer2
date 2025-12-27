@@ -71,12 +71,9 @@ export const DayItineraryCard = ({
     return new Date(a.scheduledStart).getTime() - new Date(b.scheduledStart).getTime()
   })
 
-  // Correctly identify transport segments for THIS day's sequence
+  // Correctly identify transport segments that START from this day's sequence
   const dayTransport = (trip.transport || []).filter((t) => {
-    return sortedActivities.some((activity, index) => {
-      if (index >= sortedActivities.length - 1) return false
-      return t.fromActivityId === activity.id && t.toActivityId === sortedActivities[index + 1].id
-    })
+    return t.isSelected && sortedActivities.some((activity) => t.fromActivityId === activity.id)
   })
 
   const baseCurrency = trip.baseCurrency || trip.defaultCurrency || "USD"
@@ -139,11 +136,14 @@ export const DayItineraryCard = ({
                       tripId={trip.id}
                       fromActivityId={activity.id}
                       toActivityId={sortedActivities[index + 1].id}
+                      fromActivity={activity}
+                      toActivity={sortedActivities[index + 1]}
                       alternatives={
                         trip.transport?.filter(
                           (t) => t.fromActivityId === activity.id && t.toActivityId === sortedActivities[index + 1].id,
                         ) || []
                       }
+                      currencies={trip.currencies}
                     />
                   )}
                 </Box>

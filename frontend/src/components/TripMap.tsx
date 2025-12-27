@@ -2,11 +2,11 @@ import { Box, Typography, useTheme, Paper } from "@mui/material"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { useEffect, useState, useCallback, useMemo, useRef } from "react"
-import { MapContainer, LayersControl, TileLayer, useMap } from "react-leaflet"
+import { MapContainer, LayersControl, TileLayer, useMap, Polyline } from "react-leaflet"
 
 import { useMapAnimation } from "../hooks/useMapAnimation"
 import { useLanguageStore } from "../stores/languageStore"
-import type { Activity, TripAnimation } from "../types"
+import type { Activity, TripAnimation, TransportAlternative, TransportMode } from "../types"
 
 import { AnimationController } from "./Map/Animation/AnimationController"
 import { AnimationSettingsSidebar } from "./Map/Animation/AnimationSettingsSidebar"
@@ -15,6 +15,59 @@ import { MapFlyHandler, MapStateManager } from "./Map/MapEventHandlers"
 import { LIGHT_TILES, DARK_TILES } from "./Map/MapUtils"
 import { TripMarkers } from "./Map/TripMarkers"
 import { TripAnimationLayer } from "./TripAnimationLayer"
+
+// Helper to decode Google Polyline
+function decodePolyline(encoded: string) {
+  if (!encoded) return []
+  const poly = []
+  let index = 0
+  const len = encoded.length
+  let lat = 0,
+    lng = 0
+
+  while (index < len) {
+    let b,
+      shift = 0,
+      result = 0
+    do {
+      b = encoded.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+    const dlat = result & 1 ? ~(result >> 1) : result >> 1
+    lat += dlat
+
+    shift = 0
+    result = 0
+    do {
+      b = encoded.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+    const dlng = result & 1 ? ~(result >> 1) : result >> 1
+    lng += dlng
+
+    poly.push([lat / 1e5, lng / 1e5] as [number, number])
+  }
+  return poly
+}
+
+const getModeColor = (mode: TransportMode | string) => {
+  switch (mode) {
+    case "DRIVING":
+      return "#1976d2" // Blue
+    case "WALKING":
+      return "#4caf50" // Green
+    case "TRANSIT":
+      return "#ff9800" // Orange
+    case "CYCLING":
+      return "#9c27b0" // Purple
+    case "FLIGHT":
+      return "#f44336" // Red
+    default:
+      return "#757575" // Grey
+  }
+}
 
 // Component to auto-fit map bounds to activities
 const MapAutoFitter = ({ activities, viewMode }: { activities: Activity[]; viewMode?: string }) => {
@@ -70,6 +123,8 @@ interface TripMapProps {
   onDeleteAnimation?: (id: string) => Promise<void>
   canEdit?: boolean
   onActivityClick?: (activity: Activity) => void
+  transport?: TransportAlternative[]
+  showRoutes?: boolean
 }
 
 export const TripMap = (props: TripMapProps) => {
@@ -89,6 +144,8 @@ export const TripMap = (props: TripMapProps) => {
     onDeleteAnimation,
     canEdit = true,
     onActivityClick,
+    transport = [],
+    showRoutes = false,
   } = props
 
   const theme = useTheme()
@@ -426,6 +483,59 @@ export const TripMap = (props: TripMapProps) => {
             ))}
           </LayersControl>
 
+          {/* Render Transport Routes */}
+          {showRoutes &&
+            transport
+              .filter((t) => t.waypoints) // Only show if they have waypoints
+              .filter((t) => t.isSelected) // Only show selected
+              .map((t) => {
+                const waypoints = t.waypoints as any
+
+                // Handle new structured format with multiple segments
+                if (waypoints.segments && Array.isArray(waypoints.segments)) {
+                  return waypoints.segments.map((segment: any, idx: number) => {
+                    const positions = decodePolyline(segment.polyline)
+                    if (positions.length === 0) return null
+
+                    const isTransit = segment.mode === "TRANSIT"
+                    const transitColor = segment.transit?.color ? `#${segment.transit.color}` : undefined
+                    const color = transitColor || getModeColor(isTransit ? "TRANSIT" : segment.mode)
+
+                    return (
+                      <Polyline
+                        key={`${t.id}-seg-${idx}`}
+                        positions={positions}
+                        pathOptions={{
+                          color,
+                          weight: isTransit ? 6 : 4,
+                          opacity: 0.8,
+                          dashArray: segment.mode === "WALKING" ? "1, 8" : undefined,
+                          lineCap: "round",
+                        }}
+                      />
+                    )
+                  })
+                }
+
+                // Fallback to legacy string format or overview polyline
+                const encoded = typeof waypoints === "string" ? waypoints : waypoints.overview
+                const positions = decodePolyline(encoded)
+                if (positions.length === 0) return null
+
+                return (
+                  <Polyline
+                    key={t.id}
+                    positions={positions}
+                    pathOptions={{
+                      color: getModeColor(t.transportMode),
+                      weight: 4,
+                      opacity: 0.8,
+                      dashArray: t.transportMode === "WALKING" ? "1, 8" : undefined,
+                    }}
+                  />
+                )
+              })}
+
           {viewMode === "animation" && sortedActivities.length > 0 && (
             <TripAnimationLayer
               key={animation.resetKey}
@@ -436,6 +546,7 @@ export const TripMap = (props: TripMapProps) => {
                 if (isFullScreen) handleToggleFullScreen()
               }}
               onProgressUpdate={(p) => animation.setProgress(p / 100)}
+              transport={transport}
               settings={{
                 transitionDuration: animation.settings.transitionDuration || 1.5,
                 stayDuration: animation.settings.stayDuration || 2.0,

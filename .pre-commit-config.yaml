@@ -18,3 +18,9 @@ repos:
         exclude: ^public/tinymce/
         additional_dependencies:
           - eslint@9.16.0
+      - id: check-translations
+        name: check translations
+        entry: node scripts/check_translations.cjs
+        language: system
+        pass_filenames: false
+        files: ^frontend/src/.*

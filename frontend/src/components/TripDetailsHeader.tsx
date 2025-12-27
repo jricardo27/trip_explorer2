@@ -11,6 +11,7 @@ import {
   Movie as AnimationIcon,
   Download as DownloadIcon,
   CalendarMonth as CalendarIcon,
+  Map as MapIcon,
 } from "@mui/icons-material"
 import { Box, Typography, Paper, Button, IconButton, Tabs, Tab, Chip } from "@mui/material"
 import dayjs from "dayjs"
@@ -149,6 +150,13 @@ export const TripDetailsHeader = ({
               label={t("timeline")}
               iconPosition="start"
               value="timeline"
+              sx={{ minHeight: "32px" }}
+            />
+            <Tab
+              icon={<MapIcon sx={{ fontSize: "1.1rem" }} />}
+              label={t("map") || "Map"}
+              iconPosition="start"
+              value="map"
               sx={{ minHeight: "32px" }}
             />
             <Tab

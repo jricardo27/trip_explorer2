@@ -54,6 +54,7 @@ export const TripSettingsDialog = ({
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>(trip.exchangeRates || {})
   const [isCompleted, setIsCompleted] = useState(trip.isCompleted || false)
   const [isPublic, setIsPublic] = useState(trip.isPublic || false)
+  const [publicLangEs, setPublicLangEs] = useState(false)
 
   // Shift state
   const [shiftDays, setShiftDays] = useState("")
@@ -272,18 +273,27 @@ export const TripSettingsDialog = ({
 
           {isPublic && trip.publicToken && (
             <Box sx={{ p: 2, bgcolor: "info.light", borderRadius: 1, color: "info.contrastText" }}>
-              <Typography variant="subtitle2" fontWeight="bold">
-                {t("publicSharingLink") || "Shareable Timeline Link"}:
-              </Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="subtitle2" fontWeight="bold">
+                  {t("publicSharingLink") || "Shareable Timeline Link"}:
+                </Typography>
+                <FormControlLabel
+                  control={
+                    <Switch size="small" checked={publicLangEs} onChange={(e) => setPublicLangEs(e.target.checked)} />
+                  }
+                  label={<Typography variant="caption">Español (lang=es)</Typography>}
+                />
+              </Box>
               <Typography variant="body2" sx={{ wordBreak: "break-all", mt: 0.5 }}>
-                {`${window.location.origin}/public/trip/${trip.publicToken}`}
+                {`${window.location.origin}/public/trip/${trip.publicToken}${publicLangEs ? "?lang=es" : ""}`}
               </Typography>
               <Button
                 size="small"
                 variant="contained"
                 sx={{ mt: 1, bgcolor: "white", color: "info.main", "&:hover": { bgcolor: "#eee" } }}
                 onClick={() => {
-                  navigator.clipboard.writeText(`${window.location.origin}/public/trip/${trip.publicToken}`)
+                  const url = `${window.location.origin}/public/trip/${trip.publicToken}${publicLangEs ? "?lang=es" : ""}`
+                  navigator.clipboard.writeText(url)
                   alert(t("linkCopied") || "Link copied to clipboard!")
                 }}
               >

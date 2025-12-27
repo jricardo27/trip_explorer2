@@ -103,6 +103,7 @@ export const useTripDetails = (tripId: string) => {
     mutationFn: transportApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+      queryClient.invalidateQueries({ queryKey: ["public-trip"] })
     },
   })
 
@@ -110,6 +111,7 @@ export const useTripDetails = (tripId: string) => {
     mutationFn: transportApi.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+      queryClient.invalidateQueries({ queryKey: ["public-trip"] })
     },
   })
 
@@ -117,6 +119,25 @@ export const useTripDetails = (tripId: string) => {
     mutationFn: transportApi.select,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+      queryClient.invalidateQueries({ queryKey: ["public-trip"] })
+    },
+  })
+
+  const deselectAllTransportMutation = useMutation({
+    mutationFn: ({ fromActivityId, toActivityId }: { fromActivityId: string; toActivityId: string }) =>
+      transportApi.deselectAll(tripId, fromActivityId, toActivityId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+      queryClient.invalidateQueries({ queryKey: ["public-trip"] })
+    },
+  })
+
+  const fetchSegmentTransportMutation = useMutation({
+    mutationFn: (data: { fromActivityId: string; toActivityId: string; options?: any }) =>
+      transportApi.fetchSegment({ tripId, ...data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+      queryClient.invalidateQueries({ queryKey: ["public-trip"] })
     },
   })
 
@@ -250,6 +271,9 @@ export const useTripDetails = (tripId: string) => {
     createTransport: createTransportMutation.mutateAsync,
     deleteTransport: deleteTransportMutation.mutateAsync,
     selectTransport: selectTransportMutation.mutateAsync,
+    deselectAllTransport: deselectAllTransportMutation.mutateAsync,
+    fetchSegmentTransport: fetchSegmentTransportMutation.mutateAsync,
+    isFetchingTransport: fetchSegmentTransportMutation.isPending,
 
     createAnimation: (data: any) => createAnimationMutation.mutateAsync(data),
     updateAnimation: (id: string, updates: Partial<TripAnimation>) => updateAnimationMutation.mutate({ id, updates }),
