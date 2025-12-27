@@ -4,9 +4,10 @@ import L from "leaflet"
 import markerIcon from "leaflet/dist/images/marker-icon.png"
 import markerShadow from "leaflet/dist/images/marker-shadow.png"
 import { useMemo } from "react"
-import { MapContainer, TileLayer, Polyline, Marker, useMap } from "react-leaflet"
+import { MapContainer, TileLayer, Polyline, Marker, Tooltip, useMap } from "react-leaflet"
 
 import type { TransportAlternative, Activity } from "../../types"
+import { TransportMode } from "../../types"
 
 import { getTransportModeColor } from "./transportUtils"
 
@@ -73,29 +74,69 @@ export const TransportRouteMap = ({
         )}
 
         {/* Routes for each alternative */}
-        {alternatives.map((alt) => {
+        {alternatives.map((alt, index) => {
           const isSelected = alt.id === selectedId
           const color = getTransportModeColor(alt.transportMode)
 
-          // For now, draw simple straight line between points
-          // In future, we can use actual route polylines if available
+          // Calculate offset for each route so they don't overlap
+          // Offset perpendicular to the line direction
           if (fromActivity.latitude && fromActivity.longitude && toActivity.latitude && toActivity.longitude) {
+            const offsetDistance = 0.002 // degrees (roughly 200m at equator)
+            const totalAlts = alternatives.length
+            const offsetIndex = index - (totalAlts - 1) / 2 // Center the offsets
+
+            // Calculate perpendicular offset
+            const dx = toActivity.longitude - fromActivity.longitude
+            const dy = toActivity.latitude - fromActivity.latitude
+            const length = Math.sqrt(dx * dx + dy * dy)
+            const perpX = (-dy / length) * offsetDistance * offsetIndex
+            const perpY = (dx / length) * offsetDistance * offsetIndex
+
+            const startPos: [number, number] = [fromActivity.latitude + perpY, fromActivity.longitude + perpX]
+            const endPos: [number, number] = [toActivity.latitude + perpY, toActivity.longitude + perpX]
+
+            // Different dash patterns for different modes
+            const getDashArray = (mode: TransportMode) => {
+              switch (mode) {
+                case TransportMode.WALKING:
+                  return "5, 5"
+                case TransportMode.CYCLING:
+                  return "10, 5"
+                case TransportMode.TRANSIT:
+                case TransportMode.BUS:
+                case TransportMode.TRAIN:
+                  return "15, 5, 5, 5"
+                case TransportMode.FLIGHT:
+                  return "20, 10"
+                default:
+                  return undefined // Solid line
+              }
+            }
+
             return (
               <Polyline
                 key={alt.id}
-                positions={[
-                  [fromActivity.latitude, fromActivity.longitude],
-                  [toActivity.latitude, toActivity.longitude],
-                ]}
+                positions={[startPos, endPos]}
                 pathOptions={{
                   color: color,
                   weight: isSelected ? 6 : 3,
                   opacity: isSelected ? 1 : 0.6,
+                  dashArray: getDashArray(alt.transportMode),
                 }}
                 eventHandlers={{
                   click: () => onSelectAlternative(alt.id),
                 }}
-              />
+              >
+                {/* Tooltip showing transport info */}
+                <Tooltip permanent={isSelected} direction="center" opacity={0.9}>
+                  <div style={{ fontSize: "12px", fontWeight: isSelected ? "bold" : "normal" }}>
+                    {alt.name || alt.transportMode}
+                    <br />
+                    {alt.durationMinutes} min
+                    {alt.cost && ` • ${alt.cost} ${alt.currency || "USD"}`}
+                  </div>
+                </Tooltip>
+              </Polyline>
             )
           }
           return null
