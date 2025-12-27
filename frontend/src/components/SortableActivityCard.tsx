@@ -26,7 +26,7 @@ import dayjs from "dayjs"
 import { useMemo, useState } from "react"
 
 import { useLanguageStore } from "../stores/languageStore"
-import type { Activity } from "../types"
+import type { Activity, TripMember } from "../types"
 
 interface SortableActivityCardProps {
   activity: Activity
@@ -36,6 +36,7 @@ interface SortableActivityCardProps {
   isDeleting?: boolean
   onFlyTo?: (activity: Activity) => void
   canEdit?: boolean
+  members?: TripMember[]
 }
 
 export const SortableActivityCard = ({
@@ -46,6 +47,7 @@ export const SortableActivityCard = ({
   isDeleting,
   onFlyTo,
   canEdit = true,
+  members = [],
 }: SortableActivityCardProps) => {
   const { t } = useLanguageStore()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -127,6 +129,41 @@ export const SortableActivityCard = ({
             <>
               {" • "}
               {activity.currency}${Number(activity.actualCost || activity.estimatedCost).toFixed(0)}
+            </>
+          )}
+          {activity.isPaid && activity.paidById && (
+            <>
+              {" • "}
+              <Box
+                component="span"
+                sx={{ display: "inline-flex", alignItems: "center", verticalAlign: "middle", gap: 0.5 }}
+              >
+                <Typography variant="caption" sx={{ opacity: 0.8, fontSize: "0.7rem" }}>
+                  {t("paidBy")}:
+                </Typography>
+                {(() => {
+                  const payer = (members || []).find((m) => m.id === activity.paidById)
+                  return payer ? (
+                    <Tooltip title={payer.name}>
+                      <Avatar
+                        sx={{
+                          width: 14,
+                          height: 14,
+                          fontSize: "0.55rem",
+                          bgcolor: payer.color || "grey.400",
+                        }}
+                        src={payer.avatarUrl || undefined}
+                      >
+                        {payer.name.charAt(0)}
+                      </Avatar>
+                    </Tooltip>
+                  ) : (
+                    <Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
+                      {t("someone") || "Someone"}
+                    </Typography>
+                  )
+                })()}
+              </Box>
             </>
           )}
         </Typography>

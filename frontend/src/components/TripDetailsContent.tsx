@@ -149,6 +149,7 @@ export const TripDetailsContent = ({
           }}
           exchangeRates={trip.exchangeRates}
           baseCurrency={trip.baseCurrency || trip.defaultCurrency}
+          members={trip.members}
         />
       )}
 

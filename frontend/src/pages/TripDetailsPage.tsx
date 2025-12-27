@@ -36,6 +36,7 @@ const TripDetailsPage = () => {
     selectScenario,
     createScenario,
     updateScenario,
+    copyActivity,
   } = useTripDetails(tripId!)
 
   const {
@@ -127,8 +128,14 @@ const TripDetailsPage = () => {
     })
   }
 
-  const handleCopyActivity = (activityId: string, asLink?: boolean) => {
-    console.log("Copy activity", activityId, asLink)
+  const handleCopyActivity = async (activityId: string, asLink?: boolean) => {
+    try {
+      const activity = trip?.activities?.find((a) => a.id === activityId)
+      const targetDayId = activity?.tripDayId
+      await copyActivity({ activityId, targetDayId, asLink })
+    } catch (error) {
+      console.error("Failed to copy activity:", error)
+    }
   }
 
   const handleSubmitActivity = async (data: any) => {

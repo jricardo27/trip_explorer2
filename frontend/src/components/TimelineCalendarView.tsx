@@ -2,7 +2,7 @@ import { Box, useTheme, useMediaQuery } from "@mui/material"
 import dayjs from "dayjs"
 import { useMemo, useState } from "react"
 
-import type { Activity, TripDay, TransportAlternative } from "../types"
+import type { Activity, TripDay, TransportAlternative, TripMember } from "../types"
 
 import { TimelineDayColumn } from "./Timeline/TimelineDayColumn"
 import { DayOperationDialog, ScenarioDialog, TimelineContextMenu, DayOptionsMenu } from "./Timeline/TimelineDialogs"
@@ -24,6 +24,7 @@ interface TimelineCalendarViewProps {
   onRenameScenario?: (dayId: string, scenarioId: string, newName: string) => void
   exchangeRates?: Record<string, number>
   baseCurrency?: string
+  members?: TripMember[]
   isPublic?: boolean
 }
 
@@ -40,6 +41,7 @@ export const TimelineCalendarView = ({
   onRenameScenario,
   exchangeRates = {},
   baseCurrency = "USD",
+  members = [],
   isPublic = false,
 }: TimelineCalendarViewProps) => {
   // Responsive breakpoints
@@ -351,6 +353,7 @@ export const TimelineCalendarView = ({
               onToggleComparison={handleToggleComparison}
               exchangeRates={exchangeRates}
               baseCurrency={baseCurrency}
+              members={members}
               isPublic={isPublic}
             />
           ))}

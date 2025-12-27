@@ -41,7 +41,7 @@ router.use(authenticateToken)
 // POST /api/trips/:id/transport/autofill - Auto-fill transport between activities
 router.post("/:id/transport/autofill", checkTripPermission("EDITOR"), async (req: Request, res: Response) => {
   try {
-    await transportService.autoFillTripTransport(req.params.id, (req as any).user.id)
+    await transportService.autoFillTripTransport(req.params.id)
     res.json({ success: true, message: "Transport options populated" })
   } catch (error: any) {
     console.error("Auto-fill transport error:", error)

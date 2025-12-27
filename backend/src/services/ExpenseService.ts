@@ -51,7 +51,9 @@ export class ExpenseService {
           ? {
               create: data.splits.map((s) => ({
                 memberId: s.memberId,
-                amount: s.amount || 0, // If equal, need calculation. assuming validation handles amounts or we trust frontend.
+                amount: s.amount || 0,
+                percentage: (s as any).percentage,
+                shares: (s as any).shares,
               })),
             }
           : undefined,
@@ -73,8 +75,9 @@ export class ExpenseService {
       paidById?: string
       date?: string
       isPaid?: boolean
+      splitType?: string
       deleteSplits?: boolean
-      splits?: { memberId: string; amount?: number }[]
+      splits?: { memberId: string; amount?: number; percentage?: number; shares?: number }[]
     },
   ) {
     return prisma.expense.update({
@@ -87,6 +90,7 @@ export class ExpenseService {
         paidById: data.paidById,
         paymentDate: data.date ? new Date(data.date) : undefined,
         isPaid: data.isPaid,
+        splitType: data.splitType,
         // If updating splits, we typically delete old ones and recreate
         splits: data.splits
           ? {
@@ -94,6 +98,8 @@ export class ExpenseService {
               create: data.splits.map((s) => ({
                 memberId: s.memberId,
                 amount: s.amount || 0,
+                percentage: s.percentage,
+                shares: s.shares,
               })),
             }
           : undefined,

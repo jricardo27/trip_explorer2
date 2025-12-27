@@ -259,7 +259,7 @@ export const ExpenseSplitInput: React.FC<ExpenseSplitInputProps> = ({
                   />
                 ) : (
                   <Typography variant="body2" color="text.secondary">
-                    {isIncluded ? `${currency}${split?.amount?.toFixed(2)}` : "-"}
+                    {isIncluded ? `${currency}${Number(split?.amount || 0).toFixed(2)}` : "-"}
                   </Typography>
                 )
               }
@@ -275,11 +275,11 @@ export const ExpenseSplitInput: React.FC<ExpenseSplitInputProps> = ({
                   }}
                   src={member.avatarUrl || undefined}
                 >
-                  {member.name.charAt(0)}
+                  {member.name ? member.name.charAt(0) : "?"}
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
-                primary={member.name}
+                primary={member.name || "Unnamed Member"}
                 primaryTypographyProps={{
                   variant: "body2",
                   color: isIncluded ? "text.primary" : "text.disabled",
@@ -297,10 +297,14 @@ export const ExpenseSplitInput: React.FC<ExpenseSplitInputProps> = ({
           </Typography>
           <Typography
             variant="caption"
-            color={Math.abs(value.reduce((a, b) => a + b.amount, 0) - totalAmount) > 0.1 ? "error" : "success.main"}
+            color={
+              Math.abs(value.reduce((a, b) => a + Number(b.amount || 0), 0) - totalAmount) > 0.1
+                ? "error"
+                : "success.main"
+            }
           >
             {currency}
-            {value.reduce((a, b) => a + b.amount, 0).toFixed(2)} / {currency}
+            {value.reduce((a, b) => a + Number(b.amount || 0), 0).toFixed(2)} / {currency}
             {totalAmount.toFixed(2)}
           </Typography>
         </Box>

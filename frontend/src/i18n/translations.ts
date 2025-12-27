@@ -129,6 +129,13 @@ export const translations = {
     shiftButton: "Shift All Dates",
     total: "Total",
     costBreakdown: "Cost Breakdown",
+    costSplitting: "Cost Splitting",
+    costs: "Costs",
+    costOnceForLinkedGroup: "Cost paid once for all linked copies",
+    costOnceForLinkedGroupTooltip:
+      "Enable this for multi-day passes or tickets that are valid across linked activity copies (e.g., Disneyland multi-day pass)",
+    basicInfo: "Basic Info",
+    details: "Details",
     noCostsFound: "No costs found for this day.",
 
     // Trip View Modes
@@ -184,6 +191,8 @@ export const translations = {
     date: "Date",
     conv: "Conv.",
     paidBy: "Paid By",
+    selectPayer: "Select Payer",
+    someone: "Someone",
 
     oneCurrencyIn: "1 {currency} in {defaultCurrency}",
     completedTooltip: "Mark this trip as completed to archive it from your active trips list",
@@ -196,6 +205,11 @@ export const translations = {
 
     budgetDetails: "Budget Details",
     allExpenses: "All Expenses",
+    paidExpenses: "Paid Expenses",
+    estimatedExpenses: "Estimated Expenses",
+    totalPaid: "Total Paid",
+    totalEstimated: "Total Estimated",
+    combinedTotal: "Combined Total",
     addExpense: "Add Expense",
     noExpenses: "No expenses recorded yet.",
     addFirstExpense: "Add First Expense",
@@ -598,6 +612,13 @@ export const translations = {
     shiftButton: "Desplazar Todas las Fechas",
     total: "Total",
     costBreakdown: "Desglose de Costos",
+    costSplitting: "División de Costos",
+    costs: "Costos",
+    costOnceForLinkedGroup: "Costo pagado una vez para todas las copias vinculadas",
+    costOnceForLinkedGroupTooltip:
+      "Habilite esto para pases de varios días o boletos válidos en copias de actividades vinculadas (ej: pase de varios días de Disneyland)",
+    basicInfo: "Información Básica",
+    details: "Detalles",
     noCostsFound: "No se encontraron costos para este día.",
 
     // Trip View Modes
@@ -653,6 +674,8 @@ export const translations = {
     date: "Fecha",
     conv: "Conv.",
     paidBy: "Pagado Por",
+    selectPayer: "Seleccionar Pagador",
+    someone: "Alguien",
 
     oneCurrencyIn: "1 {currency} en {defaultCurrency}",
     completedTooltip: "Marca este viaje como completado para archivarlo de tu lista de viajes activos",
@@ -665,6 +688,11 @@ export const translations = {
 
     budgetDetails: "Detalles del Presupuesto",
     allExpenses: "Todos los Gastos",
+    paidExpenses: "Gastos Pagados",
+    estimatedExpenses: "Gastos Estimados",
+    totalPaid: "Total Pagado",
+    totalEstimated: "Total Estimado",
+    combinedTotal: "Total Combinado",
     addExpense: "Agregar Gasto",
     noExpenses: "Aún no hay gastos registrados.",
     addFirstExpense: "Agregar Primer Gasto",

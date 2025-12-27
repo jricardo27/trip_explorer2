@@ -11,6 +11,8 @@ import {
   Menu,
   MenuItem,
   Grid,
+  Tabs,
+  Tab,
 } from "@mui/material"
 import React, { useState } from "react"
 
@@ -24,6 +26,7 @@ import { ActivityDateTimeFields } from "./ActivityForm/ActivityDateTimeFields"
 import { ActivityDetailsFields } from "./ActivityForm/ActivityDetailsFields"
 import { ActivityLocationFields } from "./ActivityForm/ActivityLocationFields"
 import { ParticipantSelector } from "./ActivityForm/ParticipantSelector"
+import { ErrorBoundary } from "./common/ErrorBoundary"
 import LocationPickerMap from "./LocationPickerMap"
 
 interface ActivityDialogProps {
@@ -68,6 +71,7 @@ const ActivityDialog = ({
   hideCosts = false,
 }: ActivityDialogProps) => {
   const { t } = useLanguageStore()
+  const [activeTab, setActiveTab] = useState(0)
   const [copyMenuAnchor, setCopyMenuAnchor] = useState<null | HTMLElement>(null)
 
   const form = useActivityForm({
@@ -111,80 +115,116 @@ const ActivityDialog = ({
           )}
         </Box>
       </DialogTitle>
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ height: 600, minHeight: 600 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, v) => {
+            setActiveTab(v)
+          }}
+          sx={{ mb: 2, borderBottom: 1, borderColor: "divider" }}
+        >
+          <Tab label={t("basicInfo")} />
+          <Tab label={t("costs")} />
+          <Tab label={t("details")} />
+        </Tabs>
+
         <form id="activity-form" onSubmit={form.handleFormSubmit}>
-          <Box pt={2}>
+          <Box pt={1}>
             {form.error && (
               <Alert severity="error" sx={{ mb: 2 }}>
                 {form.error}
               </Alert>
             )}
-            <Grid container spacing={2} columns={12}>
-              <ActivityBasicFields
-                name={form.name}
-                setName={form.setName}
-                activityType={form.activityType}
-                setActivityType={form.setActivityType}
-                priority={form.priority}
-                setPriority={form.setPriority}
-                canEdit={canEdit}
-                isPrivate={form.isPrivate}
-                setIsPrivate={form.setIsPrivate}
-              />
-              <ActivityDateTimeFields
-                scheduledStart={form.scheduledStart}
-                setScheduledStart={form.setScheduledStart}
-                scheduledEnd={form.scheduledEnd}
-                setScheduledEnd={form.setScheduledEnd}
-                availableDays={form.availableDays}
-                setAvailableDays={form.setAvailableDays}
-                tripStartDate={tripStartDate}
-                tripEndDate={tripEndDate}
-                canEdit={canEdit}
-              />
-              <ActivityCostFields
-                estimatedCost={form.estimatedCost}
-                setEstimatedCost={form.setEstimatedCost}
-                actualCost={form.actualCost}
-                setActualCost={form.setActualCost}
-                currency={form.currency}
-                setCurrency={form.setCurrency}
-                currencies={currencies}
-                isPaid={form.isPaid}
-                setIsPaid={form.setIsPaid}
-                isLocked={form.isLocked}
-                setIsLocked={form.setIsLocked}
-                canEdit={canEdit}
-                hideCosts={hideCosts}
-              />
-              <ActivityDetailsFields
-                notes={form.notes}
-                setNotes={form.setNotes}
-                phone={form.phone}
-                setPhone={form.setPhone}
-                email={form.email}
-                setEmail={form.setEmail}
-                website={form.website}
-                setWebsite={form.setWebsite}
-                openingHours={form.openingHours}
-                setOpeningHours={form.setOpeningHours}
-                canEdit={canEdit}
-              />
-              <ActivityLocationFields
-                latitude={form.latitude}
-                setLatitude={form.setLatitude}
-                longitude={form.longitude}
-                setLongitude={form.setLongitude}
-                setMapPickerOpen={form.setMapPickerOpen}
-                canEdit={canEdit}
-              />
-              <ParticipantSelector
-                members={form.members}
-                selectedMemberIds={form.selectedMemberIds}
-                handleToggleMember={form.handleToggleMember}
-                canEdit={canEdit}
-              />
-            </Grid>
+
+            {activeTab === 0 && (
+              <Grid container spacing={2} columns={12}>
+                <ActivityBasicFields
+                  name={form.name}
+                  setName={form.setName}
+                  activityType={form.activityType}
+                  setActivityType={form.setActivityType}
+                  priority={form.priority}
+                  setPriority={form.setPriority}
+                  canEdit={canEdit}
+                  isPrivate={form.isPrivate}
+                  setIsPrivate={form.setIsPrivate}
+                  isLocked={form.isLocked}
+                  setIsLocked={form.setIsLocked}
+                />
+                <ActivityDateTimeFields
+                  scheduledStart={form.scheduledStart}
+                  setScheduledStart={form.setScheduledStart}
+                  scheduledEnd={form.scheduledEnd}
+                  setScheduledEnd={form.setScheduledEnd}
+                  availableDays={form.availableDays}
+                  setAvailableDays={form.setAvailableDays}
+                  tripStartDate={tripStartDate}
+                  tripEndDate={tripEndDate}
+                  canEdit={canEdit}
+                />
+                <ActivityLocationFields
+                  latitude={form.latitude}
+                  setLatitude={form.setLatitude}
+                  longitude={form.longitude}
+                  setLongitude={form.setLongitude}
+                  setMapPickerOpen={form.setMapPickerOpen}
+                  canEdit={canEdit}
+                />
+              </Grid>
+            )}
+
+            {activeTab === 1 && (
+              <Grid container spacing={2} columns={12}>
+                <ErrorBoundary componentName="ActivityCostFields">
+                  <ActivityCostFields
+                    estimatedCost={form.estimatedCost}
+                    setEstimatedCost={form.setEstimatedCost}
+                    actualCost={form.actualCost}
+                    setActualCost={form.setActualCost}
+                    currency={form.currency}
+                    setCurrency={form.setCurrency}
+                    currencies={currencies}
+                    isPaid={form.isPaid}
+                    setIsPaid={form.setIsPaid}
+                    canEdit={canEdit}
+                    hideCosts={hideCosts}
+                    splitType={form.splitType}
+                    setSplitType={form.setSplitType}
+                    splits={form.splits}
+                    setSplits={form.setSplits}
+                    paidById={form.paidById}
+                    setPaidById={form.setPaidById}
+                    members={form.members}
+                    costOnceForLinkedGroup={form.costOnceForLinkedGroup}
+                    setCostOnceForLinkedGroup={form.setCostOnceForLinkedGroup}
+                  />
+                </ErrorBoundary>
+              </Grid>
+            )}
+
+            {activeTab === 2 && (
+              <Grid container spacing={2} columns={12}>
+                <ActivityDetailsFields
+                  notes={form.notes}
+                  setNotes={form.setNotes}
+                  phone={form.phone}
+                  setPhone={form.setPhone}
+                  email={form.email}
+                  setEmail={form.setEmail}
+                  website={form.website}
+                  setWebsite={form.setWebsite}
+                  openingHours={form.openingHours}
+                  setOpeningHours={form.setOpeningHours}
+                  canEdit={canEdit}
+                />
+                <ParticipantSelector
+                  members={form.members}
+                  selectedMemberIds={form.selectedMemberIds}
+                  handleToggleMember={form.handleToggleMember}
+                  canEdit={canEdit}
+                />
+              </Grid>
+            )}
           </Box>
         </form>
       </DialogContent>

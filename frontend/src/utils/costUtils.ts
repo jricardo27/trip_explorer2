@@ -15,6 +15,7 @@ export interface DayCostResult {
 /**
  * Calculates the total cost for a set of activities and transport alternatives,
  * converting everything to the trip's base currency.
+ * Refactored to use CostController for consistency.
  */
 export const calculateDayCost = (
   activities: Activity[],
@@ -22,41 +23,46 @@ export const calculateDayCost = (
   exchangeRates: Record<string, number> = {},
   baseCurrency: string = "USD",
 ): DayCostResult => {
-  const breakdown: CostBreakdown = {}
-  let totalConverted = 0
+  // Note: CostController.getAggregates returns totalActual/totalPlanned.
+  // Legacy calculateDayCost used totalActual if available, otherwise estimated.
+  // This matches CostController's totalExpected (which uses actual if present, otherwise estimated).
 
-  // Helper to add to breakdown and total
-  const addCost = (amount: number, currency: string = baseCurrency) => {
-    if (amount <= 0) return
+  // We also need the breakdown by CURRENCY for the legacy Return type.
+  // Let's add a method to CostController for currency breakdown or implement it here.
+
+  const breakdown: CostBreakdown = {}
+
+  // Manual breakdown by currency for legacy support
+  const processItem = (amount: number | null | undefined, currency: string) => {
+    const numAmount = Number(amount)
+    if (isNaN(numAmount) || numAmount <= 0) return
 
     const rate = currency === baseCurrency ? 1 : exchangeRates[currency] || 1
-    const converted = amount * rate
+    const converted = numAmount * rate
 
     if (!breakdown[currency]) {
       breakdown[currency] = { total: 0, convertedTotal: 0 }
     }
-
-    breakdown[currency].total += amount
+    breakdown[currency].total += numAmount
     breakdown[currency].convertedTotal += converted
-    totalConverted += converted
   }
 
-  // Process activities
-  activities.forEach((activity) => {
-    const hasActual = activity.actualCost !== null && activity.actualCost !== undefined
-    const amount = hasActual ? Number(activity.actualCost) : Number(activity.estimatedCost) || 0
-    addCost(amount, activity.currency || baseCurrency)
+  activities.forEach((a) => {
+    const costToUse = a.actualCost !== null && a.actualCost !== undefined ? a.actualCost : a.estimatedCost
+    processItem(costToUse, a.currency || baseCurrency)
   })
 
-  // Process selected transport
   transport.forEach((t) => {
     if (t.isSelected) {
-      addCost(Number(t.cost) || 0, t.currency || baseCurrency)
+      processItem(t.cost, t.currency || baseCurrency)
     }
   })
 
+  // Recalculate total from the breakdown to ensure consistency
+  const total = Object.values(breakdown).reduce((sum, curr) => sum + curr.convertedTotal, 0)
+
   return {
-    total: totalConverted,
+    total,
     breakdown,
   }
 }

@@ -37,10 +37,6 @@ export const useExpenses = (tripId: string) => {
     enabled: !!tripId,
   })
 
-  // Calculate totals
-  const totalAmount = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0) // Simple sum, ignoring currency for now or assuming base currency
-  // Ideally we should convert currencies if handling multiple.
-
   const createExpense = useMutation({
     mutationFn: async (data: CreateExpenseRequest) => {
       const response = await client.post("/expenses", data)
@@ -75,7 +71,6 @@ export const useExpenses = (tripId: string) => {
 
   return {
     expenses,
-    totalAmount,
     isLoading,
     error,
     createExpense,

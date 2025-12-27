@@ -69,6 +69,11 @@ export class TripService {
                     member: true,
                   },
                 },
+                expenses: {
+                  include: {
+                    splits: true,
+                  },
+                },
               },
             },
             scenarios: {
@@ -76,7 +81,14 @@ export class TripService {
               include: {
                 activities: {
                   orderBy: [{ orderIndex: "asc" }, { scheduledStart: "asc" }],
-                  include: { participants: { include: { member: true } } },
+                  include: {
+                    participants: { include: { member: true } },
+                    expenses: {
+                      include: {
+                        splits: true,
+                      },
+                    },
+                  },
                 },
               },
             },
@@ -91,11 +103,24 @@ export class TripService {
                 member: true,
               },
             },
+            expenses: {
+              include: {
+                splits: true,
+              },
+            },
           },
         },
         members: true,
         budgets: true,
-        transport: true,
+        transport: {
+          include: {
+            expenses: {
+              include: {
+                splits: true,
+              },
+            },
+          } as any,
+        },
         checklistItems: {
           orderBy: [{ category: "asc" }, { priority: "desc" }],
         },

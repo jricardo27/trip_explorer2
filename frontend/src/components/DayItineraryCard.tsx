@@ -126,6 +126,7 @@ export const DayItineraryCard = ({
                   <SortableActivityCard
                     activity={activity}
                     canEdit={canEdit}
+                    members={trip.members}
                     onEdit={() => onEditActivity(activity)}
                     onDelete={() => onDeleteActivity(activity.id)}
                     onCopy={(act, asLink) => onCopyActivity(act.id, asLink)}

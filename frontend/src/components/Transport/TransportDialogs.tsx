@@ -18,6 +18,8 @@ import {
   FormControlLabel,
   Checkbox,
   Link,
+  Tab,
+  Tabs,
 } from "@mui/material"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState, useEffect } from "react"
@@ -150,10 +152,13 @@ export const TransportEditDialog = ({
   const { expenses } = useExpenses(tripId)
   const { members } = useTripMembers(tripId)
 
+  const [activeTab, setActiveTab] = useState(0)
+
   const [name, setName] = useState("")
   const [mode, setMode] = useState<TransportMode>(TransportMode.DRIVING)
   const [duration, setDuration] = useState("")
   const [cost, setCost] = useState("")
+  const [estimatedCost, setEstimatedCost] = useState("")
   const [currency, setCurrency] = useState(currencies[0] || "AUD")
   const [notes, setNotes] = useState("")
   const [description, setDescription] = useState("")
@@ -167,6 +172,7 @@ export const TransportEditDialog = ({
   const [splits, setSplits] = useState<ExpenseSplit[]>([])
   const [splitType, setSplitType] = useState<SplitType>("equal")
   const [userEditedName, setUserEditedName] = useState(false)
+  const [paidById, setPaidById] = useState("")
 
   useEffect(() => {
     if (open) {
@@ -176,7 +182,9 @@ export const TransportEditDialog = ({
           setMode(alternative.transportMode)
           setDuration(alternative.durationMinutes.toString())
           setCost(alternative.cost?.toString() || "")
+          setEstimatedCost(alternative.estimatedCost?.toString() || "")
           setCurrency(alternative.currency || currencies[0] || "AUD")
+          setPaidById(alternative.paidById || "")
           setNotes(alternative.notes || "")
           setDescription(alternative.description || "")
           setPros(alternative.pros?.join("\n") || "")
@@ -195,6 +203,7 @@ export const TransportEditDialog = ({
                 memberId: s.memberId,
                 amount: Number(s.amount),
                 percentage: s.percentage ? Number(s.percentage) : undefined,
+                shares: s.shares ? Number(s.shares) : undefined,
               })),
             )
             setSplitType((expense.splitType as SplitType) || "equal")
@@ -207,6 +216,7 @@ export const TransportEditDialog = ({
           setMode(TransportMode.DRIVING) // This will trigger handleModeChange
           setDuration("")
           setCost("")
+          setEstimatedCost("")
           setCurrency(currencies[0] || "AUD")
           setNotes("")
           setDescription("")
@@ -219,6 +229,7 @@ export const TransportEditDialog = ({
           setInfeasibilityReason("")
           setSplits([])
           setSplitType("equal")
+          setPaidById("")
           setUserEditedName(false)
         }
       }, 0)
@@ -251,6 +262,7 @@ export const TransportEditDialog = ({
       transportMode: mode,
       durationMinutes: parseInt(duration) || 0,
       cost: hasCost ? parseFloat(cost) : undefined,
+      estimatedCost: estimatedCost ? parseFloat(estimatedCost) : undefined,
       currency,
       notes,
       description,
@@ -263,173 +275,226 @@ export const TransportEditDialog = ({
       infeasibilityReason: isFeasible ? "" : infeasibilityReason,
       splits: hasCost ? splits : undefined,
       splitType: hasCost ? splitType : undefined,
+      paidById: hasCost ? paidById || null : null,
     })
   }
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle>{alternative ? t("editTransport") : t("addTransport")}</DialogTitle>
-      <DialogContent>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid size={12}>
-            <TextField
-              label={t("name") || "Name"}
-              fullWidth
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value)
-                setUserEditedName(true)
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <TextField
-              select
-              label={t("mode")}
-              fullWidth
-              value={mode}
-              onChange={(e) => handleModeChange(e.target.value as TransportMode)}
-            >
-              {Object.values(TransportMode).map((m) => (
-                <MenuItem key={m} value={m}>
-                  {t(m as any)}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              label={t("durationMin")}
-              type="number"
-              fullWidth
-              value={duration}
-              onChange={(e) => setDuration(e.target.value)}
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              label={t("cost")}
-              type="number"
-              fullWidth
-              value={cost}
-              onChange={(e) => setCost(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <TextField
-                    select
-                    variant="standard"
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    InputProps={{ disableUnderline: true }}
-                    sx={{ width: 60, mr: 1 }}
-                  >
-                    {currencies.map((curr) => (
-                      <MenuItem key={curr} value={curr}>
-                        {curr}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid size={12}>
-            <TextField
-              label={t("description")}
-              fullWidth
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </Grid>
-          <Grid size={12}>
-            <TextField
-              label={t("notes")}
-              fullWidth
-              multiline
-              rows={2}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              label={t("pros")}
-              fullWidth
-              multiline
-              rows={3}
-              value={pros}
-              onChange={(e) => setPros(e.target.value)}
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              label={t("cons")}
-              fullWidth
-              multiline
-              rows={3}
-              value={cons}
-              onChange={(e) => setCons(e.target.value)}
-            />
-          </Grid>
-          <Grid size={12}>
-            <FormControlLabel
-              control={<Checkbox checked={requiresBooking} onChange={(e) => setRequiresBooking(e.target.checked)} />}
-              label={t("requiresBooking")}
-            />
-          </Grid>
-          {requiresBooking && (
-            <>
-              <Grid size={12}>
-                <TextField
-                  label={t("bookingUrl")}
-                  fullWidth
-                  value={bookingUrl}
-                  onChange={(e) => setBookingUrl(e.target.value)}
-                />
-              </Grid>
-              <Grid size={12}>
-                <TextField
-                  label={t("bookingReference")}
-                  fullWidth
-                  value={bookingReference}
-                  onChange={(e) => setBookingReference(e.target.value)}
-                />
-              </Grid>
-            </>
-          )}
-          <Grid size={12}>
-            <FormControlLabel
-              control={<Checkbox checked={isFeasible} onChange={(e) => setIsFeasible(e.target.checked)} />}
-              label={t("isFeasible")}
-            />
-          </Grid>
-          {!isFeasible && (
-            <Grid size={12}>
+      <DialogContent sx={{ height: 600, minHeight: 600 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, v) => setActiveTab(v)}
+          sx={{ mb: 2, borderBottom: 1, borderColor: "divider" }}
+        >
+          <Tab label={t("details") || "Details"} />
+          <Tab label={t("cost") || "Cost"} />
+        </Tabs>
+
+        {activeTab === 0 && (
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid size={{ xs: 12 }}>
               <TextField
-                label={t("infeasibilityReason")}
+                label={t("name") || "Name"}
                 fullWidth
-                multiline
-                value={infeasibilityReason}
-                onChange={(e) => setInfeasibilityReason(e.target.value)}
-              />
-            </Grid>
-          )}
-          {cost && cost.trim() !== "" && (
-            <Grid size={12}>
-              <ExpenseSplitInput
-                members={members}
-                totalAmount={parseFloat(cost) || 0}
-                currency={currency}
-                value={splits}
-                splitType={splitType}
-                onChange={(ns: ExpenseSplit[], nt: SplitType) => {
-                  setSplits(ns)
-                  setSplitType(nt)
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value)
+                  setUserEditedName(true)
                 }}
               />
             </Grid>
-          )}
-        </Grid>
+            <Grid size={{ xs: 8 }}>
+              <TextField
+                select
+                label={t("mode")}
+                fullWidth
+                value={mode}
+                onChange={(e) => handleModeChange(e.target.value as TransportMode)}
+              >
+                {Object.values(TransportMode).map((m) => (
+                  <MenuItem key={m} value={m}>
+                    {t(m as any)}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 4 }}>
+              <TextField
+                label={t("durationMin")}
+                type="number"
+                fullWidth
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                label={t("description")}
+                fullWidth
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </Grid>
+            <Grid size={12}>
+              <TextField
+                label={t("notes")}
+                fullWidth
+                multiline
+                rows={2}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </Grid>
+            <Grid size={6}>
+              <TextField
+                label={t("pros")}
+                fullWidth
+                multiline
+                rows={3}
+                value={pros}
+                onChange={(e) => setPros(e.target.value)}
+              />
+            </Grid>
+            <Grid size={6}>
+              <TextField
+                label={t("cons")}
+                fullWidth
+                multiline
+                rows={3}
+                value={cons}
+                onChange={(e) => setCons(e.target.value)}
+              />
+            </Grid>
+            <Grid size={6}>
+              <FormControlLabel
+                control={<Checkbox checked={requiresBooking} onChange={(e) => setRequiresBooking(e.target.checked)} />}
+                label={t("requiresBooking")}
+              />
+            </Grid>
+            <Grid size={6}>
+              <FormControlLabel
+                control={<Checkbox checked={isFeasible} onChange={(e) => setIsFeasible(e.target.checked)} />}
+                label={t("isFeasible")}
+              />
+            </Grid>
+            {requiresBooking && (
+              <>
+                <Grid size={12}>
+                  <TextField
+                    label={t("bookingUrl")}
+                    fullWidth
+                    value={bookingUrl}
+                    onChange={(e) => setBookingUrl(e.target.value)}
+                  />
+                </Grid>
+                <Grid size={12}>
+                  <TextField
+                    label={t("bookingReference")}
+                    fullWidth
+                    value={bookingReference}
+                    onChange={(e) => setBookingReference(e.target.value)}
+                  />
+                </Grid>
+              </>
+            )}
+            {!isFeasible && (
+              <Grid size={12}>
+                <TextField
+                  label={t("infeasibilityReason")}
+                  fullWidth
+                  multiline
+                  value={infeasibilityReason}
+                  onChange={(e) => setInfeasibilityReason(e.target.value)}
+                />
+              </Grid>
+            )}
+          </Grid>
+        )}
+
+        {activeTab === 1 && (
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid size={{ xs: 6 }}>
+              <TextField
+                label={t("estimatedCost") || "Estimated Cost"}
+                type="number"
+                fullWidth
+                value={estimatedCost}
+                onChange={(e) => setEstimatedCost(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <Typography variant="body2" sx={{ mr: 1, color: "text.secondary" }}>
+                      {currency}
+                    </Typography>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid size={{ xs: 6 }}>
+              <TextField
+                label={t("actualCost") || "Actual Cost"}
+                type="number"
+                fullWidth
+                value={cost}
+                onChange={(e) => setCost(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <TextField
+                      select
+                      variant="standard"
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      InputProps={{ disableUnderline: true }}
+                      sx={{ width: 60, mr: 1 }}
+                    >
+                      {currencies.map((curr) => (
+                        <MenuItem key={curr} value={curr}>
+                          {curr}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                select
+                size="small"
+                label={t("paidBy")}
+                value={paidById}
+                onChange={(e) => setPaidById(e.target.value)}
+                sx={{ mt: 0.5 }}
+              >
+                <MenuItem value="">
+                  <em>{t("selectPayer")}</em>
+                </MenuItem>
+                {members.map((m) => (
+                  <MenuItem key={m.id} value={m.id}>
+                    {m.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            {cost && cost.trim() !== "" && (
+              <Grid size={12}>
+                <ExpenseSplitInput
+                  members={members}
+                  totalAmount={parseFloat(cost) || 0}
+                  currency={currency}
+                  value={splits}
+                  splitType={splitType}
+                  onChange={(ns: ExpenseSplit[], nt: SplitType) => {
+                    setSplits(ns)
+                    setSplitType(nt)
+                  }}
+                />
+              </Grid>
+            )}
+          </Grid>
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t("cancel")}</Button>
@@ -473,7 +538,7 @@ export const TransportSelectionDialog = ({
   useEffect(() => {
     if (open) {
       const currentSelected = alternatives.find((a) => a.isSelected)
-      setInitialSelectedId(currentSelected?.id || null)
+      setTimeout(() => setInitialSelectedId(currentSelected?.id || null), 0)
     }
   }, [open, alternatives])
 

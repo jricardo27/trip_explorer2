@@ -41,6 +41,7 @@ export const useActivityForm = ({
   const [actualCost, setActualCost] = useState("")
   const [currency, setCurrency] = useState(defaultCurrency)
   const [isPaid, setIsPaid] = useState(false)
+  const [paidById, setPaidById] = useState("")
   const [latitude, setLatitude] = useState("")
   const [longitude, setLongitude] = useState("")
   const [notes, setNotes] = useState("")
@@ -53,68 +54,105 @@ export const useActivityForm = ({
   const [email, setEmail] = useState("")
   const [website, setWebsite] = useState("")
   const [openingHours, setOpeningHours] = useState("")
+  const [splitType, setSplitType] = useState<string>("equal")
+  const [splits, setSplits] = useState<any[]>([])
+  const [costOnceForLinkedGroup, setCostOnceForLinkedGroup] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [mapPickerOpen, setMapPickerOpen] = useState(false)
   useEffect(() => {
     if (!open) return
 
-    setError(null)
-    if (activity) {
-      setName(activity.name)
-      setActivityType(activity.activityType)
-      setScheduledStart(activity.scheduledStart ? dayjs(activity.scheduledStart) : null)
-      setScheduledEnd(activity.scheduledEnd ? dayjs(activity.scheduledEnd) : null)
-      setEstimatedCost(activity.estimatedCost?.toString() || "")
-      setActualCost(activity.actualCost?.toString() || "")
-      setCurrency(activity.currency || defaultCurrency)
-      setIsPaid(activity.isPaid || false)
-      setLatitude(activity.latitude?.toString() || "")
-      setLongitude(activity.longitude?.toString() || "")
-      setNotes(activity.notes || "")
-      setAvailableDays(activity.availableDays || [])
-      setSelectedMemberIds(activity.participants?.map((p) => p.memberId) || [])
-      setPriority(activity.priority || "normal")
-      setIsLocked(activity.isLocked || false)
-      setIsPrivate(activity.isPrivate || false)
-      setPhone(activity.phone || "")
-      setEmail(activity.email || "")
-      setWebsite(activity.website || "")
-      setOpeningHours(activity.openingHours ? JSON.stringify(activity.openingHours, null, 2) : "")
-    } else {
-      setName("")
-      setActivityType(ActivityTypeEnum.ATTRACTION)
-      let defaultStart = null
-      let defaultEnd = null
+    // Reset error on open (deferred)
+    setTimeout(() => setError(null), 0)
 
-      if (tripDayId && tripDays) {
-        const day = tripDays.find((d) => d.id === tripDayId)
-        if (day) {
-          defaultStart = dayjs(day.date).hour(9).minute(0).second(0)
+    if (activity) {
+      setTimeout(() => {
+        setName(activity.name)
+        setActivityType(activity.activityType)
+        setScheduledStart(activity.scheduledStart ? dayjs(activity.scheduledStart) : null)
+        setScheduledEnd(activity.scheduledEnd ? dayjs(activity.scheduledEnd) : null)
+        setEstimatedCost(activity.estimatedCost?.toString() || "")
+        setActualCost(activity.actualCost?.toString() || "")
+        setCurrency(activity.currency || defaultCurrency)
+        setIsPaid(activity.isPaid || false)
+        setPaidById(activity.paidById || "")
+        setLatitude(activity.latitude?.toString() || "")
+        setLongitude(activity.longitude?.toString() || "")
+        setNotes(activity.notes || "")
+        setAvailableDays(activity.availableDays || [])
+        setSelectedMemberIds(activity.participants?.map((p) => p.memberId) || [])
+        setPriority(activity.priority || "normal")
+        setIsLocked(activity.isLocked || false)
+        setIsPrivate(activity.isPrivate || false)
+        setCostOnceForLinkedGroup(activity.costOnceForLinkedGroup || false)
+        setPhone(activity.phone || "")
+        setEmail(activity.email || "")
+        setWebsite(activity.website || "")
+        try {
+          if (activity.openingHours) {
+            const hours =
+              typeof activity.openingHours === "string"
+                ? activity.openingHours
+                : JSON.stringify(activity.openingHours, null, 2)
+            setOpeningHours(hours)
+          } else {
+            setOpeningHours("")
+          }
+        } catch (e) {
+          console.error("Failed to parse opening hours:", e)
+          setOpeningHours("")
+        }
+
+        if (activity.expenses && activity.expenses.length > 0) {
+          const expense = activity.expenses[0]
+          setSplitType(expense.splitType || "equal")
+          setSplits(expense.splits || [])
+        } else {
+          setSplitType("equal")
+          setSplits([])
+        }
+      }, 0)
+    } else {
+      setTimeout(() => {
+        setName("")
+        setActivityType(ActivityTypeEnum.ATTRACTION)
+        let defaultStart = null
+        let defaultEnd = null
+
+        if (tripDayId && tripDays) {
+          const day = tripDays.find((d) => d.id === tripDayId)
+          if (day) {
+            defaultStart = dayjs(day.date).hour(9).minute(0).second(0)
+            defaultEnd = defaultStart.add(1, "hour")
+          }
+        } else if (tripStartDate) {
+          defaultStart = dayjs(tripStartDate).hour(9).minute(0).second(0)
           defaultEnd = defaultStart.add(1, "hour")
         }
-      } else if (tripStartDate) {
-        defaultStart = dayjs(tripStartDate).hour(9).minute(0).second(0)
-        defaultEnd = defaultStart.add(1, "hour")
-      }
 
-      setScheduledStart(defaultStart)
-      setScheduledEnd(defaultEnd)
-      setEstimatedCost("")
-      setActualCost("")
-      setCurrency(defaultCurrency)
-      setIsPaid(false)
-      setLatitude(initialCoordinates?.lat.toString() || "")
-      setLongitude(initialCoordinates?.lng.toString() || "")
-      setNotes("")
-      setAvailableDays([])
-      setSelectedMemberIds(members.map((m) => m.id))
-      setPriority("normal")
-      setIsLocked(false)
-      setIsPrivate(false)
-      setPhone("")
-      setEmail("")
-      setWebsite("")
-      setOpeningHours("")
+        setScheduledStart(defaultStart)
+        setScheduledEnd(defaultEnd)
+        setEstimatedCost("")
+        setActualCost("")
+        setCurrency(defaultCurrency)
+        setIsPaid(false)
+        setPaidById("")
+        setLatitude(initialCoordinates?.lat.toString() || "")
+        setLongitude(initialCoordinates?.lng.toString() || "")
+        setNotes("")
+        setAvailableDays([])
+        setSelectedMemberIds(members.map((m) => m.id))
+        setPriority("normal")
+        setIsLocked(false)
+        setIsPrivate(false)
+        setCostOnceForLinkedGroup(false)
+        setPhone("")
+        setEmail("")
+        setWebsite("")
+        setOpeningHours("")
+        setSplitType("equal")
+        setSplits([])
+      }, 0)
     }
   }, [
     open,
@@ -174,6 +212,7 @@ export const useActivityForm = ({
         isPaid,
         isLocked,
         isPrivate,
+        costOnceForLinkedGroup,
         latitude: latitude ? parseFloat(latitude) : undefined,
         longitude: longitude ? parseFloat(longitude) : undefined,
         notes,
@@ -183,7 +222,18 @@ export const useActivityForm = ({
         phone,
         email,
         website,
-        openingHours: openingHours ? JSON.parse(openingHours) : undefined,
+        openingHours: (() => {
+          if (!openingHours) return undefined
+          try {
+            return JSON.parse(openingHours)
+          } catch (e) {
+            console.error("Failed to parse opening hours:", e)
+            return undefined
+          }
+        })(),
+        splitType,
+        splits,
+        paidById: isPaid ? paidById || null : null,
       })
     } catch (err: any) {
       setError(err.message || t("failedToSave"))
@@ -207,6 +257,8 @@ export const useActivityForm = ({
     setCurrency,
     isPaid,
     setIsPaid,
+    paidById,
+    setPaidById,
     latitude,
     setLatitude,
     longitude,
@@ -223,6 +275,8 @@ export const useActivityForm = ({
     setIsLocked,
     isPrivate,
     setIsPrivate,
+    costOnceForLinkedGroup,
+    setCostOnceForLinkedGroup,
     phone,
     setPhone,
     email,
@@ -231,6 +285,10 @@ export const useActivityForm = ({
     setWebsite,
     openingHours,
     setOpeningHours,
+    splitType,
+    setSplitType,
+    splits,
+    setSplits,
     error,
     setError,
     mapPickerOpen,

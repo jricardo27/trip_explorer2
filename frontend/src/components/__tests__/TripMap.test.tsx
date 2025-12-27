@@ -31,17 +31,44 @@ vi.mock("../Map/Animation/AnimationSettingsSidebar", () => ({
 }))
 
 // Mock Leaflet components
+/* eslint-disable react/display-name */
+const LayersControl = ({ children }: { children: React.ReactNode }) => (
+  <div data-testid="layers-control">{children}</div>
+)
+LayersControl.BaseLayer = ({ children }: { children: React.ReactNode }) => (
+  <div data-testid="base-layer">{children}</div>
+)
+
 vi.mock("react-leaflet", () => ({
-  MapContainer: ({ children }: any) => <div>{children}</div>,
-  TileLayer: () => null,
-  LayersControl: ({ children }: any) => <div>{children}</div>,
-  "LayersControl.BaseLayer": ({ children }: any) => <div>{children}</div>,
-  Marker: () => null,
+  MapContainer: ({ children }: any) => <div data-testid="map-container">{children}</div>,
+  TileLayer: () => <div data-testid="tile-layer" />,
+  LayersControl: LayersControl,
+  Marker: ({ children }: any) => <div data-testid="marker">{children}</div>,
+  Popup: ({ children }: any) => <div data-testid="popup">{children}</div>,
+  Polyline: () => <div data-testid="polyline" />,
+  CircleMarker: () => <div data-testid="circle-marker" />,
+  GeoJSON: () => <div data-testid="geojson" />,
+  Tooltip: ({ children }: any) => <div data-testid="tooltip">{children}</div>,
+  useMap: vi.fn(() => ({
+    flyTo: vi.fn(),
+    fitBounds: vi.fn(),
+    distance: vi.fn(() => 1000),
+    once: vi.fn(),
+  })),
+  useMapEvents: vi.fn(() => ({
+    getCenter: () => ({ lat: 0, lng: 0 }),
+    getZoom: () => 13,
+  })),
 }))
+/* eslint-enable react/display-name */
 
 vi.mock("leaflet", () => ({
   default: {
     Icon: { Default: { prototype: { _getIconUrl: vi.fn() }, mergeOptions: vi.fn() } },
+    latLngBounds: vi.fn(() => ({
+      isValid: () => true,
+    })),
+    divIcon: vi.fn(),
   },
 }))
 
@@ -65,8 +92,8 @@ describe("TripMap Controls Visibility", () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
-    // Reset mock
     mockAnimation.isPlaying = false
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -75,7 +102,6 @@ describe("TripMap Controls Visibility", () => {
   })
 
   it("should hide controls when playing starts in fullscreen", async () => {
-    // Mock Fullscreen
     Object.defineProperty(document, "fullscreenElement", {
       value: document.createElement("div"),
       writable: true,
@@ -83,31 +109,22 @@ describe("TripMap Controls Visibility", () => {
 
     const { getByTestId, rerender } = render(<TripMap {...defaultProps} />)
 
-    // Trigger fullscreen change effect
     act(() => {
-      const event = new Event("fullscreenchange")
-      document.dispatchEvent(event)
+      document.dispatchEvent(new Event("fullscreenchange"))
     })
 
     const controls = getByTestId("animation-controls")
-
-    // Initially visible
     expect(controls.style.opacity).toBe("1")
 
-    // Update mock to playing
     mockAnimation.isPlaying = true
-
-    // Rerender to reflect hook state change
     rerender(<TripMap {...defaultProps} />)
 
-    // Should be hidden
     expect(controls.style.opacity).toBe("0")
     const sidebar = getByTestId("animation-sidebar")
     expect(sidebar.style.opacity).toBe("0")
   })
 
   it("should show controls on mouse move in fullscreen", async () => {
-    // Mock Fullscreen
     Object.defineProperty(document, "fullscreenElement", {
       value: document.createElement("div"),
       writable: true,
@@ -115,33 +132,26 @@ describe("TripMap Controls Visibility", () => {
 
     const { getByTestId, rerender, container } = render(<TripMap {...defaultProps} />)
 
-    // Enter fullscreen
     act(() => {
       document.dispatchEvent(new Event("fullscreenchange"))
     })
 
-    // Start playing -> hide
     mockAnimation.isPlaying = true
     rerender(<TripMap {...defaultProps} />)
     const controls = getByTestId("animation-controls")
     expect(controls.style.opacity).toBe("0")
 
-    // Move mouse
     await act(async () => {
-      // We need to trigger mousemove on the paper/container
-      // The container is the root div of the component
       fireEvent.mouseMove(container.firstChild as Element)
     })
 
     expect(controls.style.opacity).toBe("1")
 
-    // Sidebar settings button should remain HIDDEN in fullscreen even if controls are visible
     const sidebar = getByTestId("animation-sidebar")
     expect(sidebar.style.opacity).toBe("0")
   })
 
   it("should not flicker controls when starting playback in fullscreen", async () => {
-    // Mock Fullscreen
     Object.defineProperty(document, "fullscreenElement", {
       value: document.createElement("div"),
       writable: true,
@@ -149,28 +159,20 @@ describe("TripMap Controls Visibility", () => {
 
     const { getByTestId, rerender } = render(<TripMap {...defaultProps} />)
 
-    // Enter fullscreen
     act(() => {
       document.dispatchEvent(new Event("fullscreenchange"))
     })
 
     const controls = getByTestId("animation-controls")
-
-    // Initially visible when entering fullscreen (not playing)
     expect(controls.style.opacity).toBe("1")
 
-    // Start playing
     mockAnimation.isPlaying = true
     rerender(<TripMap {...defaultProps} />)
 
-    // Should immediately hide without fade-in flicker
     expect(controls.style.opacity).toBe("0")
   })
 
   it("should reset map view when stopping in fullscreen", () => {
-    // This test verifies the handleResetWithView logic
-    // In a real scenario, we'd need to mock the map state and verify bounds calculation
-    // For now, we just verify the handler is called
     render(
       <TripMap
         {...defaultProps}
@@ -183,7 +185,6 @@ describe("TripMap Controls Visibility", () => {
       />,
     )
 
-    // Mock fullscreen
     Object.defineProperty(document, "fullscreenElement", {
       value: document.createElement("div"),
       writable: true,
@@ -193,8 +194,6 @@ describe("TripMap Controls Visibility", () => {
       document.dispatchEvent(new Event("fullscreenchange"))
     })
 
-    // The handleResetWithView should be wired to the AnimationController
-    // We verify this by checking that handleReset is called (mocked)
     expect(mockAnimation.handleReset).toBeDefined()
   })
 })

@@ -177,6 +177,8 @@ model Activity {
   costCategory  String?  @map("cost_category")
   isPaid        Boolean  @default(false) @map("is_paid")
   paymentMethod String?  @map("payment_method")
+  paidById      String?  @map("paid_by_id")
+  costOnceForLinkedGroup Boolean @default(false) @map("cost_once_for_linked_group")
 
   useDefaultMembers Boolean @default(true) @map("use_default_members")
   isGroupActivity   Boolean @default(true) @map("is_group_activity")
@@ -194,6 +196,7 @@ model Activity {
   transportFrom  TransportAlternative[] @relation("FromActivity")
   transportTo    TransportAlternative[] @relation("ToActivity")
   animationSteps TripAnimationStep[]
+  paidBy         TripMember?            @relation("ActivityPaidBy", fields: [paidById], references: [id])
   linkedGroupId  String?                @map("linked_group_id")
   scenarioId     String?                @map("scenario_id")
   scenario       DayScenario?           @relation(fields: [scenarioId], references: [id], onDelete: SetNull)
@@ -234,8 +237,10 @@ model TransportAlternative {
   bufferMinutes   Int @default(0) @map("buffer_minutes")
 
   cost          Decimal? @db.Decimal(10, 2)
+  estimatedCost Decimal? @map("estimated_cost") @db.Decimal(10, 2)
   currency      String?  @default("AUD") @db.Char(3)
   costPerPerson Boolean  @default(true) @map("cost_per_person")
+  paidById      String?  @map("paid_by_id")
 
   distanceMeters Int?  @map("distance_meters")
   waypoints      Json?
@@ -252,9 +257,12 @@ model TransportAlternative {
   isFeasible          Boolean @default(true) @map("is_feasible")
   infeasibilityReason String? @map("infeasibility_reason")
 
-  trip         Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  fromActivity Activity @relation("FromActivity", fields: [fromActivityId], references: [id], onDelete: Cascade)
-  toActivity   Activity @relation("ToActivity", fields: [toActivityId], references: [id], onDelete: Cascade)
+  trip         Trip        @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  fromActivity Activity    @relation("FromActivity", fields: [fromActivityId], references: [id], onDelete: Cascade)
+  toActivity   Activity    @relation("ToActivity", fields: [toActivityId], references: [id], onDelete: Cascade)
+  paidBy       TripMember? @relation("TransportPaidBy", fields: [paidById], references: [id])
+
+  expenses Expense[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -284,8 +292,10 @@ model TripMember {
 
   trip          Trip                  @relation(fields: [tripId], references: [id], onDelete: Cascade)
   user          User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
-  participants  ActivityParticipant[]
+  participants   ActivityParticipant[]
   expensesPaid  Expense[]             @relation("PaidBy")
+  activitiesPaid Activity[]           @relation("ActivityPaidBy")
+  transportPaid TransportAlternative[] @relation("TransportPaidBy")
   expenseSplits ExpenseSplit[]
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -343,10 +353,11 @@ model Expense {
   tags  String[]
   notes String?
 
-  trip     Trip           @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  activity Activity?      @relation(fields: [activityId], references: [id], onDelete: SetNull)
-  paidBy   TripMember?    @relation("PaidBy", fields: [paidById], references: [id])
-  splits   ExpenseSplit[]
+  trip                 Trip                  @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  activity             Activity?             @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  transportAlternative TransportAlternative? @relation(fields: [transportAlternativeId], references: [id], onDelete: SetNull)
+  paidBy               TripMember?           @relation("PaidBy", fields: [paidById], references: [id])
+  splits               ExpenseSplit[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -360,6 +371,7 @@ model ExpenseSplit {
   memberId   String    @map("member_id")
   amount     Decimal   @db.Decimal(10, 2)
   percentage Decimal?  @db.Decimal(5, 2)
+  shares     Decimal?  @db.Decimal(10, 2)
   isPaid     Boolean   @default(false) @map("is_paid")
   paidAt     DateTime? @map("paid_at")
 

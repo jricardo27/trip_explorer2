@@ -28,6 +28,13 @@ export const updateTripSchema = z.object({
   isPublic: z.boolean().optional(),
 })
 
+const splitItemSchema = z.object({
+  memberId: z.string().uuid(),
+  amount: z.coerce.number().optional().nullable(),
+  percentage: z.coerce.number().optional().nullable(),
+  shares: z.coerce.number().optional().nullable(),
+})
+
 export const createActivitySchema = z.object({
   tripId: z.string().uuid(),
   tripDayId: z.string().uuid(), // Required - activities must be assigned to a trip day
@@ -54,11 +61,15 @@ export const createActivitySchema = z.object({
   city: z.string().optional(),
   country: z.string().optional(),
   countryCode: z.string().length(2).optional(),
-  estimatedCost: z.number().positive().optional(),
-  currency: z.string().length(3).optional(),
+  actualCost: z.coerce.number().nonnegative().optional().nullable(),
+  currency: z.string().length(3).optional().nullable(),
   participantIds: z.array(z.string().uuid()).optional(),
   availableDays: z.array(z.string()).optional(),
   isPrivate: z.boolean().optional(),
+  splitType: z.enum(["equal", "percentage", "amount", "shares"]).optional(),
+  splits: z.array(splitItemSchema).optional(),
+  costOnceForLinkedGroup: z.boolean().optional(),
+  paidById: z.string().uuid().nullable().optional(),
 })
 
 export const updateActivitySchema = z.object({
@@ -89,50 +100,41 @@ export const updateActivitySchema = z.object({
   priority: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
-  estimatedCost: z.number().positive().optional(),
-  actualCost: z.number().positive().optional(),
+  estimatedCost: z.coerce.number().nonnegative().optional().nullable(),
+  actualCost: z.coerce.number().nonnegative().optional().nullable(),
   isPaid: z.boolean().optional(),
+  costOnceForLinkedGroup: z.boolean().optional(),
   participantIds: z.array(z.string().uuid()).optional(),
   availableDays: z.array(z.string()).optional(),
   isPrivate: z.boolean().optional(),
+  splitType: z.enum(["equal", "percentage", "amount", "shares"]).optional(),
+  splits: z.array(splitItemSchema).optional(),
+  paidById: z.string().uuid().nullable().optional(),
 })
 
 export const createExpenseSchema = z.object({
   tripId: z.string().uuid(),
   activityId: z.string().uuid().optional(),
+  transportAlternativeId: z.string().uuid().optional(),
   description: z.string().min(1).max(255),
   category: z.string().min(1),
-  amount: z.number().positive(),
+  amount: z.coerce.number().nonnegative(),
   currency: z.string().length(3).default("AUD"),
   paidById: z.string().uuid().optional(),
   date: z.string().datetime().optional(),
   isPaid: z.boolean().default(true),
   splitType: z.enum(["equal", "percentage", "amount", "shares"]).default("equal"),
-  splits: z
-    .array(
-      z.object({
-        memberId: z.string().uuid(),
-        amount: z.number().optional(),
-      }),
-    )
-    .optional(),
+  splits: z.array(splitItemSchema).optional(),
 })
 
 export const updateExpenseSchema = z.object({
   description: z.string().min(1).max(255).optional(),
   category: z.string().min(1).optional(),
-  amount: z.number().positive().optional(),
+  amount: z.coerce.number().nonnegative().optional(),
   currency: z.string().length(3).optional(),
   paidById: z.string().uuid().optional(),
   date: z.string().datetime().optional(),
   isPaid: z.boolean().optional(),
   splitType: z.enum(["equal", "percentage", "amount", "shares"]).optional(),
-  splits: z
-    .array(
-      z.object({
-        memberId: z.string().uuid(),
-        amount: z.number().optional(),
-      }),
-    )
-    .optional(),
+  splits: z.array(splitItemSchema).optional(),
 })

@@ -1,4 +1,16 @@
-import { Grid, TextField, FormControl, InputLabel, Select, MenuItem, FormControlLabel, Switch } from "@mui/material"
+import { Lock as LockIcon, LockOpen as LockOpenIcon } from "@mui/icons-material"
+import {
+  Grid,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControlLabel,
+  Switch,
+  Box,
+  Typography,
+} from "@mui/material"
 
 import { useLanguageStore } from "../../stores/languageStore"
 import { ActivityType } from "../../types"
@@ -13,6 +25,8 @@ interface ActivityBasicFieldsProps {
   canEdit: boolean
   isPrivate: boolean
   setIsPrivate: (isPrivate: boolean) => void
+  isLocked: boolean
+  setIsLocked: (isLocked: boolean) => void
 }
 
 export const ActivityBasicFields = ({
@@ -25,6 +39,8 @@ export const ActivityBasicFields = ({
   canEdit,
   isPrivate,
   setIsPrivate,
+  isLocked,
+  setIsLocked,
 }: ActivityBasicFieldsProps) => {
   const { t } = useLanguageStore()
 
@@ -67,14 +83,32 @@ export const ActivityBasicFields = ({
         </FormControl>
       </Grid>
       {canEdit && (
-        <Grid size={{ xs: 12 }}>
-          <FormControlLabel
-            control={
-              <Switch checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} disabled={!canEdit} />
-            }
-            label={t("privateActivity") || "Private Activity (Hidden from public view)"}
-          />
-        </Grid>
+        <>
+          <Grid size={{ xs: 6 }}>
+            <FormControlLabel
+              control={
+                <Switch checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} disabled={!canEdit} />
+              }
+              label={t("privateActivity") || "Private Activity"}
+            />
+          </Grid>
+          <Grid size={{ xs: 6 }}>
+            <Box
+              display="flex"
+              alignItems="center"
+              gap={1}
+              onClick={() => canEdit && setIsLocked(!isLocked)}
+              sx={{ cursor: canEdit ? "pointer" : "default", height: "100%" }}
+            >
+              {isLocked ? (
+                <LockIcon fontSize="medium" sx={{ color: "warning.main" }} />
+              ) : (
+                <LockOpenIcon fontSize="medium" sx={{ color: "action.disabled" }} />
+              )}
+              <Typography variant="body1">{isLocked ? t("locked") : t("unlocked")}</Typography>
+            </Box>
+          </Grid>
+        </>
       )}
     </>
   )

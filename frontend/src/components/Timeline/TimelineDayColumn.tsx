@@ -3,7 +3,7 @@ import { Box, IconButton, Typography } from "@mui/material"
 import dayjs from "dayjs"
 
 import { useLanguageStore } from "../../stores/languageStore"
-import type { Activity, TripDay, TransportAlternative } from "../../types"
+import type { Activity, TripDay, TransportAlternative, TripMember } from "../../types"
 import { calculateDayCost } from "../../utils/costUtils"
 
 import { TimelineActivityCard } from "./TimelineActivityCard"
@@ -43,6 +43,7 @@ interface TimelineDayColumnProps {
   isPublic?: boolean
   exchangeRates: Record<string, number>
   baseCurrency: string
+  members?: TripMember[]
 }
 
 export const TimelineDayColumn = ({
@@ -76,6 +77,7 @@ export const TimelineDayColumn = ({
   isPublic = false,
   exchangeRates,
   baseCurrency,
+  members,
 }: TimelineDayColumnProps) => {
   const { t } = useLanguageStore()
   const activeScenario = day.scenarios?.find((s) => s.isSelected)
@@ -257,6 +259,7 @@ export const TimelineDayColumn = ({
                         onClick={onActivityClick || (() => {})}
                         onContextMenu={(e) => handleContextMenu(e, day, activity.id)}
                         theme={theme}
+                        members={members}
                       />
                     ))}
                   </Box>
@@ -285,6 +288,7 @@ export const TimelineDayColumn = ({
                   onClick={onActivityClick || (() => {})}
                   onContextMenu={(e) => handleContextMenu(e, day, activity.id)}
                   theme={theme}
+                  members={members}
                 />
               ))}
 

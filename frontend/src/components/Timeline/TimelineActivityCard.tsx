@@ -1,7 +1,8 @@
-import { Paper, Typography } from "@mui/material"
+import { Paper, Typography, Box, Tooltip, Avatar } from "@mui/material"
 import dayjs from "dayjs"
 
-import type { Activity } from "../../types"
+import { useLanguageStore } from "../../stores/languageStore"
+import type { Activity, TripMember } from "../../types"
 
 import { getPixelPosition, getActivityHeight } from "./TimelineUtils"
 
@@ -20,7 +21,8 @@ interface TimelineActivityCardProps {
   onClick: (activity: Activity) => void
   onContextMenu: (e: React.MouseEvent, activityId: string) => void
   isConflicting?: boolean
-  theme: any // Using any for theme to avoid complex MUI theme typing if not strictly needed
+  theme: any
+  members?: TripMember[]
 }
 
 export const TimelineActivityCard = ({
@@ -39,7 +41,9 @@ export const TimelineActivityCard = ({
   onContextMenu,
   isConflicting,
   theme,
+  members = [],
 }: TimelineActivityCardProps) => {
+  const { t } = useLanguageStore()
   if (!activity.scheduledStart) return null
 
   const effectiveEnd = activity.scheduledEnd || dayjs(activity.scheduledStart).endOf("day").toISOString()
@@ -156,6 +160,35 @@ export const TimelineActivityCard = ({
         <Typography variant="caption" sx={{ fontSize: "0.6rem", opacity: 0.8, display: "block", mt: 0.25 }}>
           {activity.activityType}
         </Typography>
+      )}
+      {(isExpanded || displayHeight > 60) && activity.isPaid && activity.paidById && (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.25 }}>
+          <Typography variant="caption" sx={{ fontSize: "0.6rem", opacity: 0.8 }}>
+            {t("paidBy")}:
+          </Typography>
+          {(() => {
+            const payer = members.find((m) => m.id === activity.paidById)
+            return payer ? (
+              <Tooltip title={payer.name}>
+                <Avatar
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    fontSize: "0.5rem",
+                    bgcolor: payer.color || "grey.400",
+                  }}
+                  src={payer.avatarUrl || undefined}
+                >
+                  {payer.name.charAt(0)}
+                </Avatar>
+              </Tooltip>
+            ) : (
+              <Typography variant="caption" sx={{ fontSize: "0.6rem" }}>
+                {t("someone")}
+              </Typography>
+            )
+          })()}
+        </Box>
       )}
     </Paper>
   )

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMemo } from "react"
 
 import client from "../api/client"
 import type { TripMember, MemberRole } from "../types"
@@ -22,7 +23,7 @@ export const useTripMembers = (tripId: string) => {
 
   // Fetch members
   const {
-    data: members,
+    data: membersData,
     isLoading,
     error,
   } = useQuery({
@@ -69,8 +70,10 @@ export const useTripMembers = (tripId: string) => {
     },
   })
 
+  const members = useMemo(() => membersData || [], [membersData])
+
   return {
-    members: members || [],
+    members,
     isLoading,
     error,
     addMember: addMember.mutateAsync,

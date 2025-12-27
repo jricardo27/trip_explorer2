@@ -29,10 +29,11 @@ import {
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs, { Dayjs } from "dayjs"
-import { useState, useMemo, Fragment, useCallback } from "react"
+import { useState, useMemo, Fragment } from "react"
 
 import { useExpenses } from "../hooks/useExpenses"
 import { useTripMembers } from "../hooks/useTripMembers"
+import { CostController } from "../services/costController"
 import { useLanguageStore } from "../stores/languageStore"
 import type { Trip, Expense, Activity } from "../types"
 
@@ -48,16 +49,6 @@ interface ExpensesPanelProps {
   onEditActivity?: (activity: Activity) => void
 }
 
-// Basic mock exchange rates (In real app, fetch from API)
-// Base: USD
-const exchangeRates: Record<string, number> = {
-  AUD: 1.5,
-  USD: 1.0,
-  EUR: 0.92,
-  GBP: 0.79,
-  JPY: 150,
-}
-
 export const ExpensesPanel = ({
   tripId,
   defaultCurrency = "AUD",
@@ -69,51 +60,98 @@ export const ExpensesPanel = ({
   const { expenses, createExpense, updateExpense, deleteExpense } = useExpenses(tripId)
   const { members } = useTripMembers(tripId)
 
+  const costController = useMemo(() => new CostController(trip || ({ id: tripId } as Trip)), [trip, tripId])
+  const aggregates = useMemo(
+    () => costController.getAggregates({ expenses, transport: trip?.transport }),
+    [costController, expenses, trip?.transport],
+  )
+
   const transportExpenses = useMemo(() => {
     if (!trip?.transport || !trip?.activities) return []
     // Get IDs of transports that already have a real expense
     const transportExpenseIds = new Set(expenses.map((e) => e.transportAlternativeId).filter(Boolean))
 
     return trip.transport
-      .filter((t: any) => t.isSelected && t.cost && t.cost > 0 && !transportExpenseIds.has(t.id))
+      .filter((t: any) => t.isSelected && (Number(t.cost) || 0) > 0 && !transportExpenseIds.has(t.id))
       .map((t: any) => {
         const fromActivity = trip?.activities?.find((a: any) => a.id === t.fromActivityId)
         const toActivity = trip?.activities?.find((a: any) => a.id === t.toActivityId)
         return {
-          id: t.id,
+          id: `virtual-trans-${t.id}`,
           description: `${t.transportMode} to ${toActivity?.name || "Destination"}`,
-          amount: t.cost || 0,
+          amount: Number(t.cost) || 0,
           currency: t.currency || defaultCurrency,
           category: "Transport",
           paymentDate: fromActivity?.scheduledStart || trip.startDate,
           createdAt: new Date().toISOString(),
           tripId: trip.id,
-          paidById: "",
-          splits: [],
+          paidById: t.paidById || "",
+          splits: t.splits || [],
+          isPaid: false,
           isTransport: true,
+          isVirtual: true,
         } as unknown as Expense
       })
   }, [trip, defaultCurrency, expenses])
 
+  const activityExpenses = useMemo(() => {
+    if (!trip?.activities) return []
+    const expenseActivityIds = new Set(expenses.map((e) => e.activityId).filter(Boolean))
+
+    // Group activities by linkedGroupId to handle costOnceForLinkedGroup
+    const seenLinkedGroups = new Set<string>()
+
+    return (trip.activities || [])
+      .filter((a) => {
+        const hasCost = a.actualCost !== null && a.actualCost !== undefined
+        const hasNoExpense = !expenseActivityIds.has(a.id)
+
+        if (!hasCost || !hasNoExpense) return false
+
+        // If it's a linked group and should be paid only once
+        if (a.linkedGroupId && a.costOnceForLinkedGroup) {
+          if (seenLinkedGroups.has(a.linkedGroupId)) {
+            return false // Skip this instance, already counted another one
+          }
+          seenLinkedGroups.add(a.linkedGroupId)
+        }
+
+        return true
+      })
+      .map(
+        (a) =>
+          ({
+            id: `virtual-act-${a.id}`,
+            description: a.name,
+            amount: Number(a.actualCost),
+            currency: a.currency || defaultCurrency,
+            category: a.activityType || "Activity",
+            paymentDate: a.scheduledStart || trip.startDate,
+            createdAt: new Date().toISOString(),
+            tripId: trip.id,
+            paidById: a.paidById || "",
+            splits: a.expenses && a.expenses.length > 0 ? a.expenses[0].splits : [],
+            isPaid: a.isPaid || false,
+            isActivityCost: true,
+            isVirtual: true,
+          }) as unknown as Expense,
+      )
+  }, [trip, defaultCurrency, expenses])
+
   const [displayCurrency, setDisplayCurrency] = useState(defaultCurrency)
 
-  const convert = useCallback((amt: number, from: string, to: string) => {
-    if (from === to) return amt
-    // Convert to USD first
-    const fromRate = exchangeRates[from] || 1 // Fallback 1:1 if unknown
-    const inUSD = amt / fromRate
-    // Convert to Target
-    const toRate = exchangeRates[to] || 1
-    return inUSD * toRate
-  }, [])
+  const allExpenses = useMemo(() => {
+    const selectedTransportIds = new Set((trip?.transport || []).filter((t: any) => t.isSelected).map((t: any) => t.id))
+    const filteredDBExpenses = expenses.filter((e) => {
+      if (e.transportAlternativeId && !selectedTransportIds.has(e.transportAlternativeId)) {
+        return false
+      }
+      return true
+    })
+    return [...filteredDBExpenses, ...transportExpenses, ...activityExpenses]
+  }, [expenses, transportExpenses, activityExpenses, trip?.transport])
 
-  const allExpenses = useMemo(() => [...expenses, ...transportExpenses], [expenses, transportExpenses])
-
-  const totalAmount = useMemo(() => {
-    return allExpenses.reduce((sum, e) => {
-      return sum + convert(Number(e.amount), e.currency || "AUD", displayCurrency)
-    }, 0)
-  }, [allExpenses, displayCurrency, convert])
+  const totalAmount = aggregates.totalActual
 
   const [tabIndex, setTabIndex] = useState(0)
 
@@ -131,8 +169,8 @@ export const ExpensesPanel = ({
   const filteredExpenses =
     selectedCategory === "All" ? allExpenses : allExpenses.filter((e) => e.category === selectedCategory)
 
-  const totalBudget = trip?.budget || 0
-  const remainingBudget = totalBudget - totalAmount
+  const totalBudget = aggregates.totalBudget
+  const remainingBudget = totalBudget - (aggregates.totalExpected || totalAmount)
 
   // Split State
   const [splitType, setSplitType] = useState<SplitType>("equal")
@@ -185,6 +223,15 @@ export const ExpensesPanel = ({
   }
 
   const handleEdit = (expense: Expense) => {
+    if ((expense as any).isActivityCost && onEditActivity && trip?.activities) {
+      const activityId = expense.id.replace("virtual-act-", "")
+      const activity = trip.activities.find((a) => a.id === activityId)
+      if (activity) {
+        onEditActivity(activity)
+        return
+      }
+    }
+
     setEditingExpenseId(expense.id)
     setDescription(expense.description)
     setNotes(expense.notes || "")
@@ -356,54 +403,197 @@ export const ExpensesPanel = ({
                 </Button>
               </Box>
             ) : (
-              <List>
-                {filteredExpenses.map((expense) => {
-                  const payer = members.find((m) => m.id === expense.paidById)
-                  return (
-                    <ListItem
-                      key={expense.id}
-                      secondaryAction={
-                        <Box>
-                          {!(expense as any).isTransport && (
-                            <>
-                              <IconButton edge="end" onClick={() => handleEdit(expense)} sx={{ mr: 1 }}>
-                                <EditIcon />
-                              </IconButton>
-                              <IconButton
-                                edge="end"
-                                onClick={(e: React.MouseEvent) => handleDeleteClick(expense.id, e)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </>
-                          )}
-                        </Box>
-                      }
-                      sx={{ borderBottom: "1px solid #eee" }}
-                    >
-                      <ListItemText
-                        primary={
-                          <Box display="flex" justifyContent="space-between" pr={6}>
-                            <Typography fontWeight="medium">{expense.description}</Typography>
-                            <Typography fontWeight="bold">
-                              {expense.currency} {Number(expense.amount).toFixed(2)}
-                            </Typography>
-                          </Box>
-                        }
-                        secondary={
-                          <Box display="flex" alignItems="center" gap={1} mt={0.5}>
-                            <Chip label={expense.category} size="small" variant="outlined" />
-                            <Typography variant="caption">
-                              Paid by {payer ? payer.name : "Someone"} •{" "}
-                              {dayjs(expense.paymentDate || expense.createdAt).format("MMM D")}
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                    </ListItem>
-                  )
-                })}
-              </List>
+              <>
+                {/* Paid Expenses Section */}
+                <Box mb={3}>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="h6" color="success.main">
+                      {t("paidExpenses")}
+                    </Typography>
+                    <Typography variant="h6" color="success.main">
+                      {defaultCurrency}{" "}
+                      {filteredExpenses
+                        .filter((e) => e.isPaid)
+                        .reduce((sum, e) => sum + Number(e.amount), 0)
+                        .toFixed(2)}
+                    </Typography>
+                  </Box>
+                  <List>
+                    {filteredExpenses
+                      .filter((e) => e.isPaid)
+                      .map((expense) => {
+                        const payer = members.find((m) => m.id === expense.paidById)
+                        const isShared =
+                          (expense.splits && expense.splits.length > 1) ||
+                          (expense as any).isActivityCost ||
+                          (expense as any).isTransport
+
+                        return (
+                          <ListItem
+                            key={expense.id}
+                            secondaryAction={
+                              <Box>
+                                {!(expense as any).isTransport && (
+                                  <>
+                                    <IconButton edge="end" onClick={() => handleEdit(expense)} sx={{ mr: 1 }}>
+                                      <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                      edge="end"
+                                      onClick={(e: React.MouseEvent) => handleDeleteClick(expense.id, e)}
+                                    >
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  </>
+                                )}
+                              </Box>
+                            }
+                            sx={{ borderBottom: "1px solid #eee" }}
+                          >
+                            <ListItemText
+                              primary={
+                                <Box display="flex" justifyContent="space-between" pr={6}>
+                                  <Typography fontWeight="medium">{expense.description}</Typography>
+                                  <Box textAlign="right">
+                                    <Typography fontWeight="bold">
+                                      {expense.currency} {Number(expense.amount).toFixed(2)}
+                                    </Typography>
+                                    {isShared && (
+                                      <Typography variant="caption" color="text.secondary">
+                                        {expense.splits && expense.splits.length > 0
+                                          ? `Split between ${expense.splits.length} people`
+                                          : "Shared equally"}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                </Box>
+                              }
+                              secondary={
+                                <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+                                  <Chip label={expense.category} size="small" variant="outlined" />
+                                  <Typography variant="caption">
+                                    {expense.paidById ? `Paid by ${payer ? payer.name : "Someone"}` : "Unpaid"} •{" "}
+                                    {dayjs(expense.paymentDate || expense.createdAt).format("MMM D")}
+                                  </Typography>
+                                </Box>
+                              }
+                            />
+                          </ListItem>
+                        )
+                      })}
+                  </List>
+                  {filteredExpenses.filter((e) => e.isPaid).length === 0 && (
+                    <Box textAlign="center" py={2}>
+                      <Typography color="text.secondary" variant="body2">
+                        {t("noExpenses")}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+
+                {/* Estimated Expenses Section */}
+                <Box mb={3}>
+                  <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="h6" color="warning.main">
+                      {t("estimatedExpenses")}
+                    </Typography>
+                    <Typography variant="h6" color="warning.main">
+                      {defaultCurrency}{" "}
+                      {filteredExpenses
+                        .filter((e) => !e.isPaid)
+                        .reduce((sum, e) => sum + Number(e.amount), 0)
+                        .toFixed(2)}
+                    </Typography>
+                  </Box>
+                  <List>
+                    {filteredExpenses
+                      .filter((e) => !e.isPaid)
+                      .map((expense) => {
+                        const payer = members.find((m) => m.id === expense.paidById)
+                        const isShared =
+                          (expense.splits && expense.splits.length > 1) ||
+                          (expense as any).isActivityCost ||
+                          (expense as any).isTransport
+
+                        return (
+                          <ListItem
+                            key={expense.id}
+                            secondaryAction={
+                              <Box>
+                                {!(expense as any).isTransport && (
+                                  <>
+                                    <IconButton edge="end" onClick={() => handleEdit(expense)} sx={{ mr: 1 }}>
+                                      <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                      edge="end"
+                                      onClick={(e: React.MouseEvent) => handleDeleteClick(expense.id, e)}
+                                    >
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  </>
+                                )}
+                              </Box>
+                            }
+                            sx={{ borderBottom: "1px solid #eee" }}
+                          >
+                            <ListItemText
+                              primary={
+                                <Box display="flex" justifyContent="space-between" pr={6}>
+                                  <Typography fontWeight="medium">{expense.description}</Typography>
+                                  <Box textAlign="right">
+                                    <Typography fontWeight="bold">
+                                      {expense.currency} {Number(expense.amount).toFixed(2)}
+                                    </Typography>
+                                    {isShared && (
+                                      <Typography variant="caption" color="text.secondary">
+                                        {expense.splits && expense.splits.length > 0
+                                          ? `Split between ${expense.splits.length} people`
+                                          : "Shared equally"}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                </Box>
+                              }
+                              secondary={
+                                <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+                                  <Chip label={expense.category} size="small" variant="outlined" />
+                                  <Typography variant="caption">
+                                    {expense.paidById ? `Paid by ${payer ? payer.name : "Someone"}` : "Unpaid"} •{" "}
+                                    {dayjs(expense.paymentDate || expense.createdAt).format("MMM D")}
+                                  </Typography>
+                                </Box>
+                              }
+                            />
+                          </ListItem>
+                        )
+                      })}
+                  </List>
+                  {filteredExpenses.filter((e) => !e.isPaid).length === 0 && (
+                    <Box textAlign="center" py={2}>
+                      <Typography color="text.secondary" variant="body2">
+                        {t("noExpenses")}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+
+                {/* Combined Total */}
+                <Box
+                  p={2}
+                  bgcolor="primary.main"
+                  color="primary.contrastText"
+                  borderRadius={1}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="h6">{t("combinedTotal")}</Typography>
+                  <Typography variant="h6">
+                    {defaultCurrency} {filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0).toFixed(2)}
+                  </Typography>
+                </Box>
+              </>
             )}
             <Dialog open={!!confirmDeleteId} onClose={() => setConfirmDeleteId(null)}>
               <DialogTitle>{t("confirmDelete")}</DialogTitle>
@@ -610,9 +800,23 @@ export const ExpensesPanel = ({
                         </TableCell>
                         <TableCell align="right">
                           <Chip
-                            label={activity.isPaid ? t("paid") : t("pending")}
+                            label={
+                              activity.isPaid ||
+                              (activity.actualCost !== null &&
+                                activity.actualCost !== undefined &&
+                                Number(activity.actualCost) > 0)
+                                ? t("paid")
+                                : t("pending")
+                            }
                             size="small"
-                            color={activity.isPaid ? "success" : "warning"}
+                            color={
+                              activity.isPaid ||
+                              (activity.actualCost !== null &&
+                                activity.actualCost !== undefined &&
+                                Number(activity.actualCost) > 0)
+                                ? "success"
+                                : "warning"
+                            }
                           />
                         </TableCell>
                       </TableRow>
@@ -622,7 +826,11 @@ export const ExpensesPanel = ({
                         .filter((trans) => trans.fromActivityId === activity.id && trans.isSelected)
                         .map((trans) => {
                           const expense = allExpenses.find((e) => e.transportAlternativeId === trans.id)
-                          const amount = expense ? Number(expense.amount) : trans.cost || 0
+                          const estimatedAmount =
+                            trans.estimatedCost !== undefined && trans.estimatedCost !== null
+                              ? Number(trans.estimatedCost)
+                              : Number(trans.cost || 0)
+                          const actualAmount = expense ? Number(expense.amount) : Number(trans.cost || 0)
                           const isPaid = expense ? expense.isPaid : false
 
                           return (
@@ -636,16 +844,16 @@ export const ExpensesPanel = ({
                                 <Chip label={t("transport")} size="small" variant="outlined" color="secondary" />
                               </TableCell>
                               <TableCell align="right">
-                                {trans.currency || defaultCurrency} {Number(amount).toFixed(2)}
+                                {trans.currency || defaultCurrency} {Number(estimatedAmount).toFixed(2)}
                               </TableCell>
                               <TableCell align="right">
-                                {trans.currency || defaultCurrency} {Number(amount).toFixed(2)}
+                                {trans.currency || defaultCurrency} {Number(actualAmount).toFixed(2)}
                               </TableCell>
                               <TableCell align="right">
                                 <Chip
-                                  label={isPaid ? t("paid") : t("pending")}
+                                  label={isPaid || Number(actualAmount) > 0 ? t("paid") : t("pending")}
                                   size="small"
-                                  color={isPaid ? "success" : "warning"}
+                                  color={isPaid || Number(actualAmount) > 0 ? "success" : "warning"}
                                 />
                               </TableCell>
                             </TableRow>
@@ -653,6 +861,51 @@ export const ExpensesPanel = ({
                         })}
                     </Fragment>
                   ))}
+                  {/* Subtotals Row */}
+                  {(trip?.activities || []).length > 0 && (
+                    <TableRow sx={{ bgcolor: "primary.light", fontWeight: "bold" }}>
+                      <TableCell colSpan={2} sx={{ fontWeight: "bold" }}>
+                        {t("total")}
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                        {defaultCurrency}{" "}
+                        {(trip?.activities || [])
+                          .reduce((sum, a) => {
+                            const estimatedCost = Number(a.estimatedCost || 0)
+                            const transportCosts = (trip?.transport || [])
+                              .filter((t) => t.fromActivityId === a.id && t.isSelected)
+                              .reduce((tSum, t) => {
+                                return (
+                                  tSum +
+                                  Number(
+                                    t.estimatedCost !== undefined && t.estimatedCost !== null
+                                      ? t.estimatedCost
+                                      : t.cost || 0,
+                                  )
+                                )
+                              }, 0)
+                            return sum + estimatedCost + transportCosts
+                          }, 0)
+                          .toFixed(2)}
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                        {defaultCurrency}{" "}
+                        {(trip?.activities || [])
+                          .reduce((sum, a) => {
+                            const actualCost = Number(a.actualCost || 0)
+                            const transportCosts = (trip?.transport || [])
+                              .filter((t) => t.fromActivityId === a.id && t.isSelected)
+                              .reduce((tSum, t) => {
+                                const expense = allExpenses.find((e) => e.transportAlternativeId === t.id)
+                                return tSum + (expense ? Number(expense.amount) : Number(t.cost || 0))
+                              }, 0)
+                            return sum + actualCost + transportCosts
+                          }, 0)
+                          .toFixed(2)}
+                      </TableCell>
+                      <TableCell />
+                    </TableRow>
+                  )}
                   {(trip?.activities || []).length === 0 && (
                     <TableRow>
                       <TableCell colSpan={5} align="center">
@@ -668,9 +921,15 @@ export const ExpensesPanel = ({
 
         {tabIndex === 4 && (
           <ExpenseReports
-            members={members}
-            expenses={expenses}
-            activities={trip?.activities || []}
+            trip={
+              {
+                ...trip,
+                expenses,
+                members,
+                activities: trip?.activities || [],
+                exchangeRates: trip?.exchangeRates || {},
+              } as any
+            }
             defaultCurrency={defaultCurrency}
             exchangeRates={trip?.exchangeRates}
           />

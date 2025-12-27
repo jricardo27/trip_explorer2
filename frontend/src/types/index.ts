@@ -183,7 +183,9 @@ export interface Activity {
   currency?: string
   costCategory?: string
   isPaid: boolean
+  paidById?: string
   paymentMethod?: string
+  costOnceForLinkedGroup?: boolean
   useDefaultMembers: boolean
   isGroupActivity: boolean
   source?: string
@@ -192,6 +194,7 @@ export interface Activity {
   tags: string[]
   availableDays: string[]
   tripDay?: TripDay
+  expenses?: Expense[]
   createdAt: string
   updatedAt: string
 }
@@ -224,6 +227,7 @@ export interface ExpenseSplit {
   memberId: string
   amount: number
   percentage?: number
+  shares?: number
   isPaid: boolean
 }
 
@@ -236,6 +240,8 @@ export interface Expense {
   category: string
   amount: number
   currency: string
+  amountInTripCurrency?: number
+  exchangeRate?: number
   paidById?: string
   paymentDate?: string
   isPaid: boolean
@@ -288,6 +294,11 @@ export interface CreateActivityRequest {
   scheduledStart?: string
   scheduledEnd?: string
   durationMinutes?: number
+  estimatedCost?: number
+  actualCost?: number
+  currency?: string
+  splits?: Partial<ExpenseSplit>[]
+  splitType?: string
 }
 
 export interface UpdateActivityRequest {
@@ -304,8 +315,11 @@ export interface UpdateActivityRequest {
   priority?: string
   estimatedCost?: number
   actualCost?: number
+  currency?: string
   isPaid?: boolean
   availableDays?: string[]
+  splits?: Partial<ExpenseSplit>[]
+  splitType?: string
 }
 
 export interface CopyTripRequest {
@@ -330,11 +344,12 @@ export interface TransportAlternative {
   durationMinutes: number
   bufferMinutes: number
   cost?: number
+  estimatedCost?: number
   currency?: string
   costPerPerson: boolean
   distanceMeters?: number
   waypoints?: any
-  description?: string
+  description: string
   notes?: string
   pros: string[]
   cons: string[]
@@ -342,7 +357,9 @@ export interface TransportAlternative {
   bookingUrl?: string
   bookingReference?: string
   isFeasible: boolean
+  paidById?: string
   infeasibilityReason?: string
+  expenses?: Expense[]
   createdAt: string
   updatedAt: string
 }
@@ -355,10 +372,13 @@ export interface CreateTransportRequest {
   name?: string
   durationMinutes: number
   cost?: number
+  estimatedCost?: number
   currency?: string
   description?: string
   notes?: string
-  splits?: { memberId: string; amount: number; percentage?: number }[]
+  splitType?: string
+  splits?: { memberId: string; amount: number; percentage?: number; shares?: number }[]
+  paidById?: string
 }
 
 export interface UpdateTransportRequest {
@@ -366,10 +386,13 @@ export interface UpdateTransportRequest {
   transportMode?: TransportMode
   durationMinutes?: number
   cost?: number
+  estimatedCost?: number
   currency?: string
   description?: string
   notes?: string
-  splits?: { memberId: string; amount: number; percentage?: number }[]
+  splitType?: string
+  splits?: { memberId: string; amount: number; percentage?: number; shares?: number }[]
+  paidById?: string
 }
 
 export interface ChecklistTemplate {

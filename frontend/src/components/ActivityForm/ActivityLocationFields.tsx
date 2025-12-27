@@ -24,7 +24,7 @@ export const ActivityLocationFields = ({
 
   return (
     <>
-      <Grid size={{ xs: 6 }}>
+      <Grid size={{ xs: 5 }}>
         <TextField
           fullWidth
           label={t("latitude")}
@@ -35,7 +35,7 @@ export const ActivityLocationFields = ({
           disabled={!canEdit}
         />
       </Grid>
-      <Grid size={{ xs: 6 }}>
+      <Grid size={{ xs: 5 }}>
         <TextField
           fullWidth
           label={t("longitude")}
@@ -46,12 +46,12 @@ export const ActivityLocationFields = ({
           disabled={!canEdit}
         />
       </Grid>
-      <Grid size={{ xs: 12 }}>
+      <Grid size={{ xs: 2 }}>
         <Button
           variant="outlined"
           fullWidth
           onClick={() => setMapPickerOpen(true)}
-          sx={{ height: 56 }}
+          sx={{ height: 56, minWidth: 0, p: 0 }}
           title={t("selectFromMap")}
           disabled={!canEdit}
         >

@@ -14,12 +14,15 @@ export class TransportService {
   }
 
   async createTransport(input: any) {
-    const { splits, splitType, ...data } = input
+    const { splits, splitType, paidById, ...data } = input
     if (!data.name) {
       data.name = data.transportMode || "Transport"
     }
     const transport = await prisma.transportAlternative.create({
-      data,
+      data: {
+        ...data,
+        paidBy: paidById ? { connect: { id: paidById } } : undefined,
+      },
     })
 
     if (data.cost && splits && splits.length > 0) {
@@ -32,16 +35,43 @@ export class TransportService {
           amount: data.cost,
           currency: data.currency || "AUD",
           splitType: splitType || "equal",
-          isPaid: false,
+          paidById: paidById || null,
+          isPaid: !!paidById,
           splits: {
             create: splits.map((s: any) => ({
               memberId: s.memberId,
               amount: s.amount || 0,
               percentage: s.percentage,
+              shares: s.shares,
             })),
           },
         },
       })
+    } else if (data.cost) {
+      // Default to equal split for all members if cost but no splits provided
+      const members = await prisma.tripMember.findMany({ where: { tripId: data.tripId } })
+      if (members.length > 0) {
+        const amountPerPerson = Number(data.cost) / members.length
+        await prisma.expense.create({
+          data: {
+            tripId: data.tripId,
+            transportAlternativeId: transport.id,
+            description: `Transport: ${data.name}`,
+            category: "Transport",
+            amount: data.cost,
+            currency: data.currency || "AUD",
+            splitType: "equal",
+            paidById: paidById || null,
+            isPaid: !!paidById,
+            splits: {
+              create: members.map((m) => ({
+                memberId: m.id,
+                amount: amountPerPerson,
+              })),
+            },
+          },
+        })
+      }
     }
 
     return transport
@@ -61,60 +91,98 @@ export class TransportService {
   }
 
   async updateTransport(id: string, input: any) {
-    const { splits, splitType, ...data } = input
+    const { splits, splitType, paidById, ...data } = input
     const transport = await prisma.transportAlternative.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+        paidBy: paidById !== undefined ? (paidById ? { connect: { id: paidById } } : { disconnect: true }) : undefined,
+      },
     })
 
-    if (data.cost !== undefined) {
+    if (data.cost !== undefined || splits !== undefined || paidById !== undefined) {
       const existingExpense = await prisma.expense.findFirst({
         where: { transportAlternativeId: id },
       })
 
-      if (data.cost && splits && splits.length > 0) {
+      const cost = data.cost !== undefined ? data.cost : transport.cost ? Number(transport.cost) : 0
+      const currentPaidById = paidById !== undefined ? paidById : (transport as any).paidById
+
+      if (cost && Number(cost) > 0) {
         if (existingExpense) {
+          const updateData: any = {
+            amount: cost,
+            currency: data.currency || transport.currency,
+            splitType: splitType || existingExpense.splitType || "equal",
+            paidById: currentPaidById || null,
+            isPaid: !!currentPaidById,
+          }
+
+          if (splits && splits.length > 0) {
+            updateData.splits = {
+              deleteMany: {},
+              create: splits.map((s: any) => ({
+                memberId: s.memberId,
+                amount: s.amount || 0,
+                percentage: s.percentage,
+                shares: s.shares,
+              })),
+            }
+          } else {
+            // If cost changed but no splits provided, and it was "equal", update split amounts
+            if (updateData.splitType === "equal") {
+              const currentSplits = await prisma.expenseSplit.findMany({ where: { expenseId: existingExpense.id } })
+              if (currentSplits.length > 0) {
+                const amountPerPerson = Number(cost) / currentSplits.length
+                updateData.splits = {
+                  updateMany: {
+                    where: { expenseId: existingExpense.id },
+                    data: { amount: amountPerPerson },
+                  },
+                }
+              }
+            }
+          }
+
           await prisma.expense.update({
             where: { id: existingExpense.id },
-            data: {
-              amount: data.cost,
-              currency: data.currency,
-              splitType: splitType || "equal",
-              splits: {
-                deleteMany: {},
-                create: splits.map((s: any) => ({
+            data: updateData,
+          })
+        } else {
+          // Create new expense if it didn't exist
+          const members = await prisma.tripMember.findMany({ where: { tripId: transport.tripId } })
+          const finalSplits =
+            splits && splits.length > 0
+              ? splits.map((s: any) => ({
                   memberId: s.memberId,
                   amount: s.amount || 0,
                   percentage: s.percentage,
-                })),
-              },
-            },
-          })
-        } else {
+                  shares: s.shares,
+                }))
+              : members.map((m) => ({
+                  memberId: m.id,
+                  amount: Number(cost) / (members.length || 1),
+                }))
+
           await prisma.expense.create({
             data: {
               tripId: transport.tripId,
               transportAlternativeId: id,
               description: `Transport: ${transport.name}`,
               category: "Transport",
-              amount: data.cost,
-              currency: data.currency || "AUD",
+              amount: cost,
+              currency: data.currency || transport.currency || "AUD",
               splitType: splitType || "equal",
-              isPaid: false,
+              paidById: currentPaidById || null,
+              isPaid: !!currentPaidById,
               splits: {
-                create: splits.map((s: any) => ({
-                  memberId: s.memberId,
-                  amount: s.amount || 0,
-                  percentage: s.percentage,
-                })),
+                create: finalSplits,
               },
             },
           })
         }
-      } else if (existingExpense && (data.cost === null || (splits && splits.length === 0))) {
-        // If cost removed or splits removed, maybe delete the expense?
-        // For now, if cost is explicit null or 0, we can delete or update to 0.
-        // Let's delete if cost is removed.
+      } else if (existingExpense && (cost === null || Number(cost) === 0)) {
+        // If cost removed or set to 0, delete the expense
         await prisma.expense.delete({ where: { id: existingExpense.id } })
       }
     }

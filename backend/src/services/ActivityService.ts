@@ -7,7 +7,7 @@ import prisma from "../utils/prisma"
 import highlightsService from "./HighlightsService"
 
 export class ActivityService {
-  async createActivity(data: {
+  async createActivity(input: {
     tripId: string
     tripDayId: string // Now required
     activityType: ActivityType
@@ -23,11 +23,17 @@ export class ActivityService {
     country?: string
     countryCode?: string
     estimatedCost?: number
+    actualCost?: number
     currency?: string
     participantIds?: string[]
     availableDays?: string[]
     isPrivate?: boolean
+    splitType?: string
+    splits?: any[]
+    paidById?: string
   }): Promise<Activity> {
+    const { actualCost, splitType, splits, paidById, ...data } = input
+
     // Calculate next order index
     let orderIndex = 0
     if (data.tripDayId) {
@@ -55,16 +61,19 @@ export class ActivityService {
         country: data.country,
         countryCode: data.countryCode,
         estimatedCost: data.estimatedCost,
+        actualCost: actualCost,
         currency: data.currency || "AUD",
         orderIndex,
         isPrivate: data.isPrivate || false,
+        isPaid: !!paidById,
+        paidById: paidById as any,
         availableDays: data.availableDays || [],
         participants: data.participantIds
           ? {
-              create: data.participantIds.map((memberId) => ({ memberId })),
+              create: data.participantIds.map((memberId: string) => ({ memberId })),
             }
           : undefined,
-      },
+      } as any,
       include: {
         tripDay: true,
         participants: {
@@ -74,6 +83,19 @@ export class ActivityService {
         },
       },
     })
+
+    // Sync expense if actualCost provided
+    if (actualCost && Number(actualCost) > 0) {
+      await this.syncActivityExpense(activity.id, {
+        tripId: activity.tripId,
+        cost: Number(actualCost),
+        currency: activity.currency || "AUD",
+        name: activity.name,
+        splits,
+        splitType,
+        paidById,
+      })
+    }
 
     // Update highlights aggregations
     const trip = await prisma.trip.findUnique({ where: { id: data.tripId } })
@@ -147,7 +169,8 @@ export class ActivityService {
     return activities
   }
 
-  async updateActivity(id: string, data: Partial<Activity>) {
+  async updateActivity(id: string, data: any) {
+    const { splits, splitType, paidById, ...activityData } = data
     const activity = await prisma.activity.findUnique({ where: { id } })
     if (!activity) throw new Error("Activity not found")
 
@@ -169,28 +192,55 @@ export class ActivityService {
       "website",
       "openingHours",
       "estimatedCost",
+      "actualCost",
       "currency",
       "isLocked",
       "activitySubtype",
       "category",
       "isPrivate",
+      "isPaid",
     ]
+
+    const updateData: any = {
+      ...activityData,
+    }
+
+    if (paidById !== undefined) {
+      if (paidById) {
+        updateData.paidBy = { connect: { id: paidById } }
+      } else {
+        updateData.paidBy = { disconnect: true }
+      }
+    }
 
     // Perform the update
     const updated = await prisma.activity.update({
       where: { id },
-      data: data as any,
+      data: updateData,
       include: { tripDay: true },
     })
+
+    // Sync expense if actualCost or splits changed
+    if (updated.actualCost !== null || splits !== undefined || data.paidById !== undefined) {
+      await this.syncActivityExpense(updated.id, {
+        tripId: updated.tripId,
+        cost: updated.actualCost ? Number(updated.actualCost) : 0,
+        currency: updated.currency || "AUD",
+        name: updated.name,
+        splits,
+        splitType,
+        paidById: paidById !== undefined ? paidById : (updated as any).paidById,
+      })
+    }
 
     // If linked, propagate distinct fields to others
     if (activity.linkedGroupId) {
       const propData: any = {}
       let hasPropUpdates = false
 
-      for (const key of Object.keys(data)) {
+      for (const key of Object.keys(activityData)) {
         if (syncFields.includes(key)) {
-          propData[key] = data[key as keyof Activity]
+          propData[key] = activityData[key]
           hasPropUpdates = true
         }
       }
@@ -221,6 +271,99 @@ export class ActivityService {
     }
 
     return updated
+  }
+
+  private async syncActivityExpense(
+    activityId: string,
+    data: {
+      tripId: string
+      cost: number
+      currency: string
+      name: string
+      splits?: any[]
+      splitType?: string
+      paidById?: string
+    },
+  ) {
+    const existingExpense = await prisma.expense.findFirst({
+      where: { activityId },
+    })
+
+    if (data.cost > 0) {
+      if (existingExpense) {
+        const updateData: any = {
+          amount: data.cost,
+          currency: data.currency,
+          description: `Activity: ${data.name}`,
+          splitType: data.splitType || existingExpense.splitType || "equal",
+          paidById: data.paidById || null,
+          isPaid: !!data.paidById,
+        }
+
+        if (data.splits && data.splits.length > 0) {
+          updateData.splits = {
+            deleteMany: {},
+            create: data.splits.map((s: any) => ({
+              memberId: s.memberId,
+              amount: s.amount || 0,
+              percentage: s.percentage,
+              shares: s.shares,
+            })),
+          }
+        } else if (updateData.splitType === "equal") {
+          // Update equal split amounts
+          const currentSplits = await prisma.expenseSplit.findMany({ where: { expenseId: existingExpense.id } })
+          if (currentSplits.length > 0) {
+            const amountPerPerson = data.cost / currentSplits.length
+            updateData.splits = {
+              updateMany: {
+                where: { expenseId: existingExpense.id },
+                data: { amount: amountPerPerson },
+              },
+            }
+          }
+        }
+
+        await prisma.expense.update({
+          where: { id: existingExpense.id },
+          data: updateData,
+        })
+      } else {
+        // Create new
+        const members = await prisma.tripMember.findMany({ where: { tripId: data.tripId } })
+        const finalSplits =
+          data.splits && data.splits.length > 0
+            ? data.splits.map((s: any) => ({
+                memberId: s.memberId,
+                amount: s.amount || 0,
+                percentage: s.percentage,
+                shares: s.shares,
+              }))
+            : members.map((m) => ({
+                memberId: m.id,
+                amount: data.cost / (members.length || 1),
+              }))
+
+        await prisma.expense.create({
+          data: {
+            tripId: data.tripId,
+            activityId,
+            description: `Activity: ${data.name}`,
+            category: "Activity",
+            amount: data.cost,
+            currency: data.currency,
+            splitType: data.splitType || "equal",
+            paidById: data.paidById || null,
+            isPaid: !!data.paidById,
+            splits: {
+              create: finalSplits,
+            },
+          },
+        })
+      }
+    } else if (existingExpense) {
+      await prisma.expense.delete({ where: { id: existingExpense.id } })
+    }
   }
 
   async deleteActivity(id: string, userId: string): Promise<void> {

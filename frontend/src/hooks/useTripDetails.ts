@@ -99,6 +99,27 @@ export const useTripDetails = (tripId: string) => {
     },
   })
 
+  const copyActivityMutation = useMutation({
+    mutationFn: async ({
+      activityId,
+      targetDayId,
+      asLink,
+    }: {
+      activityId: string
+      targetDayId?: string
+      asLink?: boolean
+    }) => {
+      const response = await client.post<ApiResponse<Activity>>(`/activities/${activityId}/copy`, {
+        targetDayId,
+        asLink: asLink || false,
+      })
+      return response.data.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trips", tripId] })
+    },
+  })
+
   const createTransportMutation = useMutation({
     mutationFn: transportApi.create,
     onSuccess: () => {
@@ -286,5 +307,7 @@ export const useTripDetails = (tripId: string) => {
     createScenario: createScenarioMutation.mutateAsync,
     selectScenario: selectScenarioMutation.mutateAsync,
     updateScenario: updateScenarioMutation.mutateAsync,
+    copyActivity: copyActivityMutation.mutateAsync,
+    isCopyingActivity: copyActivityMutation.isPending,
   }
 }

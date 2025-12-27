@@ -100,58 +100,106 @@ export const ExpenseBalances: React.FC<ExpenseBalancesProps> = ({ members, expen
     return result
   }, [members, expenses])
 
+  // Calculate total paid by each member
+  const paymentsByMember = useMemo(() => {
+    const payments: { [key: string]: number } = {}
+    members.forEach((m) => (payments[m.id] = 0))
+
+    expenses.forEach((expense) => {
+      if (expense.paidById) {
+        payments[expense.paidById] = (payments[expense.paidById] || 0) + Number(expense.amount)
+      }
+    })
+
+    return payments
+  }, [members, expenses])
+
   const getMember = (id: string) => members.find((m) => m.id === id)
 
-  if (debts.length === 0) {
-    return (
-      <Box textAlign="center" py={4}>
-        <Typography color="text.secondary">{t("noDebts")}</Typography>
-      </Box>
-    )
-  }
-
   return (
-    <List>
-      {debts.map((debt, index) => {
-        const from = getMember(debt.fromMemberId)
-        const to = getMember(debt.toMemberId)
-
-        if (!from || !to) return null
-
-        return (
-          <React.Fragment key={index}>
-            <ListItem>
-              <Box display="flex" alignItems="center" width="100%" gap={2}>
-                <Box display="flex" alignItems="center" gap={1} flex={1}>
-                  <Avatar sx={{ width: 32, height: 32, bgcolor: from.color, fontSize: "0.8rem" }}>
-                    {from.name.charAt(0)}
-                  </Avatar>
-                  <Typography variant="body2">{from.name}</Typography>
-                </Box>
-
-                <Box display="flex" flexDirection="column" alignItems="center">
-                  <Typography variant="caption" color="text.secondary">
-                    {t("owes")}
-                  </Typography>
-                  <ArrowForward color="action" fontSize="small" />
-                  <Typography fontWeight="bold" color="error.main">
-                    {currency}
-                    {debt.amount.toFixed(2)}
+    <Box>
+      {/* Payment Amounts Section */}
+      <Box mb={4}>
+        <Typography variant="h6" gutterBottom>
+          {t("totalPaid")}
+        </Typography>
+        <List>
+          {members.map((member) => {
+            const amountPaid = paymentsByMember[member.id] || 0
+            return (
+              <ListItem key={member.id} sx={{ py: 1 }}>
+                <Box display="flex" alignItems="center" width="100%" justifyContent="space-between">
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Avatar sx={{ width: 32, height: 32, bgcolor: member.color, fontSize: "0.8rem" }}>
+                      {member.name.charAt(0)}
+                    </Avatar>
+                    <Typography variant="body2">{member.name}</Typography>
+                  </Box>
+                  <Typography fontWeight="bold" color={amountPaid > 0 ? "success.main" : "text.secondary"}>
+                    {currency} {amountPaid.toFixed(2)}
                   </Typography>
                 </Box>
+              </ListItem>
+            )
+          })}
+        </List>
+      </Box>
 
-                <Box display="flex" alignItems="center" gap={1} flex={1} justifyContent="flex-end">
-                  <Typography variant="body2">{to.name}</Typography>
-                  <Avatar sx={{ width: 32, height: 32, bgcolor: to.color, fontSize: "0.8rem" }}>
-                    {to.name.charAt(0)}
-                  </Avatar>
-                </Box>
-              </Box>
-            </ListItem>
-            {index < debts.length - 1 && <Divider component="li" />}
-          </React.Fragment>
-        )
-      })}
-    </List>
+      <Divider sx={{ my: 3 }} />
+
+      {/* Debts Section */}
+      <Typography variant="h6" gutterBottom>
+        {t("balances")}
+      </Typography>
+
+      {debts.length === 0 ? (
+        <Box textAlign="center" py={4}>
+          <Typography color="text.secondary">{t("noDebts")}</Typography>
+        </Box>
+      ) : (
+        <List>
+          {debts.map((debt, index) => {
+            const from = getMember(debt.fromMemberId)
+            const to = getMember(debt.toMemberId)
+
+            if (!from || !to) return null
+
+            return (
+              <React.Fragment key={index}>
+                <ListItem>
+                  <Box display="flex" alignItems="center" width="100%" gap={2}>
+                    <Box display="flex" alignItems="center" gap={1} flex={1}>
+                      <Avatar sx={{ width: 32, height: 32, bgcolor: from.color, fontSize: "0.8rem" }}>
+                        {from.name.charAt(0)}
+                      </Avatar>
+                      <Typography variant="body2">{from.name}</Typography>
+                    </Box>
+
+                    <Box display="flex" flexDirection="column" alignItems="center">
+                      <Typography variant="caption" color="text.secondary">
+                        {t("owes")}
+                      </Typography>
+                      <ArrowForward color="action" fontSize="small" />
+                      <Typography fontWeight="bold" color="error.main">
+                        {currency}
+                        {debt.amount.toFixed(2)}
+                      </Typography>
+                    </Box>
+
+                    <Box display="flex" alignItems="center" gap={1} flex={1} justifyContent="flex-end">
+                      <Typography variant="body2">{to.name}</Typography>
+                      <Avatar sx={{ width: 32, height: 32, bgcolor: to.color, fontSize: "0.8rem" }}>
+                        {to.name.charAt(0)}
+                      </Avatar>
+                    </Box>
+                  </Box>
+                </ListItem>
+                {index < debts.length - 1 && <Divider component="li" />}
+              </React.Fragment>
+            )
+          })}
+        </List>
+      )}
+    </Box>
   )
 }

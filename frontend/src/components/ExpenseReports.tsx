@@ -29,36 +29,30 @@ import { useMemo, useState } from "react"
 import { Pie, Bar } from "react-chartjs-2"
 import * as XLSX from "xlsx"
 
+import { CostController } from "../services/costController"
 import { useLanguageStore } from "../stores/languageStore"
-import type { Activity, Expense, TripMember } from "../types"
+import type { Trip } from "../types"
 
 ChartJS.register(ArcElement, ChartTooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
 
 interface ExpenseReportsProps {
-  expenses: Expense[]
-  activities: Activity[]
-  members: TripMember[]
+  trip: Trip
   defaultCurrency: string
   exchangeRates?: Record<string, number>
 }
 
-export const ExpenseReports = ({
-  expenses,
-  activities,
-  members,
-  defaultCurrency,
-  exchangeRates = {},
-}: ExpenseReportsProps) => {
+export const ExpenseReports = ({ trip, defaultCurrency, exchangeRates = {} }: ExpenseReportsProps) => {
   const { t } = useLanguageStore()
+  const costController = useMemo(() => new CostController(trip), [trip])
   // State
   const [viewMode, setViewMode] = useState<"charts" | "spreadsheet">("charts")
 
-  // Spreadsheet Data (Calculated first to be reused for charts)
+  // Spreadsheet Data
   const processedExpenses = useMemo(() => {
-    return expenses.map((e) => {
+    return (trip.expenses || []).map((e) => {
       const rate = e.currency === defaultCurrency ? 1 : exchangeRates[e.currency] || 1
       const convertedAmount = Number(e.amount) * rate
-      const payer = members.find((m) => m.id === e.paidById)?.name || "Unknown"
+      const payer = (trip.members || []).find((m) => m.id === e.paidById)?.name || "Unknown"
 
       return {
         ...e,
@@ -67,7 +61,7 @@ export const ExpenseReports = ({
         payerName: payer,
       }
     })
-  }, [expenses, defaultCurrency, exchangeRates, members])
+  }, [trip.expenses, trip.members, defaultCurrency, exchangeRates])
 
   const categoryData = useMemo(() => {
     const totals: Record<string, number> = {}
@@ -118,59 +112,25 @@ export const ExpenseReports = ({
   }, [processedExpenses, defaultCurrency, t])
 
   const plannedVsSpentData = useMemo(() => {
-    const categories = ["Accommodation", "Transport", "Attraction", "Food", "Other"]
-    // Note: Categories are hardcoded in English here for logic, but labels should be translated.
-    // However, chart labels come from keys.
-    // Ideally we translate the labels when displaying.
-    const planned: Record<string, number> = {}
-    const spent: Record<string, number> = {}
-
-    // Initialize
-    categories.forEach((cat) => {
-      planned[cat] = 0
-      spent[cat] = 0
-    })
-
-    // Process Activities (Planned and potentially Spent)
-    activities.forEach((a) => {
-      const cat = a.activityType || "Other"
-      const rate = a.currency === defaultCurrency ? 1 : exchangeRates[a.currency || ""] || 1
-
-      const p = Number(a.estimatedCost || 0) * rate
-      const s = Number(a.actualCost || 0) * rate
-
-      const key = categories.includes(cat) ? cat : "Other"
-      planned[key] += p
-      spent[key] += s
-    })
-
-    // Process independent Expenses (Spent)
-    processedExpenses.forEach((e) => {
-      // Avoid double counting if expense is linked to activity (already handled in activities.actualCost?)
-      // Actually, many users might use one OR the other.
-      // If we have an activity.id on the expense, we should prioritize the expense as the 'actual' spent amount.
-      if (!e.activityId) {
-        const key = categories.includes(e.category) ? e.category : "Other"
-        spent[key] += e.convertedAmount
-      }
-    })
+    const categoryBreakdown = costController.getBreakdownByCategory()
+    const categories = Object.keys(categoryBreakdown)
 
     return {
       labels: categories,
       datasets: [
         {
           label: t("planned"),
-          data: categories.map((c) => planned[c]),
+          data: categories.map((c) => categoryBreakdown[c].planned),
           backgroundColor: "rgba(153, 102, 255, 0.5)",
         },
         {
           label: t("spent"),
-          data: categories.map((c) => spent[c]),
+          data: categories.map((c) => categoryBreakdown[c].actual),
           backgroundColor: "rgba(75, 192, 192, 0.5)",
         },
       ],
     }
-  }, [activities, processedExpenses, defaultCurrency, exchangeRates, t])
+  }, [costController, t])
 
   const handleExport = () => {
     const dataToExport = processedExpenses.map((e) => ({
@@ -292,7 +252,7 @@ export const ExpenseReports = ({
                         {plannedVsSpentData.labels.map((cat, i) => {
                           const p = plannedVsSpentData.datasets[0].data[i] as number
                           const s = plannedVsSpentData.datasets[1].data[i] as number
-                          const diff = p - s
+                          const diff = s - p
                           return (
                             <TableRow key={cat.toString()}>
                               <TableCell>{cat.toString()}</TableCell>
@@ -300,7 +260,7 @@ export const ExpenseReports = ({
                               <TableCell align="right">{s.toFixed(2)}</TableCell>
                               <TableCell
                                 align="right"
-                                sx={{ color: diff < 0 ? "error.main" : "success.main", fontWeight: "bold" }}
+                                sx={{ color: diff > 0 ? "error.main" : "success.main", fontWeight: "bold" }}
                               >
                                 {diff > 0 ? "+" : ""}
                                 {diff.toFixed(2)}
@@ -308,6 +268,46 @@ export const ExpenseReports = ({
                             </TableRow>
                           )
                         })}
+                        {/* Totals Row */}
+                        <TableRow sx={{ bgcolor: "action.hover", fontWeight: "bold" }}>
+                          <TableCell sx={{ fontWeight: "bold" }}>{t("total")}</TableCell>
+                          <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                            {plannedVsSpentData.datasets[0].data
+                              .reduce((sum: number, val) => sum + (val as number), 0)
+                              .toFixed(2)}
+                          </TableCell>
+                          <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                            {plannedVsSpentData.datasets[1].data
+                              .reduce((sum: number, val) => sum + (val as number), 0)
+                              .toFixed(2)}
+                          </TableCell>
+                          <TableCell
+                            align="right"
+                            sx={{
+                              fontWeight: "bold",
+                              color:
+                                plannedVsSpentData.datasets[1].data.reduce(
+                                  (sum: number, val) => sum + (val as number),
+                                  0,
+                                ) -
+                                  plannedVsSpentData.datasets[0].data.reduce(
+                                    (sum: number, val) => sum + (val as number),
+                                    0,
+                                  ) >
+                                0
+                                  ? "error.main"
+                                  : "success.main",
+                            }}
+                          >
+                            {(
+                              plannedVsSpentData.datasets[1].data.reduce(
+                                (sum: number, val) => sum + (val as number),
+                                0,
+                              ) -
+                              plannedVsSpentData.datasets[0].data.reduce((sum: number, val) => sum + (val as number), 0)
+                            ).toFixed(2)}
+                          </TableCell>
+                        </TableRow>
                       </TableBody>
                     </Table>
                   </TableContainer>
