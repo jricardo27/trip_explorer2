@@ -92,16 +92,33 @@ export const TransportRouteMap = ({
             // More robust waypoint detection
             let waypointsStr = ""
             const w = alt.waypoints
+
             if (typeof w === "string") {
-              waypointsStr = w
+              if (w.startsWith("{")) {
+                try {
+                  const parsed = JSON.parse(w)
+                  waypointsStr =
+                    parsed.overview ||
+                    parsed.polyline ||
+                    parsed.points ||
+                    parsed.overview_polyline?.points ||
+                    parsed.overview_polyline ||
+                    ""
+                } catch {
+                  // If it fails to parse as JSON but is a string, it might be the polyline itself
+                  waypointsStr = w
+                }
+              } else {
+                // Not starting with {, likely the polyline string itself
+                waypointsStr = w
+              }
             } else if (w && typeof w === "object") {
-              // Try common fields
-              waypointsStr = w.overview || w.polyline || w.points || ""
-              // If it's still empty, maybe the object IS the overview?
-              if (!waypointsStr && w.points) waypointsStr = w.points
+              // Try common fields from Google Maps or internal storage
+              waypointsStr =
+                w.overview || w.polyline || w.points || w.overview_polyline?.points || w.overview_polyline || ""
             }
 
-            if (waypointsStr) {
+            if (waypointsStr && typeof waypointsStr === "string") {
               try {
                 positions = decodePolyline(waypointsStr)
                 // Basic validation: if we only got 1 point, it's not a valid path
