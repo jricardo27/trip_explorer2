@@ -112,6 +112,7 @@ export const TransportSegment = ({
               <Typography variant="body2" color="text.secondary">
                 {formatDuration(displayAlt.durationMinutes, t)} •{" "}
                 {displayAlt.cost ? `${displayAlt.cost} ${displayAlt.currency || "USD"}` : t("free")}
+                {optionsCount > 1 && ` • ${optionsCount} ${t("optionsAvailable")}`}
               </Typography>
             </Button>
             <Box sx={{ display: "flex", opacity: 0.6, "&:hover": { opacity: 1 }, alignItems: "center" }}>
